@@ -1,0 +1,11 @@
+/.idea
+/app/Dependencies
+/build/
+!/build/build.properties.dist
+!/build/build.xml
+!/build/languages
+!/build/index.php
+/blocks/*/build/
+*.zip
+languages/*.json
+/vendor/

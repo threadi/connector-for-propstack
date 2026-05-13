@@ -1,0 +1,43 @@
+{
+	"$schema": "https://json.schemastore.org/block.json",
+	"apiVersion": 3,
+	"name": "connector-for-propstack/single",
+	"title": "Single Object",
+	"category": "connector-for-propstack",
+	"description": "Provides a block to show a single object from Propstack.",
+	"keywords": ["Propstack"],
+	"supports": {
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		},
+		"__experimentalBorder": true
+	},
+	"textdomain": "connector-for-propstack",
+	"editorScript": "file:build/index.js",
+	"editorStyle": "file:build/index.css",
+	"style": "file:build/style-index.css",
+	"attributes": {
+		"id": {
+			"type": "integer",
+			"default": 0
+		},
+		"blockId": {
+			"type": "string"
+		}
+	},
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	}
+}

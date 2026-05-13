@@ -1,0 +1,3873 @@
+# Copyright (C) 2026 laOlaWeb
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Connector for Propstack @@VersionNumber@@\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/connector-for-"
+"propstack\n"
+"POT-Creation-Date: 2026-05-13T13:42:26+00:00\n"
+"PO-Revision-Date: 2026-05-13 15:43+0200\n"
+"Last-Translator: Thomas Zwirner <tz@laolaweb.com>\n"
+"Language-Team: \n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+"X-Domain: connector-for-propstack\n"
+
+#. Plugin Name of the plugin
+#: connector-for-propstack.php app/PageBuilder/Gutenberg.php:198
+#: app/PageBuilder/Gutenberg/Patterns.php:204 app/Propstack/Propstack.php:218
+msgid "Connector for Propstack"
+msgstr "Connector für Propstack"
+
+#. Description of the plugin
+#: connector-for-propstack.php
+msgid "Allows you to present your objects from Propstack in your website."
+msgstr ""
+"Ermöglicht es dir deine Objekte aus Propstack in deiner Website zu "
+"präsentieren."
+
+#. Author of the plugin
+#: connector-for-propstack.php
+msgid "laOlaWeb"
+msgstr "laOlaWeb"
+
+#. Author URI of the plugin
+#: connector-for-propstack.php
+msgid "https://laolaweb.com"
+msgstr "https://laolaweb.com"
+
+#: app/PageBuilder/Gutenberg/Patterns.php:90
+msgid "Energy Performance Certificate"
+msgstr "Energieausweis"
+
+#: app/PageBuilder/Gutenberg/Patterns.php:91
+msgid "Display information about the energy performance certificate."
+msgstr "Informationen zum Energieausweis anzeigen."
+
+#: app/PageBuilder/Gutenberg/Patterns.php:97
+msgid "Description"
+msgstr "Beschreibung"
+
+#: app/PageBuilder/Gutenberg/Patterns.php:98
+msgid "Display the description for a single object."
+msgstr "Zeige die Beschreibung eines einzelnen Objektes an."
+
+#: app/PageBuilder/Gutenberg/Patterns.php:104
+msgid "Contact"
+msgstr "Ansprechpartner"
+
+#: app/PageBuilder/Gutenberg/Patterns.php:105
+msgid "Display the contact for a single object."
+msgstr "Zeige den Ansprechpartner eines einzelnen Objektes an."
+
+#: app/PageBuilder/Gutenberg/Templates.php:206
+msgid "Single object"
+msgstr "Einzelnes Objekt"
+
+#: app/PageBuilder/Gutenberg/Templates.php:207
+msgid "Displays a single object from Propstack."
+msgstr "Zeige ein einzelnes Objekt von Propstack an."
+
+#: app/PageBuilder/Gutenberg/Templates.php:211
+msgid "List of objects"
+msgstr "Liste mit Objekten"
+
+#: app/PageBuilder/Gutenberg/Templates.php:212
+msgid "Displays a list of objects from Propstack."
+msgstr "Zeige eine Liste von Objekten von Propstack an."
+
+#: app/PageBuilder/Page_Builders.php:114
+msgid "Page Builder"
+msgstr "Page Builder"
+
+#. translators: %1$d will be replaced by the days this message will be hidden.
+#: app/Plugin/Admin/Admin.php:88
+#, php-format
+msgid "Hide this message for %1$d days."
+msgstr "Blende diese Nachricht für %1$d Tage aus."
+
+#: app/Plugin/Admin/Admin.php:89
+msgid "Dismiss"
+msgstr "Ausblenden"
+
+#: app/Plugin/Admin/Admin.php:129
+msgid "Upgrade to PRO plugin"
+msgstr "Auf PRO Plugin aktualisieren"
+
+#: app/Plugin/Admin/Admin.php:130
+msgid "Run import"
+msgstr "Import ausführen"
+
+#: app/Plugin/Admin/Admin.php:131
+msgid "Rate us"
+msgstr "Bewerte uns"
+
+#: app/Plugin/Admin/Admin.php:132
+msgid "Your Objects"
+msgstr "Deine Objekte"
+
+#: app/Plugin/Admin/Admin.php:133
+msgid "An error occurred."
+msgstr "Ein Fehler trat auf."
+
+#: app/Plugin/Admin/Admin.php:134 app/Plugin/Setup.php:93
+#: app/Propstack/Import_Base.php:104
+msgid "The following error occurred:"
+msgstr "Der folgende Fehler trat auf:"
+
+#: app/Plugin/Admin/Admin.php:135 app/Plugin/Setup.php:92
+#: app/Propstack/Import_Base.php:102
+msgid "Error"
+msgstr "Fehler"
+
+#: app/Plugin/Admin/Admin.php:136 app/Propstack/Files.php:574
+#: app/Propstack/Files.php:966 app/Propstack/ImmoObjects.php:832
+#: app/Propstack/Imports/v1/Objects.php:469
+#: app/Propstack/Imports/v2/Objects.php:439 app/Propstack/Import_Base.php:111
+#: app/Propstack/Queue.php:454
+msgid "OK"
+msgstr "OK"
+
+#: app/Plugin/Db.php:133
+msgid "Database-error occurred!"
+msgstr "Ein Datenbankfehler ist aufgetreten!"
+
+#: app/Plugin/Db.php:134
+msgid "Statement:"
+msgstr "Abfrage:"
+
+#: app/Plugin/Db.php:135
+msgid "Error:"
+msgstr "Fehler:"
+
+#. translators: a name will replace %1$s.
+#: app/Plugin/Helper.php:260
+#, php-format
+msgid ""
+"<strong>Error during loading the required WordPress-own filesystem object!</"
+"strong><br>We will now use the local filesystem object and hope it will work."
+"<br><br>Tipps to solve this:<ul><li>Check the following error and speak to "
+"your WordPress administrator about it.</li><li>Check your <em>wp-config.php</"
+"em> if you have the constant \"FS_METHOD\" set there. If yes, remove it and "
+"check if your WordPress can save media files.</li><li>Ask the support of "
+"your hoster for help.</li></ul>Used filesystem mode: <em>%1$s</em><br>The "
+"following errors occurred:"
+msgstr ""
+"<strong>Fehler beim Laden des benötigten WordPress-eigenen "
+"Dateisystemobjekts!</strong><br>Wir verwenden nun das lokale "
+"Dateisystemobjekt und hoffen, dass es funktioniert.<br><br>Tipps zur Lösung:"
+"<ul><li>Überprüfe den folgenden Fehler und sprich dazu mit deinem WordPress-"
+"Administrator.</li><li>Überprüfe deine <em>wp-config.php</em>, ob dort die "
+"Konstante \"FS_METHOD\" gesetzt ist. Falls ja, entferne diese und prüfe, ob "
+"WordPress Mediendateien speichern kann.</li><li>Bitte den Support deines "
+"Hosters um Hilfe.</li></ul>Verwendeter Dateisystemmodus: <em>%1$s</"
+"em><br>Die folgenden Fehler sind aufgetreten:"
+
+#. translators: %1$s will be replaced by a URL.
+#: app/Plugin/Installer.php:122
+#, php-format
+msgid ""
+"Debug mode for this plugin has been enabled as this project runs in "
+"development mode. You can change this setting <a href=\"%1$s\">here</a>."
+msgstr ""
+"Der Debug-Modus für dieses Plugin wurde aktiviert, da dieses Projekt im "
+"Entwicklungsmodus ausgeführt wird. Du kannst diese Einstellung <a "
+"href=\"%1$s\">hier</a> ändern."
+
+#: app/Plugin/Intervals/Daily.php:58
+msgid "Once a day"
+msgstr "Einmal täglich"
+
+#: app/Plugin/Intervals/Hourly.php:58
+msgid "Hourly"
+msgstr "Stündlich"
+
+#: app/Plugin/Intervals/Hourly2.php:58
+msgid "Every 2 hours"
+msgstr "Alle 2 Stunden"
+
+#: app/Plugin/Intervals/Hourly3.php:58
+msgid "Every 3 hours"
+msgstr "Alle 3 Stunden"
+
+#: app/Plugin/Intervals/Hourly4.php:58
+msgid "Every 4 hours"
+msgstr "Alle 4 Stunden"
+
+#: app/Plugin/Intervals/Minutely15.php:58
+msgid "Every 15 minutes"
+msgstr "Alle 10 Minuten"
+
+#: app/Plugin/Intervals/Minutely20.php:58
+msgid "Every 20 minutes"
+msgstr "Alle 20 Minuten"
+
+#: app/Plugin/Intervals/Minutely30.php:58
+msgid "Every 30 minutes"
+msgstr "Alle 30 Minuten"
+
+#: app/Plugin/Intervals/Weekly.php:58
+msgid "Once a week"
+msgstr "Einmal pro Woche"
+
+#: app/Plugin/Languages.php:62
+msgid "German"
+msgstr "Deutsch"
+
+#: app/Plugin/Languages.php:63
+msgid "English"
+msgstr "Englisch"
+
+#. translators: %1$s will be replaced by a DB-error-message.
+#: app/Plugin/Log.php:138
+#, php-format
+msgid ""
+"Database error during plugin activation: %1$s - This usually indicates that "
+"the database system of your hosting does not meet the minimum requirements "
+"of WordPress. Please contact your hosts support team for clarification."
+msgstr ""
+"Datenbankfehler bei der Plugin-Aktivierung: %1$s – Dies deutet in der Regel "
+"darauf hin, dass das Datenbanksystem deines Hostings die "
+"Mindestanforderungen von WordPress nicht erfüllt. Bitte wende dich zur "
+"Klärung an den Support deines Hosts."
+
+#: app/Plugin/Log.php:149
+msgid "System"
+msgstr "System"
+
+#: app/Plugin/Log_Table.php:26
+msgid "State"
+msgstr "Status"
+
+#: app/Plugin/Log_Table.php:27 app/Propstack/Tables/Queue.php:31
+msgid "Date"
+msgstr "Datum"
+
+#: app/Plugin/Log_Table.php:28
+msgid "Log"
+msgstr "Protokolle"
+
+#: app/Plugin/Log_Table.php:29
+msgid "Category"
+msgstr "Kategorie"
+
+#: app/Plugin/Log_Table.php:102
+msgid "not defined"
+msgstr "nicht definiert"
+
+#: app/Plugin/Log_Table.php:120
+msgid "Unknown"
+msgstr "Unbekannt"
+
+#: app/Plugin/Log_Table.php:136
+msgid ""
+"The file will contain ALL entries. Be aware of this before you send this "
+"file to someone."
+msgstr ""
+"Die Datei wird ALLE Einträge enthalten. Sei dir dessen bewusst, bevor du "
+"diese Datei an jemanden sendest."
+
+#: app/Plugin/Log_Table.php:151 app/Plugin/Log_Table.php:158
+msgid ""
+"The file will contain ALL entries of the chosen filter. Be aware of this "
+"before you send this file to someone."
+msgstr ""
+"Die Datei wird ALLE Einträge enthalten. Sei dir dessen bewusst, bevor du "
+"diese Datei an jemanden sendest."
+
+#: app/Plugin/Log_Table.php:164 app/Plugin/Log_Table.php:173
+msgid "Export log entries"
+msgstr "Exportiere Protokoll-Einträge"
+
+#: app/Plugin/Log_Table.php:166
+msgid "Click on the button below to download the log entries as CSV."
+msgstr ""
+"Klicken auf den Button unten, um die Protokolleinträge als CSV "
+"herunterzuladen."
+
+#: app/Plugin/Log_Table.php:178 app/Plugin/Log_Table.php:209
+#: app/Plugin/Settings.php:348 app/Plugin/Settings.php:382
+#: app/Plugin/Settings.php:432 app/Propstack/Files.php:178
+#: app/Propstack/ImmoObjects.php:1463
+#: app/Propstack/PostTypes/ImmoObject.php:540
+#: app/Propstack/Tables/Queue.php:171 app/Propstack/Tables/Queue.php:206
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: app/Plugin/Log_Table.php:195
+msgid "Empty log entries"
+msgstr "Protokoll leeren"
+
+#: app/Plugin/Log_Table.php:197
+msgid "Are you sure you want to empty the log?"
+msgstr "Bist du sicher, dass du das Protokoll leeren möchtest?"
+
+#: app/Plugin/Log_Table.php:198
+msgid "You will lost any log until now."
+msgstr "Du wirst alle Protokolleinträge dadurch verlieren."
+
+#: app/Plugin/Log_Table.php:204
+msgid "Yes, empty the log"
+msgstr "Ja, leere das Protokoll"
+
+#: app/Plugin/Log_Table.php:215
+msgid "Export as CSV"
+msgstr "Export als CSV"
+
+#: app/Plugin/Log_Table.php:216
+msgid "Empty the log"
+msgstr "Protokoll leeren"
+
+#. translators: %1$s will be replaced by the category name.
+#: app/Plugin/Log_Table.php:237
+#, php-format
+msgid "No log entries for %1$s found."
+msgstr "Keine Protokoll-Einträge für %1$s gefunden."
+
+#: app/Plugin/Log_Table.php:242
+msgid "No log entries found."
+msgstr "Keine Protokoll-Einträge gefunden."
+
+#: app/Plugin/Log_Table.php:259 app/Propstack/Tables/Queue.php:238
+msgid "All"
+msgstr "Alle"
+
+#: app/Plugin/Log_Table.php:271 app/Propstack/Tables/Queue.php:243
+msgid "Errors"
+msgstr "Fehler"
+
+#: app/Plugin/Log_Table.php:327
+msgid "Ended successfully"
+msgstr "Erfolgreich abgeschlossen"
+
+#: app/Plugin/Log_Table.php:328
+msgid "Just an info"
+msgstr "Nur eine Information"
+
+#: app/Plugin/Log_Table.php:329
+msgid "Error occurred"
+msgstr "Fehler trat auf"
+
+#: app/Plugin/Roles.php:71
+msgid "Manage Propstack-based Objects"
+msgstr "Verwalte Objekte von Propstack"
+
+#: app/Plugin/Roles.php:141
+msgid "Permissions"
+msgstr "Berechtigungen"
+
+#: app/Plugin/Roles.php:145
+msgid "Access to objects"
+msgstr "Zugriff zu Objekten"
+
+#: app/Plugin/Roles.php:154
+msgid "Choose roles"
+msgstr "Wähle Rollen"
+
+#: app/Plugin/Roles.php:155
+msgid ""
+"Mark roles, which will have access to objects in the backend. These roles "
+"could also control each object-regarding setting except the permissions."
+msgstr ""
+"Markiere die Rollen, die Zugang zu den Objekten im Backend haben sollen. "
+"Diese Rollen können auch alle objekt-bezogenen Einstellungen mit Ausnahme "
+"der Berechtigungen kontrollieren."
+
+#: app/Plugin/Schedules.php:119
+msgid "Check for schedules in frontend"
+msgstr "Prüfe auch im Frontend nach Zeitplänen"
+
+#: app/Plugin/Schedules.php:120
+msgid ""
+"If enabled the plugin will check our own schedules on each request in the "
+"frontend. This could be slow the performance of your website."
+msgstr ""
+"Wenn es aktiviert ist, überprüft das Plugin unsere eigenen Zeitpläne bei "
+"jeder Anfrage im Frontend. Dies könnte die Leistung deiner Website "
+"verlangsamen."
+
+#: app/Plugin/Schedules.php:395
+msgid "An interval has to be set."
+msgstr "Es muss ein Intervall eingestellt werden."
+
+#. translators: %1$s will be replaced by the name of the used interval
+#: app/Plugin/Schedules.php:403
+#, php-format
+msgid "The given interval %1$s does not exist."
+msgstr "Das angegebene Intervall %1$s existiert nicht."
+
+#: app/Plugin/Settings.php:109
+msgctxt "settings menu title"
+msgid "Connector for Propstack"
+msgstr "Connector für Propstack"
+
+#: app/Plugin/Settings.php:110
+msgid "Settings for Connector for Propstack"
+msgstr "Einstellungen für Connector für Propstack"
+
+#: app/Plugin/Settings.php:127
+msgid "API"
+msgstr "API"
+
+#: app/Plugin/Settings.php:132
+msgid "Your API key"
+msgstr "Dein API Schlüssel"
+
+#: app/Plugin/Settings.php:143
+msgid "API Key"
+msgstr "API Schlüssel"
+
+#. translators: %1$s will be replaced by a URL.
+#: app/Plugin/Settings.php:145
+#, php-format
+msgid ""
+"Get the API key in your Propstack account <a href=\"%1$s\" "
+"target=\"_blank\">here (open new window)</a>."
+msgstr ""
+"Hole einen API Schlüssel in deinem Propstack Konto <a href=\"%1$s\" "
+"target=\"_blank\">hier (öffnet neues Fenster)</a>."
+
+#: app/Plugin/Settings.php:146
+msgid "Enter your API key"
+msgstr "Hier deinen API Schlüssel eingeben"
+
+#: app/Plugin/Settings.php:162 app/Propstack/FieldCategories/Languages.php:34
+msgid "Languages"
+msgstr "Sprachen"
+
+#: app/Plugin/Settings.php:169
+msgid "v1"
+msgstr "v1"
+
+#: app/Plugin/Settings.php:172
+msgid "v2 (Beta)"
+msgstr "v2 (Beta)"
+
+#: app/Plugin/Settings.php:181
+msgid "API version"
+msgstr "API Version"
+
+#: app/Plugin/Settings.php:205 app/Plugin/Settings.php:558
+msgid "Logs"
+msgstr "Protokolle"
+
+#: app/Plugin/Settings.php:262 app/Plugin/Settings.php:266
+msgid "Advanced settings"
+msgstr "Erweiterte Einstellungen"
+
+#: app/Plugin/Settings.php:275
+msgid "Disable archive view"
+msgstr "Deaktiviere die Detail-Ansicht"
+
+#: app/Plugin/Settings.php:285
+msgid "Disable single view"
+msgstr "Deaktiviere die Detail-Ansicht"
+
+#: app/Plugin/Settings.php:294
+msgid "Show help"
+msgstr "Hilfe anzeigen"
+
+#: app/Plugin/Settings.php:295
+msgid "If enabled we will show hints in your page builder."
+msgstr ""
+"Wenn diese Option aktiviert ist, werden in einem Page Builder Hinweise "
+"angezeigt."
+
+#: app/Plugin/Settings.php:304
+msgid "max. Age for log entries in days"
+msgstr "maximales Alter für Log-Einträge in Tagen"
+
+#: app/Plugin/Settings.php:313
+msgid "Enable debug mode"
+msgstr "Aktiviere Debug-Modus"
+
+#: app/Plugin/Settings.php:314
+msgid ""
+"If enabled the plugin will log much more events. Do not use this in a "
+"production environment."
+msgstr ""
+"Wenn diese Option aktiviert ist, protokolliert das Plugin deutlich mehr "
+"Ereignisse. Verwende diese Option nicht in einer Produktionsumgebung."
+
+#: app/Plugin/Settings.php:323
+msgid "Default timeout"
+msgstr "Standard Zeitüberschreitung"
+
+#: app/Plugin/Settings.php:324
+msgid "This timeout will be used for any API connection."
+msgstr "Diese Zeitüberschreitung gilt für alle API-Verbindungen."
+
+#: app/Plugin/Settings.php:329
+msgid "Secure settings"
+msgstr "Einstellungen sichern"
+
+#: app/Plugin/Settings.php:334
+msgid "Import settings"
+msgstr "Importiere Einstellungen"
+
+#: app/Plugin/Settings.php:336
+msgid "Choose the JSON-file with the settings for this plugin."
+msgstr ""
+"Die hochgeladene Datei ist keine gültige JSON-Datei mit Einstellungen für "
+"dieses Plugin."
+
+#: app/Plugin/Settings.php:343 app/Plugin/Settings.php:360
+#: app/Propstack/Files.php:156 app/Propstack/ImmoObjects.php:385
+msgid "Import now"
+msgstr "Jetzt importieren"
+
+#: app/Plugin/Settings.php:359 app/Propstack/Propstack.php:146
+msgid "Import"
+msgstr "Import"
+
+#: app/Plugin/Settings.php:368
+msgid "Export settings"
+msgstr "Exportiere Einstellungen"
+
+#: app/Plugin/Settings.php:370
+msgid "Click on the following button to download the settings as JSON-file."
+msgstr ""
+"Klicke auf den Button unterhalb um die JSON-Datei mit den Einstellungen "
+"auszuwählen."
+
+#: app/Plugin/Settings.php:371
+msgid ""
+"You can import this JSON-file in other projects using this WordPress plugin "
+"or theme."
+msgstr ""
+"Du kannst diese JSON-Datei mithilfe dieses WordPress-Plugins oder -Themes in "
+"andere Projekte importieren."
+
+#: app/Plugin/Settings.php:377 app/Plugin/Settings.php:394
+msgid "Export now"
+msgstr "Jetzt exportieren"
+
+#: app/Plugin/Settings.php:393
+msgid "Export"
+msgstr "Export"
+
+#: app/Plugin/Settings.php:402
+msgid "Plugin handling"
+msgstr "Pluginverwaltung"
+
+#: app/Plugin/Settings.php:416 app/Plugin/Settings.php:442
+#: app/Plugin/Settings.php:443
+msgid "Reset plugin"
+msgstr "Plugin zurücksetzen"
+
+#: app/Plugin/Settings.php:418
+msgid ""
+"Do you really want to reset any settings and data for the plugin Connector "
+"for Propstack?"
+msgstr ""
+"Möchtest Du wirklich alle Einstellungen und Daten für das Plugin \"Connector "
+"für Propstack\" zurücksetzen?"
+
+#: app/Plugin/Settings.php:419
+msgid ""
+"This will not only reset all settings, but also remove all objects and "
+"associated data."
+msgstr ""
+"Dadurch werden nicht nur alle Einstellungen zurückgesetzt, sondern auch alle "
+"Objekte und die dazugehörigen Daten gelöscht."
+
+#: app/Plugin/Settings.php:420
+msgid "You can then setup the plugin again."
+msgstr "Anschließend kannst du das Plugin erneut einrichten."
+
+#: app/Plugin/Settings.php:421
+msgid "We recommend creating a backup before resetting the plugin."
+msgstr ""
+"Wir empfehlen, vor dem Zurücksetzen des Plugins eine Sicherungskopie zu "
+"erstellen."
+
+#: app/Plugin/Settings.php:427
+msgid "Yes, reset it"
+msgstr "Ja, zurücksetzen"
+
+#: app/Plugin/Settings.php:451
+msgid "Questions? Check our forum!"
+msgstr "Fragen? Schau in unsere Forum!"
+
+#: app/Plugin/Settings.php:478
+msgid "Trademarks"
+msgstr "Markenzeichen"
+
+#: app/Plugin/Settings.php:486 app/Propstack/PostTypes/ImmoObject.php:196
+msgid "Propstack"
+msgstr "Propstack"
+
+#. translators: %1$s will be replaced by a URL.
+#: app/Plugin/Settings.php:488
+#, php-format
+msgid ""
+"The Propstack logo as part of all distributed icons is a trademark of <a "
+"href=\"%1$s\" target=\"_blank\">Propstack GmbH (open new window)</a>."
+msgstr ""
+"Das Propstack-Logo, das in allen bereitgestellten Symbolen enthalten ist, "
+"ist eine Marke der <a href=\"%1$s\" target=\"_blank\">Propstack GmbH (neues "
+"Fenster öffnen)</a>."
+
+#. translators: %1$s will be replaced by the plugin name.
+#: app/Plugin/Settings.php:642 app/Propstack/PostTypes/ImmoObject.php:404
+#: app/Propstack/Taxonomy.php:610
+#, php-format
+msgid "This page is provided by the plugin %1$s."
+msgstr "Diese Seite wird vom Plugin %1$s bereitgestellt."
+
+#. translators: %1$s will be replaced with the URL of the plugin-forum on wp.org
+#: app/Plugin/Setup.php:95
+#, php-format
+msgid ""
+"<strong>If the reason is unclear</strong> please contact our <a "
+"href=\"%1$s\" target=\"_blank\">support-forum (opens new window)</a> with as "
+"much detail as possible."
+msgstr ""
+"<strong>Wenn der Grund unklar ist</strong>, wende dich bitte mit möglichst "
+"detaillierten Angaben an unser <a href=\"%1$s\" target=\"_blank\">Support-"
+"Forum (öffnet neues Fenster)</a>."
+
+#: app/Plugin/Setup.php:184
+msgid ""
+"<strong>You have installed Connector for Propstack - nice, and thank you!</"
+"strong> Now run the setup to expand your website with the possibilities of "
+"this plugin to promote your objects from Propstack."
+msgstr ""
+"<strong>Du hast Connector für Propstack installiert - schön, und danke!</"
+"strong> Führe jetzt das Setup aus um deine Website mit den Möglichkeiten "
+"dieses Plugins zur Ausgabe deiner Objekte von Propstack zu erweitern."
+
+#: app/Plugin/Setup.php:184
+msgid "Start setup"
+msgstr "Starte Setup"
+
+#: app/Plugin/Setup.php:227
+msgid "Setup is loading"
+msgstr "Setup lädt"
+
+#: app/Plugin/Setup.php:227
+msgid "Please wait while we load the setup."
+msgstr "Bitte warte, während das Setup lädt."
+
+#: app/Plugin/Setup.php:227
+msgid "However, you can also skip the setup and configure the plugin manually."
+msgstr ""
+"Du kannst jedoch auch die Einrichtung überspringen und das Plugin manuell "
+"konfigurieren."
+
+#: app/Plugin/Setup.php:227
+msgid "Skip setup"
+msgstr "Setup abbrechen"
+
+#: app/Plugin/Setup.php:273 app/Plugin/Setup.php:551 app/Plugin/Setup.php:570
+msgid "Setup"
+msgstr "Setup"
+
+#: app/Plugin/Setup.php:275
+msgid "Back"
+msgstr "Zurück"
+
+#: app/Plugin/Setup.php:276
+msgid "Continue"
+msgstr "Weiter"
+
+#: app/Plugin/Setup.php:277
+msgid "Completed"
+msgstr "Abgeschlossen"
+
+#: app/Plugin/Setup.php:278
+msgid "Skip"
+msgstr "Überspringen"
+
+#: app/Plugin/Setup.php:280
+msgid ""
+"An error occurred. Received an incorrect response from the server. Please "
+"check your permalink settings."
+msgstr ""
+"Es ist ein Fehler aufgetreten. Habe eine falsche Antwort vom Server "
+"erhalten. Bitte überprüfe deine Permalink-Einstellungen."
+
+#: app/Plugin/Setup.php:385
+msgid ""
+"Only objects with the selected object type will be imported. All other will "
+"be ignored. You can change this setting after the setup any time."
+msgstr ""
+"Es werden nur Objekte des ausgewählten Objekttyps importiert. Alle anderen "
+"werden ignoriert. Diese Einstellung kannst du nach der Einrichtung jederzeit "
+"ändern."
+
+#. translators: %1$s will be replaced by our support-forum-URL.
+#: app/Plugin/Setup.php:397
+#, php-format
+msgid ""
+"<strong>Need help?</strong> Ask in <a href=\"%1$s\" target=\"_blank\">our "
+"forum (opens new window)</a>."
+msgstr ""
+"<strong>Benötigst Du Hilfe?</strong> Frage gerne in <a href=\"%1$s\" "
+"target=\"_blank\">unserem Forum (öffnet neues Fenster)</a>."
+
+#: app/Plugin/Setup.php:403
+msgid "Setup preparing your object data"
+msgstr "Setup bereitet deine Objekt-Daten vor"
+
+#: app/Plugin/Setup.php:442
+msgid "Retrieve data for your properties from Propstack."
+msgstr "Rufe die Daten zu deinen Immobilien von Propstack ab."
+
+#: app/Plugin/Setup.php:459
+msgid "Setup has been run."
+msgstr "Setup wurde ausgeführt."
+
+#: app/Plugin/Setup.php:459
+msgid ""
+"Your objects from Propstack has been imported. Click on \"Completed\" to "
+"view them."
+msgstr ""
+"Deine Objekte aus Propstack wurden importiert. Klicke auf „Abgeschlossen“, "
+"um sie anzuzeigen."
+
+#: app/Plugin/Templates.php:74
+msgid "Default"
+msgstr "Standard"
+
+#: app/Plugin/Templates.php:75
+msgid "Listings"
+msgstr "Listen"
+
+#: app/Plugin/Templates.php:247
+msgid ""
+"<strong>You are using a child theme that contains outdated Connector for "
+"Propstack template files.</strong> Please compare the following files in "
+"your child-theme with the one this plugin provides:"
+msgstr ""
+"<strong>Du verwendest ein Child-Theme, welches veraltete Connector für "
+"Propstack-Templates enthält.</strong> Bitte vergleiche folgenden Dateien in "
+"deinem Child-Theme mit denen, die dieses Plugin bereitstellt:"
+
+#: app/Plugin/Templates.php:247
+msgid "Hints:"
+msgstr "Hinweise:"
+
+#: app/Plugin/Templates.php:247
+msgid "The version-number in the header of the files must match."
+msgstr ""
+"Hinweis: Die Versionsnummer in den Kopfzeilen der Dateien muss "
+"übereinstimmen."
+
+#: app/Plugin/Templates.php:247
+msgid ""
+"If you have any questions about this, talk to the technical administrator of "
+"your website."
+msgstr ""
+"Wenn du Fragen dazu hast, wende dich bitte an den technischen Administrator "
+"deiner Website."
+
+#: app/Propstack/ApiRequest.php:162
+msgid "Got no response from Propstack API."
+msgstr "Leere Antwort von Propstack API erhalten."
+
+#: app/Propstack/ApiRequest.php:171
+msgid "The request to the Propstack API ended in an error: "
+msgstr "Die Anfrage an die Propstack API endete in einem Fehler: "
+
+#: app/Propstack/ApiRequest.php:188
+msgid "URL:"
+msgstr "URL:"
+
+#: app/Propstack/ApiRequest.php:189
+msgid "Request:"
+msgstr "Anfrage:"
+
+#: app/Propstack/ApiRequest.php:190
+msgid "HTTP-Status:"
+msgstr "HTTP-Status:"
+
+#: app/Propstack/ApiRequest.php:191
+msgid "Response:"
+msgstr "Antwort:"
+
+#: app/Propstack/FieldCategories/Address.php:32
+#: app/Propstack/Fields/Main/Address.php:40
+msgid "Address"
+msgstr "Anschrift"
+
+#: app/Propstack/FieldCategories/Api.php:33
+msgid "Propstack API"
+msgstr "Propstack API"
+
+#: app/Propstack/FieldCategories/Basic.php:32
+msgid "Basic"
+msgstr "Basisangaben"
+
+#: app/Propstack/FieldCategories/Broker.php:33
+#: app/Propstack/Taxonomies/Broker.php:105
+msgid "Broker"
+msgstr "Makler"
+
+#: app/Propstack/FieldCategories/BuildingConditions.php:33
+#: app/Propstack/FieldCategoryTypes/BuildingConditions.php:32
+msgid "Building Conditions"
+msgstr "Baugenehmigung"
+
+#: app/Propstack/FieldCategories/CustomFields.php:33
+msgid "Custom fields"
+msgstr "Individuelle Felder"
+
+#: app/Propstack/FieldCategories/CustomFields.php:49
+msgid "No custom fields used."
+msgstr "Keine individuellen Felder verwendet."
+
+#: app/Propstack/FieldCategories/Dates.php:32
+msgid "Dates"
+msgstr "Datumsangaben"
+
+#: app/Propstack/FieldCategories/Descriptions.php:33
+msgid "Descriptions"
+msgstr "Beschreibungen"
+
+#: app/Propstack/FieldCategories/Energy.php:33
+#: app/Propstack/FieldCategoryTypes/Energy.php:32
+msgid "Energy"
+msgstr "Energieangaben"
+
+#: app/Propstack/FieldCategories/Features.php:33
+#: app/Propstack/FieldCategoryTypes/Features.php:32
+msgid "Features"
+msgstr "Merkmale"
+
+#: app/Propstack/FieldCategories/Geo.php:33
+msgid "Geo"
+msgstr "Geo-Angaben"
+
+#: app/Propstack/FieldCategories/Images.php:37
+msgid "Images"
+msgstr "Bilder"
+
+#: app/Propstack/FieldCategories/Images.php:63
+msgid "This object does not have any images."
+msgstr "Zu diesem Objekt sind keine Bilder vorhanden."
+
+#: app/Propstack/FieldCategories/Images.php:68
+#: app/Propstack/ImmoObjects.php:889
+msgid "Got no images"
+msgstr "Keine Bilder erhalten"
+
+#: app/Propstack/FieldCategories/Images.php:70 app/Propstack/Files.php:131
+#: app/Propstack/Files.php:148 app/Propstack/Files.php:152
+#: app/Propstack/Files.php:157 app/Propstack/ImmoObjects.php:892
+#: app/Propstack/PostTypes/ImmoObject.php:321
+msgid "Import images"
+msgstr "Bilder importieren"
+
+#: app/Propstack/FieldCategories/Languages.php:53
+msgid "This object does not have a language set."
+msgstr "Für dieses Objekt ist keine Sprache festgelegt."
+
+#: app/Propstack/FieldCategories/Languages.php:62
+msgid "This object does use a language, that is actually not supported."
+msgstr ""
+"Dieses Objekt verwendet eine Sprache, die eigentlich nicht unterstützt wird."
+
+#: app/Propstack/FieldCategories/Other.php:32
+#: app/Propstack/Fields/Main/OtherNote.php:47
+#: app/Propstack/Taxonomies/PropertyType.php:490
+msgid "Other"
+msgstr "Andere"
+
+#: app/Propstack/FieldCategories/Prices.php:32
+msgid "Prices"
+msgstr "Preise"
+
+#: app/Propstack/FieldCategories/Properties.php:32
+msgid "Properties"
+msgstr "Eigenschaften"
+
+#: app/Propstack/FieldCategories/Rent.php:32
+#: app/Propstack/Taxonomies/MarketingType.php:100
+msgid "Rent"
+msgstr "Miete"
+
+#: app/Propstack/FieldCategoryTypes/Broker.php:32
+msgid "Contact the broker"
+msgstr "Ansprechpartner kontaktieren"
+
+#: app/Propstack/FieldCategoryTypes/Descriptions.php:32
+msgid "Object descriptions"
+msgstr "Objektbeschreibung"
+
+#: app/Propstack/FieldCategoryTypes/Location.php:32
+#: app/Propstack/Fields/Main/LocationNote.php:47
+msgid "Location"
+msgstr "Lage"
+
+#: app/Propstack/FieldCategoryTypes/ObjectData.php:32
+msgid "Object data"
+msgstr "Objektdaten"
+
+#. translators: %1$s: number of kilometers
+#: app/Propstack/FieldFormats/Kilometer.php:33
+#, php-format
+msgid "%1$skm"
+msgstr "%1$skm"
+
+#. translators: %1$s: number of minutes
+#: app/Propstack/FieldFormats/Minutes.php:33
+#, php-format
+msgid "%1$smin"
+msgstr "%1$smin"
+
+#: app/Propstack/Fields.php:99
+msgid "Fields"
+msgstr "Felder"
+
+#: app/Propstack/Fields.php:107
+msgid "All fields"
+msgstr "Alle Felder"
+
+#: app/Propstack/Fields.php:113
+msgid "List of Propstack objects fields"
+msgstr "Liste mit Propstack Objekt Feldern"
+
+#: app/Propstack/Fields.php:121
+msgid "The fields"
+msgstr "Die Felder"
+
+#. translators: %1$s: link to the Connector for Propstack Pro page
+#: app/Propstack/Fields.php:123
+msgid ""
+"These are the fields we get from Propstack for your objects. They are "
+"assigned to specific object types for use on the website."
+msgstr ""
+"Das sind die Felder, die wir von Propstack für Ihre Objekte erhalten. Sie "
+"werden bestimmten Objekttypen zugeordnet, damit sie auf der Website "
+"verwendet werden können."
+
+#. translators: %1$s: link to the Connector for Propstack Pro page
+#: app/Propstack/Fields.php:123
+#, php-format
+msgid ""
+"Get more fields with support for other object types like \"Stores\" with <a "
+"href=\"%1$s\" target=\"_blank\">Connector for Propstack Pro</a>."
+msgstr ""
+"Erhalte weitere Felder mit Unterstützung für andere Objekttypen wie "
+"\"Geschäfte\" mit dem <a href=\"%1$s\" target=\"_blank\">Connector für "
+"Propstack Pro</a>."
+
+#: app/Propstack/Fields.php:126 app/Propstack/Fields.php:194
+#: app/Propstack/Fields.php:288
+msgid "The field"
+msgstr "Das Feld"
+
+#: app/Propstack/Fields.php:127 app/Propstack/Fields.php:197
+msgid "Example from your objects"
+msgstr "Beispiel aus deinen Objekten"
+
+#: app/Propstack/Fields.php:190 app/Propstack/Fields.php:284
+msgid "Configure the fields"
+msgstr "Konfiguriere die Felder"
+
+#: app/Propstack/Fields.php:191
+msgid "Set configuration for fields for your objects of this object type."
+msgstr ""
+"Lege die Konfiguration für die Felder deiner Objekte dieses Objekttyps fest."
+
+#: app/Propstack/Fields.php:195 app/Propstack/Fields.php:289
+msgid "Hide in frontend"
+msgstr "Nicht anzeigen im Frontend"
+
+#: app/Propstack/Fields.php:196
+msgid "Use as object content"
+msgstr "Als Objektbeschreibung verwenden"
+
+#: app/Propstack/Fields.php:285
+msgid "Set configuration for fields for this taxonomy."
+msgstr "Konfiguration der Felder für diese Taxonomie festlegen."
+
+#: app/Propstack/Fields.php:336
+msgid "Use more object types with Connector for Propstack Pro"
+msgstr "Verwende mehr Objekttypen mit Connector für Propstack Pro"
+
+#. translators: %1$s will be replaced by the object title.
+#: app/Propstack/Fields.php:650
+#, php-format
+msgid "Could not load object type for the object %1$s"
+msgstr "Der Objekttyp für das Objekt %1$s konnte nicht geladen werden"
+
+#. translators: %1$s will be replaced by the object title.
+#: app/Propstack/Fields.php:657
+#, php-format
+msgid "Import the fields for the object %1$s"
+msgstr "Importiere die Felder für das Objekt %1$s"
+
+#: app/Propstack/Fields.php:821 app/Propstack/Fields.php:828
+msgid "not set"
+msgstr "nicht gesetzt"
+
+#: app/Propstack/Fields/Broker/AcademicTitle.php:40
+msgid "Academic title"
+msgstr "Akademischer Titel"
+
+#: app/Propstack/Fields/Broker/Cell.php:54
+msgid "Cell"
+msgstr "Mobilfunknummer"
+
+#: app/Propstack/Fields/Broker/Email.php:54
+msgid "Email"
+msgstr "E-Mail"
+
+#: app/Propstack/Fields/Broker/FirstName.php:40
+msgid "First Name"
+msgstr "Vorname"
+
+#: app/Propstack/Fields/Broker/Id.php:40 app/Propstack/PostTypes/Queue.php:144
+msgid "ID"
+msgstr "ID"
+
+#: app/Propstack/Fields/Broker/LastName.php:40
+msgid "Last Name"
+msgstr "Nachname"
+
+#: app/Propstack/Fields/Broker/Locale.php:47
+msgid "Locale"
+msgstr "Sprache"
+
+#: app/Propstack/Fields/Broker/Name.php:40
+#: app/Propstack/PostTypes/Queue.php:156
+msgid "Name"
+msgstr "Name"
+
+#: app/Propstack/Fields/Broker/Phone.php:54
+msgid "Phone"
+msgstr "Telefon"
+
+#: app/Propstack/Fields/Broker/Position.php:40
+#: app/Propstack/PostTypes/Queue.php:164
+msgid "Position"
+msgstr "Position"
+
+#: app/Propstack/Fields/Broker/PublicCell.php:47
+msgid "Public cell"
+msgstr "Öffentliche Mobilfunknummer"
+
+#: app/Propstack/Fields/Broker/PublicEmail.php:47
+msgid "Public email"
+msgstr "Öffentliche E-Mail"
+
+#: app/Propstack/Fields/Broker/PublicPhone.php:47
+msgid "Public phone"
+msgstr "Öffentliches Telefon"
+
+#: app/Propstack/Fields/Broker/Salutation.php:40
+msgid "Salutation"
+msgstr "Anrede"
+
+#: app/Propstack/Fields/Broker/Thumbnail.php:54
+msgid "Image"
+msgstr "Bild"
+
+#: app/Propstack/Fields/Main/AdditionalArea.php:40
+msgid "Additional Area"
+msgstr "Weitere Fläche"
+
+#: app/Propstack/Fields/Main/AirConditioning.php:47
+msgid "Air Conditioning"
+msgstr "Klimaanlage"
+
+#: app/Propstack/Fields/Main/AlarmSystem.php:47
+msgid "Alarm system"
+msgstr "Alarmanlage"
+
+#: app/Propstack/Fields/Main/ApartmentType.php:39
+msgid "Apartment type"
+msgstr "Wohnungstyp"
+
+#: app/Propstack/Fields/Main/ApiResponse.php:54
+msgid "Response from Propstack API"
+msgstr "Antwort von Propstack API"
+
+#: app/Propstack/Fields/Main/AutoLift.php:47
+msgid "Auto Lift"
+msgstr "Autolift"
+
+#: app/Propstack/Fields/Main/Balcony.php:47
+msgid "Balcony"
+msgstr "Balkon"
+
+#: app/Propstack/Fields/Main/BalconySpace.php:54
+msgid "Balcony space"
+msgstr "Balkonfläche"
+
+#: app/Propstack/Fields/Main/BarrierFree.php:47
+msgid "Barrier free"
+msgstr "Barrierefrei"
+
+#: app/Propstack/Fields/Main/BaseRent.php:47
+msgid "Base rent"
+msgstr "Grundmiete"
+
+#: app/Propstack/Fields/Main/BaseRentNet.php:47
+msgid "Base rent net"
+msgstr "Nettogrundmiete"
+
+#: app/Propstack/Fields/Main/BaseRentVat.php:47
+msgid "Base rent VAT"
+msgstr "Grundmiete inkl. MwSt."
+
+#: app/Propstack/Fields/Main/Bathroom.php:54
+msgid "Bathroom"
+msgstr "Badezimmer"
+
+#: app/Propstack/Fields/Main/BuildingEnergyRatingType.php:40
+msgid "Building Energy Rating Type"
+msgstr "Art der Gebäudeenergiebewertung"
+
+#: app/Propstack/Fields/Main/BuildingType.php:40
+msgid "Building Type"
+msgstr "Haustyp"
+
+#: app/Propstack/Fields/Main/BuiltInKitchen.php:47
+msgid "Built-in Kitchen"
+msgstr "Einbauküche"
+
+#: app/Propstack/Fields/Main/Cellar.php:47
+msgid "Cellar"
+msgstr "Keller"
+
+#: app/Propstack/Fields/Main/CellarSpace.php:54
+msgid "Cellar space"
+msgstr "Kellerraum"
+
+#: app/Propstack/Fields/Main/CertificateOfEligibilityNeeded.php:47
+msgid "Certificate of Eligibility Needed"
+msgstr "Berechtigungsbescheinigung erforderlich"
+
+#: app/Propstack/Fields/Main/Chimney.php:47
+msgid "Chimney"
+msgstr "Schornstein"
+
+#: app/Propstack/Fields/Main/City.php:39
+msgid "City"
+msgstr "Stadt"
+
+#: app/Propstack/Fields/Main/Co2Emission.php:47
+msgid "CO2 emissions"
+msgstr "CO₂-Emissionen"
+
+#: app/Propstack/Fields/Main/CommercializationType.php:40
+msgid "Commercialization Type"
+msgstr "Art der Vermarktung"
+
+#: app/Propstack/Fields/Main/Condition.php:39
+msgid "Object Condition"
+msgstr "Zustand des Objekts"
+
+#: app/Propstack/Fields/Main/ConnectedLoad.php:40
+msgid "Connected load"
+msgstr "Anschlussleistung"
+
+#: app/Propstack/Fields/Main/ConstructionPhase.php:40
+msgid "Construction Phase"
+msgstr "Bauphase"
+
+#: app/Propstack/Fields/Main/ConstructionYear.php:40
+msgid "Construction year"
+msgstr "Baujahr"
+
+#: app/Propstack/Fields/Main/ConstructionYearUnknown.php:47
+msgid "Construction Year Unknown"
+msgstr "Baujahr unbekannt"
+
+#: app/Propstack/Fields/Main/ContractType.php:40
+msgid "Contract Type"
+msgstr "Vertragsart"
+
+#: app/Propstack/Fields/Main/CoOwnershipShare.php:39
+msgid "Co Ownership Share"
+msgstr "Miteigentumsanteil"
+
+#: app/Propstack/Fields/Main/Corridor.php:40
+msgid "Corridor"
+msgstr "Flur"
+
+#: app/Propstack/Fields/Main/CostBalcony.php:39
+msgid "Cost balcony"
+msgstr "Kosten für den Balkon"
+
+#: app/Propstack/Fields/Main/CostLift.php:40
+msgid "Cost Lift"
+msgstr "Kostenanteil Aufzug"
+
+#: app/Propstack/Fields/Main/CostOther.php:40
+msgid "Other Costs"
+msgstr "Nicht umlegbare Kosten"
+
+#: app/Propstack/Fields/Main/Country.php:39
+msgid "Country"
+msgstr "Land"
+
+#: app/Propstack/Fields/Main/Courtage.php:39
+msgid "Courtage"
+msgstr "Käuferprovision"
+
+#: app/Propstack/Fields/Main/CourtageNote.php:39
+msgid "Courtage Note"
+msgstr "Provisionshinweis"
+
+#: app/Propstack/Fields/Main/CreatedAt.php:47
+#: app/Propstack/Fields/Main/CreatedAtFormatted.php:55
+#: app/Propstack/PostTypes/Queue.php:196
+msgid "Created at"
+msgstr "Erstellt am"
+
+#: app/Propstack/Fields/Main/Currency.php:40
+msgid "Currency"
+msgstr "Währung"
+
+#: app/Propstack/Fields/Main/Demolition.php:47
+msgid "Demolition"
+msgstr "Abriss"
+
+#: app/Propstack/Fields/Main/Deposit.php:47
+msgid "Deposit"
+msgstr "Kaution"
+
+#: app/Propstack/Fields/Main/DescriptionNote.php:47
+msgid "Description Note"
+msgstr "Beschreibung"
+
+#: app/Propstack/Fields/Main/DistanceToAirport.php:47
+msgid "Distance to airport"
+msgstr "Entfernung zum Flughafen"
+
+#: app/Propstack/Fields/Main/DistanceToAirportInKm.php:47
+msgid "Distance to airport in km"
+msgstr "Entfernung zum Flughafen in km"
+
+#: app/Propstack/Fields/Main/DistanceToAirportLength.php:47
+msgid "Distance to airport as length"
+msgstr "Entfernung zum Flughafen als Längenangabe"
+
+#: app/Propstack/Fields/Main/DistanceToFm.php:47
+msgid "Distance to next speedway"
+msgstr "Entfernung zur nächsten Autobahn"
+
+#: app/Propstack/Fields/Main/DistanceToFmInKm.php:47
+msgid "Distance to next speedway in km"
+msgstr "Entfernung zur nächsten Autobahn in km"
+
+#: app/Propstack/Fields/Main/DistanceToFmLength.php:47
+msgid "Distance to next speedway as length"
+msgstr "Entfernung zur nächsten Autobahn als Längenangabe"
+
+#: app/Propstack/Fields/Main/DistanceToMrs.php:47
+msgid "Distance next railway station"
+msgstr "Entfernung zum nächsten Bahnhof"
+
+#: app/Propstack/Fields/Main/DistanceToMrsInKm.php:47
+msgid "Distance to next railway station in km"
+msgstr "Entfernung zum nächsten Bahnhof in km"
+
+#: app/Propstack/Fields/Main/DistanceToMrsLength.php:47
+msgid "Distance to next railway station as length"
+msgstr "Entfernung zum nächsten Bahnhof in Metern"
+
+#: app/Propstack/Fields/Main/DistanceToPt.php:47
+msgid "Distance to public transfer"
+msgstr "Entfernung zur nächsten Haltestelle"
+
+#: app/Propstack/Fields/Main/DistanceToPtInKm.php:47
+msgid "Distance to public transfer in km"
+msgstr "Entfernung zur nächsten öffentlichen Verkehrsverbindung in km"
+
+#: app/Propstack/Fields/Main/DistanceToPtLength.php:47
+msgid "Distance to public transfer as length"
+msgstr "Entfernung zur öffentlichen Verkehrsanbindung als Länge"
+
+#: app/Propstack/Fields/Main/District.php:40
+msgid "District"
+msgstr "Bezirk"
+
+#: app/Propstack/Fields/Main/Duration.php:39
+msgid "Duration"
+msgstr "Dauer"
+
+#: app/Propstack/Fields/Main/DurationFrom.php:39
+msgid "Duration from"
+msgstr "Dauer ab"
+
+#: app/Propstack/Fields/Main/DurationUntil.php:40
+msgid "Duration Until"
+msgstr "Dauer bis"
+
+#: app/Propstack/Fields/Main/EndRentalDate.php:47
+msgid "End rental date"
+msgstr "Mietende"
+
+#: app/Propstack/Fields/Main/EnergyCertificateAvailability.php:42
+msgid "Energy Certificate Availability"
+msgstr "Energieausweis"
+
+#: app/Propstack/Fields/Main/EnergyCertificateCreationDate.php:42
+msgid "Energy Certificate Creation date"
+msgstr "Erstellungsdatum"
+
+#: app/Propstack/Fields/Main/EnergyCertificateEndDate.php:47
+msgid "Energy Certificate end date"
+msgstr "Energieausweis: gültig bis"
+
+#: app/Propstack/Fields/Main/EnergyCertificateStartDate.php:47
+msgid "Energy Certificate start date"
+msgstr "Energieausweis: Ausstellungsdatum"
+
+#: app/Propstack/Fields/Main/EnergyConsumptionContainsWarmWater.php:47
+msgid "Energy consumption contains warm water"
+msgstr "Energieverbrauch umfasst Warmwasser"
+
+#: app/Propstack/Fields/Main/EnergyEfficiencyClass.php:42
+msgid "Energy Certificate Class"
+msgstr "Energieeffizienzklasse"
+
+#: app/Propstack/Fields/Main/EnergyEfficiencyValue.php:42
+msgid "Energy Efficiency Value"
+msgstr "Energieeffizienzwert"
+
+#: app/Propstack/Fields/Main/EquipmentTechnologyConstructionYear.php:40
+msgid "Equipment Technology Construction year"
+msgstr "Ausstattung Technologie Baujahr"
+
+#: app/Propstack/Fields/Main/ExposeId.php:53
+msgid "Expose ID"
+msgstr "Expose ID"
+
+#: app/Propstack/Fields/Main/FinancialContribution.php:40
+msgid "Financial contribution"
+msgstr "Finanzieller Beitrag"
+
+#: app/Propstack/Fields/Main/FiringTypes.php:40
+msgid "Firing types"
+msgstr "Wesentlicher Energieträger"
+
+#: app/Propstack/Fields/Main/FlatShareSuitable.php:47
+msgid "Flat Share Suitable"
+msgstr "Reihenhauswohnung"
+
+#: app/Propstack/Fields/Main/Floor.php:40
+msgid "Floor"
+msgstr "Etage"
+
+#: app/Propstack/Fields/Main/FlooringType.php:54
+msgid "Flooring Type"
+msgstr "Bodenbelagstyp"
+
+#: app/Propstack/Fields/Main/FloorLoad.php:40
+msgid "Floor load"
+msgstr "Bodenbelastung"
+
+#: app/Propstack/Fields/Main/FloorPosition.php:40
+msgid "Floor position"
+msgstr "Bodenposition"
+
+#: app/Propstack/Fields/Main/ForBidding.php:40
+msgid "For bidding"
+msgstr "Für Gebote"
+
+#: app/Propstack/Fields/Main/FreeFrom.php:47
+msgid "Free from"
+msgstr "Frei von"
+
+#: app/Propstack/Fields/Main/FreeUntil.php:47
+msgid "Free until"
+msgstr "Frei bis"
+
+#: app/Propstack/Fields/Main/FurnishingNote.php:47
+msgid "Furnishing"
+msgstr "Ausstattung"
+
+#: app/Propstack/Fields/Main/GarageType.php:40
+msgid "Garage Type"
+msgstr "Stellplatztyp"
+
+#: app/Propstack/Fields/Main/Garden.php:47
+msgid "Garden"
+msgstr "Garten"
+
+#: app/Propstack/Fields/Main/GardenSpace.php:54
+msgid "Garden space"
+msgstr "Gartenfläche"
+
+#: app/Propstack/Fields/Main/Gender.php:39
+msgid "Gender"
+msgstr "Geschlecht"
+
+#: app/Propstack/Fields/Main/GuestToilet.php:47
+msgid "Guest Toilet"
+msgstr "Gästetoilette"
+
+#: app/Propstack/Fields/Main/HallHeight.php:39
+msgid "Hall Height"
+msgstr "Hallenhöhe"
+
+#: app/Propstack/Fields/Main/HasCanteen.php:47
+msgid "Has canteen"
+msgstr "Verfügt über eine Kantine"
+
+#: app/Propstack/Fields/Main/HasFurniture.php:47
+msgid "Has Furniture"
+msgstr "Verfügt über Möbel"
+
+#: app/Propstack/Fields/Main/HeatingCosts.php:47
+msgid "Heating costs"
+msgstr "Heizkosten"
+
+#: app/Propstack/Fields/Main/HeatingCostsInServiceCharge.php:47
+msgid "Heating Costs In Service Charge"
+msgstr "Heizkosten in der Nebenkostenabrechnung"
+
+#: app/Propstack/Fields/Main/HeatingCostsNet.php:47
+msgid "Heating costs net"
+msgstr "Heizkosten netto"
+
+#: app/Propstack/Fields/Main/HeatingCostsVat.php:47
+msgid "Heating costs VAT"
+msgstr "Heizkosten inkl. MwSt."
+
+#: app/Propstack/Fields/Main/HeatingType.php:40
+msgid "Heating types"
+msgstr "Heizungsart"
+
+#: app/Propstack/Fields/Main/HeightGarage.php:40
+msgid "Height"
+msgstr "Höhe"
+
+#: app/Propstack/Fields/Main/HideAddress.php:54
+msgid "Hide address"
+msgstr "Adresse ausblenden"
+
+#: app/Propstack/Fields/Main/HouseNumber.php:40
+msgid "House number"
+msgstr "Hausnummer"
+
+#: app/Propstack/Fields/Main/IndustrialArea.php:40
+msgid "Industrial area"
+msgstr "Gewerbegebiet"
+
+#: app/Propstack/Fields/Main/InteriorQuality.php:40
+msgid "Interior Quality"
+msgstr "Innenausstattung"
+
+#: app/Propstack/Fields/Main/InvestmentType.php:40
+msgid "Investment Type"
+msgstr "Anlageform"
+
+#: app/Propstack/Fields/Main/KitchenComplete.php:47
+msgid "Kitchen complete"
+msgstr "Komplette Küche"
+
+#: app/Propstack/Fields/Main/LanCables.php:47
+msgid "LAN Cables"
+msgstr "LAN-Kabel"
+
+#: app/Propstack/Fields/Main/LastRefurbishment.php:40
+msgid "Last refurbishment"
+msgstr "Letzte Modernisierung"
+
+#: app/Propstack/Fields/Main/Latitude.php:47
+msgid "Latitude"
+msgstr "Breitengrad"
+
+#: app/Propstack/Fields/Main/LengthGarage.php:40
+msgid "Length"
+msgstr "Länge"
+
+#: app/Propstack/Fields/Main/Lift.php:47
+msgid "Lift"
+msgstr "Aufzug"
+
+#: app/Propstack/Fields/Main/LivingSpace.php:54
+msgid "Living space"
+msgstr "Wohnfläche"
+
+#: app/Propstack/Fields/Main/LocationClassificationType.php:40
+msgid "Location Classification Type"
+msgstr "Standort Klassifizierungstyp"
+
+#: app/Propstack/Fields/Main/LodgerFlat.php:47
+msgid "Lodger Flat"
+msgstr "Mietwohnung"
+
+#: app/Propstack/Fields/Main/Loggia.php:47
+msgid "Loggia"
+msgstr "Loggia"
+
+#: app/Propstack/Fields/Main/LongDescriptionNote.php:47
+msgid "Long description"
+msgstr "Objectbeschreibung (lang)"
+
+#: app/Propstack/Fields/Main/LongFurnishingNote.php:47
+msgid "Long furnishing"
+msgstr "Ausstattung (lang)"
+
+#: app/Propstack/Fields/Main/Longitude.php:47
+msgid "Longitude"
+msgstr "Längengrad"
+
+#: app/Propstack/Fields/Main/LongLocationNote.php:47
+msgid "Long Location"
+msgstr "Lage (lang)"
+
+#: app/Propstack/Fields/Main/LongOtherNote.php:47
+msgid "Long other"
+msgstr "Sonstiges (lang)"
+
+#: app/Propstack/Fields/Main/MaintenanceReserve.php:47
+msgid "Maintenance Reserve"
+msgstr "Instandhaltungsrücklage"
+
+#: app/Propstack/Fields/Main/MarketingStartDate.php:40
+msgid "Marketing start date"
+msgstr "Startdatum der Marketingkampagne"
+
+#: app/Propstack/Fields/Main/MaxNumberOfPersons.php:47
+msgid "Max. amount of persons"
+msgstr "Max. Anzahl Personen"
+
+#: app/Propstack/Fields/Main/MaxRentalTime.php:40
+msgid "Max. Rental Time"
+msgstr "Max. Mietdauer"
+
+#: app/Propstack/Fields/Main/MinDivisible.php:39
+msgid "Min. Divisible"
+msgstr "Min. teilbar"
+
+#: app/Propstack/Fields/Main/MinRentalTime.php:39
+msgid "Min. Rental Time"
+msgstr "Mindestmietdauer"
+
+#: app/Propstack/Fields/Main/Monument.php:47
+msgid "Monument"
+msgstr "Denkmal"
+
+#: app/Propstack/Fields/Main/NetFloorSpace.php:54
+msgid "Net Floor space"
+msgstr "Nutzfläche"
+
+#: app/Propstack/Fields/Main/NonSmoker.php:47
+msgid "Non Smoker"
+msgstr "Nichtraucher"
+
+#: app/Propstack/Fields/Main/Note.php:60
+msgid "Note"
+msgstr "Notiz"
+
+#: app/Propstack/Fields/Main/NumberBeds.php:47
+msgid "Amount of beds"
+msgstr "Anzahl der Betten"
+
+#: app/Propstack/Fields/Main/NumberOfApartments.php:47
+msgid "Amount of apartments"
+msgstr "Anzahl der Wohnungen"
+
+#: app/Propstack/Fields/Main/NumberOfBalconies.php:47
+msgid "Amount of balconies"
+msgstr "Anzahl der Balkone"
+
+#: app/Propstack/Fields/Main/NumberOfBathRooms.php:47
+msgid "Amount of bathrooms"
+msgstr "Anzahl Badezimmer"
+
+#: app/Propstack/Fields/Main/NumberOfBedRooms.php:47
+msgid "Amount of bedrooms"
+msgstr "Anzahl der Schlafzimmer"
+
+#: app/Propstack/Fields/Main/NumberOfCommercials.php:47
+msgid "Number of Commercials"
+msgstr "Anzahl der Werbespots"
+
+#: app/Propstack/Fields/Main/NumberOfFloors.php:47
+msgid "Amount of floors"
+msgstr "Anzahl der Stockwerke"
+
+#: app/Propstack/Fields/Main/NumberOfParkingSpaces.php:47
+msgid "Amount of parking spaces"
+msgstr "Anzahl der Parkplätze"
+
+#: app/Propstack/Fields/Main/NumberOfRooms.php:47
+msgid "Amount of rooms"
+msgstr "Anzahl Räume"
+
+#: app/Propstack/Fields/Main/NumberOfTerraces.php:47
+msgid "Amount of terraces"
+msgstr "Anzahl der Terrassen"
+
+#: app/Propstack/Fields/Main/NumberOfUnits.php:47
+msgid "Amount units"
+msgstr "Anzahl der Einheiten"
+
+#: app/Propstack/Fields/Main/NumberSeats.php:47
+msgid "Amount of seats"
+msgstr "Anzahl der Sitzplätze"
+
+#: app/Propstack/Fields/Main/ObjectId.php:60
+msgid "Object ID"
+msgstr "Objekt ID"
+
+#: app/Propstack/Fields/Main/OtherCosts.php:47
+msgid "Other costs"
+msgstr "Sonstige Kosten"
+
+#: app/Propstack/Fields/Main/OtherCostsNet.php:47
+msgid "Other costs net"
+msgstr "Sonstige Kosten, netto"
+
+#: app/Propstack/Fields/Main/OtherCostsVat.php:47
+msgid "Other costs VAT"
+msgstr "Sonstige Kosten MwSt."
+
+#: app/Propstack/Fields/Main/OtherRent.php:39
+msgid "Other rent"
+msgstr "Sonstige Miete"
+
+#: app/Propstack/Fields/Main/OtherRentNet.php:39
+msgid "Other rent net"
+msgstr "Sonstige Nettomiete"
+
+#: app/Propstack/Fields/Main/OtherRentVat.php:39
+msgid "Other rent VAT"
+msgstr "Sonstige Mietumsatzsteuer"
+
+#: app/Propstack/Fields/Main/ParkingSpaceNumber.php:40
+msgid "Parking space number"
+msgstr "Parkplatznummer"
+
+#: app/Propstack/Fields/Main/ParkingSpacePrice.php:47
+msgid "Parking Space Price"
+msgstr "Stellplatz-Preis"
+
+#: app/Propstack/Fields/Main/ParkingSpaceType.php:40
+msgid "Parking Space Type"
+msgstr "Art des Parkplatzes"
+
+#: app/Propstack/Fields/Main/ParkingSpaceTypes.php:54
+msgid "Parking Space Types"
+msgstr "Arten von Parkplätzen"
+
+#: app/Propstack/Fields/Main/PetsAllowed.php:47
+msgid "Pets Allowed"
+msgstr "Tiere erlaubt"
+
+#: app/Propstack/Fields/Main/PlotArea.php:47
+msgid "Plot Area"
+msgstr "Grundstücksfläche"
+
+#: app/Propstack/Fields/Main/PlotNumber.php:40
+msgid "Plot number"
+msgstr "Grundstücksnummer"
+
+#: app/Propstack/Fields/Main/PlusVat.php:47
+msgid "Plus VAT"
+msgstr "zzgl. MwSt."
+
+#: app/Propstack/Fields/Main/Price.php:47
+msgid "Price"
+msgstr "Preis"
+
+#: app/Propstack/Fields/Main/PriceMultiplier.php:47
+msgid "Price Multiplier"
+msgstr "Preismultiplikator"
+
+#: app/Propstack/Fields/Main/PriceMultiplierTarget.php:47
+msgid "Price Multiplier Target"
+msgstr "Zielwert für den Kurs-Gewinn-Multiplikator"
+
+#: app/Propstack/Fields/Main/PriceNet.php:47
+msgid "Price net"
+msgstr "Nettopreis"
+
+#: app/Propstack/Fields/Main/PriceOnInquiry.php:47
+msgid "Price on inquiry"
+msgstr "Preis auf Anfrage"
+
+#: app/Propstack/Fields/Main/PricePerSqm.php:47
+msgid "Price per SQM"
+msgstr "Preis pro Quadratmeter"
+
+#: app/Propstack/Fields/Main/PriceType.php:40
+msgid "Price type"
+msgstr "Preisart"
+
+#: app/Propstack/Fields/Main/PriceVat.php:47
+msgid "Price VAT"
+msgstr "Preis inkl. MwSt."
+
+#: app/Propstack/Fields/Main/ProjectId.php:53
+#: app/Propstack/PostTypes/Queue.php:212
+msgid "Project ID"
+msgstr "Projekt ID"
+
+#: app/Propstack/Fields/Main/PropertySpaceValue.php:54
+msgid "Property space value"
+msgstr "Fläche"
+
+#: app/Propstack/Fields/Main/RecurringCosts.php:39
+msgid "Recurring costs"
+msgstr "Laufende Kosten"
+
+#: app/Propstack/Fields/Main/RecurringCostsNet.php:39
+msgid "Recurring costs net"
+msgstr "Laufende Kosten (netto)"
+
+#: app/Propstack/Fields/Main/RecurringCostsVat.php:39
+msgid "Recurring costs VAT"
+msgstr "Laufende Kosten inkl. MwSt."
+
+#: app/Propstack/Fields/Main/Region.php:39
+msgid "Region"
+msgstr "Region"
+
+#: app/Propstack/Fields/Main/RentalIncome.php:47
+msgid "Rental income"
+msgstr "Mieteinnahmen"
+
+#: app/Propstack/Fields/Main/RentalIncomeActual.php:47
+msgid "Rental income actual"
+msgstr "Tatsächliche Mieteinnahmen"
+
+#: app/Propstack/Fields/Main/RentDuration.php:39
+msgid "Rent Duration"
+msgstr "Mietdauer"
+
+#: app/Propstack/Fields/Main/Rented.php:47
+msgid "Rented"
+msgstr "Vermietet"
+
+#: app/Propstack/Fields/Main/Renter.php:39
+msgid "Renter"
+msgstr "Mieter"
+
+#: app/Propstack/Fields/Main/RentSubsidy.php:47
+msgid "Rent subsidy"
+msgstr "Hausgeld"
+
+#: app/Propstack/Fields/Main/Sauna.php:47
+msgid "Sauna"
+msgstr "Sauna"
+
+#: app/Propstack/Fields/Main/ServiceCharge.php:47
+msgid "Service charge"
+msgstr "Nebenkosten"
+
+#: app/Propstack/Fields/Main/ServiceChargeNet.php:47
+msgid "Service charge net"
+msgstr "Netto Nebenkosten"
+
+#: app/Propstack/Fields/Main/ServiceChargeVat.php:47
+msgid "Service charge VAT"
+msgstr "Mehrwertsteuer auf die Nebenkosten"
+
+#: app/Propstack/Fields/Main/ShortAddress.php:47
+msgid "Short address"
+msgstr "Kurzanschrift"
+
+#: app/Propstack/Fields/Main/SiteConstructibleType.php:39
+msgid "Site Constructible Type"
+msgstr "Bebaubarkeit des Grundstücks"
+
+#: app/Propstack/Fields/Main/SiteDevelopmentType.php:40
+msgid "Site Development Type"
+msgstr "Art der Standorterschließung"
+
+#: app/Propstack/Fields/Main/SoldPrice.php:47
+msgid "Sold price"
+msgstr "Realisierter Preis"
+
+#: app/Propstack/Fields/Main/StartRentalDate.php:47
+msgid "Start rental date"
+msgstr "Mietbeginn"
+
+#: app/Propstack/Fields/Main/StatusUpdatedAt.php:47
+msgid "Status updated at"
+msgstr "Status aktualisiert am"
+
+#: app/Propstack/Fields/Main/Street.php:40
+msgid "Street"
+msgstr "Straße"
+
+#: app/Propstack/Fields/Main/SummerResidencePractical.php:47
+msgid "Summer Residence Practical"
+msgstr "Sommerresidenz – Praktisches"
+
+#: app/Propstack/Fields/Main/SwimmingPool.php:47
+msgid "Swimming Pool"
+msgstr "Schwimmbad"
+
+#: app/Propstack/Fields/Main/Tenancy.php:47
+msgid "Tenancy"
+msgstr "Mietverhältnis"
+
+#: app/Propstack/Fields/Main/Terrace.php:47
+msgid "Terrace"
+msgstr "Terrasse"
+
+#: app/Propstack/Fields/Main/ThermalCharacteristic.php:42
+msgid "Thermal Characteristic"
+msgstr "Thermische Eigenschaften"
+
+#: app/Propstack/Fields/Main/ThermalCharacteristicElectricity.php:42
+msgid "Thermal Characteristic Electricity"
+msgstr "Thermische Eigenschaften – Elektrizität"
+
+#: app/Propstack/Fields/Main/ThermalCharacteristicHeating.php:42
+msgid "Thermal Characteristic Heating"
+msgstr "Thermische Eigenschaften der Heizung"
+
+#: app/Propstack/Fields/Main/TotalFloorSpace.php:54
+msgid "Total Floor space"
+msgstr "Gesamtfläche"
+
+#: app/Propstack/Fields/Main/TotalRent.php:47
+msgid "Total rent"
+msgstr "Gesamtmiete"
+
+#: app/Propstack/Fields/Main/TotalRentNet.php:47
+msgid "Total rent net"
+msgstr "Gesamtmiete netto"
+
+#: app/Propstack/Fields/Main/TotalRentVat.php:47
+msgid "Total rent VAT"
+msgstr "Gesamtmiete inkl. MwSt."
+
+#: app/Propstack/Fields/Main/UnitId.php:53
+msgid "Unit ID"
+msgstr "Unit ID"
+
+#: app/Propstack/Fields/Main/UpdatedAt.php:47
+#: app/Propstack/Fields/Main/UpdatedAtFormatted.php:54
+#: app/Propstack/PostTypes/Queue.php:200
+msgid "Updated at"
+msgstr "Aktualisiert am"
+
+#: app/Propstack/Fields/Main/UsableFloorSpace.php:54
+msgid "Usable Floor Space"
+msgstr "Nutzfläche"
+
+#: app/Propstack/Fields/Main/Vat.php:40
+msgid "VAT"
+msgstr "Umsatzsteuer-ID"
+
+#: app/Propstack/Fields/Main/WellnessArea.php:47
+msgid "Wellness area"
+msgstr "Wellnessbereich"
+
+#: app/Propstack/Fields/Main/WidthGarage.php:40
+msgid "Width"
+msgstr "Breite"
+
+#: app/Propstack/Fields/Main/WinterGarden.php:47
+msgid "Winter garden"
+msgstr "Wintergarten"
+
+#: app/Propstack/Fields/Main/YieldActual.php:47
+msgid "Yield actual"
+msgstr "Rendite Ist"
+
+#: app/Propstack/Fields/Main/YieldTarget.php:47
+msgid "Yield target"
+msgstr "Rendite Soll"
+
+#: app/Propstack/Fields/Main/ZipCode.php:40
+msgid "ZIP Code"
+msgstr "Postleitzahl"
+
+#: app/Propstack/FieldTypes/CodeField.php:46 app/Propstack/Widget_Base.php:153
+#: app/Propstack/Widget_Base.php:162 app/Propstack/Widget_Base.php:200
+msgid "copied"
+msgstr "kopiert"
+
+#: app/Propstack/Field_Category_Base.php:108
+msgid "hidden in frontend"
+msgstr "im Frontend versteckt"
+
+#: app/Propstack/Files.php:127
+msgid "Files"
+msgstr "Dateien"
+
+#: app/Propstack/Files.php:149
+msgid "Import of files for objects is still running. Please wait."
+msgstr "Import von Dateien für Objekte läuft bereits. Bitte warten."
+
+#: app/Propstack/Files.php:153
+msgid "No objects imported. Please import them first to import their files."
+msgstr ""
+"Es wurden keine Objekte importiert. Bitte importiere sie zuerst, um ihre "
+"Dateien zu importieren."
+
+#: app/Propstack/Files.php:164
+msgid "Import images for your objects from Propstack"
+msgstr "Importiere Bilder für deine Objekte aus Propstack"
+
+#: app/Propstack/Files.php:166
+msgid ""
+"Click on the button below to start the import of images for your objects "
+"from Propstack."
+msgstr ""
+"Klicke auf den Button unten, um den Import von Bildern für deine Objekte aus "
+"Propstack zu starten."
+
+#: app/Propstack/Files.php:167 app/Propstack/ImmoObjects.php:1452
+#: app/Propstack/PostTypes/ImmoObject.php:529
+msgid "The import could take some time. Please be patient."
+msgstr "Der Import kann eine Weile dauern. Bitte hab etwas Geduld."
+
+#: app/Propstack/Files.php:173 app/Propstack/ImmoObjects.php:1458
+#: app/Propstack/PostTypes/ImmoObject.php:535
+msgid "Import them now"
+msgstr "Jetzt importieren"
+
+#: app/Propstack/Files.php:203 app/Propstack/Files.php:207
+#: app/Propstack/Files.php:212
+msgid "Delete files"
+msgstr "Dateien löschen"
+
+#: app/Propstack/Files.php:204 app/Propstack/ImmoObjects.php:413
+msgid "No objects imported."
+msgstr "Keine Objekte importiert."
+
+#: app/Propstack/Files.php:208
+msgid "No files for objects imported."
+msgstr "Es wurden keine Dateien für Objekte importiert."
+
+#: app/Propstack/Files.php:211 app/Propstack/ImmoObjects.php:416
+msgid "Delete now"
+msgstr "Jetzt löschen"
+
+#: app/Propstack/Files.php:219
+msgid "Delete all files of your objects"
+msgstr "Lösche alle Dateien deiner Objekte"
+
+#: app/Propstack/Files.php:221
+msgid ""
+"Click on the button below to delete all files of your objects in your "
+"WordPress website."
+msgstr ""
+"Klicke auf den Button unten, um alle Dateien deiner Objekte auf deiner "
+"WordPress-Website zu löschen."
+
+#: app/Propstack/Files.php:222
+msgid ""
+"You will loose any images and documents for your objects. They will be re-"
+"imported during the next object import."
+msgstr ""
+"Du verlierst alle Bilder und Dokumente zu deinen Objekten. Diese werden beim "
+"nächsten Objektimport erneut importiert."
+
+#: app/Propstack/Files.php:228 app/Propstack/ImmoObjects.php:433
+msgid "Delete them now"
+msgstr "Lösche sie jetzt"
+
+#: app/Propstack/Files.php:233 app/Propstack/ImmoObjects.php:438
+msgid "Close"
+msgstr "Schliessen"
+
+#: app/Propstack/Files.php:245 app/Propstack/ImmoObjects.php:450
+#: app/Propstack/Tables/Queue.php:30
+msgid "Options"
+msgstr "Optionen"
+
+#: app/Propstack/Files.php:253
+msgid "Limit for import of files"
+msgstr "Grenze für Import von Dateien"
+
+#: app/Propstack/Files.php:254
+msgid ""
+"The higher this number is, the greater the likelihood of a timeout when "
+"importing files."
+msgstr ""
+"Je höher diese Zahl ist, desto größer ist die Wahrscheinlichkeit, dass es "
+"beim Importieren von Dateien zu einer Zeitüberschreitung kommt."
+
+#: app/Propstack/Files.php:263
+msgid "Image size"
+msgstr "Bildgröße"
+
+#: app/Propstack/Files.php:264
+msgid ""
+"Choose the image size to use for import in WordPress. As bigger the size as "
+"longer takes the import of any image. WordPress only needs on image size as "
+"basis to optimize the generation of them in your website."
+msgstr ""
+"Wähle die Bildgröße aus, die beim Import in WordPress verwendet werden soll. "
+"Je größer die Bildgröße, desto länger dauert der Import der Bilder. "
+"WordPress benötigt lediglich eine Bildgröße als Grundlage, um die "
+"Darstellung der Bilder auf deiner Website zu optimieren."
+
+#: app/Propstack/Files.php:267
+msgid "Original"
+msgstr "Original"
+
+#: app/Propstack/Files.php:268 app/Propstack/PostTypes/Queue.php:243
+msgid "Big URL"
+msgstr "URL von großem Bild"
+
+#: app/Propstack/Files.php:269 app/Propstack/PostTypes/Queue.php:247
+msgid "Medium URL"
+msgstr "URL von mittlerem Bild"
+
+#: app/Propstack/Files.php:270 app/Propstack/ImmoObjects.php:850
+#: app/Propstack/PostTypes/ImmoObject.php:234 app/Propstack/Taxonomies.php:232
+msgid "Thumbnail"
+msgstr "Vorschaubild"
+
+#: app/Propstack/Files.php:271
+msgid "Small thumbnail"
+msgstr "Kleines Vorschaubild"
+
+#: app/Propstack/Files.php:272
+msgid "Square image URL"
+msgstr "URL des quadratischen Bildes"
+
+#: app/Propstack/Files.php:283
+msgid "Assign new files to this user"
+msgstr "Diesen Benutzer mit neuen Dateien zuordnen"
+
+#: app/Propstack/Files.php:284 app/Propstack/ImmoObjects.php:459
+msgid ""
+"This is only a fallback if the actual user is not available (e.g., via WP "
+"CLI import or synchronisation). New files are normally assigned to the user "
+"who adds them."
+msgstr ""
+"Dies ist nur eine Ausweichlösung, falls der eigentliche Benutzer nicht "
+"verfügbar ist (z. B. bei einem Import oder einer Synchronisierung über WP "
+"CLI). Neue Dateien werden normalerweise dem Benutzer zugewiesen, der sie "
+"hochlädt."
+
+#. translators: %1$s: the given URL.
+#: app/Propstack/Files.php:375
+#, php-format
+msgid "Given URL %1$s is already in the database."
+msgstr "Die angegebene URL %1$s ist bereits in der Datenbank vorhanden."
+
+#. translators: %1$s: the given URL.
+#: app/Propstack/Files.php:445
+#, php-format
+msgid "Import of file %1$s failed:"
+msgstr "Der Import der Datei %1$s ist fehlgeschlagen:"
+
+#: app/Propstack/Files.php:499
+msgid "Deletion of files starting"
+msgstr "Löschen von Dateien startet"
+
+#. translators: %1$s: the file name.
+#: app/Propstack/Files.php:523
+#, php-format
+msgid "Deletion of file %1$s"
+msgstr "Löschen von Datei %1$s"
+
+#: app/Propstack/Files.php:565
+msgid "Files has been deleted"
+msgstr "Dateien wurden gelöscht"
+
+#: app/Propstack/Files.php:567
+msgid "The files for your objects from Propstack has been deleted."
+msgstr "Die Dateien für deine Objekte aus Propstack wurden gelöscht."
+
+#: app/Propstack/Files.php:568
+msgid ""
+"They are still in your Propstack account. They will be imported during the "
+"next object import."
+msgstr ""
+"Sie befinden sich weiterhin in deinem  Propstack-Konto. Sie werden beim "
+"nächsten Objektimport importiert."
+
+#: app/Propstack/Files.php:686 app/Propstack/ImmoObjects.php:744
+msgid "The deletion of objects has been run."
+msgstr "Das Löschen der Objekte wurde durchgeführt."
+
+#: app/Propstack/Files.php:686 app/Propstack/ImmoObjects.php:744
+msgid ""
+"They are unchanged in your Propstack account. You can import them at any "
+"time again."
+msgstr ""
+"In deinem Propstack-Konto bleiben sie unverändert. Du kannst sie jederzeit "
+"erneut importieren."
+
+#: app/Propstack/Files.php:760
+msgid "Import of files for your objects starting"
+msgstr "Import von Dateien für Ihre Objekte"
+
+#: app/Propstack/Files.php:777
+msgid "Prepare the import of files for your objects"
+msgstr "Bereite den Import der Dateien für deiner Objekte vor"
+
+#: app/Propstack/Files.php:788 app/Propstack/Files.php:792
+msgid "Collecting all files for your object to import"
+msgstr "Alle Dateien für das zu importierende Objekt sammeln"
+
+#: app/Propstack/Files.php:799 app/Propstack/Files.php:803
+msgid "Collecting all files for your objects to import"
+msgstr "Alle Dateien für deine Objekte zum Importieren sammeln"
+
+#: app/Propstack/Files.php:840
+msgid "Saved cache for import:"
+msgstr "Cache für den Import gespeichert:"
+
+#: app/Propstack/Files.php:849 app/Propstack/Files.php:853
+msgid "Import of files for your objects is starting"
+msgstr "Der Import der Dateien für deine Objekte beginnt"
+
+#: app/Propstack/Files.php:891
+msgid "Missing URL for file during file import. The used file data from API:"
+msgstr ""
+"Fehlende URL für eine Datei beim Dateiimport. Die verwendeten Dateidaten aus "
+"der API:"
+
+#. translators: %1$s will be replaced by the name of the file.
+#: app/Propstack/Files.php:909
+#, php-format
+msgid "Import file %1$s for %2$s"
+msgstr "Importiere Datei %1$s für %2$s"
+
+#: app/Propstack/Files.php:957 app/Propstack/Files.php:991
+msgid "Import of files has been run"
+msgstr "Import der Dateien wurde durchgeführt"
+
+#: app/Propstack/Files.php:959
+msgid "The files have been imported."
+msgstr "Die Dateien wurden importiert."
+
+#: app/Propstack/Files.php:960
+msgid "You can now see them on the object pages."
+msgstr "Du kannst sie nun auf den Objektseiten sehen."
+
+#. translators: %1$s will be replaced by the immo object title.
+#: app/Propstack/Files.php:977
+#, php-format
+msgid "You can now see them on the page of your object %1$s."
+msgstr "Du kannst sie nun auf der Seite deines Objekts %1$s sehen."
+
+#: app/Propstack/Files.php:982
+msgid "Show them"
+msgstr "Zeige sie an"
+
+#: app/Propstack/Files.php:1026
+msgid "The import of files from your Propstack account has been run."
+msgstr "Der Import von Dateien aus deinem Propstack-Konto wurde durchgeführt."
+
+#: app/Propstack/Filters.php:108
+msgid "Filters"
+msgstr "Filter"
+
+#: app/Propstack/Filters.php:112
+msgid "Manage filters"
+msgstr "Filter verwalten"
+
+#: app/Propstack/Filters.php:120
+msgid "The filters"
+msgstr "Die Filter"
+
+#. translators: %1$s: Connector for Propstack Pro URL
+#: app/Propstack/Filters.php:122
+msgid ""
+"These are the filters you could use in the frontend. Manage their settings "
+"here."
+msgstr ""
+"Dies sind die Filter, die du im Frontend verwenden kannst. Hier kannst du "
+"deren Einstellungen verwalten."
+
+#. translators: %1$s: Connector for Propstack Pro URL
+#: app/Propstack/Filters.php:122
+#, php-format
+msgid ""
+"Get more filters like room or spaces with <a href=\"%1$s\" "
+"target=\"_blank\">Connector for Propstack Pro</a>."
+msgstr ""
+"Erhalte weitere Filter wie \"Räume\" oder \"Flächen\" mit <a href=\"%1$s\" "
+"target=\"_blank\">Connector für Propstack Pro</a>."
+
+#: app/Propstack/Filters.php:125
+msgid "The filter"
+msgstr "Der Filter"
+
+#: app/Propstack/Filters.php:126
+msgid "Type"
+msgstr "Typ"
+
+#: app/Propstack/Filters.php:127
+msgid "Hide"
+msgstr "Verstecken"
+
+#: app/Propstack/Filters.php:190 app/Propstack/PostTypes/ImmoObject.php:512
+#: app/Propstack/Queue.php:111
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: app/Propstack/Filters.php:198
+msgid "Use POST to submit the filter"
+msgstr "Verwende POST, um den Filter zu übermitteln"
+
+#: app/Propstack/Filters.php:199
+msgid ""
+"If enabled, the filter will be submitted via POST resulting in a short URL "
+"without the visible filter parameters."
+msgstr ""
+"Wenn diese Option aktiviert ist, wird der Filter per POST übermittelt, "
+"wodurch eine Kurz-URL ohne sichtbare Filterparameter entsteht."
+
+#: app/Propstack/Filters/Cities.php:210
+msgid "Enter a city"
+msgstr "Gib eine Stadt ein"
+
+#: app/Propstack/Filters/ObjectId.php:121
+msgid "Enter an object ID"
+msgstr "Gib eine Objekt ID ein"
+
+#: app/Propstack/FilterTypes/Input.php:50
+msgid "Input field"
+msgstr "Eingabefeld"
+
+#: app/Propstack/FilterTypes/Select.php:56
+msgid "Select field"
+msgstr "Auswahlfeld"
+
+#: app/Propstack/FilterTypes/Select.php:70
+msgid "Choose"
+msgstr "Wählen"
+
+#. translators: %1$s will be replaced by the attachment ID.
+#: app/Propstack/ImmoObject.php:199
+#, php-format
+msgid "Assign image %1$s to object %2$s."
+msgstr "Bild %1$s dem Objekt %2$s als Vorschaubild zuordnen."
+
+#: app/Propstack/ImmoObjects.php:266
+msgid "Deletion of your objects is starting"
+msgstr "Löschen deiner Objekte startet"
+
+#: app/Propstack/ImmoObjects.php:272
+msgid "Delete of all Propstack objects has been started."
+msgstr "Löschen aller Propstack Objekte wurde gestartet."
+
+#: app/Propstack/ImmoObjects.php:283
+msgid "Deletion of your objects is running"
+msgstr "Das Löschen deiner Objekte wird gerade ausgeführt"
+
+#. translators: a title will replace %1$s.
+#: app/Propstack/ImmoObjects.php:295
+#, php-format
+msgid "Deleting object %1$s"
+msgstr "Objekt %1$s wird gelöscht"
+
+#. translators: a title will replace %1$s.
+#: app/Propstack/ImmoObjects.php:305
+#, php-format
+msgid "Object %1$s could not be deleted."
+msgstr "Das Objekt %1$s konnte nicht gelöscht werden."
+
+#: app/Propstack/ImmoObjects.php:324
+msgid "Cleanup the database"
+msgstr "Die Datenbank bereinigen"
+
+#: app/Propstack/ImmoObjects.php:331
+msgid "Delete of all Propstack objects has been ended."
+msgstr "Das Löschen aller Propstack-Objekte wurde abgeschlossen."
+
+#: app/Propstack/ImmoObjects.php:359
+msgid "Imports"
+msgstr "Importe"
+
+#: app/Propstack/ImmoObjects.php:364 app/Propstack/ImmoObjects.php:505
+#: app/Propstack/PostTypes/ImmoObject.php:101
+#: app/Propstack/PostTypes/ImmoObject.php:103
+#: app/Propstack/PostTypes/ImmoObject.php:349
+msgid "Objects"
+msgstr "Objekte"
+
+#: app/Propstack/ImmoObjects.php:369 app/Propstack/ImmoObjects.php:377
+#: app/Propstack/ImmoObjects.php:381 app/Propstack/ImmoObjects.php:386
+msgid "Import objects"
+msgstr "Objekte importieren"
+
+#: app/Propstack/ImmoObjects.php:378
+msgid "Propstack API key is missing."
+msgstr "Propstack API Schlüssel fehlt."
+
+#: app/Propstack/ImmoObjects.php:382 app/Propstack/Imports/v1/Objects.php:51
+#: app/Propstack/Imports/v2/Objects.php:52
+msgid "Import of objects is still running. Please wait."
+msgstr "Der Import der Objekte läuft noch. Bitte warte."
+
+#: app/Propstack/ImmoObjects.php:408 app/Propstack/ImmoObjects.php:412
+#: app/Propstack/ImmoObjects.php:417
+msgid "Delete objects"
+msgstr "Objekte löschen"
+
+#: app/Propstack/ImmoObjects.php:409 app/Propstack/Imports/v1/Objects.php:63
+#: app/Propstack/Imports/v2/Objects.php:64
+msgid "Deletion of objects is still running. Please wait."
+msgstr "Das Löschen der Objekte läuft noch. Bitte warte."
+
+#: app/Propstack/ImmoObjects.php:424
+msgid "Delete your objects"
+msgstr "Lösche deine Objekte"
+
+#: app/Propstack/ImmoObjects.php:426
+msgid ""
+"Click on the button below to delete all objects in your WordPress website."
+msgstr ""
+"Klicke auf den Button unten, um alle Objekte auf deiner WordPress-Website zu "
+"löschen."
+
+#: app/Propstack/ImmoObjects.php:427
+msgid "The objects will stay in your Propstack account."
+msgstr "Die Objekte bleiben in deinem Propstack-Konto gespeichert."
+
+#: app/Propstack/ImmoObjects.php:458
+msgid "Assign new objects to this user"
+msgstr "Diesem Benutzer neue Objekte zuweisen"
+
+#: app/Propstack/ImmoObjects.php:469
+msgid "Enable automatic import"
+msgstr "Automatischen Import aktivieren"
+
+#. translators: %1$s: Connector for Propstack Pro URL
+#: app/Propstack/ImmoObjects.php:471
+#, php-format
+msgid ""
+"Use more options for automatic imports with <a href=\"%1$s\" "
+"target=\"_blank\">Connector for Propstack Pro</a>."
+msgstr ""
+"Verwende weitere Möglichkeiten für den automatische Import mit <a "
+"href=\"%1$s\" target=\"_blank\">Connector für Propstack Pro</a>."
+
+#: app/Propstack/ImmoObjects.php:481
+msgid "Interval for automatic import"
+msgstr "Intervall für automatischen Import"
+
+#: app/Propstack/ImmoObjects.php:482
+msgid "Daily"
+msgstr "Täglich"
+
+#: app/Propstack/ImmoObjects.php:491
+msgid "Preserve files"
+msgstr "Dateien behalten"
+
+#: app/Propstack/ImmoObjects.php:492
+msgid ""
+"If objects are deleted, do not delete their files. They will stay in your "
+"media library, and you have to clean them manually."
+msgstr ""
+"Wenn Objekte gelöscht werden, werden ihre Dateien nicht gelöscht. Sie "
+"bleiben in deiner Mediathek erhalten, und du musst sie manuell entfernen."
+
+#: app/Propstack/ImmoObjects.php:510 app/Propstack/ImmoObjects.php:515
+msgid "Restrictions"
+msgstr "Einschränkungen"
+
+#: app/Propstack/ImmoObjects.php:523
+msgid "States to import"
+msgstr "Zu importierende Objektzustände"
+
+#. translators: %1$s: Connector for Propstack Pro URL
+#: app/Propstack/ImmoObjects.php:525
+#, php-format
+msgid ""
+"Use more states with <a href=\"%1$s\" target=\"_blank\">Connector for "
+"Propstack Pro</a>."
+msgstr ""
+"Verwende mehr Objektzustände mit <a href=\"%1$s\" "
+"target=\"_blank\">Connector for Propstack Pro</a>."
+
+#: app/Propstack/ImmoObjects.php:526 app/Propstack/ImmoObjects.php:900
+msgid "Vermarktung"
+msgstr "Vermarktung"
+
+#: app/Propstack/ImmoObjects.php:554
+msgid "Broker to import"
+msgstr "Zu importierender Makler"
+
+#: app/Propstack/ImmoObjects.php:555
+msgid ""
+"Only objects with the selected broker will be imported. All other will be "
+"ignored. Selecting none will import objects for each broker."
+msgstr ""
+"Es werden nur Objekte des ausgewählten Maklers importiert. Alle anderen "
+"werden ignoriert. Wenn keiner ausgewählt ist, werden Objekte aller Makler "
+"importiert."
+
+#: app/Propstack/ImmoObjects.php:584
+msgid "Marketing types to import"
+msgstr "Zu importierende Marketingtypen"
+
+#: app/Propstack/ImmoObjects.php:585
+msgid ""
+"Only objects with the selected marketing types will be imported. All other "
+"will be ignored. Selecting none will import objects for each marketing type."
+msgstr ""
+"Es werden nur Objekte mit den ausgewählten Marketingtypen importiert. Alle "
+"anderen werden ignoriert. Wenn keine ausgewählt sind, werden Objekte aller "
+"Marketingtypen importiert."
+
+#: app/Propstack/ImmoObjects.php:624
+msgid "Object types to import"
+msgstr "Zu importierende Objekttypen"
+
+#. translators: %1$s: Connector for Propstack Pro URL
+#: app/Propstack/ImmoObjects.php:626
+msgid ""
+"Only objects with the selected object types will be imported. All other will "
+"be ignored. Selecting none will import objects for each object type."
+msgstr ""
+"Es werden nur Objekte der ausgewählten Objekttypen importiert. Alle anderen "
+"werden ignoriert. Wenn keine ausgewählt sind, werden Objekte aller "
+"Objekttypen importiert."
+
+#. translators: %1$s: Connector for Propstack Pro URL
+#: app/Propstack/ImmoObjects.php:626
+#, php-format
+msgid ""
+"Use more object types with <a href=\"%1$s\" target=\"_blank\">Connector for "
+"Propstack Pro</a>."
+msgstr ""
+"Verwende weitere Objekttypen mit <a href=\"%1$s\" "
+"target=\"_blank\">Connector für Propstack Pro</a>."
+
+#: app/Propstack/ImmoObjects.php:655
+msgid "Property types to import"
+msgstr "Zu importierende Objekttypen"
+
+#: app/Propstack/ImmoObjects.php:656
+msgid ""
+"Only objects with the property types will be imported. All other will be "
+"ignored. Selecting none will import objects for each property type."
+msgstr ""
+"Es werden nur Objekte mit den angegebenen Eigenschaftstypen importiert. Alle "
+"anderen werden ignoriert. Wenn keine ausgewählt sind, werden Objekte für "
+"jeden Eigenschaftstyp importiert."
+
+#: app/Propstack/ImmoObjects.php:705 app/Propstack/Imports/v1/Objects.php:461
+#: app/Propstack/Imports/v2/Objects.php:431
+msgid "The import of objects from your Propstack account has been run."
+msgstr "Der Import von Objekten aus deinem Propstack-Konto wurde durchgeführt."
+
+#: app/Propstack/ImmoObjects.php:795
+msgid "Your objects are being imported"
+msgstr "Deine Objekte werden gerade importiert"
+
+#: app/Propstack/ImmoObjects.php:796
+msgid "Deletion of objects is running"
+msgstr "Das Löschen der Objekte läuft"
+
+#: app/Propstack/ImmoObjects.php:797
+msgid "Deletion of files is running"
+msgstr "Löschen von Dateien läuft"
+
+#: app/Propstack/ImmoObjects.php:798
+msgid "Import of files is running"
+msgstr "Import von Dateien läuft"
+
+#: app/Propstack/ImmoObjects.php:799
+msgid "Processing the queue to import images"
+msgstr "Verarbeitung der Warteschlange zum Importieren von Bildern"
+
+#: app/Propstack/ImmoObjects.php:808
+msgid ""
+"<u>Request Timeout</u> - The import apparently took too long to be completed."
+msgstr ""
+"<u>Zeitüberschreitung bei der Anfrage</u> – Der Import hat offenbar zu lange "
+"gedauert, um abgeschlossen zu werden."
+
+#: app/Propstack/ImmoObjects.php:809
+msgid ""
+"<u>Gateway Timeout</u> - The import apparently took too long to be completed."
+msgstr ""
+"<u>Gateway-Zeitüberschreitung</u> – Der Import hat offenbar zu lange "
+"gedauert, um abgeschlossen zu werden."
+
+#: app/Propstack/ImmoObjects.php:823
+msgid "Deletion has been run"
+msgstr "Löschung wurde durchgeführt"
+
+#: app/Propstack/ImmoObjects.php:825
+msgid "The objects have been deleted."
+msgstr "Die Objekte wurden gelöscht."
+
+#: app/Propstack/ImmoObjects.php:826
+msgid "They are still in your Propstack account. You can import them any time."
+msgstr ""
+"Sie befinden sich weiterhin in deinem Propstack-Konto. Du kannst sie "
+"jederzeit importieren."
+
+#: app/Propstack/ImmoObjects.php:856
+msgid "Object state"
+msgstr "Objektstatus"
+
+#. translators: %1$s will be replaced by the attachment ID.
+#: app/Propstack/ImmoObjects.php:1257
+#, php-format
+msgid "Assign image %1$s as thumbnail to object %2$s."
+msgstr "Bild %1$s dem Begriff %2$s als Vorschaubild zuordnen."
+
+#: app/Propstack/ImmoObjects.php:1291
+msgid "Get the objects in tip-top shape"
+msgstr "Bringe die Objekte auf Vordermann"
+
+#: app/Propstack/ImmoObjects.php:1449
+msgid "Import your objects from Propstack"
+msgstr "Importiere deine Objekte aus Propstack"
+
+#: app/Propstack/ImmoObjects.php:1451
+msgid ""
+"Click on the button below to start the import of your objects from Propstack."
+msgstr ""
+"Klicke auf den Button unten, um den Import deiner Objekte aus Propstack zu "
+"starten."
+
+#: app/Propstack/Imports/v1/Objects.php:123
+#: app/Propstack/Imports/v1/Objects.php:129
+#: app/Propstack/Imports/v2/Objects.php:86
+#: app/Propstack/Imports/v2/Objects.php:92
+msgid "Import of objects starting"
+msgstr "Import von Objekten startet"
+
+#. translators: a title will replace %1$s.
+#: app/Propstack/Imports/v1/Objects.php:139
+#, php-format
+msgid "Import of objects in language %1$s starting"
+msgstr "Import von Objekten in der Sprache %1$s beginnt"
+
+#: app/Propstack/Imports/v1/Objects.php:154
+msgid ""
+"The Propstack API returned an unexpected HTTP status when retrieving objects:"
+msgstr ""
+"Die Propstack API antwortete mit einem nicht erwarteten HTTP Status beim "
+"Abruf von Objekten:"
+
+#: app/Propstack/Imports/v1/Objects.php:169
+msgid "Error from Propstack API for objects:"
+msgstr "Fehler von Propstack AP für Objekte:"
+
+#: app/Propstack/Imports/v1/Objects.php:192
+#: app/Propstack/Imports/v2/Objects.php:158
+msgid "Error during decoding the API response."
+msgstr "Fehler beim Dekodieren der API-Antwort."
+
+#. translators: a title will replace %1$s.
+#: app/Propstack/Imports/v1/Objects.php:213
+#: app/Propstack/Imports/v2/Objects.php:188
+#, php-format
+msgid ""
+"The objects in the %1$s language have not been modified. The import will not "
+"be performed."
+msgstr ""
+"Die Objekte in der Sprache %1$s wurden nicht geändert. Der Import wird nicht "
+"durchgeführt."
+
+#: app/Propstack/Imports/v1/Objects.php:233
+#: app/Propstack/Imports/v1/Objects.php:237
+#: app/Propstack/Imports/v2/Objects.php:199
+#: app/Propstack/Imports/v2/Objects.php:203
+msgid "Import of objects is running"
+msgstr "Import von Objekten läuft"
+
+#. translators: %1$s will be replaced by the object title.
+#: app/Propstack/Imports/v1/Objects.php:270
+#: app/Propstack/Imports/v1/Objects.php:275
+#: app/Propstack/Imports/v2/Objects.php:241
+#: app/Propstack/Imports/v2/Objects.php:246
+#, php-format
+msgid "Import of object %1$s"
+msgstr "Import des Objekts %1$s"
+
+#. translators: %1$s will be replaced by the object title.
+#: app/Propstack/Imports/v1/Objects.php:286
+#: app/Propstack/Imports/v2/Objects.php:257
+#, php-format
+msgid "Creating new entry for the object %1$s"
+msgstr "Neuen Eintrag für das Objekt %1$s erstellen"
+
+#: app/Propstack/Imports/v1/Objects.php:314
+#: app/Propstack/Imports/v2/Objects.php:285
+msgid "New object could not be created. The following error occurred:"
+msgstr ""
+"Das neue Objekt konnte nicht erstellt werden. Es ist folgender Fehler "
+"aufgetreten:"
+
+#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v2/Objects.php:365
+msgid "Following error occurred during the import of objects via API v1:"
+msgstr ""
+"Beim Import von Objekten über die API v1 ist folgender Fehler aufgetreten:"
+
+#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v2/Objects.php:365
+msgid "Message:"
+msgstr "Nachricht:"
+
+#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v2/Objects.php:365
+msgid "Code:"
+msgstr "Code:"
+
+#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v2/Objects.php:365
+msgid "File:"
+msgstr "Datei:"
+
+#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v2/Objects.php:365
+msgid "Line:"
+msgstr "Zeile:"
+
+#. translators: %1$s will be replaced by a URL.
+#: app/Propstack/Imports/v1/Objects.php:398
+#: app/Propstack/Imports/v2/Objects.php:369
+#, php-format
+msgid "Error occurred. Check <a href=\"%1$s\">the log</a> for details."
+msgstr ""
+"Es ist ein Fehler aufgetreten. Weitere Informationen findest du <a "
+"href=\"%1$s\">im Protokoll</a>."
+
+#: app/Propstack/Imports/v1/Objects.php:414
+#: app/Propstack/Imports/v2/Objects.php:385
+msgid "Import of objects has been ended."
+msgstr "Der Import der Objekte ist abgeschlossen."
+
+#: app/Propstack/Imports/v1/Objects.php:459
+#: app/Propstack/Imports/v2/Objects.php:429
+msgid "Import of objects has been run"
+msgstr "Der Import der Objekte wurde durchgeführt"
+
+#: app/Propstack/Imports/v1/Objects.php:462
+#: app/Propstack/Imports/v2/Objects.php:432
+msgid "You will find them in the list in the backend and your frontend."
+msgstr "Du findest sie in der Liste im Backend und in deinem Frontend."
+
+#: app/Propstack/Imports/v1/Objects.php:463
+#: app/Propstack/Imports/v2/Objects.php:433
+msgid ""
+"Please note that any files for the objects are imported later. However, you "
+"can also trigger their import directly from the object itself."
+msgstr ""
+"Bitte beachte, dass alle Dateien für die Objekte erst später importiert "
+"werden. Du kannst den Import jedoch auch direkt über das Objekt selbst "
+"auslösen."
+
+#. translators: a title will replace %1$s.
+#: app/Propstack/Imports/v2/Objects.php:128
+#, php-format
+msgid "Import of objects via API v2 in language %1$s starting"
+msgstr "Import von Objekten über API v2 in der Sprache %1$s wird gestartet"
+
+#: app/Propstack/Imports/v2/Objects.php:143
+msgid "Propstack API answered with wrong HTTP-status:"
+msgstr "Die Propstack-API hat einen falschen HTTP-Status zurückgegeben:"
+
+#: app/Propstack/Imports/v2/Objects.php:167
+msgid "Got no data from Propstack API v2."
+msgstr "Es wurden keine Daten von der Propstack-API v2 abgerufen."
+
+#. translators: %1$s will be replaced by the object title.
+#: app/Propstack/Imports/v2/Objects.php:229
+#, php-format
+msgid "Import of object %1$s prevented."
+msgstr "Der Import des Objekts %1$s wurde verhindert."
+
+#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:37
+msgid "To resolve this, please access the list of your API keys in Propstack:"
+msgstr ""
+"Greife auf die Liste deiner API Schlüssel in Propstack zu um das zu lösen:"
+
+#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:39
+msgid ""
+"Edit the key you are using and grant it at least the following permissions:"
+"<br><strong>Objects:</strong> Read<br><strong>Object states:</strong> Read"
+msgstr ""
+"Bearbeite den von dir verwendeten Schlüssel und erteile ihm mindestens die "
+"folgenden Berechtigungen:<br><strong>Objekte:</strong> "
+"Lesen<br><strong>Objektzustände:</strong> Lesen"
+
+#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:40
+msgid "Save these settings and then try retrieving the data again."
+msgstr ""
+"Speichere diese Einstellungen und versuche dann erneut, die Daten abzurufen."
+
+#: app/Propstack/PostTypes/ImmoObject.php:102
+msgid "Object"
+msgstr "Objekt"
+
+#: app/Propstack/PostTypes/ImmoObject.php:104
+msgid "All objects"
+msgstr "Alle Objekte"
+
+#: app/Propstack/PostTypes/ImmoObject.php:105
+#: app/Propstack/PostTypes/ImmoObject.php:368
+msgid "View object in frontend"
+msgstr "Zeige Objekt im Frontend"
+
+#: app/Propstack/PostTypes/ImmoObject.php:106
+msgid "View objects in frontend"
+msgstr "Zeige Objekte im Frontend"
+
+#: app/Propstack/PostTypes/ImmoObject.php:107
+msgid "View object in backend"
+msgstr "Zeige Objekt im Backend"
+
+#: app/Propstack/PostTypes/ImmoObject.php:108
+msgid "Search object"
+msgstr "Objekt suchen"
+
+#: app/Propstack/PostTypes/ImmoObject.php:109
+msgid "No objects imported"
+msgstr "Keine Objekte importiert"
+
+#: app/Propstack/PostTypes/ImmoObject.php:110
+msgctxt "navigation link block title"
+msgid "Object Link"
+msgstr "Objektlink"
+
+#: app/Propstack/PostTypes/ImmoObject.php:111
+msgctxt "navigation link block description"
+msgid "A link to an object."
+msgstr "Ein Link zu einem Objekt."
+
+#: app/Propstack/PostTypes/ImmoObject.php:317
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: app/Propstack/PostTypes/ImmoObject.php:485
+msgid "No thumbnail is set."
+msgstr "Kein Beitragsbild gesetzt."
+
+#: app/Propstack/PostTypes/ImmoObject.php:525
+msgid "Import images from Propstack"
+msgstr "Importiere Bilder von Propstack"
+
+#. translators: %1$s will be replaced by the object title.
+#: app/Propstack/PostTypes/ImmoObject.php:528
+#, php-format
+msgid ""
+"Click on the button below to start the import of files for %1$s from "
+"Propstack."
+msgstr ""
+"Klicke auf den Button unten, um den Import der Dateien für %1$s aus "
+"Propstack zu starten."
+
+#: app/Propstack/PostTypes/ImmoObject.php:558
+msgid "Edit in Propstack"
+msgstr "In Propstack bearbeiten"
+
+#: app/Propstack/PostTypes/Queue.php:76 app/Propstack/PostTypes/Queue.php:78
+msgid "Entries"
+msgstr "Einträge"
+
+#: app/Propstack/PostTypes/Queue.php:77
+msgid "Entry"
+msgstr "Eintrag"
+
+#: app/Propstack/PostTypes/Queue.php:79
+msgid "No entries found"
+msgstr "Keine Einträge gefunden."
+
+#: app/Propstack/PostTypes/Queue.php:140
+msgid "Basic data"
+msgstr "Basisangaben"
+
+#: app/Propstack/PostTypes/Queue.php:148
+msgid "Token"
+msgstr "Token"
+
+#: app/Propstack/PostTypes/Queue.php:152
+msgid "Title"
+msgstr "Titel"
+
+#: app/Propstack/PostTypes/Queue.php:160 app/Propstack/Tables/Queue.php:32
+msgid "URL"
+msgstr "URL"
+
+#: app/Propstack/PostTypes/Queue.php:169
+msgid "Private"
+msgstr "Privat"
+
+#: app/Propstack/PostTypes/Queue.php:174
+msgid "On landing page"
+msgstr "Auf der Ländingpage"
+
+#: app/Propstack/PostTypes/Queue.php:178
+msgid "Exposee"
+msgstr "Exposee"
+
+#: app/Propstack/PostTypes/Queue.php:183
+msgid "Second document"
+msgstr "Zweites Dokument"
+
+#: app/Propstack/PostTypes/Queue.php:187
+msgid "Floorplan"
+msgstr "Grundriss"
+
+#: app/Propstack/PostTypes/Queue.php:191
+msgid "Tags"
+msgstr "Schlagwörter"
+
+#: app/Propstack/PostTypes/Queue.php:204
+msgid "Client ID"
+msgstr "Client ID"
+
+#: app/Propstack/PostTypes/Queue.php:208
+msgid "Property ID"
+msgstr "Property ID"
+
+#: app/Propstack/PostTypes/Queue.php:216
+msgid "Client Property ID"
+msgstr "Client Property ID"
+
+#: app/Propstack/PostTypes/Queue.php:220
+msgid "Folder ID"
+msgstr "Folder ID"
+
+#: app/Propstack/PostTypes/Queue.php:224
+msgid "Imageable type"
+msgstr "Abbildbarer Typ"
+
+#: app/Propstack/PostTypes/Queue.php:228
+msgid "Imageable ID"
+msgstr "Imageable ID"
+
+#: app/Propstack/PostTypes/Queue.php:233
+msgid "Connection IDs"
+msgstr "Connection IDs"
+
+#: app/Propstack/PostTypes/Queue.php:238
+msgid "Is not for exposee"
+msgstr "Nicht für Exposee"
+
+#: app/Propstack/PostTypes/Queue.php:251
+msgid "Thumb URL"
+msgstr "Vorschaubild URL"
+
+#: app/Propstack/PostTypes/Queue.php:255
+msgid "Small thumb URL"
+msgstr "Kleines Vorschaubild URL"
+
+#: app/Propstack/PostTypes/Queue.php:259
+msgid "Square URL"
+msgstr "URL des quadratischen Bilds"
+
+#: app/Propstack/Propstack.php:174
+msgid ""
+"The specified API token is too short. Please double-check the API token in "
+"your Propstack-account."
+msgstr ""
+"Das angegebene API-Token ist zu kurz. Bitte überprüfe den API Schlüssel in "
+"deinem Propstack-Konto noch einmal."
+
+#: app/Propstack/Propstack.php:182
+msgid ""
+"The specified API token contains not allowed characters. Please double-check "
+"the API token in your Propstack-account."
+msgstr ""
+"Der angegebene API-Token enthält unzulässige Zeichen. Bitte überprüfe den "
+"API-Token in deinem Propstack-Konto noch einmal."
+
+#: app/Propstack/Propstack.php:232
+msgid "URL-slug for archive view"
+msgstr "URL-Slug für Detail-Ansicht"
+
+#: app/Propstack/Propstack.php:234 app/Propstack/Propstack.php:245
+msgid "Available tags:"
+msgstr "Verfügbare Schlagwörter:"
+
+#: app/Propstack/Propstack.php:243
+msgid "URL-slug for single view"
+msgstr "URL-Slug für Detail-Ansicht"
+
+#: app/Propstack/Queue.php:102 app/Propstack/Queue.php:106
+msgid "Queue"
+msgstr "Warteschlange"
+
+#: app/Propstack/Queue.php:119
+msgid "Enable queue"
+msgstr "Warteschlange aktivieren"
+
+#: app/Propstack/Queue.php:120
+msgid "The queue helps you to import the files for your objects in WordPress."
+msgstr ""
+"Die Warteschlange hilft dir dabei, die Dateien für deine Objekte in "
+"WordPress zu importieren."
+
+#: app/Propstack/Queue.php:130
+msgid "Set interval for queue"
+msgstr "Intervall für Warteschlange setzen"
+
+#: app/Propstack/Queue.php:131
+msgid "Defines the time interval in which queue entries will be processed."
+msgstr ""
+"Legt das Zeitintervall fest, in dem die Einträge in der Warteschlange "
+"verarbeitet werden."
+
+#: app/Propstack/Queue.php:143
+msgid "Limit per queue run"
+msgstr "Obergrenze pro Warteschlangenlauf"
+
+#: app/Propstack/Queue.php:144
+msgid ""
+"Defines the amount of entries each queue run will process. The higher the "
+"value, the more files are imported; however, this also increases the "
+"likelihood of a timeout, which in turn causes a delay in processing."
+msgstr ""
+"Legt fest, wie viele Einträge bei jedem Durchlauf der Warteschlange "
+"verarbeitet werden. Je höher der Wert, desto mehr Dateien werden importiert; "
+"allerdings steigt dadurch auch die Wahrscheinlichkeit eines "
+"Zeitüberschreitungsfehlers, was wiederum zu einer Verzögerung bei der "
+"Verarbeitung führt."
+
+#. translators: %1$s: the given title.
+#: app/Propstack/Queue.php:174
+#, php-format
+msgid "Adding files for %1$s during import."
+msgstr "Dateien für %1$s werden beim Import hinzugefügt."
+
+#. translators: %1$s: the given URL.
+#: app/Propstack/Queue.php:211
+#, php-format
+msgid "Given file ID %1$s is already in the media library."
+msgstr "Die angegebene Datei-ID %1$s ist bereits in der Mediathek vorhanden."
+
+#: app/Propstack/Queue.php:238
+msgid "File could not be added to queue. Following error occurred:"
+msgstr ""
+"Die Datei konnte nicht zur Warteschlange hinzugefügt werden. Es ist "
+"folgender Fehler aufgetreten:"
+
+#. translators: %1$s: the given URL.
+#: app/Propstack/Queue.php:267
+#, php-format
+msgid "Given file ID %1$s has been added in the queue."
+msgstr "Die Datei mit der ID %1$s wurde der Warteschlange hinzugefügt."
+
+#. translators: %1$s: the given URL.
+#: app/Propstack/Queue.php:270
+#, php-format
+msgid "Given file ID %1$s has been updated in the queue."
+msgstr "Die Datei mit der ID %1$s wurde in der Warteschlange aktualisiert."
+
+#: app/Propstack/Queue.php:362
+msgid "Processing is starting"
+msgstr "Die Verarbeitung beginnt"
+
+#. translators: %1$s: the file name.
+#: app/Propstack/Queue.php:390
+#, php-format
+msgid "Processing file %1$s for %2$s"
+msgstr "Datei %1$s für %2$s wird verarbeitet"
+
+#: app/Propstack/Queue.php:445
+msgid "Queue has been processed"
+msgstr "Die Warteschlange wurde verarbeitet"
+
+#: app/Propstack/Queue.php:447
+msgid "The images have been imported."
+msgstr "Die Bilder wurden importiert."
+
+#: app/Propstack/Queue.php:448
+msgid "You can see them now on their objects."
+msgstr "Man kann sie jetzt an ihren Objekte sehen."
+
+#: app/Propstack/Queue.php:573
+msgid "The queue has been cleared."
+msgstr "Die Warteschlange wurde geleert."
+
+#: app/Propstack/Queue.php:573
+msgid "To import files from Propstack, run the import again."
+msgstr ""
+"Um Dateien aus Propstack zu importieren, führe den Importvorgang erneut "
+"durch."
+
+#: app/Propstack/Queue.php:596
+msgid "The queue has been processed."
+msgstr "Die Warteschlange wurde bearbeitet."
+
+#: app/Propstack/Queue.php:596
+msgid "Some files have been imported. Check your objects."
+msgstr "Einige Dateien wurden importiert. Überprüfe deine Objekte."
+
+#: app/Propstack/Tables/Queue.php:155
+msgid "Process the queue now"
+msgstr "Warteschlange jetzt bearbeiten"
+
+#: app/Propstack/Tables/Queue.php:157
+msgid "Are you sure you want to process the queue now?"
+msgstr "Möchtest du die Warteschlange wirklich jetzt verarbeiten lassen?"
+
+#. translators: %1$s will be replaced by a number, %2$s by a URL.
+#: app/Propstack/Tables/Queue.php:159
+#, php-format
+msgid ""
+"Only max. %1$d entries will be processed according <a href=\"%2$s\">to your "
+"setting</a>."
+msgstr ""
+"Es werden nur maximal %1$d Einträge entsprechend <a href=\"%2$s\">deiner "
+"Einstellung</a> verarbeitet."
+
+#: app/Propstack/Tables/Queue.php:160
+msgid "This might take some time. You have to be patient."
+msgstr "Das könnte eine Weile dauern. Du musst Geduld haben."
+
+#: app/Propstack/Tables/Queue.php:166
+msgid "Yes, process the queue"
+msgstr "Ja, die Warteschlange verarbeiten"
+
+#: app/Propstack/Tables/Queue.php:177
+msgid "Process queue"
+msgstr "Warteschlange verarbeiten"
+
+#: app/Propstack/Tables/Queue.php:192
+msgid "Clear the queue now"
+msgstr "Warteschlange jetzt löschen"
+
+#: app/Propstack/Tables/Queue.php:194
+msgid "Are you sure you want to clear the queue now?"
+msgstr "Möchtest du die Warteschlange wirklich jetzt löschen?"
+
+#: app/Propstack/Tables/Queue.php:195
+msgid "Every entry in the queue will be deleted."
+msgstr "Alle Einträge in der Warteschlange werden gelöscht."
+
+#: app/Propstack/Tables/Queue.php:201
+msgid "Yes, clear the queue"
+msgstr "Ja, die Warteschlange löschen"
+
+#: app/Propstack/Tables/Queue.php:212
+msgid "Clear queue"
+msgstr "Warteschlange löschen"
+
+#: app/Propstack/Tables/Queue.php:221
+msgid "The queue to import files from Propstack is empty."
+msgstr "Die Warteschlange für den Import von Dateien aus Propstack ist leer."
+
+#: app/Propstack/Tables/Queue.php:260
+msgid "Get options with Pro"
+msgstr "Mehr Optionen mit Pro"
+
+#: app/Propstack/Taxonomies.php:544
+msgid "Get the terms in tip-top shape"
+msgstr "Bringe die Begriffe auf Vordermann"
+
+#: app/Propstack/Taxonomies/Broker.php:100
+msgctxt "taxonomy general name"
+msgid "Broker"
+msgstr "Makler"
+
+#: app/Propstack/Taxonomies/Broker.php:101
+msgctxt "taxonomy singular name"
+msgid "Broker"
+msgstr "Makler"
+
+#: app/Propstack/Taxonomies/Broker.php:102
+msgid "Search broker"
+msgstr "Makler suchen"
+
+#: app/Propstack/Taxonomies/Broker.php:103
+msgid "Edit broker"
+msgstr "Makler bearbeiten"
+
+#: app/Propstack/Taxonomies/Broker.php:104
+msgid "Update broker"
+msgstr "Makler aktualisieren"
+
+#: app/Propstack/Taxonomies/Broker.php:106
+msgid "Go to all broker"
+msgstr "Alle Makler anzeigen"
+
+#. translators: %1$s: Category title, %2$s: Term title.
+#: app/Propstack/Taxonomies/Broker.php:167
+#, php-format
+msgctxt "Broker category title"
+msgid "%1$s %2$s"
+msgstr "%1$s %2$s"
+
+#: app/Propstack/Taxonomies/Category.php:70
+msgctxt "taxonomy general name"
+msgid "Category"
+msgstr "Kategorie"
+
+#: app/Propstack/Taxonomies/Category.php:71
+msgctxt "taxonomy singular name"
+msgid "Category"
+msgstr "Kategorie"
+
+#: app/Propstack/Taxonomies/Category.php:72
+msgid "Search categories"
+msgstr "Kategorien suchen"
+
+#: app/Propstack/Taxonomies/Category.php:73
+msgid "Edit category"
+msgstr "Kategorie bearbeiten"
+
+#: app/Propstack/Taxonomies/Category.php:74
+msgid "Update category"
+msgstr "Kategorie aktualisieren"
+
+#: app/Propstack/Taxonomies/Category.php:75
+msgid "Categories"
+msgstr "Kategorien"
+
+#: app/Propstack/Taxonomies/Category.php:76
+msgid "Go to all categories"
+msgstr "Gehe zu allen Kategorien"
+
+#: app/Propstack/Taxonomies/Category.php:95
+msgid "Living"
+msgstr "Wohnen"
+
+#: app/Propstack/Taxonomies/Category.php:100
+msgid "Commercial"
+msgstr "Gewerbe"
+
+#: app/Propstack/Taxonomies/Category.php:105
+msgid "Investment"
+msgstr "Investition"
+
+#: app/Propstack/Taxonomies/MarketingType.php:70
+msgctxt "taxonomy general name"
+msgid "Marketing types"
+msgstr "Marketingtypen"
+
+#: app/Propstack/Taxonomies/MarketingType.php:71
+msgctxt "taxonomy singular name"
+msgid "Marketing type"
+msgstr "Marketingtyp"
+
+#: app/Propstack/Taxonomies/MarketingType.php:72
+msgid "Search marketing types"
+msgstr "Suche nach Marketingtyp"
+
+#: app/Propstack/Taxonomies/MarketingType.php:73
+msgid "Edit marketing type"
+msgstr "Marketingtyp bearbeiten"
+
+#: app/Propstack/Taxonomies/MarketingType.php:74
+msgid "Update marketing type"
+msgstr "Marketingtyp aktualisieren"
+
+#: app/Propstack/Taxonomies/MarketingType.php:75
+msgid "Marketing types"
+msgstr "Marketingtypen"
+
+#: app/Propstack/Taxonomies/MarketingType.php:76
+msgid "Go to all marketing types"
+msgstr "Gehe zu allen Marketingtypen"
+
+#: app/Propstack/Taxonomies/MarketingType.php:95
+msgid "Buy"
+msgstr "Kaufen"
+
+#: app/Propstack/Taxonomies/ObjectType.php:74
+msgctxt "taxonomy general name"
+msgid "Object type"
+msgstr "Objekttyp"
+
+#: app/Propstack/Taxonomies/ObjectType.php:75
+msgctxt "taxonomy singular name"
+msgid "Object type"
+msgstr "Objekttyp"
+
+#: app/Propstack/Taxonomies/ObjectType.php:76
+msgid "Search Object type"
+msgstr "Suche nach Objekttyp"
+
+#: app/Propstack/Taxonomies/ObjectType.php:77
+msgid "Edit object type"
+msgstr "Objekttyp bearbeiten"
+
+#: app/Propstack/Taxonomies/ObjectType.php:78
+msgid "Update object type"
+msgstr "Objekttyp aktualisieren"
+
+#: app/Propstack/Taxonomies/ObjectType.php:79
+msgid "Object Types"
+msgstr "Objekttypen"
+
+#: app/Propstack/Taxonomies/ObjectType.php:80
+msgid "Go to all object types"
+msgstr "Gehe zu allen Objekttypen"
+
+#: app/Propstack/Taxonomies/ObjectTypes/Apartment.php:251
+#: app/Propstack/Taxonomies/PropertyType.php:95
+msgid "Apartment"
+msgstr "Wohnung"
+
+#: app/Propstack/Taxonomies/ObjectTypes/Apartment.php:260
+msgid "Show data of your apartment"
+msgstr "Zeige die Daten deiner Wohnung"
+
+#: app/Propstack/Taxonomies/ObjectTypes/Garage.php:216
+#: app/Propstack/Taxonomies/PropertyType.php:200
+msgid "Garage"
+msgstr "Garage"
+
+#: app/Propstack/Taxonomies/ObjectTypes/House.php:239
+msgid "House"
+msgstr "Haus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:70
+msgctxt "taxonomy general name"
+msgid "Property Type"
+msgstr "Objektart"
+
+#: app/Propstack/Taxonomies/PropertyType.php:71
+msgctxt "taxonomy singular name"
+msgid "Property Type"
+msgstr "Objektart"
+
+#: app/Propstack/Taxonomies/PropertyType.php:72
+msgid "Search Property Types"
+msgstr "Suche nach Objektart"
+
+#: app/Propstack/Taxonomies/PropertyType.php:73
+msgid "Edit Property Type"
+msgstr "Objektart bearbeiten"
+
+#: app/Propstack/Taxonomies/PropertyType.php:74
+msgid "Update Property Type"
+msgstr "Objektart aktualisieren"
+
+#: app/Propstack/Taxonomies/PropertyType.php:75
+msgid "Property Types"
+msgstr "Objektarten"
+
+#: app/Propstack/Taxonomies/PropertyType.php:76
+msgid "Go to all Property Types"
+msgstr "Gehe zu allen Objektarten"
+
+#: app/Propstack/Taxonomies/PropertyType.php:100
+msgid "Assisted Living"
+msgstr "Betreutes Wohnen"
+
+#: app/Propstack/Taxonomies/PropertyType.php:105
+msgid "Attic Apartment"
+msgstr "Dachgeschosswohnung"
+
+#: app/Propstack/Taxonomies/PropertyType.php:110
+msgid "Bar / Lounge"
+msgstr "Bar / Lounge"
+
+#: app/Propstack/Taxonomies/PropertyType.php:115
+msgid "Bungalow"
+msgstr "Bungalow"
+
+#: app/Propstack/Taxonomies/PropertyType.php:120
+msgid "Cafe"
+msgstr "Cafe"
+
+#: app/Propstack/Taxonomies/PropertyType.php:125
+msgid "Carport"
+msgstr "Carport"
+
+#: app/Propstack/Taxonomies/PropertyType.php:130
+msgid "Car Park"
+msgstr "Parkplatz"
+
+#: app/Propstack/Taxonomies/PropertyType.php:135
+msgid "Castle / Manor House"
+msgstr "Schloss / Herrenhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:140
+msgid "Club / Disco"
+msgstr "Club / Disco"
+
+#: app/Propstack/Taxonomies/PropertyType.php:145
+msgid "Cold Storage"
+msgstr "Kühlhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:150
+msgid "Commercial Centre"
+msgstr "Commercial Centre"
+
+#: app/Propstack/Taxonomies/PropertyType.php:155
+msgid "Commercial Unit"
+msgstr "Gewerbeeinheit"
+
+#: app/Propstack/Taxonomies/PropertyType.php:160
+msgid "Department Store"
+msgstr "Kaufhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:165
+msgid "Double Garage"
+msgstr "Doppelgarage"
+
+#: app/Propstack/Taxonomies/PropertyType.php:170
+msgid "Duplex"
+msgstr "Doppelt"
+
+#: app/Propstack/Taxonomies/PropertyType.php:175
+msgid "End Terrace House"
+msgstr "Reihenendhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:180
+msgid "Factory Outlet"
+msgstr "Fabrikverkauf"
+
+#: app/Propstack/Taxonomies/PropertyType.php:185
+msgid "Farm"
+msgstr "Bauernhof"
+
+#: app/Propstack/Taxonomies/PropertyType.php:190
+msgid "Farmhouse"
+msgstr "Bauernhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:195
+msgid "Finca"
+msgstr "Finca"
+
+#: app/Propstack/Taxonomies/PropertyType.php:205
+msgid "Ground Floor"
+msgstr "Erdgeschoss"
+
+#: app/Propstack/Taxonomies/PropertyType.php:210
+msgid "Guest House"
+msgstr "Gästehaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:215
+msgid "Half Basement"
+msgstr "Halbkeller"
+
+#: app/Propstack/Taxonomies/PropertyType.php:220
+msgid "Hall"
+msgstr "Halle"
+
+#: app/Propstack/Taxonomies/PropertyType.php:225
+msgid "High Rack Storage"
+msgstr "Hochregallager"
+
+#: app/Propstack/Taxonomies/PropertyType.php:230
+msgid "Horse Farm"
+msgstr "Pferdefarm"
+
+#: app/Propstack/Taxonomies/PropertyType.php:235
+msgid "Hotel"
+msgstr "Hotel"
+
+#: app/Propstack/Taxonomies/PropertyType.php:240
+msgid "Hotel Garni"
+msgstr "Hotel Garni"
+
+#: app/Propstack/Taxonomies/PropertyType.php:245
+msgid "Hotel Residence"
+msgstr "Hotel Residence"
+
+#: app/Propstack/Taxonomies/PropertyType.php:250
+msgid "Industrial Area"
+msgstr "Gewerbegebiet"
+
+#: app/Propstack/Taxonomies/PropertyType.php:255
+msgid "Industry Hall"
+msgstr "Industriehalle"
+
+#: app/Propstack/Taxonomies/PropertyType.php:260
+msgid "Industry Hall with Open Area"
+msgstr "Industriehalle mit Freifläche"
+
+#: app/Propstack/Taxonomies/PropertyType.php:265
+msgid "Investment Assisted Living"
+msgstr "Betreutes Wohnen mit Kapitalbeteiligung"
+
+#: app/Propstack/Taxonomies/PropertyType.php:270
+msgid "Investment Boarding House"
+msgstr "Investitionspension"
+
+#: app/Propstack/Taxonomies/PropertyType.php:275
+msgid "Investment Car Park"
+msgstr "Parkplatz für Investoren"
+
+#: app/Propstack/Taxonomies/PropertyType.php:280
+msgid "Investment Clinic"
+msgstr "Anlageberatung"
+
+#: app/Propstack/Taxonomies/PropertyType.php:285
+msgid "Investment Commercial Building"
+msgstr "Investitionsobjekt: Gewerbeimmobilie"
+
+#: app/Propstack/Taxonomies/PropertyType.php:290
+msgid "Investment Commercial Centre"
+msgstr "Investitionszentrum für Gewerbeimmobilien"
+
+#: app/Propstack/Taxonomies/PropertyType.php:295
+msgid "Investment Commercial Unit"
+msgstr "Abteilung für gewerbliche Immobilieninvestitionen"
+
+#: app/Propstack/Taxonomies/PropertyType.php:300
+msgid "Investment Day Care"
+msgstr "Investment-Kindertagesstätte"
+
+#: app/Propstack/Taxonomies/PropertyType.php:305
+msgid "Investment Day Nursery"
+msgstr "Investment-Kindertagesstätte"
+
+#: app/Propstack/Taxonomies/PropertyType.php:310
+msgid "Investment Hall / Storage"
+msgstr "Investitionshalle / Lager"
+
+#: app/Propstack/Taxonomies/PropertyType.php:315
+msgid "Investment Hotel"
+msgstr "Investitionshotel"
+
+#: app/Propstack/Taxonomies/PropertyType.php:320
+msgid "Investment Housing Estate"
+msgstr "Wohnanlage für Kapitalanlagezwecke"
+
+#: app/Propstack/Taxonomies/PropertyType.php:325
+msgid "Investment Industrial Property"
+msgstr "Investitionen in Gewerbeimmobilien"
+
+#: app/Propstack/Taxonomies/PropertyType.php:330
+msgid "Investment Integration Assistance"
+msgstr "Unterstützung bei der Integration von Investitionen"
+
+#: app/Propstack/Taxonomies/PropertyType.php:335
+msgid "Investment Living / Business House"
+msgstr "Wohn- und Geschäftshaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:340
+msgid "Investment Medical Service Center"
+msgstr "Investitionszentrum für medizinische Dienstleistungen"
+
+#: app/Propstack/Taxonomies/PropertyType.php:345
+msgid "Investment Micro Apartments"
+msgstr "Mikro-Wohnungen als Kapitalanlage"
+
+#: app/Propstack/Taxonomies/PropertyType.php:350
+msgid "Investment Nursing Home"
+msgstr "Pflegeheim mit Kapitalbeteiligung"
+
+#: app/Propstack/Taxonomies/PropertyType.php:355
+msgid "Investment Office & Commercial Building"
+msgstr "Anlagebüro & Geschäftsgebäude"
+
+#: app/Propstack/Taxonomies/PropertyType.php:360
+msgid "Investment Office Building"
+msgstr "Bürogebäude als Kapitalanlage"
+
+#: app/Propstack/Taxonomies/PropertyType.php:365
+msgid "Investment Other"
+msgstr "Investitionen Sonstiges"
+
+#: app/Propstack/Taxonomies/PropertyType.php:370
+msgid "Investment Plot"
+msgstr "Investitionsgrundstück"
+
+#: app/Propstack/Taxonomies/PropertyType.php:375
+msgid "Investment Rehab Clinic"
+msgstr "Klinik für Immobilienrenovierung"
+
+#: app/Propstack/Taxonomies/PropertyType.php:380
+msgid "Investment Retail Park"
+msgstr "Investitions-Einkaufszentrum"
+
+#: app/Propstack/Taxonomies/PropertyType.php:385
+msgid "Investment Shopping Centre"
+msgstr "Einkaufszentrum als Kapitalanlage"
+
+#: app/Propstack/Taxonomies/PropertyType.php:390
+msgid "Investment Shop / Sales Floor"
+msgstr "Anlageberatung / Verkaufsbereich"
+
+#: app/Propstack/Taxonomies/PropertyType.php:395
+msgid "Investment Supermarket"
+msgstr "Investment-Supermarkt"
+
+#: app/Propstack/Taxonomies/PropertyType.php:400
+msgid "Investment Surgery Building"
+msgstr "Gebäude für Investitionschirurgie"
+
+#: app/Propstack/Taxonomies/PropertyType.php:405
+msgid "Kiosk"
+msgstr "Kiosk"
+
+#: app/Propstack/Taxonomies/PropertyType.php:410
+msgid "Leisure Facility"
+msgstr "Freizeitanlage"
+
+#: app/Propstack/Taxonomies/PropertyType.php:415
+msgid "Living & Commercial Building"
+msgstr "Wohn- und Geschäftsgebäude"
+
+#: app/Propstack/Taxonomies/PropertyType.php:420
+msgid "Loft"
+msgstr "Loft"
+
+#: app/Propstack/Taxonomies/PropertyType.php:425
+msgid "Maisonette"
+msgstr "Maisonette"
+
+#: app/Propstack/Taxonomies/PropertyType.php:430
+msgid "Mid Terrace House"
+msgstr "Reihenhaus in der Mitte"
+
+#: app/Propstack/Taxonomies/PropertyType.php:435
+msgid "Multi Family House"
+msgstr "Mehrfamilienhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:440
+msgid "Multideck Cabinet Storage"
+msgstr "Mehrstöckige Schrankaufbewahrung"
+
+#: app/Propstack/Taxonomies/PropertyType.php:445
+msgid "No Information"
+msgstr "Keine Informationen"
+
+#: app/Propstack/Taxonomies/PropertyType.php:450
+msgid "Nursing Home"
+msgstr "Pflegeheim"
+
+#: app/Propstack/Taxonomies/PropertyType.php:455
+msgid "Office"
+msgstr "Büro"
+
+#: app/Propstack/Taxonomies/PropertyType.php:460
+msgid "Office & Commercial Building"
+msgstr "Büro- und Geschäftsgebäude"
+
+#: app/Propstack/Taxonomies/PropertyType.php:465
+msgid "Office Building"
+msgstr "Bürogebäude"
+
+#: app/Propstack/Taxonomies/PropertyType.php:470
+msgid "Office Centre"
+msgstr "Bürozentrum"
+
+#: app/Propstack/Taxonomies/PropertyType.php:475
+msgid "Office Floor"
+msgstr "Büroetage"
+
+#: app/Propstack/Taxonomies/PropertyType.php:480
+msgid "Office Loft"
+msgstr "Büro-Loft"
+
+#: app/Propstack/Taxonomies/PropertyType.php:485
+msgid "Office / Storage Building"
+msgstr "Büro- und Lagergebäude"
+
+#: app/Propstack/Taxonomies/PropertyType.php:495
+msgid "Pension"
+msgstr "Pension"
+
+#: app/Propstack/Taxonomies/PropertyType.php:500
+msgid "Penthouse"
+msgstr "Penthouse"
+
+#: app/Propstack/Taxonomies/PropertyType.php:505
+msgid "Raised Ground Floor"
+msgstr "Erhöhtes Erdgeschoss"
+
+#: app/Propstack/Taxonomies/PropertyType.php:510
+msgid "Repair Shop"
+msgstr "Werkstatt"
+
+#: app/Propstack/Taxonomies/PropertyType.php:515
+msgid "Restaurant"
+msgstr "Restaurant"
+
+#: app/Propstack/Taxonomies/PropertyType.php:520
+msgid "Residence"
+msgstr "Residence"
+
+#: app/Propstack/Taxonomies/PropertyType.php:525
+msgid "Roof Storey"
+msgstr "Dachgeschoss"
+
+#: app/Propstack/Taxonomies/PropertyType.php:530
+msgid "Sales Area"
+msgstr "Verkaufsfläche"
+
+#: app/Propstack/Taxonomies/PropertyType.php:535
+msgid "Sales Hall"
+msgstr "Verkaufshalle"
+
+#: app/Propstack/Taxonomies/PropertyType.php:540
+msgid "Semi-detached House"
+msgstr "Doppelhaushälfte"
+
+#: app/Propstack/Taxonomies/PropertyType.php:545
+msgid "Service Area"
+msgstr "Einzugsgebiet"
+
+#: app/Propstack/Taxonomies/PropertyType.php:550
+msgid "Showroom Space"
+msgstr "Ausstellungsfläche"
+
+#: app/Propstack/Taxonomies/PropertyType.php:555
+msgid "Single Family House"
+msgstr "Einfamilienhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:560
+msgid "Special Estate"
+msgstr "Sondervermögen"
+
+#: app/Propstack/Taxonomies/PropertyType.php:565
+msgid "Special Real Estate"
+msgstr "Spezialimmobilien"
+
+#: app/Propstack/Taxonomies/PropertyType.php:570
+msgid "Storage Area"
+msgstr "Lagerbereich"
+
+#: app/Propstack/Taxonomies/PropertyType.php:575
+msgid "Storage Hall"
+msgstr "Lagerbereich"
+
+#: app/Propstack/Taxonomies/PropertyType.php:580
+msgid "Storage with Open Area"
+msgstr "Lager mit Freifläche"
+
+#: app/Propstack/Taxonomies/PropertyType.php:585
+msgid "Street Parking"
+msgstr "Parken auf der Straße"
+
+#: app/Propstack/Taxonomies/PropertyType.php:590
+msgid "Studio"
+msgstr "Studio"
+
+#: app/Propstack/Taxonomies/PropertyType.php:595
+msgid "Summer Residence"
+msgstr "Sommerresidenz"
+
+#: app/Propstack/Taxonomies/PropertyType.php:600
+msgid "Surgery"
+msgstr "Chirurgie"
+
+#: app/Propstack/Taxonomies/PropertyType.php:605
+msgid "Surgery Building"
+msgstr "Chirurgisches Gebäude"
+
+#: app/Propstack/Taxonomies/PropertyType.php:610
+msgid "Surgery Floor"
+msgstr "Operationsstation"
+
+#: app/Propstack/Taxonomies/PropertyType.php:615
+msgid "Tavern"
+msgstr "Taverne"
+
+#: app/Propstack/Taxonomies/PropertyType.php:620
+msgid "Terrace End House"
+msgstr "Reihenendhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:625
+msgid "Terrace House"
+msgstr "Reihenhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:630
+msgid "Terraced Flat"
+msgstr "Reihenhauswohnung"
+
+#: app/Propstack/Taxonomies/PropertyType.php:635
+msgid "Townhouse"
+msgstr "Stadthaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:640
+msgid "Two Family House"
+msgstr "Zweifamilienhaus"
+
+#: app/Propstack/Taxonomies/PropertyType.php:645
+msgid "Underground Garage"
+msgstr "Tiefgarage"
+
+#: app/Propstack/Taxonomies/PropertyType.php:650
+msgid "Villa"
+msgstr "Villa"
+
+#: app/Propstack/Taxonomies/PropertyType.php:655
+msgid "Vineyard"
+msgstr "Weingut"
+
+#: app/Propstack/Taxonomies/PropertyType.php:660
+msgid "Workshop"
+msgstr "Workshop"
+
+#: app/Propstack/Taxonomy.php:325
+msgid "No terms assigned."
+msgstr "Keine Begriffe zugewiesen."
+
+#. translators: %1$s: category title, %2$s: term title
+#: app/Propstack/Taxonomy.php:510
+#, php-format
+msgid "%1$s for %2$s"
+msgstr "%1$s für %2$s"
+
+#: app/Propstack/Widgets/Broker_Field.php:116
+#: app/Propstack/Widgets/Field.php:121
+msgid "Empty field."
+msgstr "Leeres Feld."
+
+#: app/Propstack/Widgets/Description.php:102
+msgid "No description set."
+msgstr "Es wurde keine Beschreibung angegeben."
+
+#: app/Propstack/Widget_Base.php:153 app/Propstack/Widget_Base.php:162
+#: app/Propstack/Widget_Base.php:200
+msgid "Click to copy this code in your clipboard"
+msgstr "Klicke um diesen Code in ihre Zwischenablage zu kopieren"
+
+#: app/Propstack/Widget_Base.php:160
+msgid "Attributes:"
+msgstr "Eigenschaften:"
+
+#: app/Propstack/Widget_Base.php:162
+msgid "required"
+msgstr "erforderlich"
+
+#: app/Propstack/Widget_Base.php:165
+msgid "Example:"
+msgstr "Beispiel:"
+
+#: app/Propstack/Widget_Base.php:167
+msgid "Does not have any attributes."
+msgstr "Hat keine Attribute."
+
+#~ msgid "There are currently no objects available."
+#~ msgstr "Derzeit sind keine Objekte verfügbar."
+
+#~ msgid "Filter"
+#~ msgstr "Filter"
+
+#~ msgid "Provides a block to show a list of objects from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um eine Liste von Objekten aus Propstack "
+#~ "anzuzeigen."
+
+#~ msgid "Broker field"
+#~ msgstr "Maklerfeld"
+
+#~ msgid ""
+#~ "Provides a block to show a single field value of a broker from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um einen einzelnen Feldwert eines Maklers aus "
+#~ "Propstack anzuzeigen."
+
+#~ msgid ""
+#~ "Provides a block to show a description of a single object from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um eine Beschreibung eines einzelnen Objekts "
+#~ "aus Propstack anzuzeigen."
+
+#~ msgid "Select description"
+#~ msgstr "Beschreibung wählen"
+
+#~ msgid "Field"
+#~ msgstr "Feld"
+
+#~ msgid ""
+#~ "Provides a block to show a single field value of a single object from "
+#~ "Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um einen einzelnen Feldwert eines einzelnen "
+#~ "Objekts aus Propstack anzuzeigen."
+
+#~ msgid "Provides a block to the filter for objects from Propstack."
+#~ msgstr ""
+#~ "Stellt dem Filter einen Block für Objekte aus Propstack zur Verfügung."
+
+#~ msgid "Select filters"
+#~ msgstr "Filter wählen"
+
+#~ msgid "Gallery"
+#~ msgstr "Galerie"
+
+#~ msgid "Provides a block to show gallery for a single object from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block zum Filtern von Objekten aus Propstack zur Verfügung."
+
+#~ msgid "Single Object"
+#~ msgstr "Einzelobjekt"
+
+#~ msgid "Provides a block to show an immo object managed by Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block zur Verfügung, um ein von Propstack verwaltetes Immo-"
+#~ "Objekt anzuzeigen."
+
+#~ msgid "Please choose"
+#~ msgstr "Bitte wählen"
+
+#~ msgid "Select object"
+#~ msgstr "Objekt wählen"
+
+#~ msgctxt "block title"
+#~ msgid "List of objects"
+#~ msgstr "Liste mit Objekten"
+
+#~ msgctxt "block description"
+#~ msgid "Provides a block to show a list of objects from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um eine Liste von Objekten aus Propstack "
+#~ "anzuzeigen."
+
+#~ msgctxt "block keyword"
+#~ msgid "Propstack"
+#~ msgstr "Propstack"
+
+#~ msgctxt "block title"
+#~ msgid "Broker field"
+#~ msgstr "Maklerfeld"
+
+#~ msgctxt "block description"
+#~ msgid ""
+#~ "Provides a block to show a single field value of a broker from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um einen einzelnen Feldwert eines Brokers aus "
+#~ "Propstack anzuzeigen."
+
+#~ msgctxt "block title"
+#~ msgid "Description"
+#~ msgstr "Beschreibung"
+
+#~ msgctxt "block description"
+#~ msgid ""
+#~ "Provides a block to show a description of a single object from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um eine Beschreibung eines einzelnen Objekts "
+#~ "aus Propstack anzuzeigen."
+
+#~ msgctxt "block title"
+#~ msgid "Field"
+#~ msgstr "Feld"
+
+#~ msgctxt "block description"
+#~ msgid ""
+#~ "Provides a block to show a single field value of a single object from "
+#~ "Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um einen einzelnen Feldwert eines einzelnen "
+#~ "Objekts aus Propstack anzuzeigen."
+
+#~ msgctxt "block description"
+#~ msgid "Provides a block to the filter for objects from Propstack."
+#~ msgstr ""
+#~ "Stellt dem Filter einen Block für Objekte aus Propstack zur Verfügung."
+
+#~ msgctxt "block title"
+#~ msgid "Gallery"
+#~ msgstr "Galerie"
+
+#~ msgctxt "block description"
+#~ msgid "Provides a block to show gallery for a single object from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um eine Galerie für ein einzelnes Objekt aus "
+#~ "Propstack anzuzeigen."
+
+#~ msgctxt "block title"
+#~ msgid "Single Object"
+#~ msgstr "Einzelobjekt"
+
+#~ msgctxt "block description"
+#~ msgid "Provides a block to show a single object from Propstack."
+#~ msgstr ""
+#~ "Stellt einen Block bereit, um ein einzelnes Objekt aus Propstack "
+#~ "anzuzeigen."
+
+#~ msgid "Import Objects"
+#~ msgstr "Objekte importieren"
+
+#, php-format
+#~ msgid "Import object %1$s"
+#~ msgstr "Importiere Objekt %1$s"

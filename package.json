@@ -1,0 +1,45 @@
+{
+  "name": "@connector-for-propstack/connector-for-propstack",
+  "version": "1.0.0",
+  "description": "Provides Blocks for Connector for Propstack.",
+  "author": "laOlaWeb GmbH",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "concurrently --kill-others \"npm run build:archive\" \"npm run build:single\" \"npm run build:description\" \"npm run build:field\" \"npm run build:broker-field\" \"npm run build:filter\" \"npm run build:lightbox\" \"npm run build:gallery\"",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "start": "concurrently --kill-others \"npm run start:archive\" \"npm run start:single\" \"npm run start:description\" \"npm run start:field\" \"npm run start:broker-field\" \"npm run start:filter\" \"npm run start:lightbox\" \"npm run start:gallery\"",
+    "packages-update": "wp-scripts packages-update",
+    "start:description": "wp-scripts start blocks/description/src/index.js --output-path=blocks/description/build/",
+    "build:description": "wp-scripts build blocks/description/src/index.js --output-path=blocks/description/build/",
+    "start:single": "wp-scripts start blocks/single/src/index.js --output-path=blocks/single/build/",
+    "build:single": "wp-scripts build blocks/single/src/index.js --output-path=blocks/single/build/",
+    "start:archive": "wp-scripts start blocks/archive/src/index.js --output-path=blocks/archive/build/",
+    "build:archive": "wp-scripts build blocks/archive/src/index.js --output-path=blocks/archive/build/",
+    "start:field": "wp-scripts start blocks/field/src/index.js --output-path=blocks/field/build/",
+    "build:field": "wp-scripts build blocks/field/src/index.js --output-path=blocks/field/build/",
+    "start:filter": "wp-scripts start blocks/filter/src/index.js --output-path=blocks/filter/build/",
+    "build:filter": "wp-scripts build blocks/filter/src/index.js --output-path=blocks/filter/build/",
+    "start:gallery": "wp-scripts start blocks/gallery/src/index.js --output-path=blocks/gallery/build/",
+    "build:gallery": "wp-scripts build blocks/gallery/src/index.js --output-path=blocks/gallery/build/",
+    "start:broker-field": "wp-scripts start blocks/broker-field/src/index.js --output-path=blocks/broker-field/build/",
+    "build:broker-field": "wp-scripts build blocks/broker-field/src/index.js --output-path=blocks/broker-field/build/",
+    "start:lightbox": "wp-scripts start src/lightbox3.js --output-path=js/generated/",
+    "build:lightbox": "wp-scripts build src/lightbox3.js --output-path=js/generated/",
+    "make-pot": "wp i18n make-pot . languages/propstack-connector.pot --exclude=blocks/single/src/,blocks/description/src/,blocks/field/src/,blocks/archive/src/,svn/",
+    "make-json": "wp i18n make-json languages",
+    "global-styles": "cat blocks/*/build/style-index.css > css/blocks.css"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "~30.7",
+    "npm-pack-zip": "^1.3.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/runtime": "^7.28.4",
+    "@wordpress/i18n": "^6.2.0",
+    "concurrently": "^9.2.1",
+    "lightbox3": "^1.1.0"
+  }
+}

@@ -1,0 +1,10 @@
+.propstack-connector-gallery .gallery {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 20px;
+	a { display: block }
+}
+
+.lightbox3-image {
+	border-radius: 0 !important;
+}

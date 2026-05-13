@@ -1,0 +1,1068 @@
+[
+    {
+        "documents": [],
+        "id": 42,
+        "name": "Musterstraße 1 Hinterhaus",
+        "title": {
+            "label": "Überschrift",
+            "value": "Musterhaus"
+        },
+        "unit_id": "A42",
+        "exposee_id": null,
+        "project_id": null,
+        "location_id": null,
+        "broker_id": 64,
+        "archived": false,
+        "token": "IOJJO7llHKULL7",
+        "street": "Musterstraße 1",
+        "house_number": "128",
+        "apartment_number": null,
+        "zip_code": "01234",
+        "city": "Musterhausen",
+        "address": "Musterstraße 1, 01234 Musterhausen, Deutschland",
+        "short_address": "Musterstraße 18, 01234 Musterhausen",
+        "lat": 51.3069800,
+        "lng": 12.3266500,
+        "country": "DEU",
+        "custom_lp_address": null,
+        "district": {
+            "label": "Gemarkung",
+            "value": null
+        },
+        "region": null,
+        "hide_address": true,
+        "location_name": null,
+        "sublocality_level_1": null,
+        "property_space_value": 62.0,
+        "for_bidding": false,
+        "group_ids": [],
+        "construction_type": null,
+        "recommended_use_types": null,
+        "marketing_type": "BUY",
+        "object_type": "LIVING",
+        "rs_type": "APARTMENT",
+        "rs_category": "MAISONETTE",
+        "custom_fields": {
+            "objekt_webseiten_url": {
+                "value": null,
+                "pretty_value": null
+            },
+            "kein_automatischer_exposeversand": {
+                "value": null,
+                "pretty_value": "Nein"
+            }
+        },
+        "sold_date": null,
+        "valuation_price": null,
+        "valuation_price_from": null,
+        "valuation_price_to": null,
+        "total_commission": 10800.0,
+        "internal_commission": 5400.0,
+        "external_commission": 5400.0,
+        "internal_commission_percentage": 3,
+        "external_commission_percentage": 3,
+        "property_groups": [],
+        "property_status": {
+            "id": 222051,
+            "name": "Vermarktung",
+            "position": 3,
+            "color": "#DC143C",
+            "exclude_from_search_profile_matching": false,
+            "disable_expose_landing_page": false,
+            "remove_from_portal": false
+        },
+        "broker": {
+            "id": 64,
+            "salutation": "mr",
+            "academic_title": null,
+            "first_name": "Max",
+            "last_name": "Mustermann",
+            "name": "Max Mustermann",
+            "avatar": "https://images.propstack.de/photos/musterfoto.png",
+            "avatar_url": "https://images.propstack.de/photos/musterfoto.png",
+            "old_crm_id": "",
+            "position": "Immobilienberater und Inhaber",
+            "email": "max.mustermann@musterdomain.tld",
+            "phone_system_number": "",
+            "phone_system_numbers": [
+                {
+                    "value": "",
+                    "group_id": null,
+                    "position": null
+                }
+            ],
+            "phone": null,
+            "cell": "0123 4567890",
+            "public_phone": null,
+            "public_cell": "0123 4567890",
+            "public_email": "kontakt@musterdomain.tld",
+            "color": "#5F9EA0",
+            "locale": "de",
+            "connected": true,
+            "team_id": null,
+            "department_ids": [],
+            "abstract": null,
+            "description": null,
+            "custom_fields": {
+                "qualifikation": {
+                    "value": "Immobilienberater",
+                    "pretty_value": "Immobilienberater"
+                },
+                "manager": {
+                    "value": null,
+                    "pretty_value": null
+                }
+            },
+            "shop": {
+                "id": 98,
+                "name": "Max Mustermann Immobilien Consulting",
+                "color": "#5e665c",
+                "locale": "de",
+                "logo_url": "https://images.propstack.de/photos/musterfoto.png",
+                "alt_logo_url": null,
+                "watermark_url": null,
+                "favicon_url": "https://images.propstack.de/photos/musterfoto.png",
+                "subdomain": "max-mustermann-1337",
+                "domain_name": "",
+                "email": "kontakt@musterdomain.tld",
+                "phone": "+49 123 4567890",
+                "available_licenses": 1,
+                "street": "Musterstraße 2",
+                "house_number": "36",
+                "zip_code": "01234",
+                "city": "Musterhausen",
+                "short_address": "Musterstraße 2, 01234 Musterhausen",
+                "deal_cockpit_automatic_invite": null
+            },
+            "team": null
+        },
+        "project": null,
+        "relationships": [
+            {
+                "id": 64,
+                "name": null,
+                "internal_name": "owner",
+                "client_id": 1337
+            },
+            {
+                "id": 64,
+                "name": "Ansprechpartner",
+                "internal_name": "partner",
+                "client_id": 1337
+            },
+            {
+                "id": 64,
+                "name": "Mieter",
+                "internal_name": "partner",
+                "client_id": 1337
+            }
+        ],
+        "folders": [],
+        "scout_id": "",
+        "public_expose_url": "https://crm.propstack.de/public/exposee/musterhaus",
+        "openimmo_firstname": null,
+        "openimmo_lastname": null,
+        "openimmo_email": null,
+        "openimmo_phone": null,
+        "is24_contact_id": "",
+        "translations": null,
+        "status_updated_at": "2026-04-16T16:00:00.00+02:00",
+        "inquiry_department_id": null,
+        "team_id": null,
+        "images": [
+            {
+                "id": 143,
+                "is_floorplan": false,
+                "is_private": false,
+                "title": "Herzlich Willkommen",
+                "tags": null,
+                "position": 0,
+                "url": "https://images.propstack.de/photos/musterbild.png",
+                "updated_at": "2025-12-05T10:19:47.924+01:00",
+                "imageable_type": "Property",
+                "imageable_id": "",
+                "connection_ids": [],
+                "is_not_for_exposee": false,
+                "big_url": "https://images.propstack.de/photos/musterbild.png",
+                "medium_url": "https://images.propstack.de/photos/musterbild.png",
+                "thumb_url": "https://images.propstack.de/photos/musterbild.png",
+                "small_thumb_url": "https://images.propstack.de/musterbild.png",
+                "square_url": "https://images.propstack.de/photos/musterbild.png"
+            },
+            {
+                "id": 144,
+                "is_floorplan": false,
+                "is_private": false,
+                "title": "Hausansicht",
+                "tags": null,
+                "position": 0,
+                "url": "https://images.propstack.de/photos/musterbild.png",
+                "updated_at": "2025-12-05T10:19:47.924+01:00",
+                "imageable_type": "Property",
+                "imageable_id": "",
+                "connection_ids": [],
+                "is_not_for_exposee": false,
+                "big_url": "https://images.propstack.de/photos/musterbild.png",
+                "medium_url": "https://images.propstack.de/photos/musterbild.png",
+                "thumb_url": "https://images.propstack.de/photos/musterbild.png",
+                "small_thumb_url": "https://images.propstack.de/musterbild.png",
+                "square_url": "https://images.propstack.de/photos/musterbild.png"
+            }
+        ],
+        "floorplans": [],
+        "links": [],
+        "created_at_formatted": "12.04.2026 07:00",
+        "created_at": "2026-04-12T07:00:00.000+01:00",
+        "updated_at_formatted": "12.04.2026 07:00 07:00:21",
+        "updated_at": "2026-04-12T07:00:00.000+02:00",
+        "description_note": {
+            "label": "Beschreibung",
+            "value": "Lorem ipsum description note."
+        },
+        "location_note": {
+            "label": "Lage",
+            "value": "Lorem ipsum location note."
+        },
+        "furnishing_note": {
+            "label": "Ausstattung",
+            "value": "Lorem ipsum furnishing note."
+        },
+        "other_note": {
+            "label": "Sonstiges",
+            "value": "Lorem ipsum other note."
+        },
+        "long_description_note": {
+            "label": "Objektbeschreibung (lang)",
+            "value": "<p>Lorem ipsum long description note."
+        },
+        "long_location_note": {
+            "label": "Lage (lang)",
+            "value": null
+        },
+        "long_furnishing_note": {
+            "label": "Ausstattung (lang)",
+            "value": null
+        },
+        "long_other_note": {
+            "label": "Sonstiges (lang)",
+            "value": null
+        },
+        "courtage": {
+            "label": "Käuferprovision",
+            "value": "3,57 % inkl. MwSt."
+        },
+        "courtage_note": {
+            "label": "Provisionshinweis",
+            "value": "Die Käuferprovision beträgt 3,57 % inkl. MwSt. des notariell beurkundeten Kaufpreises und ist verdient und fällig mit Abschluss des Kaufvertrags."
+        },
+        "internal_brokerage": {
+            "label": "Innenprovision",
+            "value": "3,57 % inkl. MwSt."
+        },
+        "number_of_rooms": {
+            "label": "Zimmer",
+            "value": 3.0
+        },
+        "price": {
+            "label": "Preis",
+            "value": 180000.0
+        },
+        "base_rent": {
+            "label": "Kaltmiete",
+            "value": 750.0
+        },
+        "living_space": {
+            "label": "Wohnfläche ca.",
+            "value": 62.0
+        },
+        "start_rental_date": {
+            "label": "Bezugsfrei ab",
+            "value": null
+        },
+        "commercialization_type": {
+            "label": "Vermarktungsart",
+            "value": null
+        },
+        "price_type": {
+            "label": "Preistyp",
+            "value": null
+        },
+        "floor": {
+            "label": "Etage",
+            "value": "4"
+        },
+        "number_of_floors": {
+            "label": "Etagenzahl",
+            "value": null
+        },
+        "energy_certificate_construction_year": {
+            "label": "Energieausweis: Baujahr Gebäude",
+            "value": null
+        },
+        "energy_certificate_start_date": {
+            "label": "Energieausweis: Ausstellungsdatum",
+            "value": "18.11.2013"
+        },
+        "energy_certificate_end_date": {
+            "label": "Energieausweis: gültig bis",
+            "value": "28.04.2035"
+        },
+        "energy_efficiency_class": {
+            "label": "Energieeffizienzklasse",
+            "value": "C"
+        },
+        "energy_efficiency_value": {
+            "label": "Endenergiebedarf",
+            "value": null
+        },
+        "thermal_characteristic": {
+            "label": "Translation missing: de.simple_form.labels.defaults.thermal_characteristic",
+            "value": null
+        },
+        "thermal_characteristic_electricity": {
+            "label": "Energiekennwert Strom",
+            "value": null
+        },
+        "thermal_characteristic_heating": {
+            "label": "Energiekennwert Wärme",
+            "value": null
+        },
+        "deposit": {
+            "label": "Kaution",
+            "value": null
+        },
+        "rent_duration": {
+            "label": "Mietdauer",
+            "value": null
+        },
+        "lan_cables": {
+            "label": "LAN-Kabel",
+            "value": null
+        },
+        "air_conditioning": {
+            "label": "Klimaanlage",
+            "value": false
+        },
+        "duration": {
+            "label": "Laufzeit",
+            "value": null
+        },
+        "duration_from": {
+            "label": "Auftragsbeginn",
+            "value": "2025-11-12"
+        },
+        "duration_until": {
+            "label": "Auftragsende",
+            "value": "2026-02-12"
+        },
+        "has_furniture": {
+            "label": "Möbliert",
+            "value": false
+        },
+        "floor_position": {
+            "label": "Etagenlage",
+            "value": null
+        },
+        "plot_number": {
+            "label": "Flurstück",
+            "value": null
+        },
+        "renter": {
+            "label": "Aktueller Mieter",
+            "value": null
+        },
+        "note": {
+            "label": "Notiz",
+            "value": "BIC-2501 - Dieskaustraße 128"
+        },
+        "te_id": {
+            "label": "Teilungserklärungs-Nr.",
+            "value": null
+        },
+        "crane_runway_load": {
+            "label": "Kranbahn Traglast in Tonnen",
+            "value": null
+        },
+        "floor_load": {
+            "label": "Bodenbelastung",
+            "value": null
+        },
+        "connected_load": {
+            "label": "Stromanschlusswert (kVA)",
+            "value": null
+        },
+        "shop_window_length": {
+            "label": "Schaufensterfront",
+            "value": null
+        },
+        "price_per_sqm": {
+            "label": "Preis/m²",
+            "value": 2903
+        },
+        "price_multiplier": {
+            "label": "Faktor-Ist",
+            "value": null
+        },
+        "price_multiplier_target": {
+            "label": "Faktor-Soll",
+            "value": null
+        },
+        "industrial_area": {
+            "label": "Gewerbefläche ca.",
+            "value": null
+        },
+        "rental_income_target": {
+            "label": "Nettomiete Soll p.a.",
+            "value": null
+        },
+        "rental_income_actual": {
+            "label": "Nettomiete Ist p.a.",
+            "value": null
+        },
+        "sold_price": {
+            "label": "Realisierter Preis",
+            "value": null
+        },
+        "min_divisible": {
+            "label": "Teilbar ab",
+            "value": null
+        },
+        "grz": {
+            "label": "GRZ",
+            "value": null
+        },
+        "gfz": {
+            "label": "GFZ",
+            "value": null
+        },
+        "length_garage": {
+            "label": "Länge der Garage",
+            "value": null
+        },
+        "width_garage": {
+            "label": "Breite der Garage",
+            "value": null
+        },
+        "height_garage": {
+            "label": "Höhe der Garage",
+            "value": null
+        },
+        "hall_height": {
+            "label": "Hallen-/ Geschosshöhe",
+            "value": null
+        },
+        "goods_lift_load": {
+            "label": "Tragkraft Lastenaufzug",
+            "value": null
+        },
+        "cost_other": {
+            "label": "Kostenanteil sonstiges",
+            "value": null
+        },
+        "cost_lift": {
+            "label": "Kostenanteil Aufzug Gartenhaus",
+            "value": null
+        },
+        "cost_balcony": {
+            "label": "Kostenanteil Balkone",
+            "value": null
+        },
+        "min_rental_time": {
+            "label": "Mindestmietdauer",
+            "value": null
+        },
+        "max_rental_time": {
+            "label": "Maximale Mietdauer",
+            "value": null
+        },
+        "co_ownership_share": {
+            "label": "Miteigentumsanteil",
+            "value": null
+        },
+        "rental_income": {
+            "label": "Mtl. Mieteinnahmen",
+            "value": null
+        },
+        "total_rent": {
+            "label": "Warmmiete",
+            "value": null
+        },
+        "service_charge": {
+            "label": "Nebenkosten",
+            "value": null
+        },
+        "heating_costs": {
+            "label": "Heizkosten",
+            "value": null
+        },
+        "maintenance_reserve": {
+            "label": "Instandhaltungsrücklage",
+            "value": null
+        },
+        "other_costs": {
+            "label": "Nicht umlegbare Kosten",
+            "value": null
+        },
+        "parking_space_price": {
+            "label": "Stellplatz-Preis",
+            "value": null
+        },
+        "plot_area": {
+            "label": "Grundstücksfläche ca.",
+            "value": null
+        },
+        "additional_area": {
+            "label": "Weitere Fläche",
+            "value": null
+        },
+        "usable_floor_space": {
+            "label": "Nutzfläche ca.",
+            "value": null
+        },
+        "balcony_space": {
+            "label": "Balkon/Terrasse Fläche ca.",
+            "value": null
+        },
+        "net_floor_space": {
+            "label": "Nutzfläche ca.",
+            "value": null
+        },
+        "total_floor_space": {
+            "label": "Gesamtfläche ca.",
+            "value": null
+        },
+        "cubature": {
+            "label": "Kubatur",
+            "value": null
+        },
+        "cellar_space": {
+            "label": "Kellerfläche ca.",
+            "value": null
+        },
+        "garden_space": {
+            "label": "Gartenfläche ca.",
+            "value": null
+        },
+        "yield_actual": {
+            "label": "Rendite Ist",
+            "value": null
+        },
+        "yield_target": {
+            "label": "Rendite Soll",
+            "value": null
+        },
+        "co2_emission": {
+            "label": "CO2-Emissionen",
+            "value": null
+        },
+        "vat": {
+            "label": "Mehrwertsteuer",
+            "value": null
+        },
+        "heating_costs_net": {
+            "label": "Heizkosten Netto",
+            "value": null
+        },
+        "heating_costs_vat": {
+            "label": "Heizkosten Ust.",
+            "value": null
+        },
+        "service_charge_net": {
+            "label": "Betriebskosten Netto",
+            "value": null
+        },
+        "service_charge_vat": {
+            "label": "Betriebskosten Ust.",
+            "value": null
+        },
+        "other_costs_net": {
+            "label": "Sonstige Kosten Netto",
+            "value": null
+        },
+        "other_costs_vat": {
+            "label": "Sonstige Kosten Ust.",
+            "value": null
+        },
+        "price_net": {
+            "label": "Kaufpreis Netto",
+            "value": null
+        },
+        "price_vat": {
+            "label": "Kaufpreis Ust.",
+            "value": null
+        },
+        "base_rent_net": {
+            "label": "Gesamtmiete Netto",
+            "value": null
+        },
+        "base_rent_vat": {
+            "label": "Gesamtmiete Ust.",
+            "value": null
+        },
+        "total_rent_net": {
+            "label": "Gesamtbelastung Netto",
+            "value": null
+        },
+        "total_rent_vat": {
+            "label": "Gesamtbelastung Ust.",
+            "value": null
+        },
+        "other_rent": {
+            "label": "Summemiete",
+            "value": null
+        },
+        "other_rent_net": {
+            "label": "Summemiete Netto",
+            "value": null
+        },
+        "other_rent_vat": {
+            "label": "Summemiete Ust.",
+            "value": null
+        },
+        "recurring_costs": {
+            "label": "Monatliche Kosten Brutto",
+            "value": null
+        },
+        "recurring_costs_net": {
+            "label": "Monatliche Kosten Netto",
+            "value": null
+        },
+        "recurring_costs_vat": {
+            "label": "Monatliche Kosten Ust.",
+            "value": null
+        },
+        "compensation_costs": {
+            "label": "Abstand",
+            "value": null
+        },
+        "financial_contribution": {
+            "label": "Finanzierungsbeitrag",
+            "value": null
+        },
+        "distance_to_mrs": {
+            "label": "Fahrzeit nächster Hauptbahnhof",
+            "value": null
+        },
+        "distance_to_fm": {
+            "label": "Fahrzeit nächste Autobahn",
+            "value": null
+        },
+        "distance_to_pt": {
+            "label": "Fußweg zu öffentl. Verkehrsmitteln",
+            "value": 1
+        },
+        "distance_to_airport": {
+            "label": "Fahrzeit nächster Flughafen",
+            "value": 33
+        },
+        "distance_to_pt_in_km": {
+            "label": "Translation missing: de.simple_form.labels.defaults.distance_to_pt_in_km",
+            "value": 0.06
+        },
+        "distance_to_fm_in_km": {
+            "label": "Translation missing: de.simple_form.labels.defaults.distance_to_fm_in_km",
+            "value": null
+        },
+        "distance_to_mrs_in_km": {
+            "label": "Translation missing: de.simple_form.labels.defaults.distance_to_mrs_in_km",
+            "value": null
+        },
+        "distance_to_airport_in_km": {
+            "label": "Translation missing: de.simple_form.labels.defaults.distance_to_airport_in_km",
+            "value": 29.46
+        },
+        "distance_to_pt_length": {
+            "label": "Entfernung zu öffentl. Verkehrsmitteln",
+            "value": 0.06
+        },
+        "distance_to_mrs_length": {
+            "label": "Entfernung nächster Hauptbahnhof",
+            "value": null
+        },
+        "distance_to_fm_length": {
+            "label": "Entfernung nächste Autobahn",
+            "value": null
+        },
+        "distance_to_airport_length": {
+            "label": "Entfernung nächster Flughafen",
+            "value": 29.46
+        },
+        "number_of_bed_rooms": {
+            "label": "Anzahl Schlafzimmer",
+            "value": null
+        },
+        "number_of_bath_rooms": {
+            "label": "Anzahl Badezimmer",
+            "value": null
+        },
+        "parking_space_number": {
+            "label": "Stellplatz Nr.",
+            "value": null
+        },
+        "number_of_parking_spaces": {
+            "label": "Anzahl Parkplätze",
+            "value": null
+        },
+        "last_refurbishment": {
+            "label": "Letzte Modernisierung",
+            "value": 2024
+        },
+        "construction_year": {
+            "label": "Baujahr ca.",
+            "value": 1903
+        },
+        "equipment_technology_construction_year": {
+            "label": "Baujahr Anlagentechnik",
+            "value": 1999
+        },
+        "rent_subsidy": {
+            "label": "Hausgeld/Monat",
+            "value": 360
+        },
+        "tenancy": {
+            "label": "Pacht",
+            "value": null
+        },
+        "number_seats": {
+            "label": "Plätze Gastraum",
+            "value": null
+        },
+        "number_beds": {
+            "label": "Anzahl an Betten",
+            "value": null
+        },
+        "max_number_of_persons": {
+            "label": "Max. Personenanzahl",
+            "value": null
+        },
+        "corridor": {
+            "label": "Flur",
+            "value": null
+        },
+        "register_number": {
+            "label": "Grundbuchblatt",
+            "value": null
+        },
+        "number_of_balconies": {
+            "label": "Anzahl Balkone",
+            "value": null
+        },
+        "number_of_terraces": {
+            "label": "Anzahl Terrassen",
+            "value": null
+        },
+        "number_of_apartments": {
+            "label": "Wohneinheiten",
+            "value": null
+        },
+        "number_of_commercials": {
+            "label": "Gewerbeeinheiten",
+            "value": null
+        },
+        "number_of_units": {
+            "label": "Gesamteinheiten",
+            "value": null
+        },
+        "condition": {
+            "label": "Objektzustand",
+            "value": "neuwertig"
+        },
+        "interior_quality": {
+            "label": "Qualität der Ausstattung",
+            "value": "gehoben"
+        },
+        "flooring_type": {
+            "label": "Bodenbelag",
+            "value": [
+                "Fliesen",
+                "Parkett"
+            ]
+        },
+        "energy_certificate_availability": {
+            "label": "Energieausweis",
+            "value": "liegt vor"
+        },
+        "energy_certificate_creation_date": {
+            "label": "Erstellungsdatum",
+            "value": "ab 1. Mai 2014"
+        },
+        "building_energy_rating_type": {
+            "label": "Energieausweistyp",
+            "value": "Bedarfsausweis"
+        },
+        "firing_types": {
+            "label": "Wesentlicher Energieträger",
+            "value": "Gas"
+        },
+        "heating_type": {
+            "label": "Heizungsart",
+            "value": "Gas-Heizung"
+        },
+        "parking_space_type": {
+            "label": "Stellplatztyp",
+            "value": null
+        },
+        "parking_space_types": {
+            "label": "Stellplatztyp",
+            "value": null
+        },
+        "construction_phase": {
+            "label": "Bauphase",
+            "value": null
+        },
+        "utilization_trade_site": {
+            "label": "Grundstückstyp",
+            "value": null
+        },
+        "site_development_type": {
+            "label": "Erschließung",
+            "value": null
+        },
+        "site_constructible_type": {
+            "label": "Bebaubar nach",
+            "value": null
+        },
+        "garage_type": {
+            "label": "Stellplatztyp",
+            "value": null
+        },
+        "store_type": {
+            "label": "Objekttyp",
+            "value": null
+        },
+        "supply_type": {
+            "label": "Zulieferung",
+            "value": null
+        },
+        "apartment_type": {
+            "label": "Wohnungstyp",
+            "value": "Maisonette"
+        },
+        "building_type": {
+            "label": "Haustyp",
+            "value": null
+        },
+        "location_classification_type": {
+            "label": "Lageart",
+            "value": null
+        },
+        "investment_type": {
+            "label": "Objektart",
+            "value": null
+        },
+        "contract_type": {
+            "label": "Art des Vermittlungsauftrages",
+            "value": "Qualifizierter Alleinauftrag"
+        },
+        "short_term_accomodation_type": {
+            "label": "Wohnart",
+            "value": null
+        },
+        "gender": {
+            "label": "Geschlecht",
+            "value": null
+        },
+        "pets_allowed": {
+            "label": "Haustiere erlaubt",
+            "value": null
+        },
+        "rent_durations": {
+            "label": "Mietdauer",
+            "value": null
+        },
+        "rented": {
+            "label": "Vermietet",
+            "value": false
+        },
+        "lodger_flat": {
+            "label": "Einliegerwohnung vorhanden",
+            "value": false
+        },
+        "lift": {
+            "label": "Personenaufzug",
+            "value": false
+        },
+        "cellar": {
+            "label": "Keller",
+            "value": true
+        },
+        "barrier_free": {
+            "label": "Barrierefrei",
+            "value": false
+        },
+        "guest_toilet": {
+            "label": "Gäste-WC",
+            "value": false
+        },
+        "built_in_kitchen": {
+            "label": "Einbauküche",
+            "value": true
+        },
+        "balcony": {
+            "label": "Balkon / Terrasse",
+            "value": false
+        },
+        "garden": {
+            "label": "Garten / -mitbenutzung",
+            "value": false
+        },
+        "monument": {
+            "label": "Denkmalschutzobjekt",
+            "value": false
+        },
+        "ramp": {
+            "label": "Rampe",
+            "value": false
+        },
+        "construction_year_unknown": {
+            "label": "Baujahr unbekannt",
+            "value": false
+        },
+        "flat_share_suitable": {
+            "label": "WG-geeignet",
+            "value": false
+        },
+        "certificate_of_eligibility_needed": {
+            "label": "Wohnberechtigungsschein erforderlich",
+            "value": false
+        },
+        "price_on_inquiry": {
+            "label": "Preis auf Anfrage",
+            "value": false
+        },
+        "heating_costs_in_service_charge": {
+            "label": "Heizkosten in Nebenkosten enthalten",
+            "value": false
+        },
+        "short_term_constructible": {
+            "label": "Kurzfristig bebaubar",
+            "value": false
+        },
+        "building_permission": {
+            "label": "Baugenehmigung",
+            "value": false
+        },
+        "demolition": {
+            "label": "Abriss",
+            "value": false
+        },
+        "has_canteen": {
+            "label": "Kantine / Cafeteria",
+            "value": false
+        },
+        "kitchen_complete": {
+            "label": "Küche vorhanden",
+            "value": false
+        },
+        "high_voltage": {
+            "label": "Starkstrom",
+            "value": false
+        },
+        "terrace": {
+            "label": "Terrasse",
+            "value": false
+        },
+        "auto_lift": {
+            "label": "Hebebühne",
+            "value": false
+        },
+        "goods_lift": {
+            "label": "Lastenaufzug",
+            "value": false
+        },
+        "crane_runway": {
+            "label": "Kranbahn Traglast",
+            "value": false
+        },
+        "energy_consumption_contains_warm_water": {
+            "label": "Energieverbrauch für Warmwasser enthalten",
+            "value": false
+        },
+        "summer_residence_practical": {
+            "label": "Als Ferienwohnung geeignet",
+            "value": false
+        },
+        "non_smoker": {
+            "label": "Nur an Nichtraucher",
+            "value": false
+        },
+        "loggia": {
+            "label": "Loggia",
+            "value": false
+        },
+        "winter_garden": {
+            "label": "Wintergarten",
+            "value": false
+        },
+        "wellness_area": {
+            "label": "Wellness-Bereich",
+            "value": false
+        },
+        "chimney": {
+            "label": "Kamin",
+            "value": false
+        },
+        "swimming_pool": {
+            "label": "Pool",
+            "value": false
+        },
+        "sauna": {
+            "label": "Sauna",
+            "value": false
+        },
+        "bathroom": {
+            "label": "Bad",
+            "value": [
+                "Wanne",
+                "Fenster"
+            ]
+        },
+        "storeroom": {
+            "label": "Abstellraum",
+            "value": false
+        },
+        "alarm_system": {
+            "label": "Alarmanlage",
+            "value": false
+        },
+        "plus_vat": {
+            "label": "Zzgl. MwSt.",
+            "value": null
+        },
+        "free_from": {
+            "label": "Verfügbar ab",
+            "value": "sofort"
+        },
+        "free_until": {
+            "label": "Verfügbar bis",
+            "value": null
+        },
+        "end_rental_date": {
+            "label": "Das Angebot ist frei bis",
+            "value": null
+        },
+        "marketing_start_date": {
+            "label": "Vermarktungsbeginn",
+            "value": null
+        },
+        "currency": {
+            "label": "Währung",
+            "value": null
+        },
+        "areabutler_link_with_address": {
+            "label": "Translation missing: de.simple_form.labels.defaults.areabutler_link_with_address",
+            "value": null
+        },
+        "areabutler_link_without_address": {
+            "label": "Translation missing: de.simple_form.labels.defaults.areabutler_link_without_address",
+            "value": null
+        },
+        "aut_hwb": null,
+        "aut_hwb_class": null,
+        "aut_fgee": null,
+        "aut_fgee_class": null,
+        "aut_main_rent": null,
+        "aut_cadastral_community": null,
+        "changed_attributes": {}
+    }
+]

@@ -1,0 +1,23 @@
+.propstack-connector-filter {
+	display: flex;
+	gap: 20px;
+	flex-direction: column;
+	&.propstack-connector-filter-row {
+		flex-direction: row;
+		align-items: last baseline;
+	}
+	fieldset {
+		border: 0;
+		padding-left: 0;
+		padding-right: 0;
+		flex: 1 1 auto;
+	}
+	label {
+		font-weight: bold;
+		display: inline-block;
+		padding-bottom: .4em;
+	}
+	input, select {
+		width: 100%;
+	}
+}

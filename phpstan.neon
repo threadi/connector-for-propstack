@@ -1,0 +1,23 @@
+parameters:
+  level: 8
+  reportUnmatchedIgnoredErrors: false
+  ignoreErrors:
+    - "#WP_PLUGIN_DIR#"
+    - "#CONNECTOR_FOR_PROPSTACK_#"
+    - "#ARRAY_A#"
+    - "#_IN_SECONDS#"
+    - "#WP_CLI#"
+  paths:
+    - app
+    - connector-for-propstack.php
+    - uninstall.php
+  excludePaths:
+     - app/Dependencies/*
+  scanFiles:
+     - %rootDir%/../../php-stubs/wordpress-stubs/wordpress-stubs.php
+     - %rootDir%/../../php-stubs/wp-cli-stubs/wp-cli-stubs.php
+     - %rootDir%/../../php-stubs/wp-cli-stubs/wp-cli-commands-stubs.php
+     - %rootDir%/../../php-stubs/wp-cli-stubs/wp-cli-i18n-stubs.php
+     - %rootDir%/../../php-stubs/wp-cli-stubs/wp-cli-tools-stubs.php
+  earlyTerminatingFunctionCalls:
+     - wp_send_json

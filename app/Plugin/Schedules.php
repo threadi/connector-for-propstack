@@ -1,0 +1,409 @@
+<?php
+/**
+ * File to handle every schedule in this plugin.
+ *
+ * @package connector-for-propstack
+ */
+
+namespace ConnectorForPropstack\Plugin;
+
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
+use easySettingsForWordPress\Fields\Checkbox;
+
+/**
+ * The object, which handles schedules.
+ */
+class Schedules {
+	/**
+	 * Instance of this object.
+	 *
+	 * @var ?Schedules
+	 */
+	private static ?Schedules $instance = null;
+
+	/**
+	 * Constructor for Schedules-Handler.
+	 */
+	private function __construct() {}
+
+	/**
+	 * Prevent cloning of this object.
+	 *
+	 * @return void
+	 */
+	private function __clone() { }
+
+	/**
+	 * Return the instance of this Singleton object.
+	 */
+	public static function get_instance(): Schedules {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
+	 * Initialize all schedules of this plugin.
+	 *
+	 * @return void
+	 */
+	public function init(): void {
+		// initialize the intervals.
+		Intervals::get_instance()->init();
+
+		// use our own hooks.
+		if ( is_admin() ) {
+			add_filter( 'cfprop_schedule_our_events', array( $this, 'check_events' ) );
+		}
+		add_action( 'init', array( $this, 'add_the_settings' ), 20 );
+		add_action( 'init', array( $this, 'init_schedules' ), 100 );
+
+		// action to create all registered schedules.
+		add_filter( 'schedule_event', array( $this, 'add_schedule_to_list' ) );
+		add_action( 'shutdown', array( $this, 'check_events_on_shutdown' ) );
+	}
+
+	/**
+	 * Initialize the schedules via init-hook.
+	 *
+	 * @return void
+	 */
+	public function init_schedules(): void {
+		// loop through our own events.
+		foreach ( $this->get_events() as $event ) {
+			// get the schedule object.
+			$schedule_obj = $this->get_schedule_object_by_name( $event['name'] );
+
+			// bail if the object could not be loaded.
+			if ( ! $schedule_obj instanceof Schedules_Base ) {
+				continue;
+			}
+
+			// set attributes in the object, if available.
+			if ( ! empty( $event['settings'][ array_key_first( $event['settings'] ) ]['args'] ) ) {
+				$schedule_obj->set_args( $event['settings'][ array_key_first( $event['settings'] ) ]['args'] );
+			}
+
+			// define action hook to run the schedule.
+			add_action( $schedule_obj->get_name(), array( $schedule_obj, 'run' ), 10, 0 );
+		}
+	}
+
+	/**
+	 * Add settings for this extension.
+	 *
+	 * @return void
+	 */
+	public function add_the_settings(): void {
+		// get settings object.
+		$settings_obj = Settings::get_instance()->get_settings_obj();
+
+		// get the section.
+		$advanced_section = $settings_obj->get_section( 'propstack_connector_advanced' );
+
+		// bail if the tab does not exist.
+		if ( ! $advanced_section ) {
+			return;
+		}
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'propstackConnectorEnableCronCheckInFrontend' );
+		$setting->set_section( $advanced_section );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+		$field = new Checkbox( $settings_obj );
+		$field->set_title( __( 'Check for schedules in frontend', 'connector-for-propstack' ) );
+		$field->set_description( __( 'If enabled the plugin will check our own schedules on each request in the frontend. This could be slow the performance of your website.', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
+	}
+
+	/**
+	 * Get our own active events from WP-list.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	private function get_events(): array {
+		// get our own events from the events list in WordPress.
+		$our_events = $this->get_wp_events();
+
+		/**
+		 * Filter the list of our own events, e.g., to check if all which are enabled in setting are active.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 *
+		 * @param array<string,array<string,mixed>> $our_events List of our own events in WP-cron.
+		 */
+		return apply_filters( 'cfprop_schedule_our_events', $our_events );
+	}
+
+	/**
+	 * Check the available events with the ones that should be active.
+	 *
+	 * Re-installs missing events. Log this event.
+	 *
+	 * Does only run in wp-admin, not frontend.
+	 *
+	 * @param array<string,array<string,mixed>> $our_events List of our own events.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 * @noinspection PhpUnused
+	 */
+	public function check_events( array $our_events ): array {
+		// bail if check should be disabled.
+		$false = false;
+		/**
+		 * Disable the additional cron check.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param bool $false True if the check should be disabled.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		if ( apply_filters( 'cfprop_disable_cron_check', $false ) ) {
+			return $our_events;
+		}
+
+		// bail if plugin activation is running.
+		if ( defined( 'CONNECTOR_FOR_PROPSTACK_ACTIVATION_RUNNING' ) ) {
+			return $our_events;
+		}
+
+		// check the schedule objects if they are set.
+		foreach ( $this->get_schedule_object_names() as $object_name ) {
+			// bail if the class name does not exist.
+			if ( ! class_exists( $object_name ) ) {
+				continue;
+			}
+
+			// get the object.
+			$obj = new $object_name();
+
+			// bail if an object is not Schedules_Base.
+			if ( ! $obj instanceof Schedules_Base ) {
+				continue;
+			}
+
+			// install if the schedule is enabled and not in the list of our schedules.
+			if ( $obj->is_enabled() && ! isset( $our_events[ $obj->get_name() ] ) ) {
+				// reinstall the missing event.
+				$obj->install();
+
+				// re-run the check for WP-cron-events.
+				$our_events = $this->get_wp_events();
+			}
+
+			// delete it if the schedule is in the list of our events and not enabled.
+			if ( ! $obj->is_enabled() && isset( $our_events[ $obj->get_name() ] ) ) {
+				$obj->delete();
+
+				// re-run the check for WP-cron-events.
+				$our_events = $this->get_wp_events();
+			}
+		}
+
+		// return the resulting list.
+		return $our_events;
+	}
+
+	/**
+	 * Delete all our registered schedules.
+	 *
+	 * @return void
+	 */
+	public function delete_all(): void {
+		// delete the simple schedules from our plugin.
+		foreach ( $this->get_schedule_object_names() as $obj_name ) {
+			// get the object.
+			$schedule_obj = new $obj_name();
+
+			// bail if the object is not a Schedules_Base object.
+			if ( ! $schedule_obj instanceof Schedules_Base ) {
+				continue;
+			}
+
+			// delete the schedule.
+			$schedule_obj->delete();
+		}
+	}
+
+	/**
+	 * Create our schedules.
+	 *
+	 * @return void
+	 */
+	public function create_schedules(): void {
+		// install the schedules if they do not exist atm.
+		foreach ( $this->get_schedule_object_names() as $obj_name ) {
+			// get the object.
+			$schedule_obj = new $obj_name();
+
+			// bail if the object is not a Schedules_Base object.
+			if ( ! $schedule_obj instanceof Schedules_Base ) {
+				continue;
+			}
+
+			// install the schedule.
+			$schedule_obj->install();
+		}
+	}
+
+	/**
+	 * Return the list of all schedule-object-names.
+	 *
+	 * @return array<int,string>
+	 */
+	public function get_schedule_object_names(): array {
+		// list of schedules in this plugin.
+		$list_of_schedules = array();
+
+		/**
+		 * Add custom schedule-objects to use.
+		 *
+		 * They must be objects based on \ConnectorForPropstack\Plugin\Schedules_Base.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 *
+		 * @param array<int,string> $list_of_schedules List of additional schedules.
+		 */
+		return apply_filters( 'cfprop_schedules', $list_of_schedules );
+	}
+
+	/**
+	 * Return the schedule object by its name.
+	 *
+	 * @param string $name The name of the object.
+	 *
+	 * @return false|Schedules_Base
+	 */
+	public function get_schedule_object_by_name( string $name ): false|Schedules_Base {
+		foreach ( $this->get_schedule_object_names() as $object_name ) {
+			// bail if class does not exist.
+			if ( ! class_exists( $object_name ) ) {
+				continue;
+			}
+
+			// get the object.
+			$obj = new $object_name();
+
+			// bail if the object is not a "Schedule_Base" object.
+			if ( ! $obj instanceof Schedules_Base ) {
+				continue;
+			}
+
+			// bail if the name does not match.
+			if ( $name !== $obj->get_name() ) {
+				continue;
+			}
+
+			// return this object.
+			return $obj;
+		}
+		return false;
+	}
+
+	/**
+	 * Return our own events from the WP-cron-event-list.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public function get_wp_events(): array {
+		$our_events = array();
+		foreach ( _get_cron_array() as $events ) {
+			foreach ( $events as $event_name => $event_settings ) {
+				if ( str_contains( $event_name, 'cfprop_' ) ) {
+					$our_events[ $event_name ] = array(
+						'name'     => $event_name,
+						'settings' => $event_settings,
+					);
+				}
+			}
+		}
+
+		// return the resulting list.
+		return $our_events;
+	}
+
+	/**
+	 * Run check for cronjobs in the frontend, if enabled.
+	 *
+	 * @return void
+	 */
+	public function check_events_on_shutdown(): void {
+		// bail if the check is disabled.
+		if ( 1 !== absint( get_option( 'propstackConnectorEnableCronCheckInFrontend' ) ) ) {
+			return;
+		}
+
+		// run the check.
+		$this->check_events( $this->get_events() );
+	}
+
+	/**
+	 * Add a schedule to our list of schedules.
+	 *
+	 * @param object|bool $event The event properties.
+	 *
+	 * @return object|bool
+	 * @noinspection PhpUnused
+	 */
+	public function add_schedule_to_list( object|bool $event ): object|bool {
+		// bail if the event is not an object.
+		if ( ! is_object( $event ) ) {
+			return $event;
+		}
+
+		// get our object.
+		$schedule_obj = $this->get_schedule_object_by_name( $event->hook ); // @phpstan-ignore property.notFound
+
+		// bail if this is not an event of our plugin.
+		if ( ! $schedule_obj ) {
+			return $event;
+		}
+
+		// add the args to the event.
+		$schedule_obj->set_args( $event->args ); // @phpstan-ignore property.notFound
+
+		// get the actual list.
+		$list = get_option( 'propstack_connector_schedules' );
+		if ( ! is_array( $list ) ) {
+			$list = array();
+		}
+		$list[ $schedule_obj->get_name() ] = $schedule_obj->get_args();
+		update_option( 'propstack_connector_schedules', $list );
+
+		// return the event object.
+		return $event;
+	}
+
+	/**
+	 * Validate the interval.
+	 *
+	 * @param ?string $value The given interval value.
+	 *
+	 * @return string
+	 */
+	public function validate_interval( ?string $value ): string {
+		// get option.
+		$option = str_replace( 'sanitize_option_', '', (string) current_filter() );
+
+		// bail if the value is empty.
+		if ( empty( $value ) ) {
+			add_settings_error( $option, $option, __( 'An interval has to be set.', 'connector-for-propstack' ) );
+			return '';
+		}
+
+		// check if the given interval exists.
+		$intervals = Intervals::get_instance()->get_intervals_for_settings();
+		if ( empty( $intervals[ $value ] ) ) {
+			/* translators: %1$s will be replaced by the name of the used interval */
+			add_settings_error( $option, $option, sprintf( __( 'The given interval %1$s does not exist.', 'connector-for-propstack' ), esc_html( $value ) ) );
+		}
+
+		// return the string.
+		return $value;
+	}
+}

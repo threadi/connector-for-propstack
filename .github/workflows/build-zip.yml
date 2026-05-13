@@ -1,0 +1,133 @@
+name: Build release zip
+
+on:
+    push:
+        tags:
+            - '*'
+    workflow_dispatch:
+
+jobs:
+    build:
+        name: Build release zip
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup WP-CLI
+              uses: godaddy-wordpress/setup-wp-cli@1
+
+            - name: Run package installs and builds
+              run: |
+                  composer install
+                  composer update
+                  npm i
+                  npm i concurrently
+                  cd vendor/threadi/easy-dialog-for-wordpress/
+                  npm i
+                  npm run build
+                  cd ../easy-setup-for-wordpress/
+                  npm i
+                  npm run build
+                  cd ../../../
+                  npm run build:archive
+                  npm run build:broker-field
+                  npm run build:description
+                  npm run build:field
+                  npm run build:filter
+                  npm run build:single
+                  npm run build:gallery
+                  npm run build:lightbox
+                  rm -fr assets
+                  rm -fr build
+                  rm -fr releases
+                  rm -fr svn
+                  rm -fr languages
+                  rm readme.md
+
+            - uses: anchore/sbom-action@v0
+
+            - name: Generate hook documentation
+              run: vendor/bin/wp-documentor parse app --format=markdown --output=doc/hooks.md --prefix=cfprop_ --exclude=Transients.php
+
+            - name: Generate autoloader
+              run: composer dump-autoload -oa --no-dev
+
+            - name: Run PHPStan check
+              run:  vendor/bin/phpstan analyse
+
+            - name: Run WordPress Coding Standard fixes
+              run: vendor/bin/phpcbf --standard=ruleset.xml .
+              continue-on-error: true
+
+            - name: Run WordPress Coding Standard checks
+              run: vendor/bin/phpcs --standard=ruleset.xml .
+
+            - name: Set version number 1
+              uses: richardrigutins/replace-in-files@v2
+              with:
+                  files: 'connector-for-propstack.php'
+                  search-text: '@@VersionNumber@@'
+                  replacement-text: ${{ github.ref_name }}
+
+            - name: Set version number 2
+              uses: richardrigutins/replace-in-files@v2
+              with:
+                  files: 'uninstall.php'
+                  search-text: '@@VersionNumber@@'
+                  replacement-text: ${{ github.ref_name }}
+
+            - name: Set version number 3
+              uses: richardrigutins/replace-in-files@v2
+              with:
+                  files: 'readme.txt'
+                  search-text: '@@VersionNumber@@'
+                  replacement-text: ${{ github.ref_name }}
+
+            - name: Clean up
+              run: |
+                rm .gitattributes
+                rm .gitignore
+                rm -fr .github
+                rm .editorconfig
+                rm -fr doc
+                rm -fr bin
+                rm composer.sh
+                rm phpunit.xml.dist
+                rm -fr tests
+
+            - name: Run PCP check
+              uses: wordpress/plugin-check-action@v1
+              with:
+                  exclude-directories:
+                      app/Dependencies/easyTransientsForWordPress/
+                  ignore-codes:
+                      WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
+                  include-experimental: false
+                  error-severity: 7
+                  warning-severity: 6
+                  include-low-severity-errors: true
+                  slug: connector-for-propstack
+              continue-on-error: true
+
+            - name: Create ZIP release
+              run: |
+                cd ..
+                zip -rq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/ -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/docs/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/ruleset.xml" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/assets/*" "*/phpstan.neon" "*/Taskfile.yml" "*/libs/*" "*/src/*"
+                zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/autoload.php
+                zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/composer/*
+                zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/easy-setup-for-wordpress/lib/
+                zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/easy-setup-for-wordpress/build/
+                zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/crypt-for-wordpress/src/
+                zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/easy-settings-for-wordpress/assets/
+                zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/easy-settings-for-wordpress/src/
+                zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/easy-dialog-for-wordpress/build/
+                cp connector-for-propstack_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/
+
+            - name: Create Release
+              uses: softprops/action-gh-release@v2
+              if: startsWith(github.ref, 'refs/tags/')
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                files: ${{ github.event.repository.name }}_${{ github.ref_name }}.zip
