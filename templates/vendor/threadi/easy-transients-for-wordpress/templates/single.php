@@ -18,9 +18,9 @@ use ConnectorForPropstack\Plugin\Helper;
 	echo wp_kses_post( wpautop( $this->get_message() ) );
 	if ( $this->get_dismissible_days() > 0 ) {
 		/* translators: %1$d will be replaced by the days this message will be hidden. */
-		$title = sprintf( __( 'Hide this message for %1$d days.', 'propstack-connector' ), $this->get_dismissible_days() );
+		$title = sprintf( __( 'Hide this message for %1$d days.', 'connector-for-propstack' ), $this->get_dismissible_days() );
 		?>
-		<button type="button" class="notice-dismiss" title="<?php echo esc_attr( $title ); ?>"><?php echo esc_html__( 'Dismiss', 'propstack-connector' ); ?><span class="screen-reader-text"><?php echo esc_html( $title ); ?></span></button>
+		<button type="button" class="notice-dismiss" title="<?php echo esc_attr( $title ); ?>"><?php echo esc_html__( 'Dismiss', 'connector-for-propstack' ); ?><span class="screen-reader-text"><?php echo esc_html( $title ); ?></span></button>
 		<?php
 	}
 	?>

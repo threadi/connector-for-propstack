@@ -14,9 +14,9 @@ defined( 'ABSPATH' ) || exit;
 use ConnectorForPropstack\Propstack\Field_Base;
 
 ?>
-<!-- wp:group {"metadata":{"name":"<?php echo esc_html__( 'Object data', 'propstack-connector' ); ?>"},"layout":{"type":"constrained"}} -->
+<!-- wp:group {"metadata":{"name":"<?php echo esc_html__( 'Object data', 'connector-for-propstack' ); ?>"},"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:heading -->
-	<h2 class="wp-block-heading"><?php echo esc_html__( 'Object data', 'propstack-connector' ); ?></h2>
+	<h2 class="wp-block-heading"><?php echo esc_html__( 'Object data', 'connector-for-propstack' ); ?></h2>
 	<!-- /wp:heading -->
 
 	<?php

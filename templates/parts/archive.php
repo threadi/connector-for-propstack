@@ -19,7 +19,7 @@ if ( ! empty( $attributes['listing_template'] ) && ! empty( $attributes['templat
 	if ( $attributes['query']->have_posts() ) :
 		include Templates::get_instance()->get_template( 'parts/archive/' . $attributes['listing_template'] . '.php' );
 	else :
-		?><article class="site-main entry inside-article container site-content site-container content-bg content-area ht-container"><div class="entry-content"><p><?php echo esc_html__( 'There are currently no objects available.', 'propstack-connector' ); ?></p></div></article>
+		?><article class="site-main entry inside-article container site-content site-container content-bg content-area ht-container"><div class="entry-content"><p><?php echo esc_html__( 'There are currently no objects available.', 'connector-for-propstack' ); ?></p></div></article>
 		<?php
 	endif;
 }

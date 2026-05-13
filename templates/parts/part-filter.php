@@ -37,5 +37,5 @@ defined( 'ABSPATH' ) || exit;
 	do_action( 'propstack_connector_filter_after', $attributes );
 
 	?>
-	<button type="submit" class="propstack-connector-filter-button"><?php echo esc_html__( 'Filter', 'propstack-connector' ); ?></button>
+	<button type="submit" class="propstack-connector-filter-button"><?php echo esc_html__( 'Filter', 'connector-for-propstack' ); ?></button>
 </form>

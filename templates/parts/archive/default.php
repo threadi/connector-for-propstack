@@ -25,7 +25,7 @@ use ConnectorForPropstack\Propstack\ImmoObject;
 		$propstack_connector_immo_object = \ConnectorForPropstack\Propstack\ImmoObjects::get_instance()->get_object( $post_id, $attributes['lang'] );
 
 		?>
-		<article id="post-<?php echo absint( $post_id ); ?>" class="post-<?php echo absint( $post_id ); ?> post type-<?php echo esc_attr( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ); ?> status-<?php echo esc_attr( get_post_status( $post_id ) ); ?> entry <?php echo esc_attr( apply_filters( 'propstack_connector_object_classes', '', $propstack_connector_immo_object ) ); ?>" role="region" aria-label="<?php echo esc_attr__( 'Objects', 'propstack-connector' ); ?>">
+		<article id="post-<?php echo absint( $post_id ); ?>" class="post-<?php echo absint( $post_id ); ?> post type-<?php echo esc_attr( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ); ?> status-<?php echo esc_attr( get_post_status( $post_id ) ); ?> entry <?php echo esc_attr( apply_filters( 'propstack_connector_object_classes', '', $propstack_connector_immo_object ) ); ?>" role="region" aria-label="<?php echo esc_attr__( 'Objects', 'connector-for-propstack' ); ?>">
 			<?php
 			foreach ( $attributes['templates'] as $propstack_connector_template ) {
 				/**
