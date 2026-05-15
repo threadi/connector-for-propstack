@@ -62,4 +62,15 @@ class HideAddress extends Field_Base {
 	public function get_category(): Field_Category_Base {
 		return new \ConnectorForPropstack\Propstack\FieldCategories\Address();
 	}
+
+	/**
+	 * Return true if the functionality for this field is only available in the Pro version.
+	 *
+	 * Hint: the functionality is really only in the Pro plugin. This marker is used to show hints for it.
+	 *
+	 * @return bool
+	 */
+	public function only_pro(): bool {
+		return true;
+	}
 }

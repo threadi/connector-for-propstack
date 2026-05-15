@@ -51,7 +51,7 @@ class RecommendedUseTypes extends Field_Base {
 	 * @return string
 	 */
 	public function get_label(): string {
-		return 'recommended_use_types';
+		return __( 'Recommended use types', 'connector-for-propstack' );
 	}
 
 	/**

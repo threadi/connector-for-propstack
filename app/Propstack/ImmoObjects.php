@@ -126,6 +126,7 @@ class ImmoObjects {
 		add_filter( 'cfprop_api_object_url', array( $this, 'add_object_type_to_import_url' ) );
 		add_action( 'cfprop_import_content_not_change', array( $this, 'mark_as_updated' ), 10, 0 );
 		add_action( 'cfprop_restriction_value_changed', array( $this, 'remove_changed_flag' ), 10, 0 );
+		add_action( 'cfprop_object_field_metabox', array( $this, 'show_pro_hint_on_field' ), 10, 2 );
 	}
 
 	/**
@@ -1619,5 +1620,35 @@ class ImmoObjects {
 
 		// return the new value.
 		return $new_value;
+	}
+
+	/**
+	 * Show a hint for Pro plugin on single fields in backend.
+	 *
+	 * @param WP_Post    $post The post object of the immo object.
+	 * @param Field_Base $field The field object.
+	 *
+	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function show_pro_hint_on_field( WP_Post $post, Field_Base $field ): void {
+		$false = false;
+		/**
+		 * Hide the additional buttons for reviews or pro-version.
+		 *
+		 * @since 1.0.0 Available since 1.0.0
+		 * @param bool $false Set true to hide the buttons.
+		 */
+		if ( apply_filters( 'cfprop_hide_pro_hints', $false ) ) {
+			return;
+		}
+
+		// bail if this is not a Pro field.
+		if ( ! $field->only_pro() ) {
+			return;
+		}
+
+		// show hint.
+		echo '<div class="propstack-connector-pro-hint">' . esc_html__( 'Use this in Pro', 'connector-for-propstack' ) . '</div>';
 	}
 }

@@ -184,3 +184,9 @@ body.post-type-cfprop_object {
 	background-color: #eee;
 	padding: 12px;
 }
+
+#contextual-help-columns div[id*=cfprop_object] img {
+	float: right;
+	margin-left: 1em;
+	width: 120px;
+}

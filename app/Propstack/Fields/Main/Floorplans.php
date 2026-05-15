@@ -51,7 +51,7 @@ class Floorplans extends Field_Base {
 	 * @return string
 	 */
 	public function get_label(): string {
-		return 'floorplans';
+		return __( 'Floorplans', 'connector-for-propstack' );
 	}
 
 	/**

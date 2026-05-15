@@ -89,6 +89,7 @@ class Files {
 		add_action( 'cfprop_files_for_object_imported_via_ajax', array( $this, 'update_file_counter' ), 100, 0 );
 		add_action( 'cfprop_files_deleted', array( $this, 'update_file_counter' ), 100, 0 );
 		add_action( 'cfprop_queue_after_processing', array( $this, 'update_file_counter' ), 100, 0 );
+		add_filter( 'cfprop_prevent_file_import', array( $this, 'prevent_file_import' ), 10, 2 );
 
 		// use actions.
 		add_action( 'wp_ajax_import_propstack_object_files', array( $this, 'import_by_ajax' ) );
@@ -379,6 +380,23 @@ class Files {
 			return $attachment_id;
 		}
 
+		$false = false;
+		/**
+		 * Filter whether a given file should be imported.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param bool $false The default value.
+		 * @param array<string,mixed> $file_data The file data from Propstack.
+		 * @param int  $id    The file ID.
+		 * @param string  $url   The URL to use for import.
+		 * @param string  $filename The file name.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		if ( apply_filters( 'cfprop_prevent_file_import', $false, $file_data, $id, $url, $filename ) ) {
+			return 0;
+		}
+
 		// require necessary files.
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -465,8 +483,9 @@ class Files {
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param int $attachment_id The attachment ID.
 		 * @param int $id            The Propstack file ID.
+		 * @param array<string,mixed> $file_data The file data from Propstack.
 		 */
-		do_action( 'cfprop_file_imported', $attachment_id, $id );
+		do_action( 'cfprop_file_imported', $attachment_id, $id, $file_data );
 
 		// return the resulting attachment ID.
 		return $attachment_id;
@@ -1070,5 +1089,28 @@ class Files {
 
 		// return the resulting query.
 		return $query;
+	}
+
+	/**
+	 * Prevent the import of a single file by its data.
+	 *
+	 * @param bool                $result_value The resulting value (true to prevent the import).
+	 * @param array<string,mixed> $file_data The file data.
+	 *
+	 * @return bool
+	 */
+	public function prevent_file_import( bool $result_value, array $file_data ): bool {
+		// prevent import if "is_private" is true.
+		if ( isset( $file_data['is_private'] ) && $file_data['is_private'] ) {
+			return true;
+		}
+
+		// prevent import if "is_not_for_exposee" is true.
+		if ( isset( $file_data['is_not_for_exposee'] ) && $file_data['is_not_for_exposee'] ) {
+			return true;
+		}
+
+		// return the result value.
+		return $result_value;
 	}
 }

@@ -54,7 +54,7 @@ class Languages extends Field_Category_Base {
 			return;
 		}
 
-		// get list of languages.
+		// get the list of languages.
 		$languages = \ConnectorForPropstack\Plugin\Languages::get_instance()->get_languages();
 
 		// bail if language is not supported.

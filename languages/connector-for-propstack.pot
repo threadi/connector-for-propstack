@@ -9,16 +9,19 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-13T13:42:26+00:00\n"
+"POT-Creation-Date: 2026-05-15T12:50:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: connector-for-propstack\n"
 
 #. Plugin Name of the plugin
+#. translators: %1$s will be replaced by a URL.
 #: connector-for-propstack.php
-#: app/PageBuilder/Gutenberg.php:198
+#: app/PageBuilder/Gutenberg.php:189
 #: app/PageBuilder/Gutenberg/Patterns.php:204
-#: app/Propstack/Propstack.php:218
+#: app/Propstack/PostTypes/ImmoObject.php:574
+#: app/Propstack/PostTypes/ImmoObject.php:579
+#: app/Propstack/Propstack.php:221
 msgid "Connector for Propstack"
 msgstr ""
 
@@ -46,6 +49,7 @@ msgid "Display information about the energy performance certificate."
 msgstr ""
 
 #: app/PageBuilder/Gutenberg/Patterns.php:97
+#: blocks/description/build/index.js:1
 msgid "Description"
 msgstr ""
 
@@ -70,6 +74,7 @@ msgid "Displays a single object from Propstack."
 msgstr ""
 
 #: app/PageBuilder/Gutenberg/Templates.php:211
+#: blocks/archive/build/index.js:1
 msgid "List of objects"
 msgstr ""
 
@@ -124,10 +129,10 @@ msgid "Error"
 msgstr ""
 
 #: app/Plugin/Admin/Admin.php:136
-#: app/Propstack/Files.php:574
-#: app/Propstack/Files.php:966
-#: app/Propstack/ImmoObjects.php:832
-#: app/Propstack/Imports/v1/Objects.php:469
+#: app/Propstack/Files.php:593
+#: app/Propstack/Files.php:985
+#: app/Propstack/ImmoObjects.php:833
+#: app/Propstack/Imports/v1/Objects.php:468
 #: app/Propstack/Imports/v2/Objects.php:439
 #: app/Propstack/Import_Base.php:111
 #: app/Propstack/Queue.php:454
@@ -147,7 +152,7 @@ msgid "Error:"
 msgstr ""
 
 #. translators: a name will replace %1$s.
-#: app/Plugin/Helper.php:260
+#: app/Plugin/Helper.php:261
 #, php-format
 msgid "<strong>Error during loading the required WordPress-own filesystem object!</strong><br>We will now use the local filesystem object and hope it will work.<br><br>Tipps to solve this:<ul><li>Check the following error and speak to your WordPress administrator about it.</li><li>Check your <em>wp-config.php</em> if you have the constant \"FS_METHOD\" set there. If yes, remove it and check if your WordPress can save media files.</li><li>Ask the support of your hoster for help.</li></ul>Used filesystem mode: <em>%1$s</em><br>The following errors occurred:"
 msgstr ""
@@ -260,9 +265,9 @@ msgstr ""
 #: app/Plugin/Settings.php:348
 #: app/Plugin/Settings.php:382
 #: app/Plugin/Settings.php:432
-#: app/Propstack/Files.php:178
-#: app/Propstack/ImmoObjects.php:1463
-#: app/Propstack/PostTypes/ImmoObject.php:540
+#: app/Propstack/Files.php:179
+#: app/Propstack/ImmoObjects.php:1480
+#: app/Propstack/PostTypes/ImmoObject.php:543
 #: app/Propstack/Tables/Queue.php:171
 #: app/Propstack/Tables/Queue.php:206
 msgid "Cancel"
@@ -470,13 +475,13 @@ msgstr ""
 
 #: app/Plugin/Settings.php:343
 #: app/Plugin/Settings.php:360
-#: app/Propstack/Files.php:156
-#: app/Propstack/ImmoObjects.php:385
+#: app/Propstack/Files.php:157
+#: app/Propstack/ImmoObjects.php:386
 msgid "Import now"
 msgstr ""
 
 #: app/Plugin/Settings.php:359
-#: app/Propstack/Propstack.php:146
+#: app/Propstack/Propstack.php:149
 msgid "Import"
 msgstr ""
 
@@ -540,7 +545,7 @@ msgid "Trademarks"
 msgstr ""
 
 #: app/Plugin/Settings.php:486
-#: app/Propstack/PostTypes/ImmoObject.php:196
+#: app/Propstack/PostTypes/ImmoObject.php:199
 msgid "Propstack"
 msgstr ""
 
@@ -552,7 +557,7 @@ msgstr ""
 
 #. translators: %1$s will be replaced by the plugin name.
 #: app/Plugin/Settings.php:642
-#: app/Propstack/PostTypes/ImmoObject.php:404
+#: app/Propstack/PostTypes/ImmoObject.php:407
 #: app/Propstack/Taxonomy.php:610
 #, php-format
 msgid "This page is provided by the plugin %1$s."
@@ -750,17 +755,17 @@ msgid "This object does not have any images."
 msgstr ""
 
 #: app/Propstack/FieldCategories/Images.php:68
-#: app/Propstack/ImmoObjects.php:889
+#: app/Propstack/ImmoObjects.php:890
 msgid "Got no images"
 msgstr ""
 
 #: app/Propstack/FieldCategories/Images.php:70
-#: app/Propstack/Files.php:131
-#: app/Propstack/Files.php:148
-#: app/Propstack/Files.php:152
-#: app/Propstack/Files.php:157
-#: app/Propstack/ImmoObjects.php:892
-#: app/Propstack/PostTypes/ImmoObject.php:321
+#: app/Propstack/Files.php:132
+#: app/Propstack/Files.php:149
+#: app/Propstack/Files.php:153
+#: app/Propstack/Files.php:158
+#: app/Propstack/ImmoObjects.php:893
+#: app/Propstack/PostTypes/ImmoObject.php:324
 msgid "Import images"
 msgstr ""
 
@@ -805,7 +810,17 @@ msgid "Location"
 msgstr ""
 
 #: app/Propstack/FieldCategoryTypes/ObjectData.php:32
+#: templates/gutenberg/patterns/object-type-fields.php:17
+#: templates/gutenberg/patterns/object-type-fields.php:19
 msgid "Object data"
+msgstr ""
+
+#: app/Propstack/FieldFormats/Country.php:34
+msgid "Germany"
+msgstr ""
+
+#: app/Propstack/FieldFormats/Country.php:36
+msgid "Chile"
 msgstr ""
 
 #. translators: %1$s: number of kilometers
@@ -896,8 +911,8 @@ msgstr ""
 msgid "Import the fields for the object %1$s"
 msgstr ""
 
-#: app/Propstack/Fields.php:821
-#: app/Propstack/Fields.php:828
+#: app/Propstack/Fields.php:827
+#: app/Propstack/Fields.php:834
 msgid "not set"
 msgstr ""
 
@@ -974,6 +989,10 @@ msgstr ""
 
 #: app/Propstack/Fields/Main/AlarmSystem.php:47
 msgid "Alarm system"
+msgstr ""
+
+#: app/Propstack/Fields/Main/ApartmentNumber.php:40
+msgid "Apartment number"
 msgstr ""
 
 #: app/Propstack/Fields/Main/ApartmentType.php:39
@@ -1068,6 +1087,10 @@ msgstr ""
 msgid "Construction Phase"
 msgstr ""
 
+#: app/Propstack/Fields/Main/ConstructionType.php:40
+msgid "Construction type"
+msgstr ""
+
 #: app/Propstack/Fields/Main/ConstructionYear.php:40
 msgid "Construction year"
 msgstr ""
@@ -1080,7 +1103,7 @@ msgstr ""
 msgid "Contract Type"
 msgstr ""
 
-#: app/Propstack/Fields/Main/CoOwnershipShare.php:39
+#: app/Propstack/Fields/Main/CoOwnershipShare.php:47
 msgid "Co Ownership Share"
 msgstr ""
 
@@ -1100,7 +1123,7 @@ msgstr ""
 msgid "Other Costs"
 msgstr ""
 
-#: app/Propstack/Fields/Main/Country.php:39
+#: app/Propstack/Fields/Main/Country.php:47
 msgid "Country"
 msgstr ""
 
@@ -1262,11 +1285,15 @@ msgstr ""
 msgid "Floor load"
 msgstr ""
 
+#: app/Propstack/Fields/Main/Floorplans.php:54
+msgid "Floorplans"
+msgstr ""
+
 #: app/Propstack/Fields/Main/FloorPosition.php:40
 msgid "Floor position"
 msgstr ""
 
-#: app/Propstack/Fields/Main/ForBidding.php:40
+#: app/Propstack/Fields/Main/ForBidding.php:47
 msgid "For bidding"
 msgstr ""
 
@@ -1331,7 +1358,7 @@ msgid "Heating costs VAT"
 msgstr ""
 
 #: app/Propstack/Fields/Main/HeatingType.php:40
-msgid "Heating types"
+msgid "Heating type"
 msgstr ""
 
 #: app/Propstack/Fields/Main/HeightGarage.php:40
@@ -1388,6 +1415,10 @@ msgstr ""
 
 #: app/Propstack/Fields/Main/LocationClassificationType.php:40
 msgid "Location Classification Type"
+msgstr ""
+
+#: app/Propstack/Fields/Main/LocationName.php:40
+msgid "Location name"
 msgstr ""
 
 #: app/Propstack/Fields/Main/LodgerFlat.php:47
@@ -1607,6 +1638,10 @@ msgstr ""
 msgid "Property space value"
 msgstr ""
 
+#: app/Propstack/Fields/Main/RecommendedUseTypes.php:54
+msgid "Recommended use types"
+msgstr ""
+
 #: app/Propstack/Fields/Main/RecurringCosts.php:39
 msgid "Recurring costs"
 msgstr ""
@@ -1719,6 +1754,10 @@ msgstr ""
 msgid "Thermal Characteristic Heating"
 msgstr ""
 
+#: app/Propstack/Fields/Main/TotalCommission.php:47
+msgid "Total commission"
+msgstr ""
+
 #: app/Propstack/Fields/Main/TotalFloorSpace.php:54
 msgid "Total Floor space"
 msgstr ""
@@ -1747,6 +1786,18 @@ msgstr ""
 
 #: app/Propstack/Fields/Main/UsableFloorSpace.php:54
 msgid "Usable Floor Space"
+msgstr ""
+
+#: app/Propstack/Fields/Main/ValuationPrice.php:47
+msgid "Valuation price"
+msgstr ""
+
+#: app/Propstack/Fields/Main/ValuationPriceFrom.php:47
+msgid "Valuation price from"
+msgstr ""
+
+#: app/Propstack/Fields/Main/ValuationPriceTo.php:47
+msgid "Valuation price to"
 msgstr ""
 
 #: app/Propstack/Fields/Main/Vat.php:40
@@ -1788,245 +1839,245 @@ msgstr ""
 msgid "hidden in frontend"
 msgstr ""
 
-#: app/Propstack/Files.php:127
+#: app/Propstack/Files.php:128
 msgid "Files"
 msgstr ""
 
-#: app/Propstack/Files.php:149
+#: app/Propstack/Files.php:150
 msgid "Import of files for objects is still running. Please wait."
 msgstr ""
 
-#: app/Propstack/Files.php:153
+#: app/Propstack/Files.php:154
 msgid "No objects imported. Please import them first to import their files."
 msgstr ""
 
-#: app/Propstack/Files.php:164
+#: app/Propstack/Files.php:165
 msgid "Import images for your objects from Propstack"
 msgstr ""
 
-#: app/Propstack/Files.php:166
+#: app/Propstack/Files.php:167
 msgid "Click on the button below to start the import of images for your objects from Propstack."
 msgstr ""
 
-#: app/Propstack/Files.php:167
-#: app/Propstack/ImmoObjects.php:1452
-#: app/Propstack/PostTypes/ImmoObject.php:529
+#: app/Propstack/Files.php:168
+#: app/Propstack/ImmoObjects.php:1469
+#: app/Propstack/PostTypes/ImmoObject.php:532
 msgid "The import could take some time. Please be patient."
 msgstr ""
 
-#: app/Propstack/Files.php:173
-#: app/Propstack/ImmoObjects.php:1458
-#: app/Propstack/PostTypes/ImmoObject.php:535
+#: app/Propstack/Files.php:174
+#: app/Propstack/ImmoObjects.php:1475
+#: app/Propstack/PostTypes/ImmoObject.php:538
 msgid "Import them now"
 msgstr ""
 
-#: app/Propstack/Files.php:203
-#: app/Propstack/Files.php:207
-#: app/Propstack/Files.php:212
+#: app/Propstack/Files.php:204
+#: app/Propstack/Files.php:208
+#: app/Propstack/Files.php:213
 msgid "Delete files"
 msgstr ""
 
-#: app/Propstack/Files.php:204
-#: app/Propstack/ImmoObjects.php:413
+#: app/Propstack/Files.php:205
+#: app/Propstack/ImmoObjects.php:414
 msgid "No objects imported."
 msgstr ""
 
-#: app/Propstack/Files.php:208
+#: app/Propstack/Files.php:209
 msgid "No files for objects imported."
 msgstr ""
 
-#: app/Propstack/Files.php:211
-#: app/Propstack/ImmoObjects.php:416
+#: app/Propstack/Files.php:212
+#: app/Propstack/ImmoObjects.php:417
 msgid "Delete now"
 msgstr ""
 
-#: app/Propstack/Files.php:219
+#: app/Propstack/Files.php:220
 msgid "Delete all files of your objects"
 msgstr ""
 
-#: app/Propstack/Files.php:221
+#: app/Propstack/Files.php:222
 msgid "Click on the button below to delete all files of your objects in your WordPress website."
 msgstr ""
 
-#: app/Propstack/Files.php:222
+#: app/Propstack/Files.php:223
 msgid "You will loose any images and documents for your objects. They will be re-imported during the next object import."
 msgstr ""
 
-#: app/Propstack/Files.php:228
-#: app/Propstack/ImmoObjects.php:433
+#: app/Propstack/Files.php:229
+#: app/Propstack/ImmoObjects.php:434
 msgid "Delete them now"
 msgstr ""
 
-#: app/Propstack/Files.php:233
-#: app/Propstack/ImmoObjects.php:438
+#: app/Propstack/Files.php:234
+#: app/Propstack/ImmoObjects.php:439
 msgid "Close"
 msgstr ""
 
-#: app/Propstack/Files.php:245
-#: app/Propstack/ImmoObjects.php:450
+#: app/Propstack/Files.php:246
+#: app/Propstack/ImmoObjects.php:451
 #: app/Propstack/Tables/Queue.php:30
 msgid "Options"
 msgstr ""
 
-#: app/Propstack/Files.php:253
+#: app/Propstack/Files.php:254
 msgid "Limit for import of files"
 msgstr ""
 
-#: app/Propstack/Files.php:254
+#: app/Propstack/Files.php:255
 msgid "The higher this number is, the greater the likelihood of a timeout when importing files."
 msgstr ""
 
-#: app/Propstack/Files.php:263
+#: app/Propstack/Files.php:264
 msgid "Image size"
 msgstr ""
 
-#: app/Propstack/Files.php:264
+#: app/Propstack/Files.php:265
 msgid "Choose the image size to use for import in WordPress. As bigger the size as longer takes the import of any image. WordPress only needs on image size as basis to optimize the generation of them in your website."
 msgstr ""
 
-#: app/Propstack/Files.php:267
+#: app/Propstack/Files.php:268
 msgid "Original"
 msgstr ""
 
-#: app/Propstack/Files.php:268
+#: app/Propstack/Files.php:269
 #: app/Propstack/PostTypes/Queue.php:243
 msgid "Big URL"
 msgstr ""
 
-#: app/Propstack/Files.php:269
+#: app/Propstack/Files.php:270
 #: app/Propstack/PostTypes/Queue.php:247
 msgid "Medium URL"
 msgstr ""
 
-#: app/Propstack/Files.php:270
-#: app/Propstack/ImmoObjects.php:850
-#: app/Propstack/PostTypes/ImmoObject.php:234
+#: app/Propstack/Files.php:271
+#: app/Propstack/ImmoObjects.php:851
+#: app/Propstack/PostTypes/ImmoObject.php:237
 #: app/Propstack/Taxonomies.php:232
 msgid "Thumbnail"
 msgstr ""
 
-#: app/Propstack/Files.php:271
+#: app/Propstack/Files.php:272
 msgid "Small thumbnail"
 msgstr ""
 
-#: app/Propstack/Files.php:272
+#: app/Propstack/Files.php:273
 msgid "Square image URL"
 msgstr ""
 
-#: app/Propstack/Files.php:283
+#: app/Propstack/Files.php:284
 msgid "Assign new files to this user"
 msgstr ""
 
-#: app/Propstack/Files.php:284
-#: app/Propstack/ImmoObjects.php:459
+#: app/Propstack/Files.php:285
+#: app/Propstack/ImmoObjects.php:460
 msgid "This is only a fallback if the actual user is not available (e.g., via WP CLI import or synchronisation). New files are normally assigned to the user who adds them."
 msgstr ""
 
 #. translators: %1$s: the given URL.
-#: app/Propstack/Files.php:375
+#: app/Propstack/Files.php:376
 #, php-format
 msgid "Given URL %1$s is already in the database."
 msgstr ""
 
 #. translators: %1$s: the given URL.
-#: app/Propstack/Files.php:445
+#: app/Propstack/Files.php:463
 #, php-format
 msgid "Import of file %1$s failed:"
 msgstr ""
 
-#: app/Propstack/Files.php:499
+#: app/Propstack/Files.php:518
 msgid "Deletion of files starting"
 msgstr ""
 
 #. translators: %1$s: the file name.
-#: app/Propstack/Files.php:523
+#: app/Propstack/Files.php:542
 #, php-format
 msgid "Deletion of file %1$s"
 msgstr ""
 
-#: app/Propstack/Files.php:565
+#: app/Propstack/Files.php:584
 msgid "Files has been deleted"
 msgstr ""
 
-#: app/Propstack/Files.php:567
+#: app/Propstack/Files.php:586
 msgid "The files for your objects from Propstack has been deleted."
 msgstr ""
 
-#: app/Propstack/Files.php:568
+#: app/Propstack/Files.php:587
 msgid "They are still in your Propstack account. They will be imported during the next object import."
 msgstr ""
 
-#: app/Propstack/Files.php:686
-#: app/Propstack/ImmoObjects.php:744
+#: app/Propstack/Files.php:705
+#: app/Propstack/ImmoObjects.php:745
 msgid "The deletion of objects has been run."
 msgstr ""
 
-#: app/Propstack/Files.php:686
-#: app/Propstack/ImmoObjects.php:744
+#: app/Propstack/Files.php:705
+#: app/Propstack/ImmoObjects.php:745
 msgid "They are unchanged in your Propstack account. You can import them at any time again."
 msgstr ""
 
-#: app/Propstack/Files.php:760
+#: app/Propstack/Files.php:779
 msgid "Import of files for your objects starting"
 msgstr ""
 
-#: app/Propstack/Files.php:777
+#: app/Propstack/Files.php:796
 msgid "Prepare the import of files for your objects"
 msgstr ""
 
-#: app/Propstack/Files.php:788
-#: app/Propstack/Files.php:792
+#: app/Propstack/Files.php:807
+#: app/Propstack/Files.php:811
 msgid "Collecting all files for your object to import"
 msgstr ""
 
-#: app/Propstack/Files.php:799
-#: app/Propstack/Files.php:803
+#: app/Propstack/Files.php:818
+#: app/Propstack/Files.php:822
 msgid "Collecting all files for your objects to import"
 msgstr ""
 
-#: app/Propstack/Files.php:840
+#: app/Propstack/Files.php:859
 msgid "Saved cache for import:"
 msgstr ""
 
-#: app/Propstack/Files.php:849
-#: app/Propstack/Files.php:853
+#: app/Propstack/Files.php:868
+#: app/Propstack/Files.php:872
 msgid "Import of files for your objects is starting"
 msgstr ""
 
-#: app/Propstack/Files.php:891
+#: app/Propstack/Files.php:910
 msgid "Missing URL for file during file import. The used file data from API:"
 msgstr ""
 
 #. translators: %1$s will be replaced by the name of the file.
-#: app/Propstack/Files.php:909
+#: app/Propstack/Files.php:928
 #, php-format
 msgid "Import file %1$s for %2$s"
 msgstr ""
 
-#: app/Propstack/Files.php:957
-#: app/Propstack/Files.php:991
+#: app/Propstack/Files.php:976
+#: app/Propstack/Files.php:1010
 msgid "Import of files has been run"
 msgstr ""
 
-#: app/Propstack/Files.php:959
+#: app/Propstack/Files.php:978
 msgid "The files have been imported."
 msgstr ""
 
-#: app/Propstack/Files.php:960
+#: app/Propstack/Files.php:979
 msgid "You can now see them on the object pages."
 msgstr ""
 
 #. translators: %1$s will be replaced by the immo object title.
-#: app/Propstack/Files.php:977
+#: app/Propstack/Files.php:996
 #, php-format
 msgid "You can now see them on the page of your object %1$s."
 msgstr ""
 
-#: app/Propstack/Files.php:982
+#: app/Propstack/Files.php:1001
 msgid "Show them"
 msgstr ""
 
-#: app/Propstack/Files.php:1026
+#: app/Propstack/Files.php:1045
 msgid "The import of files from your Propstack account has been run."
 msgstr ""
 
@@ -2066,8 +2117,13 @@ msgid "Hide"
 msgstr ""
 
 #: app/Propstack/Filters.php:190
-#: app/Propstack/PostTypes/ImmoObject.php:512
+#: app/Propstack/PostTypes/ImmoObject.php:515
 #: app/Propstack/Queue.php:111
+#: blocks/broker-field/build/index.js:1
+#: blocks/description/build/index.js:1
+#: blocks/field/build/index.js:1
+#: blocks/filter/build/index.js:1
+#: blocks/single/build/index.js:1
 msgid "Settings"
 msgstr ""
 
@@ -2092,6 +2148,8 @@ msgid "Input field"
 msgstr ""
 
 #: app/Propstack/FilterTypes/Select.php:56
+#: blocks/broker-field/build/index.js:1
+#: blocks/field/build/index.js:1
 msgid "Select field"
 msgstr ""
 
@@ -2105,246 +2163,252 @@ msgstr ""
 msgid "Assign image %1$s to object %2$s."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:266
+#: app/Propstack/ImmoObjects.php:267
 msgid "Deletion of your objects is starting"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:272
+#: app/Propstack/ImmoObjects.php:273
 msgid "Delete of all Propstack objects has been started."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:283
+#: app/Propstack/ImmoObjects.php:284
 msgid "Deletion of your objects is running"
 msgstr ""
 
 #. translators: a title will replace %1$s.
-#: app/Propstack/ImmoObjects.php:295
+#: app/Propstack/ImmoObjects.php:296
 #, php-format
 msgid "Deleting object %1$s"
 msgstr ""
 
 #. translators: a title will replace %1$s.
-#: app/Propstack/ImmoObjects.php:305
+#: app/Propstack/ImmoObjects.php:306
 #, php-format
 msgid "Object %1$s could not be deleted."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:324
+#: app/Propstack/ImmoObjects.php:325
 msgid "Cleanup the database"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:331
+#: app/Propstack/ImmoObjects.php:332
 msgid "Delete of all Propstack objects has been ended."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:359
+#: app/Propstack/ImmoObjects.php:360
 msgid "Imports"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:364
-#: app/Propstack/ImmoObjects.php:505
-#: app/Propstack/PostTypes/ImmoObject.php:101
-#: app/Propstack/PostTypes/ImmoObject.php:103
-#: app/Propstack/PostTypes/ImmoObject.php:349
+#: app/Propstack/ImmoObjects.php:365
+#: app/Propstack/ImmoObjects.php:506
+#: app/Propstack/PostTypes/ImmoObject.php:104
+#: app/Propstack/PostTypes/ImmoObject.php:106
+#: app/Propstack/PostTypes/ImmoObject.php:352
+#: templates/parts/archive/default.php:28
+#: templates/parts/single/default.php:20
 msgid "Objects"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:369
-#: app/Propstack/ImmoObjects.php:377
-#: app/Propstack/ImmoObjects.php:381
-#: app/Propstack/ImmoObjects.php:386
+#: app/Propstack/ImmoObjects.php:370
+#: app/Propstack/ImmoObjects.php:378
+#: app/Propstack/ImmoObjects.php:382
+#: app/Propstack/ImmoObjects.php:387
 msgid "Import objects"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:378
+#: app/Propstack/ImmoObjects.php:379
 msgid "Propstack API key is missing."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:382
+#: app/Propstack/ImmoObjects.php:383
 #: app/Propstack/Imports/v1/Objects.php:51
 #: app/Propstack/Imports/v2/Objects.php:52
 msgid "Import of objects is still running. Please wait."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:408
-#: app/Propstack/ImmoObjects.php:412
-#: app/Propstack/ImmoObjects.php:417
+#: app/Propstack/ImmoObjects.php:409
+#: app/Propstack/ImmoObjects.php:413
+#: app/Propstack/ImmoObjects.php:418
 msgid "Delete objects"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:409
+#: app/Propstack/ImmoObjects.php:410
 #: app/Propstack/Imports/v1/Objects.php:63
 #: app/Propstack/Imports/v2/Objects.php:64
 msgid "Deletion of objects is still running. Please wait."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:424
+#: app/Propstack/ImmoObjects.php:425
 msgid "Delete your objects"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:426
+#: app/Propstack/ImmoObjects.php:427
 msgid "Click on the button below to delete all objects in your WordPress website."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:427
+#: app/Propstack/ImmoObjects.php:428
 msgid "The objects will stay in your Propstack account."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:458
+#: app/Propstack/ImmoObjects.php:459
 msgid "Assign new objects to this user"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:469
+#: app/Propstack/ImmoObjects.php:470
 msgid "Enable automatic import"
 msgstr ""
 
 #. translators: %1$s: Connector for Propstack Pro URL
-#: app/Propstack/ImmoObjects.php:471
+#: app/Propstack/ImmoObjects.php:472
 #, php-format
 msgid "Use more options for automatic imports with <a href=\"%1$s\" target=\"_blank\">Connector for Propstack Pro</a>."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:481
+#: app/Propstack/ImmoObjects.php:482
 msgid "Interval for automatic import"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:482
+#: app/Propstack/ImmoObjects.php:483
 msgid "Daily"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:491
+#: app/Propstack/ImmoObjects.php:492
 msgid "Preserve files"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:492
+#: app/Propstack/ImmoObjects.php:493
 msgid "If objects are deleted, do not delete their files. They will stay in your media library, and you have to clean them manually."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:510
-#: app/Propstack/ImmoObjects.php:515
+#: app/Propstack/ImmoObjects.php:511
+#: app/Propstack/ImmoObjects.php:516
 msgid "Restrictions"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:523
+#: app/Propstack/ImmoObjects.php:524
 msgid "States to import"
 msgstr ""
 
 #. translators: %1$s: Connector for Propstack Pro URL
-#: app/Propstack/ImmoObjects.php:525
+#: app/Propstack/ImmoObjects.php:526
 #, php-format
 msgid "Use more states with <a href=\"%1$s\" target=\"_blank\">Connector for Propstack Pro</a>."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:526
-#: app/Propstack/ImmoObjects.php:900
+#: app/Propstack/ImmoObjects.php:527
+#: app/Propstack/ImmoObjects.php:901
 msgid "Vermarktung"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:554
+#: app/Propstack/ImmoObjects.php:555
 msgid "Broker to import"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:555
+#: app/Propstack/ImmoObjects.php:556
 msgid "Only objects with the selected broker will be imported. All other will be ignored. Selecting none will import objects for each broker."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:584
+#: app/Propstack/ImmoObjects.php:585
 msgid "Marketing types to import"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:585
+#: app/Propstack/ImmoObjects.php:586
 msgid "Only objects with the selected marketing types will be imported. All other will be ignored. Selecting none will import objects for each marketing type."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:624
+#: app/Propstack/ImmoObjects.php:625
 msgid "Object types to import"
 msgstr ""
 
 #. translators: %1$s: Connector for Propstack Pro URL
-#: app/Propstack/ImmoObjects.php:626
+#: app/Propstack/ImmoObjects.php:627
 msgid "Only objects with the selected object types will be imported. All other will be ignored. Selecting none will import objects for each object type."
 msgstr ""
 
 #. translators: %1$s: Connector for Propstack Pro URL
-#: app/Propstack/ImmoObjects.php:626
+#: app/Propstack/ImmoObjects.php:627
 #, php-format
 msgid "Use more object types with <a href=\"%1$s\" target=\"_blank\">Connector for Propstack Pro</a>."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:655
+#: app/Propstack/ImmoObjects.php:656
 msgid "Property types to import"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:656
+#: app/Propstack/ImmoObjects.php:657
 msgid "Only objects with the property types will be imported. All other will be ignored. Selecting none will import objects for each property type."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:705
-#: app/Propstack/Imports/v1/Objects.php:461
+#: app/Propstack/ImmoObjects.php:706
+#: app/Propstack/Imports/v1/Objects.php:460
 #: app/Propstack/Imports/v2/Objects.php:431
 msgid "The import of objects from your Propstack account has been run."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:795
+#: app/Propstack/ImmoObjects.php:796
 msgid "Your objects are being imported"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:796
+#: app/Propstack/ImmoObjects.php:797
 msgid "Deletion of objects is running"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:797
+#: app/Propstack/ImmoObjects.php:798
 msgid "Deletion of files is running"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:798
+#: app/Propstack/ImmoObjects.php:799
 msgid "Import of files is running"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:799
+#: app/Propstack/ImmoObjects.php:800
 msgid "Processing the queue to import images"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:808
+#: app/Propstack/ImmoObjects.php:809
 msgid "<u>Request Timeout</u> - The import apparently took too long to be completed."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:809
+#: app/Propstack/ImmoObjects.php:810
 msgid "<u>Gateway Timeout</u> - The import apparently took too long to be completed."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:823
+#: app/Propstack/ImmoObjects.php:824
 msgid "Deletion has been run"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:825
+#: app/Propstack/ImmoObjects.php:826
 msgid "The objects have been deleted."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:826
+#: app/Propstack/ImmoObjects.php:827
 msgid "They are still in your Propstack account. You can import them any time."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:856
+#: app/Propstack/ImmoObjects.php:857
 msgid "Object state"
 msgstr ""
 
 #. translators: %1$s will be replaced by the attachment ID.
-#: app/Propstack/ImmoObjects.php:1257
+#: app/Propstack/ImmoObjects.php:1274
 #, php-format
 msgid "Assign image %1$s as thumbnail to object %2$s."
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:1291
+#: app/Propstack/ImmoObjects.php:1308
 msgid "Get the objects in tip-top shape"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:1449
+#: app/Propstack/ImmoObjects.php:1466
 msgid "Import your objects from Propstack"
 msgstr ""
 
-#: app/Propstack/ImmoObjects.php:1451
+#: app/Propstack/ImmoObjects.php:1468
 msgid "Click on the button below to start the import of your objects from Propstack."
+msgstr ""
+
+#: app/Propstack/ImmoObjects.php:1652
+msgid "Use this in Pro"
 msgstr ""
 
 #: app/Propstack/Imports/v1/Objects.php:123
@@ -2388,8 +2452,8 @@ msgid "Import of objects is running"
 msgstr ""
 
 #. translators: %1$s will be replaced by the object title.
-#: app/Propstack/Imports/v1/Objects.php:270
-#: app/Propstack/Imports/v1/Objects.php:275
+#: app/Propstack/Imports/v1/Objects.php:269
+#: app/Propstack/Imports/v1/Objects.php:274
 #: app/Propstack/Imports/v2/Objects.php:241
 #: app/Propstack/Imports/v2/Objects.php:246
 #, php-format
@@ -2397,65 +2461,65 @@ msgid "Import of object %1$s"
 msgstr ""
 
 #. translators: %1$s will be replaced by the object title.
-#: app/Propstack/Imports/v1/Objects.php:286
+#: app/Propstack/Imports/v1/Objects.php:285
 #: app/Propstack/Imports/v2/Objects.php:257
 #, php-format
 msgid "Creating new entry for the object %1$s"
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:314
+#: app/Propstack/Imports/v1/Objects.php:313
 #: app/Propstack/Imports/v2/Objects.php:285
 msgid "New object could not be created. The following error occurred:"
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v1/Objects.php:393
 #: app/Propstack/Imports/v2/Objects.php:365
 msgid "Following error occurred during the import of objects via API v1:"
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v1/Objects.php:393
 #: app/Propstack/Imports/v2/Objects.php:365
 msgid "Message:"
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v1/Objects.php:393
 #: app/Propstack/Imports/v2/Objects.php:365
 msgid "Code:"
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v1/Objects.php:393
 #: app/Propstack/Imports/v2/Objects.php:365
 msgid "File:"
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:394
+#: app/Propstack/Imports/v1/Objects.php:393
 #: app/Propstack/Imports/v2/Objects.php:365
 msgid "Line:"
 msgstr ""
 
 #. translators: %1$s will be replaced by a URL.
-#: app/Propstack/Imports/v1/Objects.php:398
+#: app/Propstack/Imports/v1/Objects.php:397
 #: app/Propstack/Imports/v2/Objects.php:369
 #, php-format
 msgid "Error occurred. Check <a href=\"%1$s\">the log</a> for details."
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:414
+#: app/Propstack/Imports/v1/Objects.php:413
 #: app/Propstack/Imports/v2/Objects.php:385
 msgid "Import of objects has been ended."
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:459
+#: app/Propstack/Imports/v1/Objects.php:458
 #: app/Propstack/Imports/v2/Objects.php:429
 msgid "Import of objects has been run"
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:462
+#: app/Propstack/Imports/v1/Objects.php:461
 #: app/Propstack/Imports/v2/Objects.php:432
 msgid "You will find them in the list in the backend and your frontend."
 msgstr ""
 
-#: app/Propstack/Imports/v1/Objects.php:463
+#: app/Propstack/Imports/v1/Objects.php:462
 #: app/Propstack/Imports/v2/Objects.php:433
 msgid "Please note that any files for the objects are imported later. However, you can also trigger their import directly from the object itself."
 msgstr ""
@@ -2480,77 +2544,117 @@ msgstr ""
 msgid "Import of object %1$s prevented."
 msgstr ""
 
-#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:37
+#: app/Propstack/KnowledgeCenter.php:197
+msgid "Question not answered?"
+msgstr ""
+
+#: app/Propstack/KnowledgeCenter.php:197
+msgid "Ask in our forum"
+msgstr ""
+
+#. translators: %1$s will be replaced by a URL.
+#: app/Propstack/KnowledgeCenter.php:221
+msgid "Documentation"
+msgstr ""
+
+#. translators: %1$s will be replaced by a URL.
+#: app/Propstack/KnowledgeCenter.php:221
+#, php-format
+msgid "We provide some documentation for the WordPress plugin <i>Connector for Propstack</i> at <a href=\"%1$s\" target=\"_blank\">GitHub (opens a new window)</a>."
+msgstr ""
+
+#: app/Propstack/KnowledgeCenter.php:226
+msgid "Documentations"
+msgstr ""
+
+#: app/Propstack/KnowledgeCenter.php:244
+msgid "The problem:"
+msgstr ""
+
+#: app/Propstack/KnowledgeCenter.php:244
+msgid "The solution:"
+msgstr ""
+
+#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:32
+msgid "Insufficient Permissions for Propstack API"
+msgstr ""
+
+#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:53
 msgid "To resolve this, please access the list of your API keys in Propstack:"
 msgstr ""
 
-#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:39
+#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:55
 msgid "Edit the key you are using and grant it at least the following permissions:<br><strong>Objects:</strong> Read<br><strong>Object states:</strong> Read"
 msgstr ""
 
-#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:40
+#: app/Propstack/KnowledgeCenter/InsufficientPermissions.php:56
 msgid "Save these settings and then try retrieving the data again."
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:102
+#: app/Propstack/PostTypes/ImmoObject.php:105
 msgid "Object"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:104
+#: app/Propstack/PostTypes/ImmoObject.php:107
 msgid "All objects"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:105
-#: app/Propstack/PostTypes/ImmoObject.php:368
+#: app/Propstack/PostTypes/ImmoObject.php:108
+#: app/Propstack/PostTypes/ImmoObject.php:371
 msgid "View object in frontend"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:106
+#: app/Propstack/PostTypes/ImmoObject.php:109
 msgid "View objects in frontend"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:107
+#: app/Propstack/PostTypes/ImmoObject.php:110
 msgid "View object in backend"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:108
+#: app/Propstack/PostTypes/ImmoObject.php:111
 msgid "Search object"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:109
+#: app/Propstack/PostTypes/ImmoObject.php:112
 msgid "No objects imported"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:110
+#: app/Propstack/PostTypes/ImmoObject.php:113
 msgctxt "navigation link block title"
 msgid "Object Link"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:111
+#: app/Propstack/PostTypes/ImmoObject.php:114
 msgctxt "navigation link block description"
 msgid "A link to an object."
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:317
+#: app/Propstack/PostTypes/ImmoObject.php:320
 msgid "Edit"
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:485
+#: app/Propstack/PostTypes/ImmoObject.php:488
 msgid "No thumbnail is set."
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:525
+#: app/Propstack/PostTypes/ImmoObject.php:528
 msgid "Import images from Propstack"
 msgstr ""
 
 #. translators: %1$s will be replaced by the object title.
-#: app/Propstack/PostTypes/ImmoObject.php:528
+#: app/Propstack/PostTypes/ImmoObject.php:531
 #, php-format
 msgid "Click on the button below to start the import of files for %1$s from Propstack."
 msgstr ""
 
-#: app/Propstack/PostTypes/ImmoObject.php:558
+#: app/Propstack/PostTypes/ImmoObject.php:561
 msgid "Edit in Propstack"
+msgstr ""
+
+#. translators: %1$s will be replaced by a URL.
+#: app/Propstack/PostTypes/ImmoObject.php:574
+msgid "The Connector for Propstack plugin allows you to import your properties from Propstack into WordPress. It lets you display all stored property data on your website.<br><br>Select the section on the left for which you need help."
 msgstr ""
 
 #: app/Propstack/PostTypes/Queue.php:76
@@ -2651,24 +2755,24 @@ msgstr ""
 msgid "Square URL"
 msgstr ""
 
-#: app/Propstack/Propstack.php:174
+#: app/Propstack/Propstack.php:177
 msgid "The specified API token is too short. Please double-check the API token in your Propstack-account."
 msgstr ""
 
-#: app/Propstack/Propstack.php:182
+#: app/Propstack/Propstack.php:185
 msgid "The specified API token contains not allowed characters. Please double-check the API token in your Propstack-account."
 msgstr ""
 
-#: app/Propstack/Propstack.php:232
+#: app/Propstack/Propstack.php:235
 msgid "URL-slug for archive view"
 msgstr ""
 
-#: app/Propstack/Propstack.php:234
-#: app/Propstack/Propstack.php:245
+#: app/Propstack/Propstack.php:237
+#: app/Propstack/Propstack.php:248
 msgid "Available tags:"
 msgstr ""
 
-#: app/Propstack/Propstack.php:243
+#: app/Propstack/Propstack.php:246
 msgid "URL-slug for single view"
 msgstr ""
 
@@ -2964,21 +3068,21 @@ msgstr ""
 msgid "Go to all object types"
 msgstr ""
 
-#: app/Propstack/Taxonomies/ObjectTypes/Apartment.php:251
+#: app/Propstack/Taxonomies/ObjectTypes/Apartment.php:252
 #: app/Propstack/Taxonomies/PropertyType.php:95
 msgid "Apartment"
 msgstr ""
 
-#: app/Propstack/Taxonomies/ObjectTypes/Apartment.php:260
+#: app/Propstack/Taxonomies/ObjectTypes/Apartment.php:261
 msgid "Show data of your apartment"
 msgstr ""
 
-#: app/Propstack/Taxonomies/ObjectTypes/Garage.php:216
+#: app/Propstack/Taxonomies/ObjectTypes/Garage.php:217
 #: app/Propstack/Taxonomies/PropertyType.php:200
 msgid "Garage"
 msgstr ""
 
-#: app/Propstack/Taxonomies/ObjectTypes/House.php:239
+#: app/Propstack/Taxonomies/ObjectTypes/House.php:241
 msgid "House"
 msgstr ""
 
@@ -3467,7 +3571,7 @@ msgid "%1$s for %2$s"
 msgstr ""
 
 #: app/Propstack/Widgets/Broker_Field.php:116
-#: app/Propstack/Widgets/Field.php:121
+#: app/Propstack/Widgets/Field.php:136
 msgid "Empty field."
 msgstr ""
 
@@ -3495,4 +3599,150 @@ msgstr ""
 
 #: app/Propstack/Widget_Base.php:167
 msgid "Does not have any attributes."
+msgstr ""
+
+#: templates/parts/archive.php:22
+msgid "There are currently no objects available."
+msgstr ""
+
+#: templates/parts/part-filter.php:40
+#: blocks/filter/build/index.js:1
+msgid "Filter"
+msgstr ""
+
+#: blocks/archive/build/index.js:1
+msgid "Provides a block to show a list of objects from Propstack."
+msgstr ""
+
+#: blocks/broker-field/build/index.js:1
+msgid "Broker field"
+msgstr ""
+
+#: blocks/broker-field/build/index.js:1
+msgid "Provides a block to show a single field value of a broker from Propstack."
+msgstr ""
+
+#: blocks/description/build/index.js:1
+msgid "Provides a block to show a description of a single object from Propstack."
+msgstr ""
+
+#: blocks/description/build/index.js:1
+msgid "Select description"
+msgstr ""
+
+#: blocks/field/build/index.js:1
+msgid "Field"
+msgstr ""
+
+#: blocks/field/build/index.js:1
+msgid "Provides a block to show a single field value of a single object from Propstack."
+msgstr ""
+
+#: blocks/filter/build/index.js:1
+msgid "Provides a block to the filter for objects from Propstack."
+msgstr ""
+
+#: blocks/filter/build/index.js:1
+msgid "Select filters"
+msgstr ""
+
+#: blocks/gallery/build/index.js:1
+msgid "Gallery"
+msgstr ""
+
+#: blocks/gallery/build/index.js:1
+msgid "Provides a block to show gallery for a single object from Propstack."
+msgstr ""
+
+#: blocks/single/build/index.js:1
+msgid "Single Object"
+msgstr ""
+
+#: blocks/single/build/index.js:1
+msgid "Provides a block to show an immo object managed by Propstack."
+msgstr ""
+
+#: blocks/single/build/index.js:1
+msgid "Please choose"
+msgstr ""
+
+#: blocks/single/build/index.js:1
+msgid "Select object"
+msgstr ""
+
+#: blocks/archive/block.json
+msgctxt "block title"
+msgid "List of objects"
+msgstr ""
+
+#: blocks/archive/block.json
+msgctxt "block description"
+msgid "Provides a block to show a list of objects from Propstack."
+msgstr ""
+
+#: blocks/archive/block.json
+#: blocks/broker-field/block.json
+#: blocks/description/block.json
+#: blocks/field/block.json
+#: blocks/filter/block.json
+#: blocks/gallery/block.json
+#: blocks/single/block.json
+msgctxt "block keyword"
+msgid "Propstack"
+msgstr ""
+
+#: blocks/broker-field/block.json
+msgctxt "block title"
+msgid "Broker field"
+msgstr ""
+
+#: blocks/broker-field/block.json
+msgctxt "block description"
+msgid "Provides a block to show a single field value of a broker from Propstack."
+msgstr ""
+
+#: blocks/description/block.json
+msgctxt "block title"
+msgid "Description"
+msgstr ""
+
+#: blocks/description/block.json
+msgctxt "block description"
+msgid "Provides a block to show a description of a single object from Propstack."
+msgstr ""
+
+#: blocks/field/block.json
+#: blocks/filter/block.json
+msgctxt "block title"
+msgid "Field"
+msgstr ""
+
+#: blocks/field/block.json
+msgctxt "block description"
+msgid "Provides a block to show a single field value of a single object from Propstack."
+msgstr ""
+
+#: blocks/filter/block.json
+msgctxt "block description"
+msgid "Provides a block to the filter for objects from Propstack."
+msgstr ""
+
+#: blocks/gallery/block.json
+msgctxt "block title"
+msgid "Gallery"
+msgstr ""
+
+#: blocks/gallery/block.json
+msgctxt "block description"
+msgid "Provides a block to show gallery for a single object from Propstack."
+msgstr ""
+
+#: blocks/single/block.json
+msgctxt "block title"
+msgid "Single Object"
+msgstr ""
+
+#: blocks/single/block.json
+msgctxt "block description"
+msgid "Provides a block to show a single object from Propstack."
 msgstr ""

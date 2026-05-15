@@ -30,6 +30,14 @@ class CoOwnershipShare extends Field_Base {
 	 * @var string
 	 */
 	protected string $name = 'co_ownership_share';
+
+	/**
+	 * The type for the field (e.g., 'boolean', 'string', 'number', 'array').
+	 *
+	 * @var string
+	 */
+	protected string $type = 'price';
+
 	/**
 	 * Return the field label.
 	 *

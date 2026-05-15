@@ -174,7 +174,7 @@ class ObjectType extends Taxonomy {
 		$object_type = $object_types[0];
 
 		// get the object type object by the given slug.
-		$object_type_object = self::get_instance()->get_object_type_by_slug( $object_type->slug );
+		$object_type_object = $this->get_object_type_by_slug( $object_type->slug );
 
 		// bail if the object type object is not set.
 		if ( ! $object_type_object instanceof Object_Type_Base ) {

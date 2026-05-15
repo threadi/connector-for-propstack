@@ -30,13 +30,14 @@ class LocationName extends Field_Base {
 	 * @var string
 	 */
 	protected string $name = 'location_name';
+
 	/**
 	 * Return the field label.
 	 *
 	 * @return string
 	 */
 	public function get_label(): string {
-		return 'location_name';
+		return __( 'Location name', 'connector-for-propstack' );
 	}
 
 	/**
@@ -45,6 +46,6 @@ class LocationName extends Field_Base {
 	 * @return Field_Category_Base
 	 */
 	public function get_category(): Field_Category_Base {
-		return new \ConnectorForPropstack\Propstack\FieldCategories\Other();
+		return new \ConnectorForPropstack\Propstack\FieldCategories\Address();
 	}
 }

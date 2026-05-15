@@ -1,11 +1,7 @@
 .propstack-connector-filter {
 	display: flex;
-	gap: 20px;
+	gap: 0;
 	flex-direction: column;
-	&.propstack-connector-filter-row {
-		flex-direction: row;
-		align-items: last baseline;
-	}
 	fieldset {
 		border: 0;
 		padding-left: 0;
@@ -19,5 +15,15 @@
 	}
 	input, select {
 		width: 100%;
+	}
+}
+
+@media (min-width: 767px) {
+	.propstack-connector-filter {
+		gap: 20px;
+		&.propstack-connector-filter-row {
+			flex-direction: row;
+			align-items: last baseline;
+		}
 	}
 }

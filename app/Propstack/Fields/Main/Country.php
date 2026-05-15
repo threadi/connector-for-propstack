@@ -30,6 +30,14 @@ class Country extends Field_Base {
 	 * @var string
 	 */
 	protected string $name = 'country';
+
+	/**
+	 * The output format, if different from the type.
+	 *
+	 * @var string
+	 */
+	protected string $output_format = 'country';
+
 	/**
 	 * Return the field label.
 	 *

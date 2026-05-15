@@ -113,6 +113,21 @@ class Field extends Widget_Base {
 			return '';
 		}
 
+		$show_field = true;
+		/**
+		 * Filter whether a field should be shown in the frontend.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param bool $show_field Whether the field should be shown in frontend.
+		 * @param Field_Base $field The field.
+		 * @param \ConnectorForPropstack\Propstack\ImmoObject $immo_object The object.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		if ( ! apply_filters( 'cfprop_show_field_in_frontend', $show_field, $field, $immo_object ) ) {
+			return '';
+		}
+
 		// return the value of the given description type in this object.
 		$field_value = Fields::get_instance()->get_field_value( $immo_object->get_id(), $field, false );
 

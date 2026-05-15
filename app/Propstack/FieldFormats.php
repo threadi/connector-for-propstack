@@ -51,6 +51,7 @@ class FieldFormats {
 	 */
 	private function get_field_formats(): array {
 		$field_formats = array(
+			'\ConnectorForPropstack\Propstack\FieldFormats\Country',
 			'\ConnectorForPropstack\Propstack\FieldFormats\DateTime',
 			'\ConnectorForPropstack\Propstack\FieldFormats\Email',
 			'\ConnectorForPropstack\Propstack\FieldFormats\Kilometer',

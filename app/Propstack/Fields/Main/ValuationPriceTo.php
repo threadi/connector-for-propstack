@@ -44,7 +44,7 @@ class ValuationPriceTo extends Field_Base {
 	 * @return string
 	 */
 	public function get_label(): string {
-		return 'valuation_price_to';
+		return __( 'Valuation price to', 'connector-for-propstack' );
 	}
 
 	/**

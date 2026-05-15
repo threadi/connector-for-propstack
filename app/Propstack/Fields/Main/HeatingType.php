@@ -37,7 +37,7 @@ class HeatingType extends Field_Base {
 	 * @return string
 	 */
 	public function get_label(): string {
-		return __( 'Heating types', 'connector-for-propstack' );
+		return __( 'Heating type', 'connector-for-propstack' );
 	}
 
 	/**

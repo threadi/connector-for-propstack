@@ -782,8 +782,17 @@ class Fields {
 		// format the value depending on its type.
 		$field_type = FieldTypes::get_instance()->get_field_type_by_name( $field->get_type() );
 
+		/**
+		 * Filter the detected field type of single field.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param FieldType_Base|false $field_type The field type.
+		 * @param Field_Base $field The field.
+		 */
+		$field_type = apply_filters( 'cfprop_field_type', $field_type, $field );
+
 		// bail if no field type could be found.
-		if ( ! $field_type ) {
+		if ( ! $field_type instanceof FieldType_Base ) {
 			return $value;
 		}
 
@@ -858,7 +867,12 @@ class Fields {
 
 		// add them to the list.
 		foreach ( self::get_instance()->get_fields_as_objects() as $index => $field ) {
-			// bail if category does not match, if set.
+			// bail if the field is hidden.
+			if ( $field->hide() || $field->hide_in_frontend() ) {
+				continue;
+			}
+
+			// bail if the category does not match, if set.
 			if ( ! empty( $field_category ) && $field_category !== $field->get_category()->get_name() ) {
 				continue;
 			}
@@ -869,7 +883,7 @@ class Fields {
 			}
 
 			// bail if the query does not match, if set.
-			if ( ! empty( $query ) && ! str_contains( $field->get_name(), $query ) ) {
+			if ( ! empty( $query ) && ! str_contains( strtolower( $field->get_label() ), strtolower( $query ) ) && ! str_contains( strtolower( $field->get_name() ), strtolower( $query ) ) ) {
 				continue;
 			}
 

@@ -30,13 +30,14 @@ class ApartmentNumber extends Field_Base {
 	 * @var string
 	 */
 	protected string $name = 'apartment_number';
+
 	/**
 	 * Return the field label.
 	 *
 	 * @return string
 	 */
 	public function get_label(): string {
-		return 'apartment_number';
+		return __( 'Apartment number', 'connector-for-propstack' );
 	}
 
 	/**

@@ -43,6 +43,7 @@ use ConnectorForPropstack\Propstack\Fields\Main\Corridor;
 use ConnectorForPropstack\Propstack\Fields\Main\CostBalcony;
 use ConnectorForPropstack\Propstack\Fields\Main\CostLift;
 use ConnectorForPropstack\Propstack\Fields\Main\CostOther;
+use ConnectorForPropstack\Propstack\Fields\Main\Country;
 use ConnectorForPropstack\Propstack\Fields\Main\Courtage;
 use ConnectorForPropstack\Propstack\Fields\Main\CourtageNote;
 use ConnectorForPropstack\Propstack\Fields\Main\CreatedAt;
@@ -150,6 +151,7 @@ use ConnectorForPropstack\Propstack\Fields\Main\Price;
 use ConnectorForPropstack\Propstack\Fields\Main\PriceMultiplier;
 use ConnectorForPropstack\Propstack\Fields\Main\PriceMultiplierTarget;
 use ConnectorForPropstack\Propstack\Fields\Main\PriceNet;
+use ConnectorForPropstack\Propstack\Fields\Main\PriceOnInquiry;
 use ConnectorForPropstack\Propstack\Fields\Main\PricePerSqm;
 use ConnectorForPropstack\Propstack\Fields\Main\PriceType;
 use ConnectorForPropstack\Propstack\Fields\Main\PriceVat;
@@ -267,9 +269,13 @@ class House extends Object_Type_Base {
 			new Address(),
 			new ShortAddress(),
 			new Street(),
+			new HouseNumber(),
 			new District(),
 			new ZipCode(),
 			new City(),
+			new Region(),
+			new Country(),
+			new HideAddress(),
 			// dates.
 			new CreatedAt(),
 			new CreatedAtFormatted(),
@@ -366,8 +372,6 @@ class House extends Object_Type_Base {
 			new HeatingCosts(),
 			new HeatingCostsNet(),
 			new HeatingCostsVat(),
-			new HideAddress(),
-			new HouseNumber(),
 			new IndustrialArea(),
 			new InteriorQuality(),
 			new InvestmentType(),
@@ -390,7 +394,6 @@ class House extends Object_Type_Base {
 			new RecurringCosts(),
 			new RecurringCostsNet(),
 			new RecurringCostsVat(),
-			new Region(),
 			new RentalIncome(),
 			new RentalIncomeActual(),
 			new RentalIncomeTarget(),
@@ -443,6 +446,7 @@ class House extends Object_Type_Base {
 			new PriceNet(),
 			new PriceVat(),
 			new PriceType(),
+			new PriceOnInquiry(),
 			// energy.
 			new EnergyCertificateAvailability(),
 			new EnergyCertificateCreationDate(),

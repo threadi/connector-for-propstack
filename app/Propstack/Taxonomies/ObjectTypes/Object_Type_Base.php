@@ -102,7 +102,7 @@ class Object_Type_Base extends Term_Base {
 	}
 
 	/**
-	 * Use label as name for object types.
+	 * Use label as the name for object types.
 	 *
 	 * @return string
 	 */

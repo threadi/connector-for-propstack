@@ -32,6 +32,13 @@ class CostLift extends Field_Base {
 	protected string $name = 'cost_lift';
 
 	/**
+	 * The type for the field (e.g., 'boolean', 'string', 'number', 'array').
+	 *
+	 * @var string
+	 */
+	protected string $type = 'price';
+
+	/**
 	 * Return the field label.
 	 *
 	 * @return string

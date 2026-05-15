@@ -13,6 +13,7 @@ namespace ConnectorForPropstack\Propstack\PostTypes;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
+use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\ProcessHandler;
 use ConnectorForPropstack\Plugin\Settings;
 use ConnectorForPropstack\Plugin\Setup;
@@ -20,13 +21,16 @@ use ConnectorForPropstack\Plugin\Templates;
 use ConnectorForPropstack\Propstack\FieldCategories;
 use ConnectorForPropstack\Propstack\FieldCategories\Images;
 use ConnectorForPropstack\Propstack\Fields;
+use ConnectorForPropstack\Propstack\Files;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\Post_Type;
 use ConnectorForPropstack\Propstack\Taxonomies;
 use ConnectorForPropstack\Propstack\Taxonomies\ObjectType;
 use ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base;
 use WP_Admin_Bar;
+use WP_Error;
 use WP_Post;
+use WP_Query;
 use WP_REST_Response;
 
 /**
@@ -86,6 +90,9 @@ class ImmoObject extends Post_Type {
 		// edit objects.
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
 		add_action( 'add_meta_boxes', array( $this, 'remove_third_party_meta_boxes' ), PHP_INT_MAX );
+
+		// use our own hooks.
+		add_filter( 'cfprop_help_tabs', array( $this, 'add_help' ) );
 
 		// run parent tasks.
 		parent::init();
@@ -556,5 +563,106 @@ class ImmoObject extends Post_Type {
 
 		// show the link as a button.
 		echo '<a href="https://crm.propstack.de/app/portfolio/properties/' . esc_attr( $immo_object->get_object_id() ) . '" target="_blank" class="button">' . esc_html__( 'Edit in Propstack', 'connector-for-propstack' ) . '</a>';
+	}
+
+	/**
+	 * Add a hint in the knowledge base.
+	 *
+	 * @param array<int,array<string,mixed>> $help_list List of help tabs.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	public function add_help( array $help_list ): array {
+		// collect the content for the help.
+		/* translators: %1$s will be replaced by a URL. */
+		$content = Helper::get_logo_img() . '<h2>' . __( 'Connector for Propstack', 'connector-for-propstack' ) . '</h2><p>' . __( 'The Connector for Propstack plugin allows you to import your properties from Propstack into WordPress. It lets you display all stored property data on your website.<br><br>Select the section on the left for which you need help.', 'connector-for-propstack' ) . '</p>';
+
+		// add the help entry.
+		$help_list[] = array(
+			'id'      => self::get_instance()->get_name() . '-' . $this->get_name(),
+			'title'   => __( 'Connector for Propstack', 'connector-for-propstack' ),
+			'content' => $content,
+		);
+
+		// return the resulting list.
+		return $help_list;
+	}
+
+	/**
+	 * Return the ID of our example image for immo objects.
+	 *
+	 * @return int
+	 */
+	public function get_example_image_id(): int {
+		$query  = array(
+			'post_type'      => 'attachment',
+			'post_status'    => 'any',
+			'meta_query'     => array(
+				array(
+					'key'     => 'cfprop_example_image',
+					'compare' => 'EXISTS',
+				),
+			),
+			'posts_per_page' => 1,
+		);
+		$result = new WP_Query( $query );
+
+		// if no image could be found, import it.
+		if ( ! $result->have_posts() ) {
+			// embed some required files.
+			require_once ABSPATH . 'wp-admin/includes/image.php'; // @phpstan-ignore requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/file.php'; // @phpstan-ignore requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/media.php'; // @phpstan-ignore requireOnce.fileNotFound
+
+			// get the WP_Filesystem object.
+			$wp_filesystem = Helper::get_wp_filesystem();
+
+			// create a tmp file with a path.
+			$tmp_file = wp_tempnam( 'immo-object-default-image.png' );
+
+			// copy our example image as media_handle_sideload() will delete it.
+			if ( ! $wp_filesystem->copy( Helper::get_plugin_path() . 'gfx/immo-object-default-image.png', $tmp_file, true ) ) {
+				Log::get_instance()->add( __( 'Could not copy the example image. Please check your file system permissions.', 'connector-for-propstack' ), 'error', 'system' );
+				return 0;
+			}
+
+			// create the array to add the image.
+			$file_array    = array(
+				'type'     => 'image/png',
+				'name'     => 'immo-object-default-image.png',
+				'tmp_name' => $tmp_file,
+				'error'    => '0',
+				'size'     => (string) $wp_filesystem->size( $tmp_file ),
+			);
+			$attachment_id = media_handle_sideload( $file_array, 0, null, array( 'post_author' => get_current_user_id() ) );
+
+			// delete the tmp file if media_handle_sideload() does it not.
+			if ( $wp_filesystem->exists( $tmp_file ) ) {
+				$wp_filesystem->delete( $tmp_file );
+			}
+
+			// bail if no image could be imported.
+			if ( $attachment_id instanceof WP_Error ) {
+				Log::get_instance()->add( __( 'Could not save the example image. Following error occurred:', 'connector-for-propstack' ) . ' <code>' . $attachment_id->get_error_message() . '</code>', 'error', 'system' );
+				return 0;
+			}
+
+			// mark this image as the example image.
+			update_post_meta( $attachment_id, 'cfprop_example_image', true );
+
+			// return the attachment ID.
+			return $attachment_id;
+		}
+
+		// get the first match.
+		$attachment = $result->posts[0];
+
+		// bail if the match is not an image.
+		if ( ! $attachment instanceof WP_Post ) {
+			return 0;
+		}
+
+		// return the image we found.
+		return absint( $attachment->ID );
 	}
 }

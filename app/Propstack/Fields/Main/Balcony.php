@@ -32,11 +32,11 @@ class Balcony extends Field_Base {
 	protected string $name = 'balcony';
 
 	/**
-	 * The WordPress-compatible type for the field (e.g., 'boolean', 'string', 'number', 'array').
+	 * The type for the field (e.g., 'boolean', 'string', 'number', 'array').
 	 *
 	 * @var string
 	 */
-	protected string $type = 'number';
+	protected string $type = 'boolean';
 
 	/**
 	 * Return the field label.
@@ -53,6 +53,6 @@ class Balcony extends Field_Base {
 	 * @return Field_Category_Base
 	 */
 	public function get_category(): Field_Category_Base {
-		return new \ConnectorForPropstack\Propstack\FieldCategories\Other();
+		return new \ConnectorForPropstack\Propstack\FieldCategories\Features();
 	}
 }

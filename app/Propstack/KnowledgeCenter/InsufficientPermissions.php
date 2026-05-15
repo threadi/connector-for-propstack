@@ -17,6 +17,22 @@ use ConnectorForPropstack\Propstack\KnowledgeCenter_Base;
  */
 class InsufficientPermissions extends KnowledgeCenter_Base {
 	/**
+	 * The internal name of the knowledge center entry.
+	 *
+	 * @var string
+	 */
+	protected string $name = 'insufficient_permissions';
+
+	/**
+	 * Return the title of the knowledge center entry.
+	 *
+	 * @return string
+	 */
+	public function get_title(): string {
+		return __( 'Insufficient Permissions for Propstack API', 'connector-for-propstack' );
+	}
+
+	/**
 	 * Return the list of keywords for this knowledge center entry.
 	 *
 	 * @return array<int,string>

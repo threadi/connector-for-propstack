@@ -32,6 +32,13 @@ class ForBidding extends Field_Base {
 	protected string $name = 'for_bidding';
 
 	/**
+	 * The type for the field (e.g., 'boolean', 'string', 'number', 'array').
+	 *
+	 * @var string
+	 */
+	protected string $type = 'boolean';
+
+	/**
 	 * Return the field label.
 	 *
 	 * @return string

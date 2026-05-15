@@ -10,6 +10,7 @@ namespace ConnectorForPropstack\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use DateTime;
 use WP_Error;
 use WP_Filesystem_Base;
 use WP_Filesystem_Direct;
@@ -367,12 +368,12 @@ class Helper {
 	}
 
 	/**
-	 * Return the user ID of the author during an object creation depending on actual login state.
+	 * Return the user ID of the author during an object creation depending on the actual login state.
 	 *
 	 * @return int
 	 */
 	public static function get_author_during_object_creation(): int {
-		// if user is logged in, use its user ID.
+		// if the user is logged in, use its user ID.
 		if ( is_user_logged_in() ) {
 			return wp_get_current_user()->ID;
 		}
@@ -382,7 +383,7 @@ class Helper {
 	}
 
 	/**
-	 * Format a given datetime with WP-settings and functions.
+	 * Format a given date with WP-settings and functions.
 	 *
 	 * @param string $date The date as YYYY-MM-DD.
 	 * @return string
@@ -399,8 +400,24 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_format_date_time( string $date ): string {
-		$dt = get_date_from_gmt( $date );
-		return date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $dt ) );
+		// bail if the given value is empty.
+		if ( empty( $date ) ) {
+			return '';
+		}
+
+		try {
+			$dt = new DateTime( $date );
+			// return the formatted date.
+			return date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $dt->getTimestamp() );
+		} catch ( \Exception $e ) {
+			Log::get_instance()->add( __( 'Error during date formatting:', 'connector-for-propstack' ) . ' <code>' . $e->getMessage() . '</code>', 'info', 'system' );
+
+			// fallback on any error with DateTime.
+			$dt = get_date_from_gmt( $date );
+
+			// return the formatted date.
+			return date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $dt ) );
+		}
 	}
 
 	/**
@@ -413,7 +430,7 @@ class Helper {
 			return admin_url( basename( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
 		}
 
-		// set return value for the page url.
+		// set the return value for the page url.
 		$page_url = '';
 
 		// get actual object.
@@ -468,7 +485,7 @@ class Helper {
 	}
 
 	/**
-	 * Return a shortened URL with the domain and filename on base of given URL.
+	 * Return a shortened URL with the domain and filename on the base of the given URL.
 	 *
 	 * @param string $url The given URL.
 	 *
@@ -509,7 +526,7 @@ class Helper {
 			}
 		}
 
-		// return thr shortened URL.
+		// return the shortened URL.
 		return $shortened_url;
 	}
 
@@ -532,5 +549,14 @@ class Helper {
 	 */
 	public static function get_review_url(): string {
 		return 'https://wordpress.org/plugins/connector-for-propstack/#reviews';
+	}
+
+	/**
+	 * Return the link to the documentation of this plugin on GitHub.
+	 *
+	 * @return string
+	 */
+	public static function get_github_documentation_link(): string {
+		return 'https://github.com/threadi/propstack-connector/tree/master/doc';
 	}
 }

@@ -15,13 +15,13 @@ use ConnectorForPropstack\Propstack\FieldFormat_Base;
 /**
  * Object to handle this field format
  */
-class SquareMeter extends FieldFormat_Base {
+class Country extends FieldFormat_Base {
 	/**
 	 * The internal name of the format.
 	 *
 	 * @var string
 	 */
-	protected string $name = 'square_meter';
+	protected string $name = 'country';
 
 	/**
 	 * Return the value.
@@ -29,12 +29,13 @@ class SquareMeter extends FieldFormat_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
-		// bail if no value is set.
-		if ( empty( $this->value ) ) {
-			return '';
+		switch ( $this->value ) {
+			case 'DEU':
+				return __( 'Germany', 'connector-for-propstack' );
+			case 'CHL':
+				return __( 'Chile', 'connector-for-propstack' );
+			default:
+				return $this->value;
 		}
-
-		// return the value with m² as prefix.
-		return $this->value . 'm²';
 	}
 }

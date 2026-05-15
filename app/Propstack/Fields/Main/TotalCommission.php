@@ -30,13 +30,21 @@ class TotalCommission extends Field_Base {
 	 * @var string
 	 */
 	protected string $name = 'total_commission';
+
+	/**
+	 * The type for the field (e.g., 'boolean', 'string', 'number', 'array').
+	 *
+	 * @var string
+	 */
+	protected string $type = 'price';
+
 	/**
 	 * Return the field label.
 	 *
 	 * @return string
 	 */
 	public function get_label(): string {
-		return 'total_commission';
+		return __( 'Total commission', 'connector-for-propstack' );
 	}
 
 	/**
@@ -45,6 +53,6 @@ class TotalCommission extends Field_Base {
 	 * @return Field_Category_Base
 	 */
 	public function get_category(): Field_Category_Base {
-		return new \ConnectorForPropstack\Propstack\FieldCategories\Other();
+		return new \ConnectorForPropstack\Propstack\FieldCategories\Prices();
 	}
 }

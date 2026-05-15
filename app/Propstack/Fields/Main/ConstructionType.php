@@ -30,13 +30,14 @@ class ConstructionType extends Field_Base {
 	 * @var string
 	 */
 	protected string $name = 'construction_type';
+
 	/**
 	 * Return the field label.
 	 *
 	 * @return string
 	 */
 	public function get_label(): string {
-		return 'construction_type';
+		return __( 'Construction type', 'connector-for-propstack' );
 	}
 
 	/**
