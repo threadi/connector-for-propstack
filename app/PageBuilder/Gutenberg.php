@@ -12,6 +12,8 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\PageBuilder\Gutenberg\Blocks_Basis;
 use ConnectorForPropstack\PageBuilder\Gutenberg\Templates;
+use ConnectorForPropstack\Propstack\ImmoObjects;
+use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use ConnectorForPropstack\Propstack\Taxonomies;
 
 /**
@@ -58,6 +60,7 @@ class Gutenberg extends PageBuilder_Base {
 
 		// use hooks.
 		add_filter( 'render_block_core/post-terms', array( $this, 'prevent_post_term_links' ), 10, 2 );
+		add_filter( 'render_block_core/post-featured-image', array( $this, 'use_fallback_thumbnail_image' ), 10, 2 );
 
 		// call parent init.
 		parent::init();
@@ -187,27 +190,27 @@ class Gutenberg extends PageBuilder_Base {
 	/**
 	 * Prevent the linking of our own taxonomies in core post-term block.
 	 *
-	 * @param string              $content The content.
+	 * @param string              $block_content The content.
 	 * @param array<string,mixed> $block The block configuration.
 	 *
 	 * @return string
 	 */
-	public function prevent_post_term_links( string $content, array $block ): string {
+	public function prevent_post_term_links( string $block_content, array $block ): string {
 		// bail if no term is set.
 		if ( empty( $block['attrs']['term'] ) ) {
-			return $content;
+			return $block_content;
 		}
 
 		// bail if the used term is none of our taxonomies.
 		if ( ! array_key_exists( $block['attrs']['term'], Taxonomies::get_instance()->get_taxonomies() ) ) {
-			return $content;
+			return $block_content;
 		}
 
 		// remove the links.
 		$new_content = preg_replace(
 			'/<a[^>]*>(.*?)<\/a>/i',
 			'$1',
-			$content
+			$block_content
 		);
 
 		// bail if replacement was not successful.
@@ -217,5 +220,56 @@ class Gutenberg extends PageBuilder_Base {
 
 		// return the content without link.
 		return $new_content;
+	}
+
+	/**
+	 * Use a fallback image if no thumbnail is available for our immo object.
+	 *
+	 * @param string              $block_content The content.
+	 * @param array<string,mixed> $block The block configuration.
+	 *
+	 * @return string
+	 */
+	public function use_fallback_thumbnail_image( string $block_content, array $block ): string {
+		// bail if an image is available.
+		if ( has_post_thumbnail() ) {
+			return $block_content;
+		}
+
+		// get the ID.
+		$post_id = get_the_ID();
+
+		// bail if no post ID could be loaded.
+		if ( ! $post_id ) {
+			return $block_content;
+		}
+
+		// bail if this is not an immo object.
+		if ( get_post_type( $post_id ) !== ImmoObject::get_instance()->get_name() ) {
+			return $block_content;
+		}
+
+		// get the fallback image.
+		$attachment_id = ImmoObject::get_instance()->get_example_image_id();
+
+		// bail if no fallback image is available.
+		if ( 0 === $attachment_id ) {
+			return $block_content;
+		}
+
+		// get the image.
+		$image = wp_get_attachment_image( $attachment_id, isset( $block['attrs']['sizeSlug'] ) ? $block['attrs']['sizeSlug'] : 'full' );
+
+		// link the image, if set.
+		if ( isset( $block['attrs']['isLink'] ) && $block['attrs']['isLink'] ) {
+			// get the link target.
+			$url = (string) get_permalink( $post_id );
+
+			// return the fallback image with a link.
+			return '<figure class="cfprop-thumbnail wp-block-post-featured-image"><a href="' . esc_url( $url ) . '">' . wp_kses_post( $image ) . '</a></figure>';
+		}
+
+		// return the fallback image without a link.
+		return '<figure class="cfprop-thumbnail wp-block-post-featured-image">' . wp_kses_post( $image ) . '</figure>';
 	}
 }
