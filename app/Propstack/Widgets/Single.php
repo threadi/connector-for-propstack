@@ -81,14 +81,15 @@ class Single extends Widget_Base {
 		}
 
 		// set some attributes to configure the rendering.
-		$attributes['classes']   = 'propstack-connector-object default-max-width';
+		$attributes['classes']   = 'cfprop-object default-max-width';
 		$attributes['template']  = 'default';
 		$attributes['templates'] = array(
-			'object_data',
-			'energy',
-			'descriptions',
-			'location',
-			'broker',
+			'thumbnail',
+			'marketing_type',
+			'key_facts',
+			'property_details',
+			'2column_content',
+			'gallery',
 		);
 		$attributes['lang']      = Languages::get_instance()->get_current_lang();
 
@@ -108,7 +109,15 @@ class Single extends Widget_Base {
 		// collect the output.
 		ob_start();
 
-		// embed content.
+		/**
+		 * Run custom actions before the output of the archive listing.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param array $attributes List of attributes.
+		 */
+		do_action( 'cfprop_get_template_before', $attributes );
+
+		// use the template to generate the output.
 		include Templates::get_instance()->get_template( 'parts/single/' . $attributes['template'] . '.php' );
 
 		// return the resulting code.

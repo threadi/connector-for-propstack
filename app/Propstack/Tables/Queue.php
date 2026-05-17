@@ -48,7 +48,7 @@ class Queue extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		add_filter(
-			'propstack_connector_queue_query',
+			'cfprop_queue_query',
 			static function ( array $query ) {
 				$query['posts_per_page'] = -1;
 				return $query;
@@ -144,14 +144,14 @@ class Queue extends WP_List_Table {
 			$process_url = add_query_arg(
 				array(
 					'action' => 'propstack_connector_queue_process',
-					'nonce'  => wp_create_nonce( 'propstack-connector-queue-process' ),
+					'nonce'  => wp_create_nonce( 'cfprop-queue-process' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
 
 			// create empty-dialog.
 			$process_dialog = array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Process the queue now', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'Are you sure you want to process the queue now?', 'connector-for-propstack' ) . '</strong></p>',
@@ -181,14 +181,14 @@ class Queue extends WP_List_Table {
 			$clear_url = add_query_arg(
 				array(
 					'action' => 'propstack_connector_queue_clear',
-					'nonce'  => wp_create_nonce( 'propstack-connector-queue-clear' ),
+					'nonce'  => wp_create_nonce( 'cfprop-queue-clear' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
 
 			// create clear-dialog.
 			$clear_dialog = array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Clear the queue now', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'Are you sure you want to clear the queue now?', 'connector-for-propstack' ) . '</strong></p>',
@@ -257,7 +257,7 @@ class Queue extends WP_List_Table {
 	 * @return string
 	 */
 	private function get_options(): string {
-		return '<a class="propstack-connector-pro-hint" href="' . Helper::get_pro_url() . '" target="_blank">' . esc_html__( 'Get options with Pro', 'connector-for-propstack' ) . '</a>';
+		return '<a class="cfprop-pro-hint" href="' . Helper::get_pro_url() . '" target="_blank">' . esc_html__( 'Get options with Pro', 'connector-for-propstack' ) . '</a>';
 	}
 
 	/**

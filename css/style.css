@@ -1,0 +1,253 @@
+.cfprop-field .dashicons {
+	vertical-align: middle;
+}
+
+/**
+	Styles for archive.
+ */
+.cfprop-objects {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1.2em;
+	max-width: 1200px !important;
+}
+
+.type-cfprop_object {
+	background-color: #fafafa;
+	margin-top: 1em;
+	padding-bottom: 1em;
+}
+
+.cfprop-thumbnail img {
+	height: 300px !important;
+	object-fit: cover;
+	width: 100% !important;
+}
+
+.cfprop-location-object-type {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 1em;
+	padding: 0 1rem;
+}
+
+.cfprop-title {
+	border-bottom: 1px solid #eee;
+	border-top: 1px solid #eee;
+	margin-top: .5em;
+	padding: .5em 1rem;
+}
+
+.cfprop-values {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 1em;
+	padding: 0 1rem;
+	div {
+		display: flex;
+		flex-direction: row;
+	}
+}
+
+.cfprop-detail-link {
+	margin-top: 1em;
+	padding: 0 1rem;
+}
+
+.cfprop-field-type-price, .cfprop-field-format-square_meter {
+	white-space: nowrap;
+}
+
+/**
+	Styles for single.
+ */
+.cfprop-object.default-max-width {
+	max-width: 1200px;
+	h1 {
+		font-size: 32px;
+	}
+}
+
+.cfprop-hero {
+	color: #fff;
+	position: relative;
+	z-index: 1;
+	.wp-block-group {
+		position: absolute;
+		margin: 0;
+		padding: 0 20px;
+		bottom: 20px;
+		left: 0;
+		right: 0;
+		z-index: 1;
+	}
+}
+
+.cfprop-sticky {
+	position: sticky;
+	top: 1em;
+	z-index: 1;
+}
+
+.cfprop-marketing-type {
+	padding: 20px;
+
+	span {
+		display: inline-block;
+		text-transform: uppercase;
+		border-radius: 7px;
+		font-size: 14px;
+		margin-top: 1em;
+		padding: 10px 20px;
+		background-color: #000;
+		color: #fff;
+	}
+}
+
+.cfprop-key-facts {
+	background-color: #fafafa;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	gap: 0;
+	padding: 20px;
+	justify-content: space-between;
+	.cfprop-field-city {
+		font-size: 1.2em;
+	}
+}
+
+.cfprop-property-details {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 1.2em;
+	margin-top: 1em;
+	padding: 10px;
+	&>div {
+		display: flex;
+		flex-direction: row;
+		gap: .4em;
+		flex-wrap: nowrap;
+	}
+}
+
+.wp-block-group:not(.cfprop-simple-hiding):has(> p + .cfprop-field:empty), .cfprop-simple-hiding .cfprop-field:empty {
+	display: none;
+}
+
+.cfprop-2column-content {
+	display: flex;
+	gap: 1.2em;
+	margin-top: 1em;
+	.cfprop-2column-content-left {
+		flex-basis: 66%;
+		.cfprop-field {
+			margin-top: 1em;
+		}
+		&>div {
+			margin-top: 1em;
+		}
+	}
+	.cfprop-2column-content-right {
+		flex-basis: 33%;
+	}
+	h2 {
+		font-size: 1.2em;
+	}
+}
+
+.cfprop-contact-box {
+	background-color: #686868;
+	color: #fff;
+	padding: 20px;
+	position: sticky;
+	top: 1em;
+	z-index: 1;
+	.cfprop-contact {
+		display: flex;
+		flex-direction: row;
+		gap: 20px;
+		margin-top: 1em;
+	}
+	.button {
+		display: block;
+		margin-top: 1em;
+		text-align: center;
+		width: 100%;
+	}
+}
+
+.cfprop-costs {
+	background-color: #fafafa;
+	display: grid;
+	grid-template-columns: auto auto;
+	padding: 20px;
+	&>div {
+		display: flex;
+		flex-direction: row;
+		gap: .4em;
+		flex-wrap: nowrap;
+		.cfprop-field {
+			margin-top: 0 !important;
+		}
+	}
+}
+
+.cfprop-features {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 1.2em;
+	margin-top: 1em;
+	&>div {
+		display: flex;
+		flex-direction: row;
+		gap: .2em;
+		flex-wrap: nowrap;
+		.cfprop-field {
+			margin-top: 0 !important;
+		}
+	}
+}
+
+.cfprop-building-conditions-energy {
+	background-color: #fafafa;
+	display: flex;
+	flex-direction: row;
+	gap: 1.2em;
+	padding: 20px;
+	&>div {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		&>div {
+			display: flex;
+			flex-direction: row;
+			gap: .2em;
+			flex-wrap: nowrap;
+			.cfprop-field {
+				margin-top: 0 !important;
+			}
+		}
+	}
+}
+
+.cfprop-distances {
+	background-color: #fafafa;
+	display: flex;
+	flex-direction: column;
+	gap: 1.2em;
+	padding: 20px;
+	font-size: .8em;
+	&>div {
+		display: flex;
+		flex-direction: row;
+		gap: .2em;
+		flex-wrap: nowrap;
+		.cfprop-field {
+			margin-top: 0 !important;
+		}
+	}
+}

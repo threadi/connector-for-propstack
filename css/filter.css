@@ -1,11 +1,11 @@
-.propstack-connector-filter {
+.cfprop-filter {
 	display: flex;
 	gap: 0;
 	flex-direction: column;
+	max-width: 1200px !important;
 	fieldset {
 		border: 0;
-		padding-left: 0;
-		padding-right: 0;
+		padding: 0;
 		flex: 1 1 auto;
 	}
 	label {
@@ -19,9 +19,9 @@
 }
 
 @media (min-width: 767px) {
-	.propstack-connector-filter {
+	.cfprop-filter {
 		gap: 20px;
-		&.propstack-connector-filter-row {
+		&.cfprop-filter-row {
 			flex-direction: row;
 			align-items: last baseline;
 		}

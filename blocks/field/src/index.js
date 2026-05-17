@@ -22,6 +22,11 @@ import { registerBlockType } from '@wordpress/blocks';
 import './style.scss';
 
 /**
+ * Prepare the field store.
+ */
+import '../../store.js';
+
+/**
  * Internal dependencies
  */
 import Edit from './edit';

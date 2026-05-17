@@ -15,7 +15,11 @@ defined( 'ABSPATH' ) || exit;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Templates;
 use ConnectorForPropstack\Propstack\Field_Base;
+use ConnectorForPropstack\Propstack\FieldFormat_Base;
+use ConnectorForPropstack\Propstack\FieldFormats;
 use ConnectorForPropstack\Propstack\Fields;
+use ConnectorForPropstack\Propstack\FieldType_Base;
+use ConnectorForPropstack\Propstack\FieldTypes;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use ConnectorForPropstack\Propstack\Taxonomies\ObjectType;
 use ConnectorForPropstack\Propstack\Widget_Base;
@@ -118,7 +122,7 @@ class Field extends Widget_Base {
 		 * Filter whether a field should be shown in the frontend.
 		 *
 		 * @since 1.0.0 Available since 1.0.0.
-		 * @param bool $show_field Whether the field should be shown in frontend.
+		 * @param bool $show_field Whether the field should be shown in the frontend.
 		 * @param Field_Base $field The field.
 		 * @param \ConnectorForPropstack\Propstack\ImmoObject $immo_object The object.
 		 *
@@ -126,6 +130,23 @@ class Field extends Widget_Base {
 		 */
 		if ( ! apply_filters( 'cfprop_show_field_in_frontend', $show_field, $field, $immo_object ) ) {
 			return '';
+		}
+
+		// create list of classes, if it does not exist.
+		if ( ! isset( $attributes['classes'] ) ) {
+			$attributes['classes'] = '';
+		}
+
+		// add the field type as class.
+		$field_type = FieldTypes::get_instance()->get_field_type_by_name( $field->get_type() );
+		if ( $field_type instanceof FieldType_Base && ! empty( $field_type->get_name() ) ) {
+			$attributes['classes'] .= ' cfprop-field-type-' . sanitize_html_class( $field_type->get_name() );
+		}
+
+		// add the field format as class.
+		$field_format = FieldFormats::get_instance()->get_field_format_by_name( $field->get_output_format() );
+		if ( $field_format instanceof FieldFormat_Base && ! empty( $field_format->get_name() ) ) {
+			$attributes['classes'] .= ' cfprop-field-format-' . sanitize_html_class( $field_format->get_name() );
 		}
 
 		// return the value of the given description type in this object.
@@ -138,6 +159,16 @@ class Field extends Widget_Base {
 
 		// return the template with this value.
 		ob_start();
+
+		/**
+		 * Run custom actions before the output of the archive listing.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param array $attributes List of attributes.
+		 */
+		do_action( 'cfprop_get_template_before', $attributes );
+
+		// use the template to generate the output.
 		include Templates::get_instance()->get_template( 'parts/part-field.php' );
 		$content = ob_get_clean();
 		if ( ! $content ) {

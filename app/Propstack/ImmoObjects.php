@@ -117,6 +117,7 @@ class ImmoObjects {
 		add_action( 'cfprop_import_object_after', array( $this, 'set_has_objects' ), 10, 0 );
 		add_action( 'cfprop_files_for_object_imported_via_ajax', array( $this, 'assign_feature_image' ) );
 		add_action( 'cfprop_queue_after_processing', array( $this, 'assign_feature_image_via_queue' ), 10, 0 );
+		add_action( 'cfprop_import_object', array( $this, 'assign_feature_image_during_import' ), 10, 2 );
 		add_action( 'cfprop_import_object_after', array( $this, 'cleanup_after_import' ) );
 		add_action( 'cfprop_import_object_after', array( $this, 'set_main_object_type' ) );
 		add_filter( 'cfprop_object_type_fields', array( $this, 'hide_object_type_fields' ) );
@@ -295,7 +296,7 @@ class ImmoObjects {
 			/* translators: a title will replace %1$s. */
 			$process_handler->set_status( sprintf( __( 'Deleting object %1$s', 'connector-for-propstack' ), '<em>' . $object->get_title() . '</em>' ) );
 
-			// get the assigned images and documents and delete them, if not disabled.
+			// get the assigned images and delete them, if not disabled.
 			if ( 0 === $preserve_images ) {
 				foreach ( $object->get_images() as $attachment_id ) {
 					$delete_result = wp_delete_post( $attachment_id, true );
@@ -421,7 +422,7 @@ class ImmoObjects {
 				'dialog',
 				(string) wp_json_encode(
 					array(
-						'className' => 'propstack-connector-dialog',
+						'className' => 'cfprop-dialog',
 						'title'     => __( 'Delete your objects', 'connector-for-propstack' ),
 						'texts'     => array(
 							'<p><strong>' . __( 'Click on the button below to delete all objects in your WordPress website.', 'connector-for-propstack' ) . '</strong></p>',
@@ -469,7 +470,7 @@ class ImmoObjects {
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Enable automatic import', 'connector-for-propstack' ) );
 		/* translators: %1$s: Connector for Propstack Pro URL */
-		$field->set_description( '<span class="propstack-connector-pro-hint">' . sprintf( __( 'Use more options for automatic imports with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
+		$field->set_description( '<span class="cfprop-pro-hint">' . sprintf( __( 'Use more options for automatic imports with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
 		$field->set_readonly( true );
 		$import_schedule_setting->set_field( $field );
 
@@ -518,12 +519,12 @@ class ImmoObjects {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_import_states' );
 		$setting->set_type( 'array' );
-		$setting->set_default( array( '222051' ) );
+		$setting->set_default( array() );
 		$setting->set_section( $import_restrictions_section );
 		$field = new Value( $settings_obj );
 		$field->set_title( __( 'States to import', 'connector-for-propstack' ) );
 		/* translators: %1$s: Connector for Propstack Pro URL */
-		$field->set_description( '<br><span class="propstack-connector-pro-hint">' . sprintf( __( 'Use more states with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
+		$field->set_description( '<br><span class="cfprop-pro-hint">' . sprintf( __( 'Use more states with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
 		$field->set_value( __( 'Vermarktung', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
@@ -624,7 +625,7 @@ class ImmoObjects {
 		$field = new MultiSelect( $settings_obj );
 		$field->set_title( __( 'Object types to import', 'connector-for-propstack' ) );
 		/* translators: %1$s: Connector for Propstack Pro URL */
-		$field->set_description( __( 'Only objects with the selected object types will be imported. All other will be ignored. Selecting none will import objects for each object type.', 'connector-for-propstack' ) . '<br><br><span class="propstack-connector-pro-hint">' . __( 'Use more object types with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ) . '</span>' );
+		$field->set_description( __( 'Only objects with the selected object types will be imported. All other will be ignored. Selecting none will import objects for each object type.', 'connector-for-propstack' ) . '<br><br><span class="cfprop-pro-hint">' . __( 'Use more object types with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ) . '</span>' );
 		$field->set_options( $object_types );
 		$setting->set_field( $field );
 
@@ -773,7 +774,7 @@ class ImmoObjects {
 	 */
 	public function add_js(): void {
 		wp_enqueue_script(
-			'propstack-connector-imports',
+			'cfprop-imports',
 			Helper::get_plugin_url() . 'admin/objects.js',
 			array(),
 			Helper::get_file_version( trailingslashit( Helper::get_plugin_path() ) . 'admin/objects.js' ),
@@ -782,7 +783,7 @@ class ImmoObjects {
 
 		// add php-vars to our js-script.
 		wp_localize_script(
-			'propstack-connector-imports',
+			'cfprop-imports',
 			'propstackConnectorImportJsVars',
 			array(
 				'ajax_url'                     => admin_url( 'admin-ajax.php' ),
@@ -803,7 +804,7 @@ class ImmoObjects {
 
 		// add php-vars to our js-script for possible import-errors.
 		wp_localize_script(
-			'propstack-connector-imports',
+			'cfprop-imports',
 			'propstackConnectorJsErrors',
 			array(
 				'Request Timeout'  => __( '<u>Request Timeout</u> - The import apparently took too long to be completed.', 'connector-for-propstack' ),
@@ -820,7 +821,7 @@ class ImmoObjects {
 	private function get_success_dialog_config(): array {
 		return array(
 			'detail' => array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Deletion has been run', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'The objects have been deleted.', 'connector-for-propstack' ) . '</strong></p>',
@@ -848,7 +849,7 @@ class ImmoObjects {
 		// add a column for the thumbnail after the cb-column.
 		$cb_position = array_search( 'cb', array_keys( $columns ), true );
 		if ( false !== $cb_position ) {
-			$columns = Helper::add_array_in_array_on_position( $columns, ( $cb_position + 1 ), array( 'propstack-connector-thumbnail' => __( 'Thumbnail', 'connector-for-propstack' ) ) );
+			$columns = Helper::add_array_in_array_on_position( $columns, ( $cb_position + 1 ), array( 'cfprop-thumbnail' => __( 'Thumbnail', 'connector-for-propstack' ) ) );
 		}
 
 		// add a column for the object state after the broker column.
@@ -876,7 +877,7 @@ class ImmoObjects {
 	 */
 	public function add_custom_column_contents( string $column_name, int $post_id ): void {
 		// show the object thumbnail.
-		if ( 'propstack-connector-thumbnail' === $column_name ) {
+		if ( 'cfprop-thumbnail' === $column_name ) {
 			$attachment_id = absint( get_post_thumbnail_id( $post_id ) );
 			if ( $attachment_id > 0 ) {
 				echo wp_get_attachment_image( $attachment_id, array( 80, 80 ) );
@@ -1044,7 +1045,7 @@ class ImmoObjects {
 	public function prevent_import_by_state( bool $prevent_import, array $immo_object ): bool {
 		// check if "property_status" (API v1) is set.
 		if ( ! empty( $immo_object['property_status']['id'] ) ) {
-			return $this->prevent_import_by_taxonomy( 'propstack_connector_import_states', (string) $immo_object['property_status']['id'], $prevent_import );
+			return 'Vermarktung' !== $immo_object['property_status']['name'];
 		}
 
 		// bail if "property_status_id" (API v2) is set.
@@ -1168,12 +1169,12 @@ class ImmoObjects {
 	 * Prevent import of incomplete object data by its given property state.
 	 *
 	 * @param string $setting_name   The settings name we want to use.
-	 * @param string $value The value from API to check.
+	 * @param string $value          The value from API to check.
 	 * @param bool   $prevent_import The marker to prevent import.
 	 *
 	 * @return bool
 	 */
-	private function prevent_import_by_taxonomy( string $setting_name, string $value, bool $prevent_import ): bool {
+	public function prevent_import_by_taxonomy( string $setting_name, string $value, bool $prevent_import ): bool {
 		// get the list of allowed states.
 		$allowed_states = get_option( $setting_name );
 
@@ -1187,7 +1188,7 @@ class ImmoObjects {
 			return $prevent_import;
 		}
 
-		// bail if the given "property_status" is not in the list of allowed object states for import.
+		// prevent the import if the given value is not in the list of allowed terms for import.
 		if ( ! in_array( $value, $allowed_states, true ) ) {
 			return true;
 		}
@@ -1203,6 +1204,35 @@ class ImmoObjects {
 	 */
 	public function assign_feature_image_via_queue(): void {
 		$this->assign_feature_image( 0 );
+	}
+
+	/**
+	 * Assign feature image during import.
+	 *
+	 * @param array<string,mixed> $object_data  The object data from API.
+	 * @param int                 $post_id The post-ID of the object.
+	 *
+	 * @return void
+	 */
+	public function assign_feature_image_during_import( array $object_data, int $post_id ): void {
+		// update the position for each image from what we got from the Propstack API.
+		foreach ( $object_data['images'] as $file_data ) {
+			// get the file by its ID in media library.
+			$attachment_id = Files::get_instance()->is_file_in_media_library( $file_data['id'] );
+
+			// bail if attachment ID is not known.
+			if ( 0 === $attachment_id ) {
+				continue;
+			}
+
+			// update the position from Propstack to the file, if given.
+			if ( ! empty( $file_data['position'] ) ) {
+				update_post_meta( $attachment_id, 'propstack_file_position', $file_data['position'] );
+			}
+		}
+
+		// re-calc the feature image for this object.
+		$this->assign_feature_image( $post_id );
 	}
 
 	/**
@@ -1240,7 +1270,7 @@ class ImmoObjects {
 				continue;
 			}
 
-			// get the image with the lowest position value.
+			// get the image with the lowest position value on this immo object.
 			$position                    = 100000;
 			$attachment_id_for_thumbnail = false;
 			foreach ( $results->get_posts() as $attachment_id ) {
@@ -1462,7 +1492,7 @@ class ImmoObjects {
 	 */
 	private function get_import_dialog(): array {
 		return array(
-			'className' => 'propstack-connector-dialog',
+			'className' => 'cfprop-dialog',
 			'title'     => __( 'Import your objects from Propstack', 'connector-for-propstack' ),
 			'texts'     => array(
 				'<p><strong>' . __( 'Click on the button below to start the import of your objects from Propstack.', 'connector-for-propstack' ) . '</strong></p>',
@@ -1490,7 +1520,7 @@ class ImmoObjects {
 	 */
 	public function get_import_dialog_by_ajax(): void {
 		// check nonce.
-		check_ajax_referer( 'propstack-connector-get-import-dialog', 'nonce' );
+		check_ajax_referer( 'cfprop-get-import-dialog', 'nonce' );
 
 		// return the dialog.
 		wp_send_json( array( 'detail' => $this->get_import_dialog() ) );
@@ -1623,7 +1653,7 @@ class ImmoObjects {
 	}
 
 	/**
-	 * Show a hint for Pro plugin on single fields in backend.
+	 * Show a hint for Pro plugin on single fields in the backend.
 	 *
 	 * @param WP_Post    $post The post object of the immo object.
 	 * @param Field_Base $field The field object.
@@ -1638,6 +1668,8 @@ class ImmoObjects {
 		 *
 		 * @since 1.0.0 Available since 1.0.0
 		 * @param bool $false Set true to hide the buttons.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
 		 */
 		if ( apply_filters( 'cfprop_hide_pro_hints', $false ) ) {
 			return;
@@ -1649,6 +1681,6 @@ class ImmoObjects {
 		}
 
 		// show hint.
-		echo '<div class="propstack-connector-pro-hint">' . esc_html__( 'Use this in Pro', 'connector-for-propstack' ) . '</div>';
+		echo '<div class="cfprop-pro-hint">' . esc_html__( 'Use this in Pro', 'connector-for-propstack' ) . '</div>';
 	}
 }

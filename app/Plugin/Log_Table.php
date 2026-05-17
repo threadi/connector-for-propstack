@@ -139,7 +139,7 @@ class Log_Table extends WP_List_Table {
 			$download_url = add_query_arg(
 				array(
 					'action' => 'propstack_connector_log_export',
-					'nonce'  => wp_create_nonce( 'propstack-connector-log-export' ),
+					'nonce'  => wp_create_nonce( 'cfprop-log-export' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
@@ -160,7 +160,7 @@ class Log_Table extends WP_List_Table {
 
 			// create download-dialog.
 			$download_dialog = array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Export log entries', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p>' . __( 'Click on the button below to download the log entries as CSV.', 'connector-for-propstack' ) . '</p>',
@@ -184,14 +184,14 @@ class Log_Table extends WP_List_Table {
 			$empty_url = add_query_arg(
 				array(
 					'action' => 'propstack_connector_log_empty',
-					'nonce'  => wp_create_nonce( 'propstack-connector-log-empty' ),
+					'nonce'  => wp_create_nonce( 'cfprop-log-empty' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
 
 			// create download-dialog.
 			$empty_dialog = array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Empty log entries', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'Are you sure you want to empty the log?', 'connector-for-propstack' ) . '</strong></p>',

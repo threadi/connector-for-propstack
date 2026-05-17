@@ -103,21 +103,10 @@ class Rest {
 	/**
 	 * Return the list of available fields.
 	 *
-	 * We return the 10 most important fields of the request is sent without any query.
-	 *
-	 * @param WP_REST_Request $request The REST API request.
-	 *
 	 * @return array<int,mixed>
 	 */
-	public function get_fields( WP_REST_Request $request ): array {
-		// get the requested field category.
-		$field_category = $request->get_param( 'field_category' );
-
-		// get the query.
-		$query = $request->get_param( 'query' );
-
-		// get the fields.
-		return Fields::get_instance()->get_fields_by_request( $field_category, $query );
+	public function get_fields(): array {
+		return Fields::get_instance()->get_fields_by_request( '', '', true );
 	}
 
 	/**

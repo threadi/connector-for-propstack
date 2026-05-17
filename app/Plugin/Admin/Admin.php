@@ -121,7 +121,7 @@ class Admin {
 			'propstackConnectorJsVars',
 			array(
 				'ajax_url'                => admin_url( 'admin-ajax.php' ),
-				'get_import_dialog_nonce' => wp_create_nonce( 'propstack-connector-get-import-dialog' ),
+				'get_import_dialog_nonce' => wp_create_nonce( 'cfprop-get-import-dialog' ),
 				'pro_url'                 => Helper::get_pro_url(),
 				'import_url'              => ImmoObjects::get_instance()->get_import_url(),
 				'review_url'              => Helper::get_review_url(),
@@ -146,7 +146,7 @@ class Admin {
 	 */
 	public function export_log(): void {
 		// check the nonce.
-		check_admin_referer( 'propstack-connector-log-export', 'nonce' );
+		check_admin_referer( 'cfprop-log-export', 'nonce' );
 
 		// get entries.
 		$log     = Log::get_instance();
@@ -200,7 +200,7 @@ class Admin {
 		global $wpdb;
 
 		// check the nonce.
-		check_admin_referer( 'propstack-connector-log-empty', 'nonce' );
+		check_admin_referer( 'cfprop-log-empty', 'nonce' );
 
 		// empty the table.
 		$wpdb->query( sprintf( 'TRUNCATE TABLE %s', (string) esc_sql( $wpdb->prefix . 'propstack_logs' ) ) ); // @phpstan-ignore cast.string
@@ -251,9 +251,11 @@ class Admin {
 		 * @since 1.0.0 Available since 1.0.0
 		 *
 		 * @param bool $false Set true to hide the buttons.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
 		 */
 		if ( apply_filters( 'cfprop_hide_pro_hints', $false ) ) {
-			$classes .= ' propstack-connector-hide-buttons';
+			$classes .= ' cfprop-hide-buttons';
 		}
 
 		// return resulting classes.

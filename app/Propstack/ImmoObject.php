@@ -204,11 +204,29 @@ class ImmoObject {
 	}
 
 	/**
+	 * Clear the list of images on this object.
+	 *
+	 * @return void
+	 */
+	public function clear_image_list(): void {
+		delete_post_meta( $this->get_id(), 'images' );
+	}
+
+	/**
 	 * Return the single view URL for this object.
 	 *
 	 * @return string
 	 */
 	public function get_link(): string {
 		return (string) get_permalink( $this->get_id() );
+	}
+
+	/**
+	 * Return the URL to edit this object in Propstack.
+	 *
+	 * @return string
+	 */
+	public function get_url_to_propstack(): string {
+		return 'https://crm.propstack.de/app/portfolio/properties/' . $this->get_object_id();
 	}
 }

@@ -224,7 +224,7 @@ class Setup {
 	 */
 	public function display(): void {
 		// create help in case of error during loading of the setup.
-		$error_help = '<div class="propstack-connector-transient notice notice-success"><h3>' . wp_kses_post( Helper::get_logo_img() ) . ' ' . esc_html( apply_filters( 'cfprop_transient_title', Helper::get_plugin_name() ) ) . '</h3><p><strong>' . __( 'Setup is loading', 'connector-for-propstack' ) . '</strong><br>' . __( 'Please wait while we load the setup.', 'connector-for-propstack' ) . '<br>' . __( 'However, you can also skip the setup and configure the plugin manually.', 'connector-for-propstack' ) . '</p><p><a href="' . esc_url( \easySetupForWordPress\Setup::get_instance()->get_skip_url( $this->get_setup_name(), Settings::get_instance()->get_url() ) ) . '" class="button button-primary">' . __( 'Skip setup', 'connector-for-propstack' ) . '</a></p></div>';
+		$error_help = '<div class="cfprop-transient notice notice-success"><h3>' . wp_kses_post( Helper::get_logo_img() ) . ' ' . esc_html( apply_filters( 'cfprop_transient_title', Helper::get_plugin_name() ) ) . '</h3><p><strong>' . __( 'Setup is loading', 'connector-for-propstack' ) . '</strong><br>' . __( 'Please wait while we load the setup.', 'connector-for-propstack' ) . '<br>' . __( 'However, you can also skip the setup and configure the plugin manually.', 'connector-for-propstack' ) . '</p><p><a href="' . esc_url( \easySetupForWordPress\Setup::get_instance()->get_skip_url( $this->get_setup_name(), Settings::get_instance()->get_url() ) ) . '" class="button button-primary">' . __( 'Skip setup', 'connector-for-propstack' ) . '</a></p></div>';
 
 		// add error text.
 		\easySetupForWordPress\Setup::get_instance()->set_error_help( $error_help );

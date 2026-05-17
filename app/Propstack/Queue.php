@@ -176,12 +176,13 @@ class Queue {
 
 		// set the limit for requesting of queue entries to unlimited.
 		add_filter(
-			'propstack_connector_queue_query',
+			'cfprop_queue_query',
 			static function ( array $query ): array {
 				$query['posts_per_page'] = -1;
 				return $query;
 			}
 		);
+
 		// get all files in the queue.
 		$queue = $this->get_queue();
 
@@ -192,7 +193,7 @@ class Queue {
 		// use one array for both.
 		$list_of_existing_files_in_queue = array_combine( $titles, $ids );
 
-		// add the documents and images of this object to the queue.
+		// add the images of this object to the queue.
 		foreach ( $immo_object['images'] as $file ) {
 			// get its post-ID in the queue.
 			$queue_post_id = 0;
@@ -208,7 +209,7 @@ class Queue {
 				// add a log entry if debug is enabled.
 				if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
 					/* translators: %1$s: the given URL. */
-					Log::get_instance()->add( sprintf( __( 'Given file ID %1$s is already in the media library.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'import' );
+					Log::get_instance()->add( sprintf( __( 'Given file ID %1$s is already in the media library and will not be added to the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'import' );
 				}
 
 				// remove the queue entry.
@@ -441,7 +442,7 @@ class Queue {
 		// create a dialog for the OK message.
 		$dialog = array(
 			'detail' => array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Queue has been processed', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'The images have been imported.', 'connector-for-propstack' ) . '</strong></p>',
@@ -500,7 +501,7 @@ class Queue {
 	public function clear(): void {
 		// return the meta-query to get all entries in the queue.
 		add_filter(
-			'propstack_connector_queue_query',
+			'cfprop_queue_query',
 			function ( $query ) {
 				unset( $query['meta_query'] );
 				$query['posts_per_page'] = -1;
@@ -562,7 +563,7 @@ class Queue {
 	 */
 	public function clear_by_request(): void {
 		// check nonce.
-		check_admin_referer( 'propstack-connector-queue-clear', 'nonce' );
+		check_admin_referer( 'cfprop-queue-clear', 'nonce' );
 
 		// clear the queue.
 		$this->clear();
@@ -585,7 +586,7 @@ class Queue {
 	 */
 	public function process_by_request(): void {
 		// check nonce.
-		check_admin_referer( 'propstack-connector-queue-process', 'nonce' );
+		check_admin_referer( 'cfprop-queue-process', 'nonce' );
 
 		// clear the queue.
 		$this->process();

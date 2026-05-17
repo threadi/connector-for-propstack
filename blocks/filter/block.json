@@ -37,6 +37,10 @@
         "filters": {
             "type": "array",
             "default": []
+        },
+        "filter_alignment": {
+            "type": "string",
+            "default": "row"
         }
 	},
 	"example": {

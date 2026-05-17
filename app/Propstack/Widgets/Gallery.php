@@ -105,9 +105,9 @@ class Gallery extends Widget_Base {
 		$ids = implode( ',', wp_list_pluck( $images, 'ID' ) );
 
 		// enable the styles.
-		wp_enqueue_style( 'propstack-connector-gallery' );
-		wp_enqueue_style( 'propstack-connector-lightbox3' );
-		wp_enqueue_script( 'propstack-connector-lightbox3' );
+		wp_enqueue_style( 'cfprop-gallery' );
+		wp_enqueue_style( 'cfprop-lightbox3' );
+		wp_enqueue_script( 'cfprop-lightbox3' );
 
 		// add the lightbox marker to the image link.
 		add_filter( 'wp_get_attachment_link', array( $this, 'add_lightbox_marker_to_image_link' ) );
@@ -124,7 +124,7 @@ class Gallery extends Widget_Base {
 		}
 
 		// return the gallery.
-		return '<div class="propstack-connector-gallery">' . wp_kses_post( $gallery ) . '</div>';
+		return '<div class="cfprop-gallery">' . wp_kses_post( $gallery ) . '</div>';
 	}
 
 	/**
@@ -134,19 +134,19 @@ class Gallery extends Widget_Base {
 	 */
 	public function register_css_and_js(): void {
 		wp_register_style(
-			'propstack-connector-gallery',
+			'cfprop-gallery',
 			Helper::get_plugin_url() . 'css/gallery.css',
 			array(),
 			Helper::get_file_version( Helper::get_plugin_path() . 'css/gallery.css' ),
 		);
 		wp_register_style(
-			'propstack-connector-lightbox3',
+			'cfprop-lightbox3',
 			Helper::get_plugin_url() . 'js/generated/lightbox3.css',
 			array(),
 			Helper::get_file_version( Helper::get_plugin_path() . 'js/generated/lightbox3.css' ),
 		);
 		wp_register_script(
-			'propstack-connector-lightbox3',
+			'cfprop-lightbox3',
 			Helper::get_plugin_url() . 'js/generated/lightbox3.js',
 			array(),
 			Helper::get_file_version( trailingslashit( Helper::get_plugin_path() ) . 'js/generated/lightbox3.js' ),
@@ -174,8 +174,8 @@ class Gallery extends Widget_Base {
 		$this->register_css_and_js();
 
 		// enable the styles.
-		wp_enqueue_style( 'propstack-connector-gallery' );
-		wp_enqueue_style( 'propstack-connector-lightbox3' );
-		wp_enqueue_script( 'propstack-connector-lightbox3' );
+		wp_enqueue_style( 'cfprop-gallery' );
+		wp_enqueue_style( 'cfprop-lightbox3' );
+		wp_enqueue_script( 'cfprop-lightbox3' );
 	}
 }

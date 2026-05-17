@@ -50,7 +50,7 @@ class InsufficientPermissions extends KnowledgeCenter_Base {
 	 * @return string
 	 */
 	public function get_text(): string {
-		$text  = '<p class="propstack-connector-knowledge-entry"><strong>' . __( 'To resolve this, please access the list of your API keys in Propstack:', 'connector-for-propstack' ) . '</strong>';
+		$text  = '<p class="cfprop-knowledge-entry"><strong>' . __( 'To resolve this, please access the list of your API keys in Propstack:', 'connector-for-propstack' ) . '</strong>';
 		$text .= ' <a href="https://crm.propstack.de/app/admin/api_keys" target="_blank">https://crm.propstack.de/app/admin/api_keys</a>';
 		$text .= '<br>' . __( 'Edit the key you are using and grant it at least the following permissions:<br><strong>Objects:</strong> Read<br><strong>Object states:</strong> Read', 'connector-for-propstack' );
 		$text .= '<br>' . __( 'Save these settings and then try retrieving the data again.', 'connector-for-propstack' ) . '</p>';

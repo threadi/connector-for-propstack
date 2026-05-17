@@ -94,7 +94,6 @@ class Init {
 		add_action( 'wp', array( $this, 'update_slugs' ) );
 
 		// use our own hooks.
-		add_filter( 'connector_for_propstack_enqueue_styles_and_scripts', array( $this, 'enqueue_styles_and_scripts' ), 10, 2 );
 		add_filter( 'cfprop_archive_slug', array( $this, 'get_custom_archive_slug' ) );
 		add_filter( 'cfprop_single_slug', array( $this, 'get_custom_single_slug' ) );
 	}
@@ -190,21 +189,6 @@ class Init {
 
 		// disable the flag to update them.
 		update_option( 'propstack_connector_update_slugs', 0 );
-	}
-
-	/**
-	 * Return whether the settings styles and scripts should be loaded.
-	 *
-	 * @param bool   $result The result.
-	 * @param string $hook The used hook.
-	 *
-	 * @return bool
-	 */
-	public function enqueue_styles_and_scripts( bool $result, string $hook ): bool {
-		if ( 'options-permalink.php' !== $hook ) {
-			return $result;
-		}
-		return true;
 	}
 
 	/**

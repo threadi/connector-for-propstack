@@ -29,7 +29,11 @@ class EditorField extends FieldType_Base {
 	 * @return mixed
 	 */
 	public function get_value(): mixed {
-		return nl2br( $this->value );
+		// remove any <p>-elements.
+		$pre_cleaned_value = preg_replace( '/^\s*<p[^>]*>|<\/p>\s*$/i', '', $this->value );
+
+		// add line breaks.
+		return nl2br( $pre_cleaned_value );
 	}
 
 	/**
@@ -38,7 +42,14 @@ class EditorField extends FieldType_Base {
 	 * @return mixed
 	 */
 	public function get_cleaned_value(): mixed {
-		$pre_cleaned_value = preg_replace( '/ style=("|\')(.*?)("|\')/', '', $this->value );
-		return preg_replace( '/ id=("|\')(.*?)("|\')/', '', $pre_cleaned_value );
+		return preg_replace(
+			array(
+				'/ style=("|\')(.*?)("|\')/',   // remove inline styles on HTML-elements.
+				'/ id=("|\')(.*?)("|\')/',      // remove the ID attribute on every HTML-element.
+				'/^\s*<p[^>]*>|<\/p>\s*$/i',   // remove any <p>-elements.
+			),
+			'',
+			$this->value
+		);
 	}
 }

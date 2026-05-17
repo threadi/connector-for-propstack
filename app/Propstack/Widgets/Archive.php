@@ -76,13 +76,14 @@ class Archive extends Widget_Base {
 		$query_params = apply_filters( 'cfprop_archive_query_params', $query_params, $attributes );
 
 		// add settings to use the templates.
-		$attributes['classes']          = 'propstack-connector-objects default-max-width';
+		$attributes['classes']          = 'cfprop-objects default-max-width';
 		$attributes['listing_template'] = 'default';
 		$attributes['templates']        = array(
 			'thumbnail',
-			'small_location',
+			'location_object_type',
 			'title',
-			'important_object_data',
+			'values',
+			'detail_link',
 		);
 		$attributes['query']            = ImmoObjects::get_instance()->get_objects_query( $query_params );
 		$attributes['lang']             = Languages::get_instance()->get_current_lang();
@@ -109,7 +110,15 @@ class Archive extends Widget_Base {
 		// collect the output.
 		ob_start();
 
-		// embed the listing content.
+		/**
+		 * Run custom actions before the output of the archive listing.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param array $attributes List of attributes.
+		 */
+		do_action( 'cfprop_get_template_before', $attributes );
+
+		// use the template to generate the output.
 		include Templates::get_instance()->get_template( 'parts/archive.php' );
 
 		// get the content.

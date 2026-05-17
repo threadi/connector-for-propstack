@@ -141,14 +141,14 @@ class Taxonomy {
 		return array(
 			'hierarchical'       => false,
 			'labels'             => $this->get_labels(),
-			'public'             => false,
+			'public'             => true,
 			'show_ui'            => true,
 			'show_in_menu'       => Setup::get_instance()->is_completed(),
 			'show_in_nav_menus'  => false,
 			'show_admin_column'  => true,
 			'show_tagcloud'      => true,
 			'show_in_quick_edit' => false,
-			'show_in_rest'       => true,
+			'show_in_rest'       => is_user_logged_in(),
 			'query_var'          => true,
 			'meta_box_cb'        => array( $this, 'show_meta_box' ),
 			'capabilities'       => array(

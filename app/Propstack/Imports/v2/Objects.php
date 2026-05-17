@@ -425,7 +425,7 @@ class Objects extends Import_Base {
 	private function get_success_dialog_config(): array {
 		return array(
 			'detail' => array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Import of objects has been run', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'The import of objects from your Propstack account has been run.', 'connector-for-propstack' ) . '</strong></p>',

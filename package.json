@@ -27,7 +27,7 @@
     "build:broker-field": "wp-scripts build blocks/broker-field/src/index.js --output-path=blocks/broker-field/build/",
     "start:lightbox": "wp-scripts start src/lightbox3.js --output-path=js/generated/",
     "build:lightbox": "wp-scripts build src/lightbox3.js --output-path=js/generated/",
-    "make-pot": "wp i18n make-pot . languages/propstack-connector.pot --exclude=blocks/single/src/,blocks/description/src/,blocks/field/src/,blocks/archive/src/,svn/",
+    "make-pot": "wp i18n make-pot . languages/connector-for-propstack.pot --exclude=blocks/single/src/,blocks/description/src/,blocks/field/src/,blocks/archive/src/,svn/",
     "make-json": "wp i18n make-json languages",
     "global-styles": "cat blocks/*/build/style-index.css > css/blocks.css"
   },

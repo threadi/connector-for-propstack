@@ -104,6 +104,16 @@ class Description extends Widget_Base {
 
 		// return the template with this value.
 		ob_start();
+
+		/**
+		 * Run custom actions before the output of the archive listing.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param array $attributes List of attributes.
+		 */
+		do_action( 'cfprop_get_template_before', $attributes );
+
+		// use the template to generate the output.
 		include Templates::get_instance()->get_template( 'parts/part-description.php' );
 		$content = ob_get_clean();
 		if ( ! $content ) {

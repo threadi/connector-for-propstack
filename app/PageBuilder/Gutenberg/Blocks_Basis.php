@@ -18,7 +18,7 @@ use WP_Block_Type_Registry;
  */
 class Blocks_Basis {
 	/**
-	 * Internal name of this block.
+	 * The internal name for this block.
 	 *
 	 * @var string
 	 */
@@ -128,29 +128,6 @@ class Blocks_Basis {
 	}
 
 	/**
-	 * Register our block translations if they are delivered by the plugin itself.
-	 *
-	 * @return void
-	 */
-	public function register_translations(): void {
-		wp_set_script_translations( 'propstack-connector-' . $this->get_name() . '-editor-script', $this->get_text_domain(), $this->get_language_path() );
-	}
-
-	/**
-	 * Return the block class depending on its blockId.
-	 *
-	 * @param array<string,mixed> $attributes List of attributes.
-	 *
-	 * @return string
-	 */
-	protected function get_block_class( array $attributes ): string {
-		if ( ! empty( $attributes['blockId'] ) ) {
-			return 'propstack-connector-block-' . $attributes['blockId'];
-		}
-		return '';
-	}
-
-	/**
 	 * Return the list of attributes for this block.
 	 *
 	 * @return array<string,mixed>
@@ -193,37 +170,6 @@ class Blocks_Basis {
 	 */
 	protected function get_name(): string {
 		return $this->name;
-	}
-
-	/**
-	 * Return the text domain this block is using.
-	 *
-	 * @return string
-	 */
-	private function get_text_domain(): string {
-		return $this->text_domain;
-	}
-
-	/**
-	 * Return the language path.
-	 *
-	 * @return string
-	 */
-	private function get_language_path(): string {
-		$language_path = Helper::get_plugin_path() . 'languages/';
-
-		$instance = $this;
-		/**
-		 * Return the language path this plugin should use.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 *
-		 * @param string $language_path The path to the languages.
-		 * @param Blocks_Basis $instance The Block object.
-		 *
-		 * @return string
-		 */
-		return apply_filters( 'cfprop_block_language_path', $language_path, $instance );
 	}
 
 	/**

@@ -79,6 +79,7 @@ class Settings {
 
 		// misc.
 		add_filter( 'admin_footer_text', array( $this, 'show_plugin_hint_in_footer' ), 0 );
+		add_filter( 'connector_for_propstack_enqueue_styles_and_scripts', array( $this, 'enqueue_styles_and_scripts' ), 10, 2 );
 	}
 
 	/**
@@ -330,7 +331,7 @@ class Settings {
 
 		// create import dialog.
 		$dialog = array(
-			'className' => 'propstack-connector-dialog',
+			'className' => 'cfprop-dialog',
 			'title'     => __( 'Import settings', 'connector-for-propstack' ),
 			'texts'     => array(
 				'<p><strong>' . __( 'Choose the JSON-file with the settings for this plugin.', 'connector-for-propstack' ) . '</strong></p>',
@@ -364,7 +365,7 @@ class Settings {
 
 		// create export dialog.
 		$dialog = array(
-			'className' => 'propstack-connector-dialog',
+			'className' => 'cfprop-dialog',
 			'title'     => __( 'Export settings', 'connector-for-propstack' ),
 			'texts'     => array(
 				'<p><strong>' . __( 'Click on the following button to download the settings as JSON-file.', 'connector-for-propstack' ) . '</strong></p>',
@@ -405,14 +406,14 @@ class Settings {
 		$reset_url = add_query_arg(
 			array(
 				'action' => 'propstack_connector_reset',
-				'nonce'  => wp_create_nonce( 'propstack-connector-reset' ),
+				'nonce'  => wp_create_nonce( 'cfprop-reset' ),
 			),
 			get_admin_url() . 'admin.php'
 		);
 
 		// create dialog.
 		$reset_dialog = array(
-			'className' => 'propstack-connector-dialog',
+			'className' => 'cfprop-dialog',
 			'title'     => __( 'Reset plugin', 'connector-for-propstack' ),
 			'texts'     => array(
 				'<p><strong>' . __( 'Do you really want to reset any settings and data for the plugin Connector for Propstack?', 'connector-for-propstack' ) . '</strong></p>',
@@ -577,7 +578,7 @@ class Settings {
 	 */
 	public function reset_plugin_by_request(): void {
 		// check nonce.
-		check_admin_referer( 'propstack-connector-reset', 'nonce' );
+		check_admin_referer( 'cfprop-reset', 'nonce' );
 
 		// uninstall all.
 		Uninstaller::get_instance()->run();
@@ -640,5 +641,20 @@ class Settings {
 		// show hint for our plugin.
 		/* translators: %1$s will be replaced by the plugin name. */
 		return $content . ' ' . sprintf( __( 'This page is provided by the plugin %1$s.', 'connector-for-propstack' ), '<em>' . Helper::get_plugin_name() . '</em>' );
+	}
+
+	/**
+	 * Return whether the settings styles and scripts should be loaded.
+	 *
+	 * @param bool   $result The result.
+	 * @param string $hook The used hook.
+	 *
+	 * @return bool
+	 */
+	public function enqueue_styles_and_scripts( bool $result, string $hook ): bool {
+		if ( 'options-permalink.php' !== $hook ) {
+			return $result;
+		}
+		return true;
 	}
 }

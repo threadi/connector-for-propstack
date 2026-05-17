@@ -18,9 +18,6 @@ get_header();
 
 ?>
 	<div>
-		<header class="site-main page-header alignwide">
-			<?php the_title( '<h1 class="page-title site-container">', '</h1>' ); ?>
-		</header>
 		<?php
 		echo wp_kses_post( \ConnectorForPropstack\Propstack\Widgets\Single::get_instance()->render( array( 'object_id' => $propstack_connector_object_id ) ) );
 		?>

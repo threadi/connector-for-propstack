@@ -229,7 +229,7 @@ class Taxonomies {
 
 		// add the thumbnail column for Broker.
 		if ( \ConnectorForPropstack\Propstack\Taxonomies\Broker::get_instance()->get_name() === $taxonomy ) {
-			$columns = Helper::add_array_in_array_on_position( $columns, 0, array( 'propstack-connector-thumbnail' => __( 'Thumbnail', 'connector-for-propstack' ) ) );
+			$columns = Helper::add_array_in_array_on_position( $columns, 0, array( 'cfprop-thumbnail' => __( 'Thumbnail', 'connector-for-propstack' ) ) );
 		}
 
 		// bail if this is an object type.
@@ -245,7 +245,7 @@ class Taxonomies {
 			}
 
 			// add the field.
-			$columns[ 'propstack-connector-' . $field->get_name() ] = $field->get_label();
+			$columns[ 'cfprop-' . $field->get_name() ] = $field->get_label();
 		}
 
 		// return resulting columns.
@@ -282,7 +282,7 @@ class Taxonomies {
 
 			// show the field.
 			?>
-			<tr class="propstack-connector-<?php echo esc_attr( $field->get_name() ); ?> form-field">
+			<tr class="cfprop-<?php echo esc_attr( $field->get_name() ); ?> form-field">
 				<th><label><?php echo esc_html( $field->get_label() ); ?></label></th>
 				<td>
 					<?php echo wp_kses_post( $this->get_field_value( $term->term_id, $field, false ) ); ?>
@@ -413,7 +413,7 @@ class Taxonomies {
 	 */
 	public function add_thumbnail_in_column( string $output, string $column_name, int $term_id ): string {
 		// bail if this is not our column.
-		if ( 'propstack-connector-thumbnail' !== $column_name ) {
+		if ( 'cfprop-thumbnail' !== $column_name ) {
 			return $output;
 		}
 
@@ -515,7 +515,7 @@ class Taxonomies {
 					}
 
 					// hide this field in the table.
-					$hidden[] = 'propstack-connector-' . $field->get_name();
+					$hidden[] = 'cfprop-' . $field->get_name();
 				}
 			}
 		}

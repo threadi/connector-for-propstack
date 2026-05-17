@@ -19,16 +19,16 @@ use ConnectorForPropstack\Propstack\ImmoObject;
 ?><div class="<?php echo esc_attr( $attributes['classes'] ); ?>">
 	<article id="post-<?php echo absint( $post_id ); ?>" class="post-<?php echo absint( $post_id ); ?> post type-<?php echo esc_attr( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ); ?> status-<?php echo esc_attr( get_post_status( $post_id ) ); ?> entry <?php echo esc_attr( apply_filters( 'propstack_connector_object_classes', '', $immo_object ) ); ?>" role="region" aria-label="<?php echo esc_attr__( 'Objects', 'connector-for-propstack' ); ?>">
 		<?php
-		foreach ( $attributes['templates'] as $propstack_connector_template ) {
+		foreach ( $attributes['templates'] as $cfprop_template ) {
 			/**
 			 * Use the template hook to render the object.
 			 *
 			 * @since 1.0.0 Available since 1.0.0.
 			 * @param ImmoObject    $immo_object      The immo object as an object.
-			 * @param string       $propstack_connector_template         The template name.
+			 * @param string       $cfprop_template         The template name.
 			 * @param array<string,mixed>  $attributes   List of attributes.
 			 */
-			do_action( 'propstack_connector_template_' . $propstack_connector_template, $immo_object, $propstack_connector_template, $attributes );
+			do_action( 'cfprop_template_' . $cfprop_template, $immo_object, $cfprop_template, $attributes );
 		}
 		?>
 	</article>

@@ -119,7 +119,7 @@ class Filters {
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'The filters', 'connector-for-propstack' ) );
 		/* translators: %1$s: Connector for Propstack Pro URL */
-		$field->set_description( __( 'These are the filters you could use in the frontend. Manage their settings here.', 'connector-for-propstack' ) . '<br><br><span class="propstack-connector-pro-hint">' . sprintf( __( 'Get more filters like room or spaces with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
+		$field->set_description( __( 'These are the filters you could use in the frontend. Manage their settings here.', 'connector-for-propstack' ) . '<br><br><span class="cfprop-pro-hint">' . sprintf( __( 'Get more filters like room or spaces with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
 		$field->set_columns(
 			array(
 				__( 'The filter', 'connector-for-propstack' ),

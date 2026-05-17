@@ -62,6 +62,9 @@ class Templates {
 
 		// expand kses-filter.
 		add_filter( 'wp_kses_allowed_html', array( $this, 'add_kses_html' ), 10, 2 );
+
+		// use our own hooks.
+		add_action( 'cfprop_get_template_before', array( $this, 'add_styles' ) );
 	}
 
 	/**
@@ -454,9 +457,9 @@ class Templates {
 		}
 
 		// show these styles the classic way.
-		wp_register_style( 'propstack-connector-styles', false, array(), CONNECTOR_FOR_PROPSTACK_VERSION, 'all' );
-		wp_enqueue_style( 'propstack-connector-generated-styles' );
-		wp_add_inline_style( 'propstack-connector-generated-styles', $css );
+		wp_register_style( 'cfprop-styles', false, array(), CONNECTOR_FOR_PROPSTACK_VERSION, 'all' );
+		wp_enqueue_style( 'cfprop-generated-styles' );
+		wp_add_inline_style( 'cfprop-generated-styles', $css );
 	}
 
 	/**

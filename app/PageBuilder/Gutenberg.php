@@ -11,8 +11,8 @@ namespace ConnectorForPropstack\PageBuilder;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\PageBuilder\Gutenberg\Blocks_Basis;
-use ConnectorForPropstack\PageBuilder\Gutenberg\Patterns;
 use ConnectorForPropstack\PageBuilder\Gutenberg\Templates;
+use ConnectorForPropstack\Propstack\Taxonomies;
 
 /**
  * Object to handle the Gutenberg support.
@@ -45,9 +45,6 @@ class Gutenberg extends PageBuilder_Base {
 		// add our custom blocks.
 		add_action( 'init', array( $this, 'register_blocks' ) );
 
-		// add our custom pattern.
-		add_action( 'init', array( $this, 'add_pattern' ) );
-
 		// initialize the templates.
 		Templates::get_instance()->init();
 
@@ -58,6 +55,9 @@ class Gutenberg extends PageBuilder_Base {
 		if ( ! $this->theme_support_block_templates() ) {
 			return;
 		}
+
+		// use hooks.
+		add_filter( 'render_block_core/post-terms', array( $this, 'prevent_post_term_links' ), 10, 2 );
 
 		// call parent init.
 		parent::init();
@@ -158,15 +158,6 @@ class Gutenberg extends PageBuilder_Base {
 	}
 
 	/**
-	 * Initialize the pattern-object to register them.
-	 *
-	 * @return void
-	 */
-	public function add_pattern(): void {
-		Patterns::get_instance()->init();
-	}
-
-	/**
 	 * Remove our own templates on uninstallation.
 	 *
 	 * @return void
@@ -191,5 +182,40 @@ class Gutenberg extends PageBuilder_Base {
 
 		// return the resulting list.
 		return $block_categories;
+	}
+
+	/**
+	 * Prevent the linking of our own taxonomies in core post-term block.
+	 *
+	 * @param string              $content The content.
+	 * @param array<string,mixed> $block The block configuration.
+	 *
+	 * @return string
+	 */
+	public function prevent_post_term_links( string $content, array $block ): string {
+		// bail if no term is set.
+		if ( empty( $block['attrs']['term'] ) ) {
+			return $content;
+		}
+
+		// bail if the used term is none of our taxonomies.
+		if ( ! array_key_exists( $block['attrs']['term'], Taxonomies::get_instance()->get_taxonomies() ) ) {
+			return $content;
+		}
+
+		// remove the links.
+		$new_content = preg_replace(
+			'/<a[^>]*>(.*?)<\/a>/i',
+			'$1',
+			$content
+		);
+
+		// bail if replacement was not successful.
+		if ( ! is_string( $new_content ) ) {
+			return '';
+		}
+
+		// return the content without link.
+		return $new_content;
 	}
 }

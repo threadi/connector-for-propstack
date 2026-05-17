@@ -90,6 +90,7 @@ class Files {
 		add_action( 'cfprop_files_deleted', array( $this, 'update_file_counter' ), 100, 0 );
 		add_action( 'cfprop_queue_after_processing', array( $this, 'update_file_counter' ), 100, 0 );
 		add_filter( 'cfprop_prevent_file_import', array( $this, 'prevent_file_import' ), 10, 2 );
+		add_action( 'cfprop_import_object', array( $this, 'delete_unused_files' ), 10, 2 );
 
 		// use actions.
 		add_action( 'wp_ajax_import_propstack_object_files', array( $this, 'import_by_ajax' ) );
@@ -161,7 +162,7 @@ class Files {
 				'dialog',
 				(string) wp_json_encode(
 					array(
-						'className' => 'propstack-connector-dialog',
+						'className' => 'cfprop-dialog',
 						'title'     => __( 'Import images for your objects from Propstack', 'connector-for-propstack' ),
 						'texts'     => array(
 							'<p><strong>' . __( 'Click on the button below to start the import of images for your objects from Propstack.', 'connector-for-propstack' ) . '</strong></p>',
@@ -216,11 +217,11 @@ class Files {
 				'dialog',
 				(string) wp_json_encode(
 					array(
-						'className' => 'propstack-connector-dialog',
+						'className' => 'cfprop-dialog',
 						'title'     => __( 'Delete all files of your objects', 'connector-for-propstack' ),
 						'texts'     => array(
 							'<p><strong>' . __( 'Click on the button below to delete all files of your objects in your WordPress website.', 'connector-for-propstack' ) . '</strong></p>',
-							'<p>' . __( 'You will loose any images and documents for your objects. They will be re-imported during the next object import.', 'connector-for-propstack' ) . '</p>',
+							'<p>' . __( 'You will lose any images for your objects. They will be re-imported during the next object import.', 'connector-for-propstack' ) . '</p>',
 						),
 						'buttons'   => array(
 							array(
@@ -382,10 +383,10 @@ class Files {
 
 		$false = false;
 		/**
-		 * Filter whether a given file should be imported.
+		 * Filter whether a given file should not be imported.
 		 *
 		 * @since 1.0.0 Available since 1.0.0.
-		 * @param bool $false The default value.
+		 * @param bool $false Return true to prevent the import.
 		 * @param array<string,mixed> $file_data The file data from Propstack.
 		 * @param int  $id    The file ID.
 		 * @param string  $url   The URL to use for import.
@@ -580,7 +581,7 @@ class Files {
 		// create a dialog for the OK message.
 		$dialog = array(
 			'detail' => array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Files has been deleted', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'The files for your objects from Propstack has been deleted.', 'connector-for-propstack' ) . '</strong></p>',
@@ -670,7 +671,7 @@ class Files {
 	 * @return void
 	 */
 	public function delete_not_updated_files(): void {
-		// add filter to restrict the query to a single object.
+		// add a filter to restrict the query to a single object.
 		add_filter( 'cfprop_files_query', array( $this, 'set_post_id_filter' ) );
 
 		// delete the not updated files.
@@ -749,7 +750,7 @@ class Files {
 	/**
 	 * Import the files for all objects.
 	 *
-	 * This process is running in loops with a limited number of files per run.
+	 * This process is running in loops with a limited amount of files per run.
 	 * It must be reloaded to continue.
 	 *
 	 * @param int $post_id The post-ID of the immo object these files should be assigned to.
@@ -856,7 +857,7 @@ class Files {
 
 			// add a log entry if debug is enabled.
 			if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-				Log::get_instance()->add( __( 'Saved cache for import:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $files_to_import ) . '</code>', 'info', 'import' );
+				Log::get_instance()->add( __( 'Cache stored during import:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $files_to_import ) . '</code>', 'info', 'import' );
 			}
 
 			// reset the counter if we start a new import.
@@ -907,7 +908,7 @@ class Files {
 			// bail if no URL could be found.
 			if ( empty( $url ) ) {
 				// add a log entry.
-				Log::get_instance()->add( __( 'Missing URL for file during file import. The used file data from API:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $file ) . '</code>', 'error', 'import' );
+				Log::get_instance()->add( __( 'Missing URL for the file during file import. The used file data from API:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $file ) . '</code>', 'error', 'import' );
 
 				// update the counter.
 				$process_handler->set_count( $process_handler->get_count() + 1 );
@@ -972,7 +973,7 @@ class Files {
 		// get dialog.
 		$dialog = array(
 			'detail' => array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Import of files has been run', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'The files have been imported.', 'connector-for-propstack' ) . '</strong></p>',
@@ -1112,5 +1113,64 @@ class Files {
 
 		// return the result value.
 		return $result_value;
+	}
+
+	/**
+	 * Delete files from immo object, which does not return from Propstack anymore.
+	 *
+	 * Hint: we compare them by the given "propstack_file_id".
+	 *
+	 * @param array<string,mixed> $object_data The object data from API.
+	 * @param int                 $post_id The post-ID of the object.
+	 *
+	 * @return void
+	 */
+	public function delete_unused_files( array $object_data, int $post_id ): void {
+		// get the immo object.
+		$immo_object = ImmoObjects::get_instance()->get_object( $post_id );
+
+		// get its images.
+		$images = $immo_object->get_images();
+
+		// bail if list of images is empty.
+		if ( empty( $images ) ) {
+			return;
+		}
+
+		// get the "propstack_file_id" for each file.
+		$list = array();
+		foreach ( $images as $attachment_id ) {
+			$list[ $attachment_id ] = (string) get_post_meta( $attachment_id, 'propstack_file_id', true );
+		}
+
+		// clean the list of images on this object.
+		$immo_object->clear_image_list();
+
+		// loop through the images from the API and remove them from the local list, which are in the API list.
+		foreach ( $object_data['images'] as $image ) {
+			// get the given "propstack_file_id" from the list.
+			$attachment_id = array_search( (string) $image['id'], $list, true );
+
+			// bail if this ID is not in the list.
+			if ( ! is_int( $attachment_id ) ) {
+				continue;
+			}
+
+			// add this file to the new list of images on this object.
+			$immo_object->add_to_image_list( $attachment_id );
+
+			// remove this key from the list.
+			unset( $list[ $attachment_id ] );
+		}
+
+		// bail if the resulting list is empty (aka: nothing has been changed).
+		if ( empty( $list ) ) {
+			return;
+		}
+
+		// delete all files from this list from media library.
+		foreach ( $list as $attachment_id => $id ) {
+			wp_delete_attachment( $attachment_id, true );
+		}
 	}
 }

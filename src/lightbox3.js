@@ -3,7 +3,7 @@ import '../node_modules/lightbox3/dist/lightbox3.css';
 
 document.addEventListener('DOMContentLoaded', () => {
   Lightbox.init( {
-      'selector': '.propstack-connector-gallery .gallery .gallery-item a'
+      'selector': '.cfprop-gallery .gallery .gallery-item a'
     }
   );
 });

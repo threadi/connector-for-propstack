@@ -107,7 +107,7 @@ class Cli {
 	public function process_queue(): void {
 		// set the limit for requesting of queue entries to unlimited.
 		add_filter(
-			'propstack_connector_queue_query',
+			'cfprop_queue_query',
 			static function ( array $query ): array {
 				$query['posts_per_page'] = -1;
 				return $query;
@@ -161,7 +161,7 @@ class Cli {
 	public function import_files(): void {
 		// remove the limit.
 		add_filter(
-			'propstack_connector_files_import_limit',
+			'cfprop_files_import_limit',
 			static function () {
 				return -1;
 			}

@@ -1,10 +1,10 @@
 :root {
-	--propstack-connector-pro-bg: yellow;
-	--propstack-connector-pro-font: #000;
-	--propstack-connector-hint-bg: #c45602;
-	--propstack-connector-hint-font: #fff;
-	--propstack-connector-pro-hint-bg: #fca15b;
-	--propstack-connector-pro-hint-font: #000;
+	--cfprop-pro-bg: yellow;
+	--cfprop-pro-font: #000;
+	--cfprop-hint-bg: #c45602;
+	--cfprop-hint-font: #fff;
+	--cfprop-pro-hint-bg: #fca15b;
+	--cfprop-pro-hint-font: #000;
 }
 
 .post-type-cfprop_object .postbox {
@@ -36,15 +36,15 @@
 		gap: 20px;
 		justify-content: normal;
 	}
-	.propstack-connector-disabled {
+	.cfprop-disabled {
 		opacity: .6;
 	}
 }
 
 #cfprop_object-propstack {
-	background-color: var(--propstack-connector-pro-hint-bg);
+	background-color: var(--cfprop-pro-hint-bg);
 	h2, .handle-actions * {
-		color: var(--propstack-connector-pro-hint-font);
+		color: var(--cfprop-pro-hint-font);
 	}
 }
 
@@ -67,7 +67,7 @@ body.settings_page_connector-for-propstack {
 		width: 60px;
 	}
 	#date {
-		width: 120px;
+		width: 140px;
 	}
 	#category {
 		width: 180px;
@@ -88,12 +88,12 @@ body.settings_page_connector-for-propstack {
 		float: none;
 		width: 100%;
 	}
-	#propstack-connector-thumbnail {
+	#cfprop-thumbnail {
 		width: 150px;
 	}
 }
 
-.easy-dialog.propstack-connector-dialog {
+.easy-dialog.cfprop-dialog {
 	&:has(progress) {
 		width: 60%;
 		min-width: 800px;
@@ -114,7 +114,7 @@ body.settings_page_connector-for-propstack {
 }
 
 .nav-tab-help {
-	background-color: var(--propstack-connector-pro-hint-bg);
+	background-color: var(--cfprop-pro-hint-bg);
 	float: right;
 	line-height: 1.6;
 	margin-right: 4px;
@@ -137,7 +137,7 @@ body.post-type-cfprop_object .nav-tab a[target="_blank"]:after, body.post-type-c
 	margin-top: -7px;
 }
 
-body.post-type-cfprop_object, body.settings_page_propstack-connector {
+body.post-type-cfprop_object, body.settings_page_connector-for-propstack {
 	a.review-hint-button:after {
 		color: #d4af37;
 		content: "\f155 \f155 \f155 \f155 \f155";
@@ -155,9 +155,9 @@ body.post-type-cfprop_object, body.settings_page_propstack-connector {
 	}
 }
 
-.propstack-connector-pro-hint {
-	background-color: var(--propstack-connector-pro-hint-bg);
-	color: var(--propstack-connector-pro-hint-font);
+.cfprop-pro-hint {
+	background-color: var(--cfprop-pro-hint-bg);
+	color: var(--cfprop-pro-hint-font);
 	padding: 4px 8px;
 }
 
@@ -180,7 +180,7 @@ body.post-type-cfprop_object {
 	}
 }
 
-.propstack-connector-knowledge-entry {
+.cfprop-knowledge-entry {
 	background-color: #eee;
 	padding: 12px;
 }

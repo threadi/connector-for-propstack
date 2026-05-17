@@ -164,6 +164,6 @@ class Intervals {
 	 * @return string
 	 */
 	public function get_prefix(): string {
-		return 'propstack_connector_';
+		return 'cfprop_';
 	}
 }

@@ -98,7 +98,7 @@ class Import_Base {
 	protected function get_error_dialog_config(): array {
 		return array(
 			'detail' => array(
-				'className' => 'propstack-connector-dialog',
+				'className' => 'cfprop-dialog',
 				'title'     => __( 'Error', 'connector-for-propstack' ),
 				'texts'     => array(
 					'<p><strong>' . __( 'The following error occurred:', 'connector-for-propstack' ) . '</strong></p>',

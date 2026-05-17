@@ -139,7 +139,7 @@ class ImmoObject extends Post_Type {
 			'exclude_from_search' => false,
 			'taxonomies'          => array_keys( Taxonomies::get_instance()->get_taxonomies() ),
 			'publicly_queryable'  => true,
-			'show_in_rest'        => true,
+			'show_in_rest'        => is_user_logged_in(),
 			'capability_type'     => 'post',
 			'capabilities'        => array(
 				'create_posts'       => 'do_not_allow',
@@ -309,6 +309,9 @@ class ImmoObject extends Post_Type {
 			return $actions;
 		}
 
+		// get the object.
+		$immo_object = ImmoObjects::get_instance()->get_object( $post->ID );
+
 		$new_actions = array();
 		if ( ! empty( $actions['view'] ) ) {
 			$new_actions = array(
@@ -326,6 +329,9 @@ class ImmoObject extends Post_Type {
 
 		// add a link to import the files of this object.
 		$new_actions['files-import'] = '<a href="#" class="easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $this->get_import_images_dialog( $post->ID ) ) ) . '">' . __( 'Import images', 'connector-for-propstack' ) . '</a>';
+
+		// add a link to edit this object in Propstack.
+		$new_actions['edit-in-propstack'] = '<a href="' . esc_url( $immo_object->get_url_to_propstack() ) . '" target="_blank">' . __( 'Edit in Propstack', 'connector-for-propstack' ) . '</a>';
 
 		// return the resulting list.
 		return $new_actions;
@@ -369,7 +375,7 @@ class ImmoObject extends Post_Type {
 			$immo_obj = ImmoObjects::get_instance()->get_object( $post_id );
 			$admin_bar->add_menu(
 				array(
-					'id'     => 'propstack-connector-single',
+					'id'     => 'cfprop-single',
 					'parent' => null,
 					'group'  => null,
 					'title'  => __( 'View object in frontend', 'connector-for-propstack' ),
@@ -528,7 +534,7 @@ class ImmoObject extends Post_Type {
 	 */
 	public function get_import_images_dialog( int $post_id ): array {
 		return array(
-			'className' => 'propstack-connector-dialog',
+			'className' => 'cfprop-dialog',
 			'title'     => __( 'Import images from Propstack', 'connector-for-propstack' ),
 			'texts'     => array(
 				/* translators: %1$s will be replaced by the object title. */
@@ -562,7 +568,7 @@ class ImmoObject extends Post_Type {
 		$immo_object = ImmoObjects::get_instance()->get_object( $post->ID );
 
 		// show the link as a button.
-		echo '<a href="https://crm.propstack.de/app/portfolio/properties/' . esc_attr( $immo_object->get_object_id() ) . '" target="_blank" class="button">' . esc_html__( 'Edit in Propstack', 'connector-for-propstack' ) . '</a>';
+		echo '<a href="' . esc_url( $immo_object->get_url_to_propstack() ) . '" target="_blank" class="button">' . esc_html__( 'Edit in Propstack', 'connector-for-propstack' ) . '</a>';
 	}
 
 	/**
@@ -618,10 +624,10 @@ class ImmoObject extends Post_Type {
 			$wp_filesystem = Helper::get_wp_filesystem();
 
 			// create a tmp file with a path.
-			$tmp_file = wp_tempnam( 'immo-object-default-image.png' );
+			$tmp_file = wp_tempnam( 'immo-object-default-image.jpg' );
 
 			// copy our example image as media_handle_sideload() will delete it.
-			if ( ! $wp_filesystem->copy( Helper::get_plugin_path() . 'gfx/immo-object-default-image.png', $tmp_file, true ) ) {
+			if ( ! $wp_filesystem->copy( Helper::get_plugin_path() . 'gfx/immo-object-default-image.jpg', $tmp_file, true ) ) {
 				Log::get_instance()->add( __( 'Could not copy the example image. Please check your file system permissions.', 'connector-for-propstack' ), 'error', 'system' );
 				return 0;
 			}
@@ -629,7 +635,7 @@ class ImmoObject extends Post_Type {
 			// create the array to add the image.
 			$file_array    = array(
 				'type'     => 'image/png',
-				'name'     => 'immo-object-default-image.png',
+				'name'     => 'immo-object-default-image.jpg',
 				'tmp_name' => $tmp_file,
 				'error'    => '0',
 				'size'     => (string) $wp_filesystem->size( $tmp_file ),

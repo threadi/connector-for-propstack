@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 // output.
 ?>
-<form action="<?php echo esc_url( $attributes['current_url'] ); ?>" method="<?php echo esc_attr( $attributes['method'] ); ?>" class="propstack-connector-filter default-max-width<?php echo esc_attr( $attributes['classes'] ); ?>">
+<form action="<?php echo esc_url( $attributes['current_url'] ); ?>" method="<?php echo esc_attr( $attributes['method'] ); ?>" class="cfprop-filter default-max-width<?php echo esc_attr( $attributes['classes'] ); ?>">
 	<?php
 
 	/**
@@ -24,8 +24,8 @@ defined( 'ABSPATH' ) || exit;
 	 */
 	do_action( 'propstack_connector_filter_before', $attributes );
 
-	foreach ( $attributes['filter_objects'] as $propstack_connector_filter ) {
-		echo wp_kses_post( $propstack_connector_filter->render() );
+	foreach ( $attributes['filter_objects'] as $cfprop_filter ) {
+		echo wp_kses_post( $cfprop_filter->render() );
 	}
 
 	/**
@@ -37,5 +37,5 @@ defined( 'ABSPATH' ) || exit;
 	do_action( 'propstack_connector_filter_after', $attributes );
 
 	?>
-	<button type="submit" class="propstack-connector-filter-button"><?php echo esc_html__( 'Filter', 'connector-for-propstack' ); ?></button>
+	<button type="submit" class="cfprop-filter-button"><?php echo esc_html__( 'Filter', 'connector-for-propstack' ); ?></button>
 </form>

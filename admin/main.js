@@ -1,9 +1,9 @@
 jQuery(document).ready(function($) {
   // add option near to list-headline.
-  $( 'body.post-type-cfprop_object:not(.propstack-connector-hide-buttons) h1.wp-heading-inline, body.settings_page_propstack-connector:not(.propstack-connector-hide-buttons) h1.wp-heading-inline' ).after( '<a class="page-title-action propstack-connector-pro-hint" href="' + propstackConnectorJsVars.pro_url + '" target="_blank">' + propstackConnectorJsVars.title_get_pro + '</a>' );
-  $( 'body.post-type-cfprop_object h1.wp-heading-inline' ).after( '<a class="page-title-action propstack-connector-import-hint" href="' + propstackConnectorJsVars.import_url + '">' + propstackConnectorJsVars.title_run_import + '</a>' );
-  $( 'body.settings_page_propstack-connector h1.wp-heading-inline' ).after( '<a class="page-title-action propstack-connector-objects" href="' + propstackConnectorJsVars.objects_url + '">' + propstackConnectorJsVars.title_objects + '</a>' );
-  $( 'body.post-type-cfprop_object:not(.propstack-connector-hide-buttons) h1.wp-heading-inline, body.settings_page_propstack-connector:not(.propstack-connector-hide-buttons) h1.wp-heading-inline' ).each( function () {
+  $( 'body.post-type-cfprop_object:not(.cfprop-hide-buttons) h1.wp-heading-inline, body.settings_page_connector-for-propstack:not(.cfprop-hide-buttons) h1.wp-heading-inline' ).after( '<a class="page-title-action cfprop-pro-hint" href="' + propstackConnectorJsVars.pro_url + '" target="_blank">' + propstackConnectorJsVars.title_get_pro + '</a>' );
+  $( 'body.post-type-cfprop_object h1.wp-heading-inline' ).after( '<a class="page-title-action cfprop-import-hint" href="' + propstackConnectorJsVars.import_url + '">' + propstackConnectorJsVars.title_run_import + '</a>' );
+  $( 'body.settings_page_propstack-connector h1.wp-heading-inline' ).after( '<a class="page-title-action cfprop-objects" href="' + propstackConnectorJsVars.objects_url + '">' + propstackConnectorJsVars.title_objects + '</a>' );
+  $( 'body.post-type-cfprop_object:not(.cfprop-hide-buttons) h1.wp-heading-inline, body.settings_page_connector-for-propstack:not(.cfprop-hide-buttons) h1.wp-heading-inline' ).each( function () {
     let button = document.createElement( 'a' );
     button.className = 'review-hint-button page-title-action';
     button.href = propstackConnectorJsVars.review_url;
@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
   /**
    * Get the content for the dialog via AJAX for dynamic content-changes.
    */
-  $('a.propstack-connector-import-hint').on('click', function (e) {
+  $('a.cfprop-import-hint').on('click', function (e) {
     e.preventDefault();
     propstack_connector_get_import_dialog();
   });

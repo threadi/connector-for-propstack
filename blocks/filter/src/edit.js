@@ -75,6 +75,19 @@ export default function Edit( object ) {
             value={object.attributes.filters}
             onChange={(value) => onChange( 'filters', value, object )}
           />
+          <SelectControl
+            __next40pxDefaultSize
+            __nextHasNoMarginBottom
+            label={__('Alignment', 'connector-for-propstack')}
+            options={
+              [
+                { label: __( 'Side by side', 'connector-for-propstack' ), value: 'row' },
+                { label: __( 'Below each other', 'connector-for-propstack' ), value: 'column' },
+              ]
+            }
+            value={object.attributes.filter_alignment}
+            onChange={(value) => onChange( 'filter_alignment', value, object )}
+          />
         </PanelBody>
       </InspectorControls>
 			<ServerSideRender

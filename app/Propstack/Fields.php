@@ -75,6 +75,7 @@ class Fields {
 		add_action( 'cfprop_import_object_field', array( $this, 'import_example' ), 10, 2 );
 		add_action( 'cfprop_import_object_field', array( $this, 'set_post_content' ), 10, 4 );
 		add_filter( 'cfprop_import_object_field_value', array( $this, 'clean_field_value_during_import' ), 10, 2 );
+		add_filter( 'cfprop_rest_fields', array( $this, 'sort_rest_fields' ) );
 	}
 
 	/**
@@ -120,7 +121,7 @@ class Fields {
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'The fields', 'connector-for-propstack' ) );
 		/* translators: %1$s: link to the Connector for Propstack Pro page */
-		$field->set_description( __( 'These are the fields we get from Propstack for your objects. They are assigned to specific object types for use on the website.', 'connector-for-propstack' ) . '<br><br><span class="propstack-connector-pro-hint">' . sprintf( __( 'Get more fields with support for other object types like "Stores" with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
+		$field->set_description( __( 'These are the fields we get from Propstack for your objects. They are assigned to specific object types for use on the website.', 'connector-for-propstack' ) . '<br><br><span class="cfprop-pro-hint">' . sprintf( __( 'Get more fields with support for other object types like "Stores" with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
 		$field->set_columns(
 			array(
 				__( 'The field', 'connector-for-propstack' ),
@@ -336,7 +337,7 @@ class Fields {
 		$fields_pro_tab->set_title( __( 'Use more object types with Connector for Propstack Pro', 'connector-for-propstack' ) );
 		$fields_pro_tab->set_url( Helper::get_pro_url() );
 		$fields_pro_tab->set_url_target( '_blank' );
-		$fields_pro_tab->set_tab_class( 'propstack-connector-pro-hint' );
+		$fields_pro_tab->set_tab_class( 'cfprop-pro-hint' );
 	}
 
 	/**
@@ -353,6 +354,7 @@ class Fields {
 			'\ConnectorForPropstack\Propstack\Fields\Main\AirConditioning',
 			'\ConnectorForPropstack\Propstack\Fields\Main\AlarmSystem',
 			'\ConnectorForPropstack\Propstack\Fields\Main\ApiResponse',
+			'\ConnectorForPropstack\Propstack\Fields\Main\AutoLift',
 			'\ConnectorForPropstack\Propstack\Fields\Main\Balcony',
 			'\ConnectorForPropstack\Propstack\Fields\Main\BarrierFree',
 			'\ConnectorForPropstack\Propstack\Fields\Main\BalconySpace',
@@ -450,6 +452,7 @@ class Fields {
 			'\ConnectorForPropstack\Propstack\Fields\Main\InteriorQuality',
 			'\ConnectorForPropstack\Propstack\Fields\Main\InvestmentType',
 			'\ConnectorForPropstack\Propstack\Fields\Main\KitchenComplete',
+			'\ConnectorForPropstack\Propstack\Fields\Main\LanCables',
 			'\ConnectorForPropstack\Propstack\Fields\Main\LastRefurbishment',
 			'\ConnectorForPropstack\Propstack\Fields\Main\Latitude',
 			'\ConnectorForPropstack\Propstack\Fields\Main\LengthGarage',
@@ -457,6 +460,7 @@ class Fields {
 			'\ConnectorForPropstack\Propstack\Fields\Main\LivingSpace',
 			'\ConnectorForPropstack\Propstack\Fields\Main\LocationClassificationType',
 			'\ConnectorForPropstack\Propstack\Fields\Main\LocationName',
+			'\ConnectorForPropstack\Propstack\Fields\Main\LocationNote',
 			'\ConnectorForPropstack\Propstack\Fields\Main\LodgerFlat',
 			'\ConnectorForPropstack\Propstack\Fields\Main\Loggia',
 			'\ConnectorForPropstack\Propstack\Fields\Main\Longitude',
@@ -473,7 +477,6 @@ class Fields {
 			'\ConnectorForPropstack\Propstack\Fields\Main\NumberBeds',
 			'\ConnectorForPropstack\Propstack\Fields\Main\NumberOfCommercials',
 			'\ConnectorForPropstack\Propstack\Fields\Main\NumberSeats',
-			'\ConnectorForPropstack\Propstack\Fields\Main\LocationNote',
 			'\ConnectorForPropstack\Propstack\Fields\Main\Monument',
 			'\ConnectorForPropstack\Propstack\Fields\Main\NetFloorSpace',
 			'\ConnectorForPropstack\Propstack\Fields\Main\NonSmoker',
@@ -484,6 +487,7 @@ class Fields {
 			'\ConnectorForPropstack\Propstack\Fields\Main\NumberOfBedRooms',
 			'\ConnectorForPropstack\Propstack\Fields\Main\NumberOfFloors',
 			'\ConnectorForPropstack\Propstack\Fields\Main\NumberOfRooms',
+			'\ConnectorForPropstack\Propstack\Fields\Main\NumberOfParkingSpaces',
 			'\ConnectorForPropstack\Propstack\Fields\Main\NumberOfTerraces',
 			'\ConnectorForPropstack\Propstack\Fields\Main\NumberOfUnits',
 			'\ConnectorForPropstack\Propstack\Fields\Main\ObjectId',
@@ -783,7 +787,7 @@ class Fields {
 		$field_type = FieldTypes::get_instance()->get_field_type_by_name( $field->get_type() );
 
 		/**
-		 * Filter the detected field type of single field.
+		 * Filter the detected field-type of single field.
 		 *
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param FieldType_Base|false $field_type The field type.
@@ -843,15 +847,16 @@ class Fields {
 	 *
 	 * @param string $field_category The field category.
 	 * @param string $query The query for a name.
+	 * @param bool   $load_all True if all fields should be loaded.
 	 *
 	 * @return array<int,mixed>
 	 */
-	public function get_fields_by_request( mixed $field_category, mixed $query ): array {
+	public function get_fields_by_request( mixed $field_category, mixed $query, bool $load_all = false ): array {
 		// prepare the list of fields.
 		$fields = array();
 
-		// if no query or "field_category" is set, return the 10 most important fields.
-		if ( empty( $query ) && empty( $field_category ) ) {
+		// if no query and "field_category" is set, return the most important fields.
+		if ( empty( $query ) && empty( $field_category ) && ! $load_all ) {
 			foreach ( self::get_instance()->get_important_fields_as_objects() as $index => $field ) {
 				// add the field to the list.
 				$fields[] = array(
@@ -866,7 +871,7 @@ class Fields {
 		}
 
 		// add them to the list.
-		foreach ( self::get_instance()->get_fields_as_objects() as $index => $field ) {
+		foreach ( self::get_instance()->get_fields_as_objects() as $field ) {
 			// bail if the field is hidden.
 			if ( $field->hide() || $field->hide_in_frontend() ) {
 				continue;
@@ -889,7 +894,7 @@ class Fields {
 
 			// add the field to the list.
 			$fields[] = array(
-				'id'    => ( $index + 1 ),
+				'id'    => count( $fields ) + 1,
 				'label' => $field->get_label(),
 				'value' => $field->get_name(),
 			);
@@ -1003,5 +1008,25 @@ class Fields {
 			}
 		}
 		Cache::set( 'disabled_fields', $cache );
+	}
+
+	/**
+	 * Sort the fields returned via REST API.
+	 *
+	 * @param array<string,mixed> $fields List of fields.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function sort_rest_fields( array $fields ): array {
+		// order the list by their labels.
+		usort(
+			$fields,
+			static function ( $a, $b ) {
+				return strcmp( $a['label'], $b['label'] );
+			}
+		);
+
+		// return the resulting list.
+		return $fields; // @phpstan-ignore return.type
 	}
 }

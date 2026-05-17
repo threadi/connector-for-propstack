@@ -1,3 +1,25 @@
-.wp-block-columns:has(.propstack-connector-field:empty) {
+.wp-block-group:not(.cfprop-simple-hiding):has(> p + .cfprop-field:empty), .cfprop-simple-hiding .cfprop-field:empty {
 	display: none;
+}
+
+.wp-block-group:has(> p + .cfprop-field .dashicons-no) {
+	display: none;
+}
+
+.cfprop-field .dashicons {
+	vertical-align: middle;
+}
+
+.wp-block-query .cfprop_object {
+	.wp-block-group:has(.wp-block-post-featured-image) {
+		position: relative;
+		z-index: 1;
+		.wp-block-post-terms {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			margin: 0;
+			z-index: 1;
+		}
+	}
 }

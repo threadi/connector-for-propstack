@@ -15,12 +15,12 @@ use ConnectorForPropstack\Propstack\FilterTypes\Select;
 
 ?>
 <fieldset>
-	<label for="propstack-connector-filter-<?php echo esc_attr( $interface->get_filter_name() ); ?>"><?php echo esc_html( $interface->get_label() ); ?></label>
-	<select id="propstack-connector-filter-<?php echo esc_attr( $interface->get_filter_name() ); ?>" name="filter[<?php echo esc_attr( $interface->get_filter_name() ); ?>]">
+	<label for="cfprop-filter-<?php echo esc_attr( $interface->get_filter_name() ); ?>"><?php echo esc_html( $interface->get_label() ); ?></label>
+	<select id="cfprop-filter-<?php echo esc_attr( $interface->get_filter_name() ); ?>" name="filter[<?php echo esc_attr( $interface->get_filter_name() ); ?>]">
 		<?php
-		foreach ( $interface->get_options() as $propstack_connector_key => $propstack_connector_label ) {
+		foreach ( $interface->get_options() as $cfprop_key => $cfprop_label ) {
 			?>
-				<option value="<?php echo esc_attr( $propstack_connector_key ); ?>"<?php echo $interface->is_selected( $propstack_connector_key ) ? ' selected' : ''; ?>><?php echo esc_html( $propstack_connector_label ); ?></option>
+				<option value="<?php echo esc_attr( $cfprop_key ); ?>"<?php echo $interface->is_selected( $cfprop_key ) ? ' selected' : ''; ?>><?php echo esc_html( $cfprop_label ); ?></option>
 				<?php
 		}
 		?>

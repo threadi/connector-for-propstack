@@ -27,7 +27,7 @@ use ConnectorForPropstack\Propstack\ImmoObject;
 		?>
 		<article id="post-<?php echo absint( $post_id ); ?>" class="post-<?php echo absint( $post_id ); ?> post type-<?php echo esc_attr( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ); ?> status-<?php echo esc_attr( get_post_status( $post_id ) ); ?> entry <?php echo esc_attr( apply_filters( 'propstack_connector_object_classes', '', $propstack_connector_immo_object ) ); ?>" role="region" aria-label="<?php echo esc_attr__( 'Objects', 'connector-for-propstack' ); ?>">
 			<?php
-			foreach ( $attributes['templates'] as $propstack_connector_template ) {
+			foreach ( $attributes['templates'] as $cfprop_template ) {
 				/**
 				 * Use the template hook to render the object.
 				 *
@@ -35,7 +35,7 @@ use ConnectorForPropstack\Propstack\ImmoObject;
 				 * @param ImmoObject    $propstack_connector_immo_object      The immo object as an object.
 				 * @param array<string,mixed>  $attributes   List of attributes.
 				 */
-				do_action( 'propstack_connector_template_' . $propstack_connector_template, $propstack_connector_immo_object, $attributes );
+				do_action( 'cfprop_template_' . $cfprop_template, $propstack_connector_immo_object, $attributes );
 			}
 			?>
 		</article>

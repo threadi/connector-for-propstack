@@ -93,7 +93,7 @@ function propstack_connector_start_ajax_process( config ) {
       // show progress.
       let dialog_config = {
         detail: {
-          className: 'propstack-connector-dialog',
+          className: 'cfprop-dialog',
           title: config.process_title,
           progressbar: {
             active: true,

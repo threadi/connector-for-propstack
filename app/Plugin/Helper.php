@@ -557,6 +557,6 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_github_documentation_link(): string {
-		return 'https://github.com/threadi/propstack-connector/tree/master/doc';
+		return 'https://github.com/threadi/connector-for-propstack/tree/master/doc';
 	}
 }

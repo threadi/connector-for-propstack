@@ -11,6 +11,6 @@
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-foreach ( $fields as $propstack_connector_field ) {
-	echo '<p><strong>' . esc_html( $propstack_connector_field['label'] ) . ':</strong> ' . wp_kses_post( $propstack_connector_field['value'] ) . '</p>';
+foreach ( $fields as $cfprop_field ) {
+	echo '<p><strong>' . esc_html( $cfprop_field['label'] ) . ':</strong> ' . wp_kses_post( $cfprop_field['value'] ) . '</p>';
 }

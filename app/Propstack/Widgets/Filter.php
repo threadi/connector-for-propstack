@@ -64,6 +64,7 @@ class Filter extends Widget_Base {
 	public function init(): void {
 		// use hooks.
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_css' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_css' ) );
 
 		// use global init.
 		parent::init();
@@ -106,7 +107,7 @@ class Filter extends Widget_Base {
 		if ( empty( $attributes['filter_alignment'] ) ) {
 			$attributes['filter_alignment'] = 'column';
 		}
-		$attributes['classes'] .= ' propstack-connector-filter-' . $attributes['filter_alignment'];
+		$attributes['classes'] .= ' cfprop-filter-' . $attributes['filter_alignment'];
 
 		/**
 		 * Filter the attributes for the select filter widget.
@@ -121,12 +122,20 @@ class Filter extends Widget_Base {
 		}
 
 		// enable the styles.
-		wp_enqueue_style( 'propstack-connector-filters' );
+		wp_enqueue_style( 'cfprop-filters' );
 
 		// collect the output.
 		ob_start();
 
-		// embed the listing content.
+		/**
+		 * Run custom actions before the output of the archive listing.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param array $attributes List of attributes.
+		 */
+		do_action( 'cfprop_get_template_before', $attributes );
+
+		// use the template to generate the output.
 		include Templates::get_instance()->get_template( 'parts/part-filter.php' );
 
 		// get the content.
@@ -146,7 +155,7 @@ class Filter extends Widget_Base {
 	 */
 	public function register_css(): void {
 		wp_register_style(
-			'propstack-connector-filters',
+			'cfprop-filters',
 			Helper::get_plugin_url() . 'css/filter.css',
 			array(),
 			Helper::get_file_version( Helper::get_plugin_path() . 'css/filter.css' ),
@@ -162,6 +171,6 @@ class Filter extends Widget_Base {
 		$this->register_css();
 
 		// enable the styles.
-		wp_enqueue_style( 'propstack-connector-filters' );
+		wp_enqueue_style( 'cfprop-filters' );
 	}
 }

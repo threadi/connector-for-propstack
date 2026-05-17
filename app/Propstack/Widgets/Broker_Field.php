@@ -108,6 +108,11 @@ class Broker_Field extends Widget_Base {
 			return '';
 		}
 
+		// create list of classes, if it does not exist.
+		if ( ! isset( $attributes['classes'] ) ) {
+			$attributes['classes'] = '';
+		}
+
 		// return the value of the given description type in this object.
 		$field_value = Taxonomies::get_instance()->get_field_value( $term[0]->term_id, $field, false );
 
@@ -118,6 +123,16 @@ class Broker_Field extends Widget_Base {
 
 		// return the template with this value.
 		ob_start();
+
+		/**
+		 * Run custom actions before the output of the archive listing.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param array $attributes List of attributes.
+		 */
+		do_action( 'cfprop_get_template_before', $attributes );
+
+		// use the template to generate the output.
 		include Templates::get_instance()->get_template( 'parts/part-field.php' );
 		$content = ob_get_clean();
 		if ( ! $content ) {
