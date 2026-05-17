@@ -76,7 +76,7 @@ class Input extends Filter_Type_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
-		// check for nonce even though this is just a filter and nothing is actually being written here, and the filter is public with no known user.
+		// check for nonce even though this is just a filter and nothing is actually being written here, and the filter is public.
 		if ( isset( $_GET['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'cfprop-verify' ) ) {
 			exit;
 		}

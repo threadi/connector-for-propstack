@@ -611,6 +611,11 @@ class Queue {
 		// check nonce.
 		check_admin_referer( 'propstack-queue-processing', 'nonce' );
 
+		// bail if capability is missing.
+		if( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// clear the queue.
 		$this->process();
 

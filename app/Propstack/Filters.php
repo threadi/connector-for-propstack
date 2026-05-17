@@ -2,12 +2,6 @@
 /**
  * File for handling the filter for objects in the frontend.
  *
- * TODO:
- * - Show matches count.
- * -> Configurable where (button, own field ..)
- * -> disablable
- * - AJAX-reload
- *
  * @package connector-for-propstack
  */
 

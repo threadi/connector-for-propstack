@@ -58,15 +58,18 @@ class Helper {
 		global $wpdb;
 
 		// get blogs in this site-network.
-		return Db::get_instance()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			'
-            SELECT blog_id
-            FROM ' . $wpdb->blogs . "
-            WHERE site_id = '" . $wpdb->siteid . "'
-            AND spam = '0'
-            AND deleted = '0'
-            AND archived = '0'
-        	"
+		return Db::get_instance()->get_results(
+			$wpdb->prepare(
+				'
+	            SELECT blog_id
+	            FROM ' . $wpdb->blogs . "
+	            WHERE site_id = %s
+	            AND spam = '0'
+	            AND deleted = '0'
+	            AND archived = '0'
+	            ",
+				$wpdb->siteid
+			)
 		);
 	}
 

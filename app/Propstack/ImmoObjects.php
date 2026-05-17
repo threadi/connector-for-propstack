@@ -721,6 +721,11 @@ class ImmoObjects {
 		// check nonce.
 		check_ajax_referer( 'import-propstack-objects', 'nonce' );
 
+		// bail if capability is missing.
+		if( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// run the import.
 		$this->import();
 
@@ -759,6 +764,11 @@ class ImmoObjects {
 	public function delete_by_ajax(): void {
 		// check nonce.
 		check_ajax_referer( 'delete-propstack-objects', 'nonce' );
+
+		// bail if capability is missing.
+		if( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
 
 		// run the deletion.
 		$this->delete_all();

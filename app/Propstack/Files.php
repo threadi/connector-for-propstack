@@ -720,6 +720,11 @@ class Files {
 		// check nonce.
 		check_ajax_referer( 'delete-propstack-object-files', 'nonce' );
 
+		// bail if capability is missing.
+		if( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// run the deletion.
 		$this->delete_all();
 
@@ -739,6 +744,11 @@ class Files {
 	public function import_by_ajax(): void {
 		// check nonce.
 		check_ajax_referer( 'import-propstack-object-files', 'nonce' );
+
+		// bail if capability is missing.
+		if( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
 
 		// run the import.
 		$this->import();

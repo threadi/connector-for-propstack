@@ -137,7 +137,7 @@ class Settings {
 		$setting->set_section( $section );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
-		$setting->set_show_in_rest( true );
+		$setting->set_show_in_rest( is_user_logged_in() );
 		$setting->set_read_callback( array( Crypt::get_instance(), 'decrypt' ) );
 		$setting->set_save_callback( array( Crypt::get_instance(), 'encrypt' ) );
 		$field = new Password( $settings_obj );

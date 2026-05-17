@@ -1,6 +1,6 @@
 === Connector for Propstack ===
 Contributors: laolaweb, threadi
-Tags: propstack
+Tags: propstack, real estate, immobilien, immo, crm
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.2
