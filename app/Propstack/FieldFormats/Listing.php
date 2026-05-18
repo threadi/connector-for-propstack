@@ -47,6 +47,6 @@ class Listing extends FieldFormat_Base {
 		}
 
 		// return the resulting list.
-		return '<ul>' . $list . '</ul>';
+		return '</p><ul>' . $list . '</ul><p>';
 	}
 }

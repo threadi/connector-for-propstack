@@ -722,7 +722,7 @@ class ImmoObjects {
 		check_ajax_referer( 'import-propstack-objects', 'nonce' );
 
 		// bail if capability is missing.
-		if( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
 			return;
 		}
 
@@ -766,7 +766,7 @@ class ImmoObjects {
 		check_ajax_referer( 'delete-propstack-objects', 'nonce' );
 
 		// bail if capability is missing.
-		if( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
 			return;
 		}
 

@@ -95,6 +95,7 @@ jobs:
                 rm composer.sh
                 rm phpunit.xml.dist
                 rm -fr tests
+                rm -fr languages
 
             - name: Run PCP check
               uses: wordpress/plugin-check-action@v1

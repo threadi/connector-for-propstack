@@ -54,9 +54,6 @@ class Init {
 	 * @return void
 	 */
 	public function init(): void {
-		// TODO für Release entfernen!
-		add_action( 'init', array( $this, 'load_languages' ), 0 );
-
 		// initialize the settings.
 		Settings::get_instance()->init();
 
