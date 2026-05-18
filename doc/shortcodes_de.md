@@ -4,16 +4,16 @@ Die folgenden Shortcodes können verwendet werden, um in das WordPress-Projekt i
 
 ## Liste von Objekten
 
-`[propstack_connector_archive]`
+`[cfprop_archive]`
 
 ## Detailansicht eines Objekts
 
-`[propstack_connector_single]`
+`[cfprop_single]`
 
 ## Filter
 
-`[propstack_connector_filter]`
+`[cfprop_filter]`
 
 ## Galerie
 
-`[propstack_connector_gallery]`
+`[cfprop_gallery]`

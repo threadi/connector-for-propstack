@@ -75,9 +75,9 @@ class Queue {
 		add_action( 'cfprop_file_imported', array( $this, 'remove_file' ), 10, 2 );
 
 		// use action hooks.
-		add_action( 'admin_action_propstack_connector_queue_clear', array( $this, 'clear_by_request' ) );
-		add_action( 'admin_action_propstack_connector_queue_process', array( $this, 'process_by_request' ) );
-		add_action( 'wp_ajax_propstack_connector_queue_process', array( $this, 'process_via_ajax' ) );
+		add_action( 'admin_action_cfprop_queue_clear', array( $this, 'clear_by_request' ) );
+		add_action( 'admin_action_cfprop_queue_process', array( $this, 'process_by_request' ) );
+		add_action( 'wp_ajax_cfprop_queue_process', array( $this, 'process_via_ajax' ) );
 	}
 
 	/**

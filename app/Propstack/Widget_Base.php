@@ -54,7 +54,7 @@ class Widget_Base {
 	 */
 	public function init(): void {
 		// add a shortcode for this widget.
-		add_shortcode( 'propstack_connector_' . $this->get_name(), array( $this, 'get_shortcode' ) );
+		add_shortcode( 'cfprop_' . $this->get_name(), array( $this, 'get_shortcode' ) );
 	}
 
 	/**
@@ -98,7 +98,7 @@ class Widget_Base {
 	 * @return string
 	 */
 	public function get_shortcode( array $attributes ): string {
-		return $this->render( $attributes );
+		return wp_kses_post( $this->render( $attributes ) );
 	}
 
 	/**

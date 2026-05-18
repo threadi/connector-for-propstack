@@ -143,7 +143,7 @@ class Queue extends WP_List_Table {
 			// define process-URL.
 			$process_url = add_query_arg(
 				array(
-					'action' => 'propstack_connector_queue_process',
+					'action' => 'cfprop_queue_process',
 					'nonce'  => wp_create_nonce( 'cfprop-queue-process' ),
 				),
 				get_admin_url() . 'admin.php'
@@ -180,7 +180,7 @@ class Queue extends WP_List_Table {
 			// define clear-URL.
 			$clear_url = add_query_arg(
 				array(
-					'action' => 'propstack_connector_queue_clear',
+					'action' => 'cfprop_queue_clear',
 					'nonce'  => wp_create_nonce( 'cfprop-queue-clear' ),
 				),
 				get_admin_url() . 'admin.php'

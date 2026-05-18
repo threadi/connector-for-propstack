@@ -3,9 +3,9 @@
  */
 function propstack_connector_object_import( process_id ) {
   propstack_connector_start_ajax_process( {
-    'start_action': 'import_propstack_objects',
+    'start_action': 'cfprop_import_objects',
     'start_nonce': propstackConnectorImportJsVars.start_nonce,
-    'info_action': 'get_propstack_process_info',
+    'info_action': 'cfprop_process_info',
     'info_nonce': propstackConnectorImportJsVars.process_info_nonce,
     'process_title': propstackConnectorImportJsVars.title,
     'process_id': process_id
@@ -17,9 +17,9 @@ function propstack_connector_object_import( process_id ) {
  */
 function propstack_connector_object_files_import( process_id, post_id ) {
   propstack_connector_start_ajax_process( {
-    'start_action': 'import_propstack_object_files',
+    'start_action': 'cfprop_import_object_files',
     'start_nonce': propstackConnectorImportJsVars.start_files_nonce,
-    'info_action': 'get_propstack_process_info',
+    'info_action': 'cfprop_process_info',
     'info_nonce': propstackConnectorImportJsVars.process_info_nonce,
     'process_title': propstackConnectorImportJsVars.files_title,
     'post': post_id,
@@ -32,9 +32,9 @@ function propstack_connector_object_files_import( process_id, post_id ) {
  */
 function propstack_connector_queue_process( process_id, post_id ) {
   propstack_connector_start_ajax_process( {
-    'start_action': 'propstack_connector_queue_process',
+    'start_action': 'cfprop_queue_process',
     'start_nonce': propstackConnectorImportJsVars.start_queue_processing_nonce,
-    'info_action': 'get_propstack_process_info',
+    'info_action': 'cfprop_process_info',
     'info_nonce': propstackConnectorImportJsVars.process_info_nonce,
     'process_title': propstackConnectorImportJsVars.queue_title,
     'post': post_id,
@@ -48,9 +48,9 @@ function propstack_connector_queue_process( process_id, post_id ) {
  */
 function propstack_connector_object_delete( process_id ) {
   propstack_connector_start_ajax_process( {
-    'start_action': 'delete_propstack_objects',
+    'start_action': 'cfprop_delete_objects',
     'start_nonce': propstackConnectorImportJsVars.delete_start_nonce,
-    'info_action': 'get_propstack_process_info',
+    'info_action': 'cfprop_process_info',
     'info_nonce': propstackConnectorImportJsVars.process_info_nonce,
     'process_title': propstackConnectorImportJsVars.delete_title,
     'process_id': process_id
@@ -62,9 +62,9 @@ function propstack_connector_object_delete( process_id ) {
  */
 function propstack_connector_object_file_delete( process_id ) {
   propstack_connector_start_ajax_process( {
-    'start_action': 'delete_propstack_object_files',
+    'start_action': 'cfprop_delete_object_files',
     'start_nonce': propstackConnectorImportJsVars.delete_files_start_nonce,
-    'info_action': 'get_propstack_process_info',
+    'info_action': 'cfprop_process_info',
     'info_nonce': propstackConnectorImportJsVars.process_info_nonce,
     'process_title': propstackConnectorImportJsVars.delete_files_title,
     'process_id': process_id

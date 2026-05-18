@@ -58,7 +58,7 @@ class ProcessHandler {
 	 * @return void
 	 */
 	public function init(): void {
-		add_action( 'wp_ajax_get_propstack_process_info', array( $this, 'get_process_info_by_ajax' ) );
+		add_action( 'wp_ajax_cfprop_process_info', array( $this, 'get_process_info_by_ajax' ) );
 	}
 
 	/**

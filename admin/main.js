@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
    */
   $('a.cfprop-import-hint').on('click', function (e) {
     e.preventDefault();
-    propstack_connector_get_import_dialog();
+    cfprop_get_import_dialog();
   });
 
   /**
@@ -34,13 +34,13 @@ jQuery(document).ready(function($) {
 /**
  * Get the import dialog via AJAX.
  */
-function propstack_connector_get_import_dialog() {
+function cfprop_get_import_dialog() {
   // get the dialog via AJAX.
   jQuery.ajax({
     type: "POST",
     url: propstackConnectorJsVars.ajax_url,
     data: {
-      'action': 'propstack_connector_get_import_dialog',
+      'action': 'cfprop_get_import_dialog',
       'nonce': propstackConnectorJsVars.get_import_dialog_nonce
     },
     error: function( jqXHR, textStatus, errorThrown ) {

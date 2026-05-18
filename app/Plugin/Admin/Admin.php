@@ -64,8 +64,8 @@ class Admin {
 		add_filter( 'admin_body_class', array( $this, 'add_body_classes' ) );
 
 		// use admin actions.
-		add_action( 'admin_action_propstack_connector_log_export', array( $this, 'export_log' ) );
-		add_action( 'admin_action_propstack_connector_log_empty', array( $this, 'empty_log' ) );
+		add_action( 'admin_action_cfprop_log_export', array( $this, 'export_log' ) );
+		add_action( 'admin_action_cfprop_log_empty', array( $this, 'empty_log' ) );
 	}
 
 	/**

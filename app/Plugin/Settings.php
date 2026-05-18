@@ -75,7 +75,7 @@ class Settings {
 		add_action( 'init', array( $this, 'add_trademark_hint' ), 20 );
 
 		// use admin actions.
-		add_action( 'admin_action_propstack_connector_reset', array( $this, 'reset_plugin_by_request' ) );
+		add_action( 'admin_action_cfprop_reset', array( $this, 'reset_plugin_by_request' ) );
 
 		// misc.
 		add_filter( 'admin_footer_text', array( $this, 'show_plugin_hint_in_footer' ), 0 );
@@ -405,7 +405,7 @@ class Settings {
 		// create reset URL.
 		$reset_url = add_query_arg(
 			array(
-				'action' => 'propstack_connector_reset',
+				'action' => 'cfprop_reset',
 				'nonce'  => wp_create_nonce( 'cfprop-reset' ),
 			),
 			get_admin_url() . 'admin.php'

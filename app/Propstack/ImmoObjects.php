@@ -101,11 +101,11 @@ class ImmoObjects {
 		add_action( 'pre_get_posts', array( $this, 'extend_search' ) );
 
 		// use actions.
-		add_action( 'wp_ajax_import_propstack_objects', array( $this, 'import_by_ajax' ) );
-		add_action( 'admin_action_import_propstack_objects', array( $this, 'import_by_request' ) );
-		add_action( 'wp_ajax_delete_propstack_objects', array( $this, 'delete_by_ajax' ) );
-		add_action( 'admin_action_delete_propstack_objects', array( $this, 'delete_by_request' ) );
-		add_action( 'wp_ajax_propstack_connector_get_import_dialog', array( $this, 'get_import_dialog_by_ajax' ) );
+		add_action( 'wp_ajax_cfprop_import_objects', array( $this, 'import_by_ajax' ) );
+		add_action( 'admin_action_cfprop_import_objects', array( $this, 'import_by_request' ) );
+		add_action( 'wp_ajax_cfprop_delete_objects', array( $this, 'delete_by_ajax' ) );
+		add_action( 'admin_action_cfprop_delete_objects', array( $this, 'delete_by_request' ) );
+		add_action( 'wp_ajax_cfprop_get_import_dialog', array( $this, 'get_import_dialog_by_ajax' ) );
 
 		// use our own hooks.
 		add_filter( 'cfprop_prevent_import_of_object', array( $this, 'prevent_import_by_state' ), 10, 2 );
@@ -395,7 +395,7 @@ class ImmoObjects {
 		// create the import URL.
 		$delete_url = add_query_arg(
 			array(
-				'action' => 'delete_propstack_objects',
+				'action' => 'cfprop_delete_objects',
 				'nonce'  => wp_create_nonce( 'delete-propstack-objects' ),
 			),
 			get_admin_url() . 'admin.php'
@@ -1488,7 +1488,7 @@ class ImmoObjects {
 	public function get_import_url(): string {
 		return add_query_arg(
 			array(
-				'action' => 'import_propstack_objects',
+				'action' => 'cfprop_import_objects',
 				'nonce'  => wp_create_nonce( 'import-propstack-objects' ),
 			),
 			get_admin_url() . 'admin.php'

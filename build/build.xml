@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="connector-for-propstack" basedir="." default="help">
+
+    <!-- Include the config file -->
+    <loadproperties srcFile="build.properties" />
+
+    <!-- Sets variables, which can later be used. -->
+    <property name="src.dir" location="../" />
+    <property name="build.dir" location="../releases" />
+    <property name="log.dir" location="./" />
+
+    <!-- check for necessary vars -->
+    <fail unless="plugin.slug" />
+    <fail unless="plugin.version" />
+    <fail unless="composer.path" />
+    <fail unless="npm.path" />
+    <fail message="Do not run as root!">
+        <condition>
+            <equals arg1="root" arg2="${user.name}"/>
+        </condition>
+    </fail>
+
+    <!-- install npm -->
+    <target name="npm-install">
+        <delete file="${log.dir}/npm-install1.txt"/>
+        <delete file="${log.dir}/npm-install2.txt"/>
+        <delete file="${log.dir}/npm-install3.txt"/>
+        <delete file="${log.dir}/npm-install4.txt"/>
+		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install1.txt">
+			<arg line="install"/>
+		</exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install2.txt">
+            <arg line="install concurrently"/>
+        </exec>
+        <exec dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install3.txt">
+            <arg line="install"/>
+        </exec>
+        <exec dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install4.txt">
+            <arg line="install"/>
+        </exec>
+    </target>
+
+    <!-- build the Blocks via npm -->
+    <target name="npm-build" depends="npm-install">
+        <delete file="${log.dir}/npm-build1.txt"/>
+        <delete file="${log.dir}/npm-build2.txt"/>
+        <delete file="${log.dir}/npm-build3.txt"/>
+        <delete file="${log.dir}/npm-build4.txt"/>
+        <delete file="${log.dir}/npm-build5.txt"/>
+        <delete file="${log.dir}/npm-build6.txt"/>
+        <delete file="${log.dir}/npm-build7.txt"/>
+        <delete file="${log.dir}/npm-build8.txt"/>
+        <delete file="${log.dir}/npm-build9.txt"/>
+        <delete file="${log.dir}/npm-build10.txt"/>
+        <delete file="${log.dir}/npm-build11.txt"/>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build1.txt">
+            <arg line="run build:archive"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build2.txt">
+            <arg line="run build:broker-field"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
+            <arg line="run build:description"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
+            <arg line="run build:field"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build5.txt">
+            <arg line="run build:single"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build7.txt">
+            <arg line="run build:filter"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build8.txt">
+            <arg line="run build:gallery"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build9.txt">
+            <arg line="run build:lightbox"/>
+        </exec>
+        <exec dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build10.txt">
+            <arg line="run build"/>
+        </exec>
+        <exec dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build11.txt">
+            <arg line="run build"/>
+        </exec>
+    </target>
+
+	<!-- install composer -->
+	<target name="composer-install">
+		<delete file="${log.dir}/composer-install.txt"/>
+		<delete file="${log.dir}/composer-update.txt"/>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install.txt">
+			<arg line="install"/>
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-update.txt">
+			<arg line="update"/>
+		</exec>
+	</target>
+
+	<!-- generate autoloader for release -->
+	<target name="autoloader-generation">
+		<delete file="${log.dir}/autoloader-generation.txt"/>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/autoloader-generation.txt">
+			<arg line="dump-autoload -oa --no-dev"/>
+		</exec>
+	</target>
+
+	<!-- generate autoloader for dev -->
+	<target name="autoloader-generation-dev">
+		<delete file="${log.dir}/autoloader-generation-dev.txt"/>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/autoloader-generation-dev.txt">
+			<arg line="dump-autoload -oa"/>
+		</exec>
+	</target>
+
+    <!-- set the version number in some plugin-files for the release -->
+    <target name="setVersionNumber">
+        <delete file="${build.dir}/${plugin.slug}-release.php"/>
+        <copy file="${src.dir}/${plugin.slug}.php" tofile="${src.dir}/${plugin.slug}-release.php"/>
+        <replace file="${src.dir}/${plugin.slug}-release.php">
+            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+        </replace>
+
+        <delete file="${src.dir}/uninstall-release.php"/>
+        <copy file="${src.dir}/uninstall.php" tofile="${src.dir}/uninstall-release.php"/>
+        <replace file="${src.dir}/uninstall-release.php">
+            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+        </replace>
+
+		<delete file="${build.dir}/readme-release.txt"/>
+		<copy file="${src.dir}/readme.txt" tofile="${src.dir}/readme-release.txt"/>
+		<replace file="${src.dir}/readme-release.txt">
+			<replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+		</replace>
+    </target>
+
+	<!-- check WCS compatibility -->
+	<target name="check-wcs" depends="composer-install">
+		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/phpcbf">
+			<arg line="--standard=ruleset.xml ."/>
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="vendor/bin/phpcs">
+			<arg line="--standard=ruleset.xml ."/>
+		</exec>
+	</target>
+
+	<!-- generate documentation -->
+	<target name="generate-documentation" depends="composer-install">
+		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/wp-documentor">
+			<arg line="parse app --format=markdown --output=doc/hooks.md --prefix=cfprop_ --exclude=Support.php --exclude=Transients.php"/>
+		</exec>
+	</target>
+
+	<!-- check PHPStan -->
+	<target name="check-phpstan" depends="composer-install">
+		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/phpstan">
+			<arg line="analyse"/>
+		</exec>
+	</target>
+
+	<!-- PHP Unit Tests -->
+	<target name="php-unit-tests" depends="composer-install">
+		<delete file="${log.dir}/php-unit-tests-1.txt"/>
+		<delete file="${log.dir}/php-unit-tests-2.txt"/>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/php-unit-tests-1.txt">
+			<arg line="test-install-during-build"/>
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/php-unit-tests-2.txt">
+			<arg line="test"/>
+		</exec>
+	</target>
+
+	<!-- prepare -->
+	<target name="prepare" description="Prepare the project" depends="composer-install,npm-build" />
+
+    <!-- init project -->
+    <target name="init" description="Initialize the project" depends="prepare,autoloader-generation-dev" />
+
+    <!-- create release-zip -->
+    <target name="build" description="Builds a new release" depends="prepare,generate-documentation,php-unit-tests,autoloader-generation,check-phpstan,check-wcs,setVersionNumber">
+        <delete file="${build.dir}/${plugin.slug}_${plugin.version}.zip"/>
+        <zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip">
+            <zipfileset dir="${src.dir}/admin" prefix="${plugin.slug}/admin" />
+			<zipfileset dir="${src.dir}/app" prefix="${plugin.slug}/app" />
+            <zipfileset dir="${src.dir}/blocks/" prefix="${plugin.slug}/blocks/">
+				<exclude name="**/**/src/**" />
+			</zipfileset>
+            <zipfileset dir="${src.dir}/css" prefix="${plugin.slug}/css" />
+            <zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
+            <zipfileset dir="${src.dir}/js" prefix="${plugin.slug}/js" />
+			<zipfileset dir="${src.dir}/templates" prefix="${plugin.slug}/templates" />
+			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
+			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
+            <zipfileset dir="${src.dir}/vendor/threadi/crypt-for-wordpress/src/" prefix="${plugin.slug}/vendor/threadi/crypt-for-wordpress/src/" />
+            <zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/lib/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/lib/" />
+            <zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/build/" />
+            <zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/assets/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/assets/" />
+			<zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/src/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/src/" />
+            <zipfileset dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-dialog-for-wordpress/build/" />
+			<zipfileset dir="${src.dir}" includes="composer.json" fullpath="${plugin.slug}/composer.json" />
+            <zipfileset dir="${src.dir}" includes="wpml-config.xml" fullpath="${plugin.slug}/wpml-config.xml" />
+			<zipfileset dir="${src.dir}" includes="readme-release.txt" fullpath="${plugin.slug}/readme.txt" />
+            <zipfileset dir="${src.dir}" includes="uninstall-release.php" fullpath="${plugin.slug}/uninstall.php" />
+            <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
+        </zip>
+		<antcall target="autoloader-generation-dev" />
+        <delete file="${src.dir}/${plugin.slug}-release.php"/>
+		<delete file="${src.dir}/uninstall-release.php"/>
+		<delete file="${src.dir}/readme-release.txt"/>
+    </target>
+
+	<!-- show help for ant commands -->
+    <target name="help">
+        <java classname="org.apache.tools.ant.Main">
+            <arg value="-projecthelp" />
+            <arg value="-buildfile" />
+            <arg value="build.xml" />
+        </java>
+    </target>
+
+</project>

@@ -93,10 +93,10 @@ class Files {
 		add_action( 'cfprop_import_object', array( $this, 'delete_unused_files' ), 10, 2 );
 
 		// use actions.
-		add_action( 'wp_ajax_import_propstack_object_files', array( $this, 'import_by_ajax' ) );
-		add_action( 'admin_action_import_propstack_object_files', array( $this, 'import_by_request' ) );
-		add_action( 'wp_ajax_delete_propstack_object_files', array( $this, 'delete_by_ajax' ) );
-		add_action( 'admin_action_delete_propstack_object_files', array( $this, 'delete_by_request' ) );
+		add_action( 'wp_ajax_cfprop_import_object_files', array( $this, 'import_by_ajax' ) );
+		add_action( 'admin_action_cfprop_import_object_files', array( $this, 'import_by_request' ) );
+		add_action( 'wp_ajax_cfprop_delete_object_files', array( $this, 'delete_by_ajax' ) );
+		add_action( 'admin_action_cfprop_delete_object_files', array( $this, 'delete_by_request' ) );
 	}
 
 	/**
@@ -135,7 +135,7 @@ class Files {
 		// create the import URL.
 		$import_url = add_query_arg(
 			array(
-				'action' => 'import_propstack_object_files',
+				'action' => 'cfprop_import_object_files',
 				'nonce'  => wp_create_nonce( 'import-propstack-object-files' ),
 			),
 			get_admin_url() . 'admin.php'
@@ -190,7 +190,7 @@ class Files {
 		// create the import URL.
 		$delete_url = add_query_arg(
 			array(
-				'action' => 'delete_propstack_object_files',
+				'action' => 'cfprop_delete_object_files',
 				'nonce'  => wp_create_nonce( 'delete-propstack-object-files' ),
 			),
 			get_admin_url() . 'admin.php'

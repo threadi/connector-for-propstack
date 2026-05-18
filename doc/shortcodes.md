@@ -4,16 +4,16 @@ The following shortcodes can be used to display objects imported into the WordPr
 
 ## List of objects
 
-`[propstack_connector_archive]`
+`[cfprop_archive]`
 
 ## Detail view of an object
 
-`[propstack_connector_single]`
+`[cfprop_single]`
 
 ## Filter
 
-`[propstack_connector_filter]`
+`[cfprop_filter]`
 
 ## Gallery
 
-`[propstack_connector_gallery]`
+`[cfprop_gallery]`

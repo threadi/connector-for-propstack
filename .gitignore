@@ -1,9 +1,7 @@
 /.idea
 /app/Dependencies
 /blocks/*/build/
-/build/
-!/build/build.properties.dist
-!/build/build.xml
+/build/build.properties
 *.zip
 languages/*.json
 /vendor/

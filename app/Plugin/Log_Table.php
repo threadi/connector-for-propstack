@@ -138,7 +138,7 @@ class Log_Table extends WP_List_Table {
 			// define export-URL.
 			$download_url = add_query_arg(
 				array(
-					'action' => 'propstack_connector_log_export',
+					'action' => 'cfprop_log_export',
 					'nonce'  => wp_create_nonce( 'cfprop-log-export' ),
 				),
 				get_admin_url() . 'admin.php'
@@ -183,7 +183,7 @@ class Log_Table extends WP_List_Table {
 			// define empty-URL.
 			$empty_url = add_query_arg(
 				array(
-					'action' => 'propstack_connector_log_empty',
+					'action' => 'cfprop_log_empty',
 					'nonce'  => wp_create_nonce( 'cfprop-log-empty' ),
 				),
 				get_admin_url() . 'admin.php'

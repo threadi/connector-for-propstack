@@ -98,6 +98,6 @@ class Broker_Field extends Blocks_Basis {
 		$attributes['styles'] = implode( PHP_EOL, $styles_array );
 		$attributes['classes'] = $classes . ' ' . Helper::get_attribute_value_from_html( 'class', $block_html_attributes );
 
-		return \ConnectorForPropstack\Propstack\Widgets\Broker_Field::get_instance()->render( $attributes );
+		return wp_kses_post( \ConnectorForPropstack\Propstack\Widgets\Broker_Field::get_instance()->render( $attributes ) );
 	}
 }
