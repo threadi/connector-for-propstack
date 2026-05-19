@@ -29,6 +29,10 @@ class Email extends FieldFormat_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
+		if( empty( $this->value ) ) {
+			return '';
+		}
+
 		return '<a href="mailto:' . $this->value . '">' . $this->value . '</a>';
 	}
 }

@@ -34,7 +34,7 @@ class SquareMeter extends FieldFormat_Base {
 			return '';
 		}
 
-		// return the value with m² as prefix.
+		// return the value with m² as the prefix.
 		return $this->value . 'm²';
 	}
 }

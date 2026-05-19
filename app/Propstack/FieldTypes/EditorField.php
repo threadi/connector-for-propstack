@@ -42,6 +42,12 @@ class EditorField extends FieldType_Base {
 	 * @return mixed
 	 */
 	public function get_cleaned_value(): mixed {
+		// bail if no value is set.
+		if( empty( $this->value ) ) {
+			return '';
+		}
+
+		// clean the value.
 		return preg_replace(
 			array(
 				'/ style=("|\')(.*?)("|\')/',   // remove inline styles on HTML-elements.

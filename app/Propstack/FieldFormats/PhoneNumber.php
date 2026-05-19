@@ -29,6 +29,10 @@ class PhoneNumber extends FieldFormat_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
+		if( empty( $this->value ) ) {
+			return '';
+		}
+
 		return '<a href="tel:' . $this->value . '">' . $this->value . '</a>';
 	}
 }

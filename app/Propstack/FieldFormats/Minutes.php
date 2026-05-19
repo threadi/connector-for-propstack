@@ -29,6 +29,10 @@ class Minutes extends FieldFormat_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
+		if( empty( $this->value ) ) {
+			return '';
+		}
+
 		/* translators: %1$s: number of minutes */
 		return sprintf( __( '%1$smin', 'connector-for-propstack' ), $this->value );
 	}
