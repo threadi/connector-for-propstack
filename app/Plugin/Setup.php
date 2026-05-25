@@ -117,7 +117,7 @@ class Setup {
 			add_action( 'cfprop_queue_processing', array( $this, 'update_process_step' ) );
 
 			// misc.
-			add_filter( 'plugin_action_links_' . plugin_basename( CONNECTOR_FOR_PROPSTACK_PLUGIN ), array( $this, 'add_setting_link' ) );
+			add_filter( 'plugin_action_links_' . plugin_basename( CFPROP_PLUGIN ), array( $this, 'add_setting_link' ) );
 		}
 	}
 

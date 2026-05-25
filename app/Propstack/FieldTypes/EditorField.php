@@ -43,7 +43,7 @@ class EditorField extends FieldType_Base {
 	 */
 	public function get_cleaned_value(): mixed {
 		// bail if no value is set.
-		if( empty( $this->value ) ) {
+		if ( empty( $this->value ) ) {
 			return '';
 		}
 

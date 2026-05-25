@@ -102,13 +102,13 @@ class Templates {
 		}
 
 		// check if the requested template exists in the theme.
-		$theme_template = locate_template( trailingslashit( basename( dirname( CONNECTOR_FOR_PROPSTACK_PLUGIN ) ) ) . $template );
+		$theme_template = locate_template( trailingslashit( basename( dirname( CFPROP_PLUGIN ) ) ) . $template );
 		if ( $theme_template ) {
 			return $theme_template;
 		}
 
 		// set the directory for the template to use.
-		$directory = CONNECTOR_FOR_PROPSTACK_PLUGIN;
+		$directory = CFPROP_PLUGIN;
 
 		/**
 		 * Set the template directory.
@@ -125,7 +125,7 @@ class Templates {
 		}
 
 		// return template from light-plugin.
-		return plugin_dir_path( CONNECTOR_FOR_PROPSTACK_PLUGIN ) . 'templates/' . $template;
+		return plugin_dir_path( CFPROP_PLUGIN ) . 'templates/' . $template;
 	}
 
 	/**
@@ -136,13 +136,13 @@ class Templates {
 	 */
 	public function has_template( string $template ): bool {
 		// check if the requested template exists in the theme.
-		$theme_template = locate_template( trailingslashit( basename( dirname( CONNECTOR_FOR_PROPSTACK_PLUGIN ) ) ) . $template );
+		$theme_template = locate_template( trailingslashit( basename( dirname( CFPROP_PLUGIN ) ) ) . $template );
 		if ( $theme_template ) {
 			return true;
 		}
 
 		// set the directory for the template to use.
-		$directory = CONNECTOR_FOR_PROPSTACK_PLUGIN;
+		$directory = CFPROP_PLUGIN;
 
 		/**
 		 * Set the template directory.
@@ -159,7 +159,7 @@ class Templates {
 		}
 
 		// return template from light-plugin.
-		return file_exists( plugin_dir_path( CONNECTOR_FOR_PROPSTACK_PLUGIN ) . 'templates/' . $template );
+		return file_exists( plugin_dir_path( CFPROP_PLUGIN ) . 'templates/' . $template );
 	}
 
 	/**
@@ -447,19 +447,23 @@ class Templates {
 		// get the styles.
 		$css = $attributes['styles'];
 
+		// clean the CSS.
+		$prepared_css = wp_strip_all_tags( $css );
+		$prepared_css = str_replace( array( '</style>', '<style' ), '', $prepared_css );
+
 		// if this is a block theme, add styles the modern way.
 		if ( Helper::theme_is_fse_theme() && ! Helper::is_rest_request() ) {
 			// show these styles the modern way.
-			wp_add_inline_style( 'wp-block-library', $css );
+			wp_add_inline_style( 'wp-block-library', $prepared_css );
 
 			// and do nothing more.
 			return;
 		}
 
 		// show these styles the classic way.
-		wp_register_style( 'cfprop-styles', false, array(), CONNECTOR_FOR_PROPSTACK_VERSION, 'all' );
+		wp_register_style( 'cfprop-generated-styles', false, array(), CFPROP_VERSION, 'all' );
 		wp_enqueue_style( 'cfprop-generated-styles' );
-		wp_add_inline_style( 'cfprop-generated-styles', $css );
+		wp_add_inline_style( 'cfprop-generated-styles', $prepared_css );
 	}
 
 	/**

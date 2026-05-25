@@ -60,7 +60,7 @@ class Crypt {
 	private function get_crypt_obj(): \CryptForWordPress\Crypt {
 		if ( null === $this->crypt_obj ) {
 			// configure the crypt object.
-			$this->crypt_obj = new \CryptForWordPress\Crypt( CONNECTOR_FOR_PROPSTACK_PLUGIN );
+			$this->crypt_obj = new \CryptForWordPress\Crypt( CFPROP_PLUGIN );
 			$this->crypt_obj->set_config(
 				array(
 					'openssl' => array(

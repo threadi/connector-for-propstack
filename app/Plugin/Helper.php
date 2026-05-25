@@ -88,7 +88,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_plugin_url(): string {
-		return trailingslashit( plugin_dir_url( CONNECTOR_FOR_PROPSTACK_PLUGIN ) );
+		return trailingslashit( plugin_dir_url( CFPROP_PLUGIN ) );
 	}
 
 	/**
@@ -97,7 +97,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_plugin_path(): string {
-		return trailingslashit( plugin_dir_path( CONNECTOR_FOR_PROPSTACK_PLUGIN ) );
+		return trailingslashit( plugin_dir_path( CFPROP_PLUGIN ) );
 	}
 
 	/**
@@ -163,7 +163,7 @@ class Helper {
 	 */
 	public static function get_plugin_name(): string {
 		// get the plugin data.
-		$plugin_data = get_plugin_data( CONNECTOR_FOR_PROPSTACK_PLUGIN );
+		$plugin_data = get_plugin_data( CFPROP_PLUGIN );
 
 		// bail if no 'Name' is in the result.
 		if ( empty( $plugin_data['Name'] ) ) {
@@ -195,7 +195,7 @@ class Helper {
 			return (string) filemtime( $filepath );
 		}
 
-		$plugin_version = CONNECTOR_FOR_PROPSTACK_VERSION;
+		$plugin_version = CFPROP_VERSION;
 
 		/**
 		 * Filter the used file version (for JS- and CSS-files, which get enqueued).

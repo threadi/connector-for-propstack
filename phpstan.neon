@@ -3,7 +3,7 @@ parameters:
   reportUnmatchedIgnoredErrors: false
   ignoreErrors:
     - "#WP_PLUGIN_DIR#"
-    - "#CONNECTOR_FOR_PROPSTACK_#"
+    - "#CFPROP_#"
     - "#ARRAY_A#"
     - "#_IN_SECONDS#"
     - "#WP_CLI#"

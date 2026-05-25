@@ -65,7 +65,7 @@ class Users {
 	 */
 	public function get_first_administrator_user(): int {
 		// get value from the cache.
-		$user_id = absint( get_option( 'propstack_connector_admin_id', 0 ) );
+		$user_id = absint( get_option( 'cfprop_admin_id', 0 ) );
 
 		// return the ID from cache, if given.
 		if ( $user_id > 0 ) {
@@ -101,7 +101,7 @@ class Users {
 		$user_id = absint( $roles[0]->ID );
 
 		// save this ID in the cache.
-		update_option( 'propstack_connector_admin_id', $user_id );
+		update_option( 'cfprop_admin_id', $user_id );
 
 		// return it.
 		return $user_id;
@@ -113,7 +113,7 @@ class Users {
 	 * @return void
 	 */
 	public function reset_cache(): void {
-		delete_option( 'propstack_connector_admin_id' );
+		delete_option( 'cfprop_admin_id' );
 	}
 
 	/**

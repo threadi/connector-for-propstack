@@ -54,11 +54,11 @@ class Broker {
 	 */
 	public function init(): void {
 		// define constants.
-		if ( ! defined( 'CONNECTOR_FOR_PROPSTACK_BROKER_IMPORT_RUNNING' ) ) {
-			define( 'CONNECTOR_FOR_PROPSTACK_BROKER_IMPORT_RUNNING', 'propstack_connector_broker_import_running' );
+		if ( ! defined( 'CFPROP_BROKER_IMPORT_RUNNING' ) ) {
+			define( 'CFPROP_BROKER_IMPORT_RUNNING', 'propstack_connector_broker_import_running' );
 		}
-		if ( ! defined( 'CONNECTOR_FOR_PROPSTACK_BROKER_DELETE_RUNNING' ) ) {
-			define( 'CONNECTOR_FOR_PROPSTACK_BROKER_DELETE_RUNNING', 'propstack_connector_broker_delete_running' );
+		if ( ! defined( 'CFPROP_BROKER_DELETE_RUNNING' ) ) {
+			define( 'CFPROP_BROKER_DELETE_RUNNING', 'propstack_connector_broker_delete_running' );
 		}
 
 		// use hooks.

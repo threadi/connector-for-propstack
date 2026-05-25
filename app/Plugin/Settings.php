@@ -89,7 +89,7 @@ class Settings {
 	 */
 	public function get_settings_obj(): \easySettingsForWordPress\Settings {
 		if ( null === $this->settings_obj ) {
-			$this->settings_obj = new \easySettingsForWordPress\Settings( CONNECTOR_FOR_PROPSTACK_PLUGIN );
+			$this->settings_obj = new \easySettingsForWordPress\Settings( CFPROP_PLUGIN );
 		}
 
 		// return the settings object.
@@ -188,14 +188,14 @@ class Settings {
 		$hidden_section->set_hidden( true );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_main_object_type' );
+		$setting = $settings_obj->add_setting( 'cfprop_main_object_type' );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_field( $field );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_update_slugs' );
+		$setting = $settings_obj->add_setting( 'cfprop_update_slugs' );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
@@ -613,7 +613,7 @@ class Settings {
 	 * @return string|null
 	 */
 	public function update_slugs( string|null $value ): string|null {
-		update_option( 'propstack_connector_update_slugs', 1 );
+		update_option( 'cfprop_update_slugs', 1 );
 		return $value;
 	}
 

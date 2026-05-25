@@ -102,6 +102,6 @@ class Term_Base {
 	 * @return string
 	 */
 	public function get_source(): string {
-		return CONNECTOR_FOR_PROPSTACK_PLUGIN;
+		return CFPROP_PLUGIN;
 	}
 }

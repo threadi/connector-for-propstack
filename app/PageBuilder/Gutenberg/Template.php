@@ -391,7 +391,7 @@ class Template {
 
 			// if this is the single template, get the main object type.
 			if ( $this->is_single() ) {
-				$main_object_type_slug = get_option( 'propstack_connector_main_object_type' );
+				$main_object_type_slug = get_option( 'cfprop_main_object_type' );
 
 				// if a main object type could be loaded, use its pattern as the base for this template.
 				if ( ! empty( $main_object_type_slug ) ) {

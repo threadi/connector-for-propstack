@@ -82,11 +82,11 @@ class ImmoObjects {
 	 */
 	public function init(): void {
 		// define constants.
-		if ( ! defined( 'CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING' ) ) {
-			define( 'CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING', 'propstack_connector_import_running' );
+		if ( ! defined( 'CFPROP_IMPORT_RUNNING' ) ) {
+			define( 'CFPROP_IMPORT_RUNNING', 'propstack_connector_import_running' );
 		}
-		if ( ! defined( 'CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING' ) ) {
-			define( 'CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING', 'propstack_connector_delete_running' );
+		if ( ! defined( 'CFPROP_DELETE_RUNNING' ) ) {
+			define( 'CFPROP_DELETE_RUNNING', 'propstack_connector_delete_running' );
 		}
 
 		// use hooks.
@@ -248,7 +248,7 @@ class ImmoObjects {
 	 */
 	public function delete_all(): void {
 		// bail if import or deletion are still running.
-		if ( absint( get_option( CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING ) ) > 0 || absint( get_option( CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING ) ) > 0 ) {
+		if ( absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 || absint( get_option( CFPROP_DELETE_RUNNING ) ) > 0 ) {
 			return;
 		}
 
@@ -267,7 +267,7 @@ class ImmoObjects {
 		$process_handler->set_max_count( 0 );
 		$process_handler->set_status( __( 'Deletion of your objects is starting', 'connector-for-propstack' ) );
 		$process_handler->set_running( time() );
-		update_option( CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING, time() );
+		update_option( CFPROP_DELETE_RUNNING, time() );
 
 		// add a log entry if debug is enabled.
 		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
@@ -336,7 +336,7 @@ class ImmoObjects {
 		// update the marker.
 		$process_handler->set_message( $this->get_success_dialog_config() );
 		$process_handler->set_running( 0 );
-		update_option( CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING, 0 );
+		update_option( CFPROP_DELETE_RUNNING, 0 );
 	}
 
 	/**
@@ -378,7 +378,7 @@ class ImmoObjects {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import objects', 'connector-for-propstack' ) );
 			$field->set_description( __( 'Propstack API key is missing.', 'connector-for-propstack' ) );
-		} elseif ( defined( 'CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING' ) && absint( get_option( CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING ) ) > 0 ) {
+		} elseif ( defined( 'CFPROP_IMPORT_RUNNING' ) && absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import objects', 'connector-for-propstack' ) );
 			$field->set_description( __( 'Import of objects is still running. Please wait.', 'connector-for-propstack' ) );
@@ -405,7 +405,7 @@ class ImmoObjects {
 		$setting = $settings_obj->add_setting( 'propstack_connector_delete' );
 		$setting->set_section( $import_section );
 		$setting->prevent_export( true );
-		if ( defined( 'CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING' ) && absint( get_option( CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING ) ) > 0 ) {
+		if ( defined( 'CFPROP_DELETE_RUNNING' ) && absint( get_option( CFPROP_DELETE_RUNNING ) ) > 0 ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Delete objects', 'connector-for-propstack' ) );
 			$field->set_description( __( 'Deletion of objects is still running. Please wait.', 'connector-for-propstack' ) );
@@ -496,7 +496,7 @@ class ImmoObjects {
 
 		// add hidden setting for each language.
 		foreach ( Languages::get_instance()->get_languages() as $language_code => $name ) {
-			$setting = $settings_obj->add_setting( 'propstack_connector_md5_' . $language_code );
+			$setting = $settings_obj->add_setting( 'cfprop_md5_' . $language_code );
 			$setting->prevent_export( true );
 			$setting->set_type( 'string' );
 			$setting->set_default( '' );
@@ -668,21 +668,21 @@ class ImmoObjects {
 		}
 
 		// add setting.
-		$setting = $settings_obj->add_setting( CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING );
+		$setting = $settings_obj->add_setting( CFPROP_DELETE_RUNNING );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->prevent_export( true );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_has_objects' );
+		$setting = $settings_obj->add_setting( 'cfprop_has_objects' );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->prevent_export( true );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_last_api_response' );
+		$setting = $settings_obj->add_setting( 'cfprop_last_api_response' );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
@@ -1325,7 +1325,7 @@ class ImmoObjects {
 	 * @return bool
 	 */
 	public function has_objects(): bool {
-		return 1 === absint( get_option( 'propstack_connector_has_objects' ) );
+		return 1 === absint( get_option( 'cfprop_has_objects' ) );
 	}
 
 	/**
@@ -1416,7 +1416,7 @@ class ImmoObjects {
 		if ( ! $main_object_type_term instanceof WP_Term ) {
 			return;
 		}
-		update_option( 'propstack_connector_main_object_type', $main_object_type_term->slug );
+		update_option( 'cfprop_main_object_type', $main_object_type_term->slug );
 	}
 
 	/**
@@ -1449,7 +1449,7 @@ class ImmoObjects {
 	 * @return void
 	 */
 	public function set_has_objects(): void {
-		update_option( 'propstack_connector_has_objects', count( $this->get_objects() ) > 0 ? 1 : 0 );
+		update_option( 'cfprop_has_objects', count( $this->get_objects() ) > 0 ? 1 : 0 );
 	}
 
 	/**
@@ -1560,7 +1560,7 @@ class ImmoObjects {
 	 * @return array<string,mixed>
 	 */
 	public function save_response( array $data ): array {
-		update_option( 'propstack_connector_last_api_response', $data );
+		update_option( 'cfprop_last_api_response', $data );
 		return $data;
 	}
 
@@ -1633,7 +1633,7 @@ class ImmoObjects {
 	 */
 	public function remove_changed_flag(): void {
 		foreach ( Languages::get_instance()->get_languages() as $language_code => $name ) {
-			delete_option( 'propstack_connector_md5_' . $language_code );
+			delete_option( 'cfprop_md5_' . $language_code );
 		}
 	}
 

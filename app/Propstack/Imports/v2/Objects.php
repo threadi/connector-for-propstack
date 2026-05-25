@@ -47,7 +47,7 @@ class Objects extends Import_Base {
 	 */
 	public function run(): void {
 		// bail if an import is still running.
-		if ( absint( get_option( CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING ) ) > 0 ) {
+		if ( absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 ) {
 			// add the error.
 			$this->add_error( 'propstack_object_import_is_running', __( 'Import of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -59,7 +59,7 @@ class Objects extends Import_Base {
 		}
 
 		// bail if the deletion is still running.
-		if ( absint( get_option( CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING ) ) > 0 ) {
+		if ( absint( get_option( CFPROP_DELETE_RUNNING ) ) > 0 ) {
 			// add the error.
 			$this->add_error( 'propstack_object_deletion_is_running', __( 'Deletion of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -85,7 +85,7 @@ class Objects extends Import_Base {
 		$process_handler->set_max_count( 0 );
 		$process_handler->set_status( __( 'Import of objects starting', 'connector-for-propstack' ) );
 		$process_handler->set_running( time() );
-		update_option( CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING, time() );
+		update_option( CFPROP_IMPORT_RUNNING, time() );
 
 		// add a log entry if debug is enabled.
 		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
@@ -182,7 +182,7 @@ class Objects extends Import_Base {
 				$md5 = md5( Helper::get_json( $data['data'] ) );
 
 				// bail if the md5 of this content has not changed and debug mode is not enabled.
-				if ( get_option( 'propstack_connector_md5_' . $language_code ) === $md5 && 1 !== absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+				if ( get_option( 'cfprop_md5_' . $language_code ) === $md5 && 1 !== absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
 					// add a log entry.
 					/* translators: a title will replace %1$s. */
 					Log::get_instance()->add( sprintf( __( 'The objects in the %1$s language have not been modified. The import will not be performed.', 'connector-for-propstack' ), ' <em>' . $language_code . '</em>' ), 'info', 'import' );
@@ -328,7 +328,7 @@ class Objects extends Import_Base {
 				do_action( 'cfprop_import_language', $language_code );
 
 				// save the md5 hash.
-				update_option( 'propstack_connector_md5_' . $language_code, $md5 );
+				update_option( 'cfprop_md5_' . $language_code, $md5 );
 
 				// set finished.
 				$progress ? $progress->finish() : '';
@@ -387,7 +387,7 @@ class Objects extends Import_Base {
 
 		// update the running marker.
 		$process_handler->set_running( 0 );
-		update_option( CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING, 0 );
+		update_option( CFPROP_IMPORT_RUNNING, 0 );
 	}
 
 	/**

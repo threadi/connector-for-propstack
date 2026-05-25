@@ -151,13 +151,6 @@ class Log_Table extends WP_List_Table {
 				$contains     = '<p>' . __( 'The file will contain ALL entries of the chosen filter. Be aware of this before you send this file to someone.', 'connector-for-propstack' ) . '</p>';
 			}
 
-			// get md5.
-			$md5 = $this->get_md5_filter();
-			if ( ! empty( $md5 ) ) {
-				$download_url = add_query_arg( array( 'md5' => $md5 ), $download_url );
-				$contains     = '<p>' . __( 'The file will contain ALL entries of the chosen filter. Be aware of this before you send this file to someone.', 'connector-for-propstack' ) . '</p>';
-			}
-
 			// create download-dialog.
 			$download_dialog = array(
 				'className' => 'cfprop-dialog',
@@ -219,7 +212,7 @@ class Log_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Message to be displayed when there are no items.
+	 * Message to be displayed if we have no items.
 	 *
 	 * @since 3.1.0
 	 */
@@ -249,7 +242,7 @@ class Log_Table extends WP_List_Table {
 	 */
 	protected function get_views(): array {
 		// get the main url without the filter.
-		$url = remove_query_arg( array( 'category', 'md5', 'errors' ) );
+		$url = remove_query_arg( array( 'category', 'errors' ) );
 
 		// get actual filter.
 		$category = $this->get_category_filter();
@@ -266,7 +259,7 @@ class Log_Table extends WP_List_Table {
 			$list[ $key ] = '<a href="' . esc_url( $url ) . '"' . ( $category === $key ? ' class="current"' : '' ) . '>' . esc_html( $label ) . '</a>';
 		}
 
-		// add filter for errors.
+		// add a filter for errors.
 		$url            = add_query_arg( array( 'errors' => 1 ) );
 		$list['errors'] = '<a href="' . esc_url( $url ) . '"' . ( 1 === absint( filter_input( INPUT_GET, 'errors', FILTER_SANITIZE_NUMBER_INT ) ) ? ' class="current"' : '' ) . '>' . esc_html__( 'Errors', 'connector-for-propstack' ) . '</a>';
 
@@ -295,24 +288,6 @@ class Log_Table extends WP_List_Table {
 
 		// return the category.
 		return $category;
-	}
-
-	/**
-	 * Get actual category-filter-value.
-	 *
-	 * @return string
-	 */
-	private function get_md5_filter(): string {
-		// get md5 from request.
-		$md5 = filter_input( INPUT_GET, 'md5', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-
-		// return empty if nothing has been in request.
-		if ( is_null( $md5 ) ) {
-			return '';
-		}
-
-		// return the md5 hash.
-		return $md5;
 	}
 
 	/**

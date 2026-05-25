@@ -61,7 +61,7 @@ class Uninstaller {
 	 */
 	public function run(): void {
 		// set deactivation runner to enable.
-		define( 'CONNECTOR_FOR_PROPSTACK_DEACTIVATION_RUNNING', 1 );
+		define( 'CFPROP_DEACTIVATION_RUNNING', 1 );
 
 		if ( is_multisite() ) {
 			// get original blog ID.

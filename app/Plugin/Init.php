@@ -177,7 +177,7 @@ class Init {
 	 * @noinspection PhpUnused
 	 */
 	public function update_slugs(): void {
-		if ( 1 !== absint( get_option( 'propstack_connector_update_slugs' ) ) ) {
+		if ( 1 !== absint( get_option( 'cfprop_update_slugs' ) ) ) {
 			return;
 		}
 
@@ -185,7 +185,7 @@ class Init {
 		flush_rewrite_rules();
 
 		// disable the flag to update them.
-		update_option( 'propstack_connector_update_slugs', 0 );
+		update_option( 'cfprop_update_slugs', 0 );
 	}
 
 	/**
@@ -202,7 +202,7 @@ class Init {
 		}
 
 		// return the configured string for the archive slug.
-		return (string) get_option( 'propstack_connector_archive_slug', $slug );
+		return (string) get_option( 'cfprop_archive_slug', $slug );
 	}
 
 	/**
@@ -219,7 +219,7 @@ class Init {
 		}
 
 		// return setting for the single slug.
-		return get_option( 'propstack_connector_single_slug', $slug );
+		return get_option( 'cfprop_single_slug', $slug );
 	}
 
 	/**
@@ -228,6 +228,6 @@ class Init {
 	 * @return void
 	 */
 	public function load_languages(): void {
-		load_plugin_textdomain( 'connector-for-propstack', false, dirname( plugin_basename( CONNECTOR_FOR_PROPSTACK_PLUGIN ) ) . '/languages' );
+		load_plugin_textdomain( 'connector-for-propstack', false, dirname( plugin_basename( CFPROP_PLUGIN ) ) . '/languages' );
 	}
 }

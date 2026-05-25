@@ -223,8 +223,8 @@ class Admin {
 		}
 
 		// get the slugs from the request.
-		$archive_slug = filter_input( INPUT_POST, 'propstack_connector_archive_slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$single_slug  = filter_input( INPUT_POST, 'propstack_connector_single_slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$archive_slug = filter_input( INPUT_POST, 'cfprop_archive_slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$single_slug  = filter_input( INPUT_POST, 'cfprop_single_slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		// bail if no slugs are set.
 		if ( is_null( $archive_slug ) && is_null( $single_slug ) ) {
@@ -232,8 +232,8 @@ class Admin {
 		}
 
 		// save the slugs.
-		update_option( 'propstack_connector_archive_slug', $archive_slug );
-		update_option( 'propstack_connector_single_slug', $single_slug );
+		update_option( 'cfprop_archive_slug', $archive_slug );
+		update_option( 'cfprop_single_slug', $single_slug );
 	}
 
 	/**

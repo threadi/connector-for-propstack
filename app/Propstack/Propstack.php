@@ -227,7 +227,7 @@ class Propstack {
 		}
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_archive_slug' );
+		$setting = $settings_obj->add_setting( 'cfprop_archive_slug' );
 		$setting->set_type( 'string' );
 		$setting->set_default( Helper::get_archive_slug() );
 		$setting->set_section( $permalink_section );
@@ -238,7 +238,7 @@ class Propstack {
 		$setting->set_field( $field );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_single_slug' );
+		$setting = $settings_obj->add_setting( 'cfprop_single_slug' );
 		$setting->set_type( 'string' );
 		$setting->set_default( Helper::get_single_slug() );
 		$setting->set_section( $permalink_section );

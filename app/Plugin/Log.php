@@ -15,13 +15,6 @@ defined( 'ABSPATH' ) || exit;
  */
 class Log {
 	/**
-	 * The md5 hash.
-	 *
-	 * @var string
-	 */
-	private string $md5 = '';
-
-	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Log
@@ -122,7 +115,7 @@ class Log {
 	 */
 	public function clean_log(): void {
 		// bail on uninstalling.
-		if ( defined( 'CONNECTOR_FOR_PROPSTACK_DEACTIVATION_RUNNING' ) ) {
+		if ( defined( 'CFPROP_DEACTIVATION_RUNNING' ) ) {
 			return;
 		}
 
@@ -204,22 +197,6 @@ class Log {
 		 */
 		$category = (string) apply_filters( 'cfprop_log_category', $category );
 
-		// get md5.
-		$md5 = (string) filter_input( INPUT_GET, 'md5', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-
-		// if the request is empty, get md5 from the object if set.
-		if ( empty( $md5 ) ) {
-			$md5 = $this->get_md5();
-		}
-
-		/**
-		 * Filter the used md5.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 * @param string $md5 The md5 to use.
-		 */
-		$md5 = (string) apply_filters( 'cfprop_log_md5', $md5 );
-
 		// get errors.
 		$errors = absint( filter_input( INPUT_GET, 'errors', FILTER_SANITIZE_NUMBER_INT ) );
 
@@ -238,7 +215,7 @@ class Log {
 		}
 
 		// if only category is set.
-		if ( ! empty( $category ) && empty( $md5 ) ) {
+		if ( ! empty( $category ) ) {
 			// get and return the entries.
 			return Db::get_instance()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 				$wpdb->prepare(
@@ -248,38 +225,6 @@ class Log {
                     ORDER BY ' . $order_by . ' ' . $order . ', `id` ' . $order . '
                     LIMIT %d',
 					array( $category, $limit )
-				),
-				ARRAY_A
-			);
-		}
-
-		// if only md5 is set.
-		if ( empty( $category ) && ! empty( $md5 ) ) {
-			// get and return the entries.
-			return Db::get_instance()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-				$wpdb->prepare(
-					'SELECT `state`, `time` AS `date`, `log`, `category`
-                    FROM `' . $wpdb->prefix . 'propstack_logs`
-                    WHERE `md5` = %s' . $where . '
-                    ORDER BY ' . $order_by . ' ' . $order . ', `id` ' . $order . '
-                    LIMIT %d',
-					array( $md5, $limit )
-				),
-				ARRAY_A
-			);
-		}
-
-		// if both are set.
-		if ( ! empty( $category ) && ! empty( $md5 ) ) {
-			// get and return the entries.
-			return Db::get_instance()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-				$wpdb->prepare(
-					'SELECT `state`, `time` AS `date`, `log`, `category`
-                    FROM `' . $wpdb->prefix . 'propstack_logs`
-                    WHERE `md5` = %s AND `category` = %s' . $where . '
-                    ORDER BY ' . $order_by . ' ' . $order . ', `id` ' . $order . '
-                    LIMIT %d',
-					array( $md5, $category, $limit )
 				),
 				ARRAY_A
 			);
@@ -311,25 +256,5 @@ class Log {
 			),
 			ARRAY_A
 		);
-	}
-
-	/**
-	 * Return md5 hash.
-	 *
-	 * @return string
-	 */
-	private function get_md5(): string {
-		return $this->md5;
-	}
-
-	/**
-	 * Set the md5 hash.
-	 *
-	 * @param string $md5 The md5 hash.
-	 *
-	 * @return void
-	 */
-	public function set_md5( string $md5 ): void {
-		$this->md5 = $md5;
 	}
 }

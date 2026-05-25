@@ -29,7 +29,7 @@ class Email extends FieldFormat_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
-		if( empty( $this->value ) ) {
+		if ( empty( $this->value ) ) {
 			return '';
 		}
 

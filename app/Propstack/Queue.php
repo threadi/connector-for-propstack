@@ -332,7 +332,7 @@ class Queue {
 	 */
 	public function process(): void {
 		// bail if deactivation is in progress.
-		if ( defined( 'CONNECTOR_FOR_PROPSTACK_DEACTIVATION_RUNNING' ) ) {
+		if ( defined( 'CFPROP_DEACTIVATION_RUNNING' ) ) {
 			return;
 		}
 

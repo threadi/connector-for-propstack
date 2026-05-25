@@ -168,7 +168,7 @@ class Schedules {
 		}
 
 		// bail if plugin activation is running.
-		if ( defined( 'CONNECTOR_FOR_PROPSTACK_ACTIVATION_RUNNING' ) ) {
+		if ( defined( 'CFPROP_ACTIVATION_RUNNING' ) ) {
 			return $our_events;
 		}
 
@@ -368,12 +368,12 @@ class Schedules {
 		$schedule_obj->set_args( $event->args ); // @phpstan-ignore property.notFound
 
 		// get the actual list.
-		$list = get_option( 'propstack_connector_schedules' );
+		$list = get_option( 'cfprop_schedules' );
 		if ( ! is_array( $list ) ) {
 			$list = array();
 		}
 		$list[ $schedule_obj->get_name() ] = $schedule_obj->get_args();
-		update_option( 'propstack_connector_schedules', $list );
+		update_option( 'cfprop_schedules', $list );
 
 		// return the event object.
 		return $event;

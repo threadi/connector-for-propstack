@@ -123,7 +123,7 @@ class ProcessHandler {
 		}
 
 		// get the actual values for the actual process ID.
-		$values = get_option( 'propstack_connector_process_values' );
+		$values = get_option( 'cfprop_process_values' );
 
 		// if this is not an array, create it.
 		if ( ! is_array( $values ) ) {
@@ -139,7 +139,7 @@ class ProcessHandler {
 		$values[ $this->get_id() ][ $key ] = $value;
 
 		// save it.
-		update_option( 'propstack_connector_process_values', $values );
+		update_option( 'cfprop_process_values', $values );
 	}
 
 	/**
@@ -156,7 +156,7 @@ class ProcessHandler {
 		}
 
 		// get the values.
-		$values = get_option( 'propstack_connector_process_values' );
+		$values = get_option( 'cfprop_process_values' );
 
 		// if this is not an array, create it.
 		if ( ! is_array( $values ) ) {
@@ -320,7 +320,7 @@ class ProcessHandler {
 		}
 
 		// get the values.
-		$values = get_option( 'propstack_connector_process_values' );
+		$values = get_option( 'cfprop_process_values' );
 
 		// if this is not an array, create it.
 		if ( ! is_array( $values ) ) {
@@ -333,6 +333,6 @@ class ProcessHandler {
 		}
 
 		// save it.
-		update_option( 'propstack_connector_process_values', $values );
+		update_option( 'cfprop_process_values', $values );
 	}
 }

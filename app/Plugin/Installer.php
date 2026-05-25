@@ -59,7 +59,7 @@ class Installer {
 	 */
 	public function activation(): void {
 		// mark the activation runner as running.
-		define( 'CONNECTOR_FOR_PROPSTACK_ACTIVATION_RUNNING', 1 );
+		define( 'CFPROP_ACTIVATION_RUNNING', 1 );
 
 		if ( is_multisite() ) {
 			// loop through the blogs.
@@ -109,7 +109,7 @@ class Installer {
 		Propstack::get_instance()->activation();
 
 		// refresh permalinks.
-		update_option( 'propstack_connector_update_slugs', 1 );
+		update_option( 'cfprop_update_slugs', 1 );
 
 		// add info about enabled complete logging if development mode is enabled.
 		$transients_obj = Transients::get_instance();

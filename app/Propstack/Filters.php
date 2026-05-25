@@ -364,7 +364,7 @@ class Filters {
 		}
 
 		// show it if the activation is running to load all settings.
-		if ( defined( 'CONNECTOR_FOR_PROPSTACK_ACTIVATION_RUNNING' ) ) {
+		if ( defined( 'CFPROP_ACTIVATION_RUNNING' ) ) {
 			return false;
 		}
 

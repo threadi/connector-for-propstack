@@ -25,10 +25,10 @@ class Objects extends ConnectorForPropstackTestCase {
 	 */
 	public function set_up(): void {
 		// set running import.
-		update_option( CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING, 0 );
+		update_option( CFPROP_IMPORT_RUNNING, 0 );
 
 		// set running import.
-		update_option( CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING, 0 );
+		update_option( CFPROP_DELETE_RUNNING, 0 );
 
 		// set language to "de".
 		update_option( 'propstack_connector_languages', 'de' );
@@ -47,7 +47,7 @@ class Objects extends ConnectorForPropstackTestCase {
 	 */
 	public function test_import_running(): void {
 		// set running import.
-		update_option( CONNECTOR_FOR_PROPSTACK_IMPORT_RUNNING, time() );
+		update_option( CFPROP_IMPORT_RUNNING, time() );
 
 		// run it.
 		$this->import_obj->run();
@@ -67,7 +67,7 @@ class Objects extends ConnectorForPropstackTestCase {
 	 */
 	public function test_deletion_running(): void {
 		// set running import.
-		update_option( CONNECTOR_FOR_PROPSTACK_DELETE_RUNNING, time() );
+		update_option( CFPROP_DELETE_RUNNING, time() );
 
 		// run it.
 		$this->import_obj->run();

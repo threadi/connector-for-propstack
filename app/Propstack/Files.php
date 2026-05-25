@@ -69,11 +69,11 @@ class Files {
 	 */
 	public function init(): void {
 		// define constants.
-		if ( ! defined( 'CONNECTOR_FOR_PROPSTACK_FILES_IMPORT_RUNNING' ) ) {
-			define( 'CONNECTOR_FOR_PROPSTACK_FILES_IMPORT_RUNNING', 'propstack_connector_files_import_running' );
+		if ( ! defined( 'CFPROP_FILES_IMPORT_RUNNING' ) ) {
+			define( 'CFPROP_FILES_IMPORT_RUNNING', 'propstack_connector_files_import_running' );
 		}
-		if ( ! defined( 'CONNECTOR_FOR_PROPSTACK_FILES_DELETE_RUNNING' ) ) {
-			define( 'CONNECTOR_FOR_PROPSTACK_FILES_DELETE_RUNNING', 'propstack_connector_files_delete_running' );
+		if ( ! defined( 'CFPROP_FILES_DELETE_RUNNING' ) ) {
+			define( 'CFPROP_FILES_DELETE_RUNNING', 'propstack_connector_files_delete_running' );
 		}
 
 		// use hooks.
@@ -145,7 +145,7 @@ class Files {
 		$setting = $settings_obj->add_setting( 'propstack_connector_files_import' );
 		$setting->set_section( $files_import_section );
 		$setting->prevent_export( true );
-		if ( defined( 'CONNECTOR_FOR_PROPSTACK_FILES_IMPORT_RUNNING' ) && absint( get_option( CONNECTOR_FOR_PROPSTACK_FILES_IMPORT_RUNNING ) ) > 0 ) {
+		if ( defined( 'CFPROP_FILES_IMPORT_RUNNING' ) && absint( get_option( CFPROP_FILES_IMPORT_RUNNING ) ) > 0 ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import images', 'connector-for-propstack' ) );
 			$field->set_description( __( 'Import of files for objects is still running. Please wait.', 'connector-for-propstack' ) );
@@ -296,21 +296,21 @@ class Files {
 		}
 
 		// add setting.
-		$setting = $settings_obj->add_setting( CONNECTOR_FOR_PROPSTACK_FILES_IMPORT_RUNNING );
+		$setting = $settings_obj->add_setting( CFPROP_FILES_IMPORT_RUNNING );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->prevent_export( true );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( CONNECTOR_FOR_PROPSTACK_FILES_DELETE_RUNNING );
+		$setting = $settings_obj->add_setting( CFPROP_FILES_DELETE_RUNNING );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->prevent_export( true );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_files_imported' );
+		$setting = $settings_obj->add_setting( 'cfprop_files_imported' );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
@@ -499,7 +499,7 @@ class Files {
 	 */
 	public function delete_all(): void {
 		// bail if file import is running.
-		if ( absint( get_option( CONNECTOR_FOR_PROPSTACK_FILES_IMPORT_RUNNING, 0 ) ) > 0 ) {
+		if ( absint( get_option( CFPROP_FILES_IMPORT_RUNNING, 0 ) ) > 0 ) {
 			return;
 		}
 
@@ -518,7 +518,7 @@ class Files {
 		$process_handler->set_max_count( 0 );
 		$process_handler->set_status( __( 'Deletion of files starting', 'connector-for-propstack' ) );
 		$process_handler->set_running( time() );
-		update_option( CONNECTOR_FOR_PROPSTACK_FILES_DELETE_RUNNING, time() );
+		update_option( CFPROP_FILES_DELETE_RUNNING, time() );
 
 		// get the list of files from Propstack that have been imported.
 		$files = $this->get_files();
@@ -607,7 +607,7 @@ class Files {
 
 		// end the process.
 		$process_handler->set_running( 0 );
-		update_option( CONNECTOR_FOR_PROPSTACK_FILES_DELETE_RUNNING, 0 );
+		update_option( CFPROP_FILES_DELETE_RUNNING, 0 );
 	}
 
 	/**
@@ -769,7 +769,7 @@ class Files {
 	 */
 	public function import( int $post_id = 0 ): void {
 		// bail if deletion is running.
-		if ( absint( get_option( CONNECTOR_FOR_PROPSTACK_FILES_DELETE_RUNNING, 0 ) ) > 0 ) {
+		if ( absint( get_option( CFPROP_FILES_DELETE_RUNNING, 0 ) ) > 0 ) {
 			return;
 		}
 
@@ -791,7 +791,7 @@ class Files {
 		$process_handler->set_running( time() );
 
 		// set global marker.
-		update_option( CONNECTOR_FOR_PROPSTACK_FILES_IMPORT_RUNNING, time() );
+		update_option( CFPROP_FILES_IMPORT_RUNNING, time() );
 
 		// get the cached list of files to import.
 		$files_to_import = get_transient( 'propstack_object_files_to_import ' );
@@ -1035,7 +1035,7 @@ class Files {
 		// update the marker.
 		$process_handler->set_running( 0 );
 		$progress ? $progress->finish() : '';
-		update_option( CONNECTOR_FOR_PROPSTACK_FILES_IMPORT_RUNNING, 0 );
+		update_option( CFPROP_FILES_IMPORT_RUNNING, 0 );
 	}
 
 	/**
@@ -1067,7 +1067,7 @@ class Files {
 	 * @return bool
 	 */
 	private function has_files(): bool {
-		return absint( get_option( 'propstack_connector_files_imported', 0 ) ) > 0;
+		return absint( get_option( 'cfprop_files_imported', 0 ) ) > 0;
 	}
 
 	/**
@@ -1076,7 +1076,7 @@ class Files {
 	 * @return void
 	 */
 	public function update_file_counter(): void {
-		update_option( 'propstack_connector_files_imported', $this->get_files()->found_posts );
+		update_option( 'cfprop_files_imported', $this->get_files()->found_posts );
 	}
 
 	/**

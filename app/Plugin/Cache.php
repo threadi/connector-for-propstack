@@ -69,7 +69,7 @@ class Cache {
 	 * @return mixed
 	 */
 	public static function get( string $key ): mixed {
-		return get_option( 'propstack_connector_cache_' . $key . '_' . Languages::get_instance()->get_current_lang() );
+		return get_option( 'cfprop_cache_' . $key . '_' . Languages::get_instance()->get_current_lang() );
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Cache {
 	 * @return void
 	 */
 	public static function set( string $key, mixed $cache ): void {
-		update_option( 'propstack_connector_cache_' . $key . '_' . Languages::get_instance()->get_current_lang(), $cache );
+		update_option( 'cfprop_cache_' . $key . '_' . Languages::get_instance()->get_current_lang(), $cache );
 	}
 
 	/**
@@ -92,7 +92,7 @@ class Cache {
 	 * @return void
 	 */
 	public static function delete( string $key ): void {
-		delete_option( 'propstack_connector_cache_' . $key . '_' . Languages::get_instance()->get_current_lang() );
+		delete_option( 'cfprop_cache_' . $key . '_' . Languages::get_instance()->get_current_lang() );
 	}
 
 	/**

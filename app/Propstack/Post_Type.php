@@ -65,7 +65,7 @@ class Post_Type {
 	 * @return bool
 	 */
 	public function is_from_plugin( string $plugin_path ): bool {
-		return CONNECTOR_FOR_PROPSTACK_PLUGIN === $plugin_path;
+		return CFPROP_PLUGIN === $plugin_path;
 	}
 
 	/**
