@@ -685,7 +685,7 @@ class Files {
 		}
 
 		// remove the filter.
-		remove_filter( 'propstack_connector_files_query', array( $this, 'set_post_id_filter' ) );
+		remove_filter( 'cfprop_files_query', array( $this, 'set_post_id_filter' ) );
 	}
 
 	/**
