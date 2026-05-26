@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
 	 * @since 1.0.0 Available since 1.0.0.
 	 * @param array<string,mixed> $attributes List of attributes for displaying templates.
 	 */
-	do_action( 'propstack_connector_filter_before', $attributes );
+	do_action( 'cfprop_filter_before', $attributes );
 
 	foreach ( $attributes['filter_objects'] as $cfprop_filter ) {
 		echo wp_kses_post( $cfprop_filter->render() );
@@ -34,7 +34,7 @@ defined( 'ABSPATH' ) || exit;
 	 * @since 1.0.0 Available since 1.0.0.
 	 * @param array<string,mixed> $attributes List of attributes for displaying templates.
 	 */
-	do_action( 'propstack_connector_filter_after', $attributes );
+	do_action( 'cfprop_filter_after', $attributes );
 
 	?>
 	<button type="submit" class="cfprop-filter-button"><?php echo esc_html__( 'Filter', 'connector-for-propstack' ); ?></button>

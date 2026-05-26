@@ -22,10 +22,10 @@ use ConnectorForPropstack\Propstack\ImmoObject;
 		$post_id = absint( get_the_id() );
 
 		// get the immo object as an object with the requested language.
-		$propstack_connector_immo_object = \ConnectorForPropstack\Propstack\ImmoObjects::get_instance()->get_object( $post_id, $attributes['lang'] );
+		$cfprop_immo_object = \ConnectorForPropstack\Propstack\ImmoObjects::get_instance()->get_object( $post_id, $attributes['lang'] );
 
 		?>
-		<article id="post-<?php echo absint( $post_id ); ?>" class="post-<?php echo absint( $post_id ); ?> post type-<?php echo esc_attr( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ); ?> status-<?php echo esc_attr( get_post_status( $post_id ) ); ?> entry <?php echo esc_attr( apply_filters( 'propstack_connector_object_classes', '', $propstack_connector_immo_object ) ); ?>" role="region" aria-label="<?php echo esc_attr__( 'Objects', 'connector-for-propstack' ); ?>">
+		<article id="post-<?php echo absint( $post_id ); ?>" class="post-<?php echo absint( $post_id ); ?> post type-<?php echo esc_attr( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ); ?> status-<?php echo esc_attr( get_post_status( $post_id ) ); ?> entry <?php echo esc_attr( apply_filters( 'cfprop_object_classes', '', $cfprop_immo_object ) ); ?>" role="region" aria-label="<?php echo esc_attr__( 'Objects', 'connector-for-propstack' ); ?>">
 			<?php
 			foreach ( $attributes['templates'] as $cfprop_template ) {
 				/**

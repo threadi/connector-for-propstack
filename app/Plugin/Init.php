@@ -221,13 +221,4 @@ class Init {
 		// return setting for the single slug.
 		return get_option( 'cfprop_single_slug', $slug );
 	}
-
-	/**
-	 * Load texts depending on actual language.
-	 *
-	 * @return void
-	 */
-	public function load_languages(): void {
-		load_plugin_textdomain( 'connector-for-propstack', false, dirname( plugin_basename( CFPROP_PLUGIN ) ) . '/languages' );
-	}
 }

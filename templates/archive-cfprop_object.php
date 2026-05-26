@@ -10,7 +10,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // get the description.
-$propstack_connector_description = get_the_archive_description();
+$cfprop_description = get_the_archive_description();
 
 get_header();
 
@@ -18,8 +18,8 @@ get_header();
 	<div>
 		<header class="site-main page-header alignwide">
 			<?php the_archive_title( '<h1 class="page-title site-container">', '</h1>' ); ?>
-			<?php if ( $propstack_connector_description ) : ?>
-				<div class="archive-description"><?php echo wp_kses_post( wpautop( $propstack_connector_description ) ); ?></div>
+			<?php if ( $cfprop_description ) : ?>
+				<div class="archive-description"><?php echo wp_kses_post( wpautop( $cfprop_description ) ); ?></div>
 			<?php endif; ?>
 		</header>
 		<?php

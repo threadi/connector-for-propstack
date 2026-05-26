@@ -17,7 +17,7 @@ use ConnectorForPropstack\Propstack\ImmoObject;
 
 // output.
 ?><div class="<?php echo esc_attr( $attributes['classes'] ); ?>">
-	<article id="post-<?php echo absint( $post_id ); ?>" class="post-<?php echo absint( $post_id ); ?> post type-<?php echo esc_attr( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ); ?> status-<?php echo esc_attr( get_post_status( $post_id ) ); ?> entry <?php echo esc_attr( apply_filters( 'propstack_connector_object_classes', '', $immo_object ) ); ?>" role="region" aria-label="<?php echo esc_attr__( 'Objects', 'connector-for-propstack' ); ?>">
+	<article id="post-<?php echo absint( $post_id ); ?>" class="post-<?php echo absint( $post_id ); ?> post type-<?php echo esc_attr( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ); ?> status-<?php echo esc_attr( get_post_status( $post_id ) ); ?> entry <?php echo esc_attr( apply_filters( 'cfprop_object_classes', '', $immo_object ) ); ?>" role="region" aria-label="<?php echo esc_attr__( 'Objects', 'connector-for-propstack' ); ?>">
 		<?php
 		foreach ( $attributes['templates'] as $cfprop_template ) {
 			/**
