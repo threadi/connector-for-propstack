@@ -160,6 +160,11 @@ class Log {
 	 * @return array<int,mixed>
 	 */
 	public function get_entries(): array {
+		// bail if user has no capability.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return array();
+		}
+
 		global $wpdb;
 
 		// define allowed "order by" values.

@@ -148,9 +148,19 @@ class Admin {
 		// check the nonce.
 		check_admin_referer( 'cfprop-log-export', 'nonce' );
 
+		// bail if user has no capability.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// get entries.
 		$log     = Log::get_instance();
 		$entries = $log->get_entries();
+
+		// bail if no entries could be read.
+		if ( empty( $entries ) ) {
+			return;
+		}
 
 		// create the filename for JSON-download-file.
 		$filename = gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '_Propstack_Connector_Logs.csv';
@@ -202,6 +212,13 @@ class Admin {
 		// check the nonce.
 		check_admin_referer( 'cfprop-log-empty', 'nonce' );
 
+		// bail if user has no capability.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( (string) wp_get_referer() );
+			exit;
+		}
+
 		// empty the table.
 		$wpdb->query( sprintf( 'TRUNCATE TABLE %s', (string) esc_sql( $wpdb->prefix . 'propstack_logs' ) ) ); // @phpstan-ignore cast.string
 
@@ -217,17 +234,26 @@ class Admin {
 	 * @return void
 	 */
 	public function save_slugs(): void {
+		// do nothing if our parameters are not set.
+		if ( ! isset( $_POST['cfprop_archive_slug'], $_POST['cfprop_single_slug'] ) ) {
+			return;
+		}
+
+		// WordPress automatically generates the nonce for the permalink page
+		// and checks it explicitly here. See: wp-admin/options-permalink.php.
+		check_admin_referer( 'update-permalink' );
+
 		// bail if user has no capability.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
 		// get the slugs from the request.
-		$archive_slug = filter_input( INPUT_POST, 'cfprop_archive_slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$single_slug  = filter_input( INPUT_POST, 'cfprop_single_slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$archive_slug = sanitize_title( wp_unslash( $_POST['cfprop_archive_slug'] ) );
+		$single_slug  = sanitize_title( wp_unslash( $_POST['cfprop_single_slug'] ) );
 
 		// bail if no slugs are set.
-		if ( is_null( $archive_slug ) && is_null( $single_slug ) ) {
+		if ( empty( $archive_slug ) || empty( $single_slug ) ) {
 			return;
 		}
 

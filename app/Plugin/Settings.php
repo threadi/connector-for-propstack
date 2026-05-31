@@ -132,12 +132,12 @@ class Settings {
 		$section = $api_tab->add_section( 'propstack_connector_api', 10 );
 		$section->set_title( __( 'Your API key', 'connector-for-propstack' ) );
 
-		// add setting for a Password.
+		// add setting for the API key.
 		$setting = $settings_obj->add_setting( 'propstack_connector_api_key' );
 		$setting->set_section( $section );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
-		$setting->set_show_in_rest( is_user_logged_in() );
+		$setting->set_show_in_rest( current_user_can( $settings_obj->get_capability() ) );
 		$setting->set_read_callback( array( Crypt::get_instance(), 'decrypt' ) );
 		$setting->set_save_callback( array( Crypt::get_instance(), 'encrypt' ) );
 		$field = new Password( $settings_obj );

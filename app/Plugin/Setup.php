@@ -440,7 +440,7 @@ class Setup {
 
 		// step 1: import the object from Propstack.
 		$this->set_process_label( __( 'Retrieve data for your properties from Propstack.', 'connector-for-propstack' ) );
-		ImmoObjects::get_instance()->import();
+		ImmoObjects::get_instance()->import( '' );
 	}
 
 	/**

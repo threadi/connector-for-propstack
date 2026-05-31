@@ -27,7 +27,7 @@ class Cli {
 	 */
 	public function import_objects(): void {
 		// import the objects.
-		$import_obj = ImmoObjects::get_instance()->import();
+		$import_obj = ImmoObjects::get_instance()->import( '' );
 
 		// show errors if any occurred.
 		if ( $import_obj->has_errors() ) {
@@ -74,7 +74,7 @@ class Cli {
 		$immo_objects_object = ImmoObjects::get_instance();
 
 		// delete them.
-		$immo_objects_object->delete_all();
+		$immo_objects_object->delete_all( '' );
 
 		// show error if objects still exist.
 		if ( $immo_objects_object->has_objects() ) {
@@ -92,7 +92,7 @@ class Cli {
 	 * @noinspection PhpUnused
 	 */
 	public function delete_imported_files(): void {
-		Files::get_instance()->delete_all();
+		Files::get_instance()->delete_all( '' );
 
 		// output success-message.
 		\WP_CLI::success( 'Imported files has been deleted.' );
@@ -115,7 +115,7 @@ class Cli {
 		);
 
 		// process the queue.
-		\ConnectorForPropstack\Propstack\Queue::get_instance()->process();
+		\ConnectorForPropstack\Propstack\Queue::get_instance()->process( '' );
 
 		// output success-message.
 		\WP_CLI::success( 'Queue has been processed.' );

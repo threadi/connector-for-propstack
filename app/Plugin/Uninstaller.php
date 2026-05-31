@@ -100,13 +100,13 @@ class Uninstaller {
 		Fields::get_instance()->add_settings();
 
 		// delete all objects from Propstack.
-		ImmoObjects::get_instance()->delete_all();
+		ImmoObjects::get_instance()->delete_all( '' );
 		foreach ( Taxonomies::get_instance()->get_taxonomies_as_objects() as $taxonomy ) {
 			$taxonomy->delete_all();
 		}
 
 		// delete all files.
-		Files::get_instance()->delete_all();
+		Files::get_instance()->delete_all( '' );
 
 		// clean the queue.
 		Queue::get_instance()->clear();

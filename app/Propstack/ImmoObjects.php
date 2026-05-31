@@ -244,18 +244,14 @@ class ImmoObjects {
 	/**
 	 * Delete all objects.
 	 *
+	 * @param string $process_id The process ID.
+	 *
 	 * @return void
 	 */
-	public function delete_all(): void {
+	public function delete_all( string $process_id ): void {
 		// bail if import or deletion are still running.
 		if ( absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 || absint( get_option( CFPROP_DELETE_RUNNING ) ) > 0 ) {
 			return;
-		}
-
-		// get the process ID from the request.
-		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $process_id ) ) {
-			$process_id = '';
 		}
 
 		// get the process handler and set the process ID.
@@ -698,8 +694,19 @@ class ImmoObjects {
 		// check nonce.
 		check_admin_referer( 'import-propstack-objects', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// run the import.
-		$this->import();
+		$this->import( $process_id );
 
 		// show hint.
 		$transient_obj = Transients::get_instance()->add();
@@ -726,8 +733,14 @@ class ImmoObjects {
 			return;
 		}
 
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// run the import.
-		$this->import();
+		$this->import( $process_id );
 
 		// send ok.
 		wp_send_json_success();
@@ -742,8 +755,19 @@ class ImmoObjects {
 		// check nonce.
 		check_admin_referer( 'delete-propstack-objects', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// run the deletion.
-		$this->delete_all();
+		$this->delete_all( $process_id );
 
 		// show hint.
 		$transient_obj = Transients::get_instance()->add();
@@ -770,8 +794,14 @@ class ImmoObjects {
 			return;
 		}
 
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// run the deletion.
-		$this->delete_all();
+		$this->delete_all( $process_id );
 
 		// send ok.
 		wp_send_json_success();
@@ -1331,18 +1361,14 @@ class ImmoObjects {
 	/**
 	 * Clean up after import of objects.
 	 *
+	 * @param Import_Base $import_obj The import object.
+	 *
 	 * @return void
 	 */
-	public function cleanup_after_import(): void {
-		// get process ID from request.
-		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $process_id ) ) {
-			$process_id = '';
-		}
-
+	public function cleanup_after_import( Import_Base $import_obj ): void {
 		// get the process handler with this ID.
 		$process_handler = ProcessHandler::get_instance();
-		$process_handler->set_id( $process_id );
+		$process_handler->set_id( $import_obj->get_process_id() );
 
 		// update status.
 		$process_handler->set_status( __( 'Get the objects in tip-top shape', 'connector-for-propstack' ) );
@@ -1465,15 +1491,18 @@ class ImmoObjects {
 	/**
 	 * Run the import depending on the API version setting.
 	 *
+	 * @param string $process_id The process ID to use.
+	 *
 	 * @return Import_Base
 	 */
-	public function import(): Import_Base {
+	public function import( string $process_id ): Import_Base {
 		$import_obj = new Imports\v1\Objects();
 		if ( 'v2' === get_option( 'propstack_connector_api_version' ) ) {
 			$import_obj = new Imports\v2\Objects();
 		}
 
 		// run the import.
+		$import_obj->set_process_id( $process_id );
 		$import_obj->run();
 
 		// return the import object.

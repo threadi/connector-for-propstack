@@ -62,6 +62,6 @@ class Queue extends Schedules_Base {
 		$queue_object = \ConnectorForPropstack\Propstack\Queue::get_instance();
 
 		// process the queue.
-		$queue_object->process();
+		$queue_object->process( '' );
 	}
 }

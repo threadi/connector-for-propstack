@@ -25,6 +25,13 @@ class Import_Base {
 	private array $errors = array();
 
 	/**
+	 * The process ID.
+	 *
+	 * @var string
+	 */
+	private string $process_id = '';
+
+	/**
 	 * Return the header to be used for any API request.
 	 *
 	 * @return array<string,mixed>
@@ -124,5 +131,25 @@ class Import_Base {
 		foreach ( $this->get_errors() as $error ) {
 			Log::get_instance()->add( $error->get_error_message(), 'error', 'import' );
 		}
+	}
+
+	/**
+	 * Return the process ID to use during the import.
+	 *
+	 * @return string
+	 */
+	public function get_process_id(): string {
+		return $this->process_id;
+	}
+
+	/**
+	 * Set the process ID.
+	 *
+	 * @param string $process_id The process ID.
+	 *
+	 * @return void
+	 */
+	public function set_process_id( string $process_id ): void {
+		$this->process_id = $process_id;
 	}
 }

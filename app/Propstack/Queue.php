@@ -328,9 +328,11 @@ class Queue {
 	 *
 	 * The number for X can be changed but is set to 10 per process run.
 	 *
+	 * @param string $process_id The process ID.
+	 *
 	 * @return void
 	 */
-	public function process(): void {
+	public function process( string $process_id ): void {
 		// bail if deactivation is in progress.
 		if ( defined( 'CFPROP_DEACTIVATION_RUNNING' ) ) {
 			return;
@@ -346,12 +348,6 @@ class Queue {
 		 * @param int $count The max count.
 		 */
 		do_action( 'cfprop_queue_before_processing', count( $queue ) );
-
-		// get the process ID from the request.
-		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $process_id ) ) {
-			$process_id = '';
-		}
 
 		// get the process handler and set the process ID.
 		$process_handler = ProcessHandler::get_instance();
@@ -588,8 +584,19 @@ class Queue {
 		// check nonce.
 		check_admin_referer( 'cfprop-queue-process', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// clear the queue.
-		$this->process();
+		$this->process( $process_id );
 
 		// show a message.
 		$transient_obj = Transients::get_instance()->add();
@@ -616,8 +623,14 @@ class Queue {
 			return;
 		}
 
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// clear the queue.
-		$this->process();
+		$this->process( $process_id );
 
 		// return ok.
 		wp_send_json_success();

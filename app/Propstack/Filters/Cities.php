@@ -231,13 +231,8 @@ class Cities extends Filter_Base {
 			return $query_params;
 		}
 
-		// check for nonce even though this is just a filter and nothing is actually being written here, and the filter is public.
-		if ( isset( $_GET['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'cfprop-verify' ) ) {
-			exit;
-		}
-
 		// get the filters.
-		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_GET['filter'] ) ) : array();
+		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Read-only public endpoint, no nonce required.
 
 		// get the param from the request.
 		$city = isset( $filters[ $this->get_field()->get_name() ] ) ? sanitize_text_field( $filters[ $this->get_field()->get_name() ] ) : '';

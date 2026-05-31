@@ -70,15 +70,9 @@ class Objects extends Import_Base {
 			return;
 		}
 
-		// get the process ID from the request.
-		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $process_id ) ) {
-			$process_id = '';
-		}
-
 		// get the process handler and set the process ID.
 		$process_handler = ProcessHandler::get_instance();
-		$process_handler->set_id( $process_id );
+		$process_handler->set_id( $this->get_process_id() );
 
 		// set initial value.
 		$process_handler->set_count( 0 );

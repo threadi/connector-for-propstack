@@ -495,18 +495,14 @@ class Files {
 	/**
 	 * Delete all files we imported from Propstack.
 	 *
+	 * @param string $process_id The process ID.
+	 *
 	 * @return void
 	 */
-	public function delete_all(): void {
+	public function delete_all( string $process_id ): void {
 		// bail if file import is running.
 		if ( absint( get_option( CFPROP_FILES_IMPORT_RUNNING, 0 ) ) > 0 ) {
 			return;
-		}
-
-		// get the process ID from the request.
-		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $process_id ) ) {
-			$process_id = '';
 		}
 
 		// get the process handler and set the process ID.
@@ -697,8 +693,19 @@ class Files {
 		// check nonce.
 		check_admin_referer( 'delete-propstack-object-files', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// run the deletion.
-		$this->delete_all();
+		$this->delete_all( $process_id );
 
 		// show hint.
 		$transient_obj = Transients::get_instance()->add();
@@ -725,8 +732,14 @@ class Files {
 			return;
 		}
 
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// run the deletion.
-		$this->delete_all();
+		$this->delete_all( '' );
 
 		// send ok.
 		wp_send_json_success();
@@ -750,8 +763,14 @@ class Files {
 			return;
 		}
 
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// run the import.
-		$this->import();
+		$this->import( 0, $process_id );
 
 		// send ok.
 		wp_send_json_success();
@@ -763,11 +782,12 @@ class Files {
 	 * This process is running in loops with a limited amount of files per run.
 	 * It must be reloaded to continue.
 	 *
-	 * @param int $post_id The post-ID of the immo object these files should be assigned to.
+	 * @param int    $post_id The post-ID of the immo object these files should be assigned to.
+	 * @param string $process_id The process ID.
 	 *
 	 * @return void
 	 */
-	public function import( int $post_id = 0 ): void {
+	public function import( int $post_id = 0, string $process_id = '' ): void {
 		// bail if deletion is running.
 		if ( absint( get_option( CFPROP_FILES_DELETE_RUNNING, 0 ) ) > 0 ) {
 			return;
@@ -775,12 +795,6 @@ class Files {
 
 		// get the "immo objects" object.
 		$immo_objects_obj = ImmoObjects::get_instance();
-
-		// get the process ID from the request.
-		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $process_id ) ) {
-			$process_id = '';
-		}
 
 		// get the process handler and set the process ID.
 		$process_handler = ProcessHandler::get_instance();
@@ -1047,8 +1061,19 @@ class Files {
 		// check nonce.
 		check_admin_referer( 'import-propstack-object-files', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
+		// get the process ID from the request.
+		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $process_id ) ) {
+			$process_id = '';
+		}
+
 		// run the import.
-		$this->import();
+		$this->import( 0, $process_id );
 
 		// show hint.
 		$transient_obj = Transients::get_instance()->add();

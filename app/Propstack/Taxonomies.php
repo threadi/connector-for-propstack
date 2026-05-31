@@ -527,18 +527,14 @@ class Taxonomies {
 	/**
 	 * Clean up the terms after import of objects.
 	 *
+	 * @param Import_Base $import_obj The import object.
+	 *
 	 * @return void
 	 */
-	public function cleanup_after_import(): void {
-		// get process ID from request.
-		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $process_id ) ) {
-			$process_id = '';
-		}
-
+	public function cleanup_after_import( Import_Base $import_obj ): void {
 		// get the process handler with this ID.
 		$process_handler = ProcessHandler::get_instance();
-		$process_handler->set_id( $process_id );
+		$process_handler->set_id( $import_obj->get_process_id() );
 
 		// update status.
 		$process_handler->set_status( __( 'Get the terms in tip-top shape', 'connector-for-propstack' ) );

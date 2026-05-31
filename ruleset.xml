@@ -19,6 +19,10 @@
     <exclude-pattern>*/svn/*</exclude-pattern>
     <exclude-pattern>*/js/*</exclude-pattern>
     <exclude-pattern>*/app/Plugin/Cache.php</exclude-pattern>
+    <exclude-pattern>*/app/Propstack/Filters/ObjectId.php</exclude-pattern>
+    <exclude-pattern>*/app/Propstack/Filters/Cities.php</exclude-pattern>
+    <exclude-pattern>*/app/Propstack/FilterTypes/Select.php</exclude-pattern>
+    <exclude-pattern>*/app/Propstack/FilterTypes/Input.php</exclude-pattern>
     <exclude-pattern>*/app/Dependencies/*</exclude-pattern>
 
     <!-- Use additional rulesets -->

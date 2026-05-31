@@ -114,13 +114,8 @@ class Select extends Filter_Type_Base {
 	 * @return bool
 	 */
 	public function is_selected( string $key ): bool {
-		// check for nonce even though this is just a filter and nothing is actually being written here, and the filter is public.
-		if ( isset( $_GET['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'cfprop-verify' ) ) {
-			exit;
-		}
-
 		// get the filters.
-		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_GET['filter'] ) ) : array();
+		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Read-only public endpoint, no nonce required.
 
 		// if no value is set, return the min value.
 		if ( ! isset( $filters[ $this->get_filter_name() ] ) ) {
