@@ -1,0 +1,17 @@
+{
+	"landingPage": "\/wp-admin\/options-general.php?page=connector-for-propstack",
+	"preferredVersions": {
+		"php": "8.4",
+		"wp": "latest"
+	},
+    "features": {
+        "networking": true
+    },
+	"steps": [
+		{
+			"step": "login",
+			"username": "admin",
+			"password": "password"
+		}
+	]
+}
