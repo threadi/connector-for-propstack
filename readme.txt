@@ -29,6 +29,16 @@ Import and display your objects from [Propstack](https://www.propstack.de) direc
 
 - Propstack account with API credentials
 
+#### The Pro license includes:
+
+* Use all object types Propstack offers, like "Office" and "Store"
+* More fields for your Propstack objects data
+* Support for Elementor with nine Widgets and multiple templates
+* Support for Elementor Forms as a contact form
+* More blocks for Block Editor (like object status)
+
+[get the Pro-version](https://laolaweb.com/en/plugins/propstack-wordpress-plugin/order-propstack-plugin-pro/)
+
 #### External services
 
 This plugin connects to the Propstack API via [www.propstack.de](https://www.propstack.de) to get the objects of your personal account there.
