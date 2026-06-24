@@ -21,7 +21,7 @@ Import and display your objects from [Propstack](https://www.propstack.de) direc
 - objects are indexable for search engines (SEO)
 - each object gets its own URL on your website
 - data-protection compliant as Propstack did not get any data from your visitors
-- 8 Blocks for Block Editor and [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
+- 7 Blocks for Block Editor and [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
 - support for classic as well as block themes
 - filter for archive listings using City and Object ID
 
