@@ -21,13 +21,23 @@ Import and display your objects from [Propstack](https://www.propstack.de) direc
 - objects are indexable for search engines (SEO)
 - each object gets its own URL on your website
 - data-protection compliant as Propstack did not get any data from your visitors
-- 8 Blocks for Block Editor and [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
+- 7 Blocks for Block Editor and [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
 - support for classic as well as block themes
 - filter for archive listings using City and Object ID
 
 #### Requirements
 
 - Propstack account with API credentials
+
+#### The Pro license includes:
+
+* Use all object types Propstack offers, like "Office" and "Store"
+* More fields for your Propstack objects data
+* Support for Elementor with nine Widgets and multiple templates
+* Support for Elementor Forms as a contact form
+* More blocks for Block Editor (like object status)
+
+[get the Pro-version](https://laolaweb.com/en/plugins/propstack-wordpress-plugin/order-propstack-plugin-pro/)
 
 #### External services
 
