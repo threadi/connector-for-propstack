@@ -5,6 +5,7 @@
 ### Changed
 
 - Updated crypt library to 2.0.0
+- Updated dependencies
 
 ## [1.0.0] - 22.06.2026
 
