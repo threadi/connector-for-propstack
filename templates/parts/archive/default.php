@@ -32,10 +32,10 @@ use ConnectorForPropstack\Propstack\ImmoObject;
 				 * Use the template hook to render the object.
 				 *
 				 * @since 1.0.0 Available since 1.0.0.
-				 * @param ImmoObject    $propstack_connector_immo_object      The immo object as an object.
+				 * @param ImmoObject    $cfprop_immo_object      The immo object as an object.
 				 * @param array<string,mixed>  $attributes   List of attributes.
 				 */
-				do_action( 'cfprop_template_' . $cfprop_template, $propstack_connector_immo_object, $attributes );
+				do_action( 'cfprop_template_' . $cfprop_template, $cfprop_immo_object, $attributes );
 			}
 			?>
 		</article>

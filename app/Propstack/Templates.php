@@ -173,7 +173,7 @@ class Templates {
 			return;
 		}
 
-		// show another thumbnail output in single page.
+		// show another thumbnail output in the single page.
 		if ( is_singular() ) {
 			// get the object type for this object.
 			$object_type_term = wp_get_object_terms( $immo_object->get_id(), ObjectType::get_instance()->get_name() );

@@ -562,4 +562,26 @@ class Helper {
 	public static function get_github_documentation_link(): string {
 		return 'https://github.com/threadi/connector-for-propstack/tree/master/doc';
 	}
+
+	/**
+	 * Checks whether a given plugin is active.
+	 *
+	 * Used because WP's own function is_plugin_active() is not accessible everywhere.
+	 *
+	 * @param string $plugin Path to the requested plugin relative to plugin-directory.
+	 * @return bool
+	 */
+	public static function is_plugin_active( string $plugin ): bool {
+		return in_array( $plugin, (array) get_option( 'active_plugins', array() ), true );
+	}
+
+	/**
+	 * Checks whether a given plugin is installed.
+	 *
+	 * @param string $plugin Path to the requested plugin relative to plugin-directory.
+	 * @return bool
+	 */
+	public static function is_plugin_installed( string $plugin ): bool {
+		return file_exists( trailingslashit( WP_PLUGIN_DIR ) . $plugin );
+	}
 }
