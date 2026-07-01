@@ -10,6 +10,7 @@
 ### Fixed
 
 - Fixed an error in the default archive template
+- Fixed a wrong field in Block Editor single template
 
 ## [1.0.0] - 22.06.2026
 

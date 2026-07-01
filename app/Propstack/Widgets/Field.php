@@ -132,7 +132,7 @@ class Field extends Widget_Base {
 			return '';
 		}
 
-		// create list of classes, if it does not exist.
+		// create the entry for classes if it does not exist.
 		if ( ! isset( $attributes['classes'] ) ) {
 			$attributes['classes'] = '';
 		}
