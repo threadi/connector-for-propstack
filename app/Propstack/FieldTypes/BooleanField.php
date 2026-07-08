@@ -24,6 +24,13 @@ class BooleanField extends FieldType_Base {
 	protected string $name = 'boolean';
 
 	/**
+	 * Marker to use HTML for this field type.
+	 *
+	 * @var bool
+	 */
+	protected bool $with_html = true;
+
+	/**
 	 * Return the value.
 	 *
 	 * @return string
