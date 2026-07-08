@@ -89,14 +89,14 @@ class Object_Data extends Widget_Base {
 
 		// collect the field labels and values for this object.
 		$fields = array();
-		foreach ( $attributes['object_data'] as $value ) {
+		foreach ( $attributes['object_data'] as $field_name ) {
 			// bail if the value is empty.
-			if ( empty( $value ) ) {
+			if ( empty( $field_name ) ) {
 				continue;
 			}
 
 			// get the field object.
-			$field_obj = Fields::get_instance()->get_field_by_name( $value );
+			$field_obj = Fields::get_instance()->get_field_by_name( $field_name );
 
 			// bail if the field object could not be found.
 			if ( ! $field_obj instanceof Field_Base ) {

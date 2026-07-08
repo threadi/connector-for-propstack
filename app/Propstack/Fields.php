@@ -787,7 +787,7 @@ class Fields {
 		$field_type = FieldTypes::get_instance()->get_field_type_by_name( $field->get_type() );
 
 		/**
-		 * Filter the detected field-type of single field.
+		 * Filter the detected field-type of a single field.
 		 *
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param FieldType_Base|false $field_type The field type.
