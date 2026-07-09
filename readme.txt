@@ -33,8 +33,8 @@ Import and display your objects from [Propstack](https://www.propstack.de) direc
 
 * Use all object types Propstack offers, like "Office" and "Store"
 * More fields for your Propstack objects data
-* Support for Elementor with nine Widgets and multiple templates
-* Support for Elementor Forms as a contact form
+* Support for Elementor with eight Widgets and multiple templates
+* Support for Elementor Forms, Contact Form 7 and WPForms as a contact form, which submit its data direct to Propstack
 * More blocks for Block Editor (like object status)
 
 [get the Pro-version](https://laolaweb.com/en/plugins/propstack-wordpress-plugin/order-propstack-plugin-pro/)
@@ -77,6 +77,12 @@ The plugin can be installed even without a Propstack account. However, it is unu
 = Does this plugin use iframes? =
 
 No, no iframe of any kind is used to embed data.
+
+= How can I submit contacts from my website to Propstack? =
+
+Create a form using your preferred form plugin. You can then receive the form data via email and forward it to Propstack.
+
+With Connector for Propstack Pro, this transfer can take place automatically without any manual intervention on your part.
 
 == Screenshots ==
 
