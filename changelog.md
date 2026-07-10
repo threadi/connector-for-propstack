@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Optimized loading of object types
 - Use global helper to nat sort arrays
 - Updated crypt library to 2.0.1
 - Updated dependencies
