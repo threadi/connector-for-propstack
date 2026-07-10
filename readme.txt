@@ -32,9 +32,9 @@ Import and display your objects from [Propstack](https://www.propstack.de) direc
 #### The Pro license includes:
 
 * Use all object types Propstack offers, like "Office" and "Store"
-* More fields for your Propstack objects data
-* Support for Avada, Bricks and Elementor with eight Widgets and multiple templates
-* Submit your contacts data direct to Propstack by using Avada Forms, Elementor Forms, Contact Form 7 or WPForms as a contact form
+* Get more fields for your Propstack objects data
+* Use eight widgets and prepared templates in page builders like Avada, Bricks or Elementor
+* Submit your contact enquiries directly to Propstack by using Avada Forms, Elementor Forms, Contact Form 7 or WPForms as a contact form
 * More blocks for Block Editor (like object status)
 
 [get the Pro-version](https://laolaweb.com/en/plugins/propstack-wordpress-plugin/order-propstack-plugin-pro/)
