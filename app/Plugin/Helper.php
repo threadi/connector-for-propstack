@@ -10,6 +10,7 @@ namespace ConnectorForPropstack\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use Collator;
 use DateTime;
 use WP_Error;
 use WP_Filesystem_Base;
@@ -583,5 +584,34 @@ class Helper {
 	 */
 	public static function is_plugin_installed( string $plugin ): bool {
 		return file_exists( trailingslashit( WP_PLUGIN_DIR ) . $plugin );
+	}
+
+	/**
+	 * Return a nat-sorted array of the given array.
+	 *
+	 * @param array<string,mixed> $array_to_sort The array to sort.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public static function get_nat_sorted_array( array $array_to_sort ): array {
+		// order them depending on hosting environments.
+		if ( class_exists( 'Collator' ) ) {
+			// use natural sort via PHP intl extension.
+			$collator = new Collator( Languages::get_instance()->get_current_lang() );
+			$collator->setAttribute( Collator::NUMERIC_COLLATION, Collator::ON );
+			uksort(
+				$array_to_sort,
+				// @phpstan-ignore argument.type
+				static function ( $a, $b ) use ( $collator ) {
+					return $collator->compare( (string) $a, (string) $b );
+				}
+			);
+		} else {
+			// use simple sort.
+			uksort( $array_to_sort, 'strcoll' );
+		}
+
+		// return the sorted array.
+		return $array_to_sort;
 	}
 }

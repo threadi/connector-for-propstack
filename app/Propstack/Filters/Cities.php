@@ -10,9 +10,8 @@ namespace ConnectorForPropstack\Propstack\Filters;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use Collator;
 use ConnectorForPropstack\Plugin\Cache;
-use ConnectorForPropstack\Plugin\Languages;
+use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Propstack\Field_Base;
 use ConnectorForPropstack\Propstack\Fields;
 use ConnectorForPropstack\Propstack\Fields\Main\City;
@@ -183,22 +182,8 @@ class Cities extends Filter_Base {
 
 		// add a filter for cities, if more than 0.
 		if ( count( $cities ) > 0 ) {
-			// order them depending on hosting environments.
-			if ( class_exists( 'Collator' ) ) {
-				// use natural sort via PHP intl extension.
-				$collator = new Collator( Languages::get_instance()->get_current_lang() );
-				$collator->setAttribute( Collator::NUMERIC_COLLATION, Collator::ON );
-				uksort(
-					$cities,
-					// @phpstan-ignore argument.type
-					static function ( $a, $b ) use ( $collator ) {
-						return $collator->compare( (string) $a, (string) $b );
-					}
-				);
-			} else {
-				// use simple sort.
-				uksort( $cities, 'strcoll' );
-			}
+			// sort the list.
+			$cities = Helper::get_nat_sorted_array( $cities );
 
 			// create the filter object and configure it.
 			$obj = $this->get_filter_type( $this->get_field()->get_name() );
