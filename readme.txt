@@ -91,6 +91,12 @@ With Connector for Propstack Pro, this transfer can take place automatically wit
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Initial Release
+- Optimized loading of object types
+- Use global helper to nat sort arrays
+- Updated crypt library to 2.0.1
+- Updated dependencies
+- Fixed an error in the default archive template
+- Fixed a wrong field in Block Editor single template
+- Fixed missing output of boolean fields in some cases
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)
