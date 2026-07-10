@@ -101,6 +101,8 @@ class Uninstaller {
 
 		// delete all objects from Propstack.
 		ImmoObjects::get_instance()->delete_all( '' );
+
+		// delete the terms of all taxonomies.
 		foreach ( Taxonomies::get_instance()->get_taxonomies_as_objects() as $taxonomy ) {
 			$taxonomy->delete_all();
 		}

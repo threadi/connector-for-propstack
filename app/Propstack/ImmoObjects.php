@@ -10,6 +10,7 @@ namespace ConnectorForPropstack\Propstack;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use ConnectorForPropstack\Plugin\Setup;
 use easySettingsForWordPress\Fields\Button;
 use easySettingsForWordPress\Fields\Checkbox;
 use easySettingsForWordPress\Fields\MultiSelect;
@@ -586,7 +587,7 @@ class ImmoObjects {
 
 		// get the available object types.
 		$object_types = Cache::get( Taxonomies\ObjectType::get_instance()->get_name() . '_non_empty_terms_for_settings' );
-		if ( empty( $object_types ) ) {
+		if ( empty( $object_types ) || ! Setup::get_instance()->is_completed() ) {
 			$state_terms  = get_terms(
 				array(
 					'taxonomy'   => Taxonomies\ObjectType::get_instance()->get_name(),
