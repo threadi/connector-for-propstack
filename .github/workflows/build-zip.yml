@@ -92,7 +92,7 @@ jobs:
                 rm .editorconfig
                 rm -fr doc
                 rm -fr bin
-                rm composer.sh
+                rm dev-composer.sh
                 rm phpunit.xml.dist
                 rm -fr tests
                 rm -fr languages
