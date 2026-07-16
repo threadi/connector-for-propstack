@@ -141,7 +141,7 @@ class ObjectId extends Filter_Base {
 		}
 
 		// get the filters.
-		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Read-only public endpoint, no nonce required.
+		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( (array) $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Read-only public endpoint, no nonce required.
 
 		// get the param from the request.
 		$object_id = isset( $filters[ $this->get_field()->get_name() ] ) ? sanitize_text_field( $filters[ $this->get_field()->get_name() ] ) : '';

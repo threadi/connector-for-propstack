@@ -115,7 +115,7 @@ class Select extends Filter_Type_Base {
 	 */
 	public function is_selected( string $key ): bool {
 		// get the filters.
-		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Read-only public endpoint, no nonce required.
+		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( (array) $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Read-only public endpoint, no nonce required.
 
 		// if no value is set, return the min value.
 		if ( ! isset( $filters[ $this->get_filter_name() ] ) ) {

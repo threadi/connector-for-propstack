@@ -337,7 +337,7 @@ class Taxonomy {
 				),
 				get_admin_url() . 'edit.php'
 			);
-			$list[] = '<a href="' . $url . '">' . $term->name . '</a>';
+			$list[] = '<a href="' . esc_url( $url ) . '">' . esc_html( $term->name ) . '</a>';
 		}
 
 		// show them.

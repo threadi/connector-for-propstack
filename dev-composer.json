@@ -62,7 +62,7 @@
         "threadi/easy-settings-for-wordpress": "@beta",
         "threadi/easy-setup-for-wordpress": "^1.3.1",
         "threadi/easy-transients-for-wordpress": "^1.4.3",
-        "threadi/crypt-for-wordpress": "^1.0",
+        "threadi/crypt-for-wordpress": "@beta",
         "ext-simplexml": "*",
         "ext-libxml": "*"
     },
@@ -85,6 +85,13 @@
         {
             "type": "path",
             "url": "../../../easy-settings-for-wordpress/",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../../../crypt-for-wordpress/",
             "options": {
                 "symlink": true
             }

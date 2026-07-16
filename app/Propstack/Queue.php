@@ -280,11 +280,19 @@ class Queue {
 	 * @return array<int,WP_Post>
 	 */
 	public function get_queue(): array {
+		// get the limit for the queue.
+		$limit = absint( get_option( 'propstack_connector_queue_limit' ) );
+
+		// if the limit is 0, set it to 10.
+		if ( 0 === $limit ) {
+			$limit = 10;
+		}
+
 		// get entries to process.
 		$query = array(
 			'post_type'      => PostTypes\Queue::get_instance()->get_name(),
 			'post_status'    => 'publish',
-			'posts_per_page' => absint( get_option( 'propstack_connector_queue_limit' ) ),
+			'posts_per_page' => $limit,
 			'meta_query'     => array(
 				array(
 					'key'     => 'failed',
@@ -560,6 +568,13 @@ class Queue {
 	public function clear_by_request(): void {
 		// check nonce.
 		check_admin_referer( 'cfprop-queue-clear', 'nonce' );
+
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect back to the referring page.
+			wp_safe_redirect( (string) wp_get_referer() );
+			exit;
+		}
 
 		// clear the queue.
 		$this->clear();

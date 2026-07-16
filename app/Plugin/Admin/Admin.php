@@ -11,6 +11,7 @@ namespace ConnectorForPropstack\Plugin\Admin;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Dependencies\easyTransientsForWordPress\Transients;
+use ConnectorForPropstack\Plugin\Crypt;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\Settings;
@@ -60,6 +61,7 @@ class Admin {
 		// use hooks.
 		add_action( 'init', array( $this, 'configure_transients' ), 5 );
 		add_action( 'admin_init', array( $this, 'save_slugs' ) );
+		add_action( 'shutdown', array( $this, 'check_crypt' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_js_and_styles' ), 10, 0 );
 		add_filter( 'admin_body_class', array( $this, 'add_body_classes' ) );
 
@@ -148,7 +150,7 @@ class Admin {
 		// check the nonce.
 		check_admin_referer( 'cfprop-log-export', 'nonce' );
 
-		// bail if user has no capability.
+		// bail if the user has no capability.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
 			return;
 		}
@@ -189,11 +191,11 @@ class Admin {
 		$head_row = $entries[0];
 
 		// add the header.
-		fputcsv( $fp, array_keys( $head_row ) );
+		fputcsv( $fp, array_map( array( $this, 'escape_csv_value' ), array_keys( $head_row ) ) );
 
 		// add the entries.
 		foreach ( $entries as $data ) {
-			fputcsv( $fp, $data );
+			fputcsv( $fp, array_map( array( $this, 'escape_csv_value' ), $data ) );
 		}
 
 		// do nothing more.
@@ -212,7 +214,7 @@ class Admin {
 		// check the nonce.
 		check_admin_referer( 'cfprop-log-empty', 'nonce' );
 
-		// bail if user has no capability.
+		// bail if the user has no capability.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
 			// redirect user.
 			wp_safe_redirect( (string) wp_get_referer() );
@@ -243,7 +245,7 @@ class Admin {
 		// and checks it explicitly here. See: wp-admin/options-permalink.php.
 		check_admin_referer( 'update-permalink' );
 
-		// bail if user has no capability.
+		// bail if the user has no capability.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -286,5 +288,68 @@ class Admin {
 
 		// return resulting classes.
 		return $classes;
+	}
+
+	/**
+	 * Escape a single value against CSV/formula injection.
+	 *
+	 * @param mixed $value The cell value.
+	 *
+	 * @return string
+	 */
+	private function escape_csv_value( mixed $value ): string {
+		$value = (string) $value;
+
+		// prefix values that a spreadsheet app could interpret as a formula.
+		if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+			$value = "'" . $value;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Log crypt errors.
+	 *
+	 * @return void
+	 */
+	public function check_crypt(): void {
+		// bail in frontend.
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		// get crypt errors.
+		$crypt_errors = Crypt::get_instance()->get_crypt_obj()->get_errors();
+
+		// bail if no errors occurred.
+		if ( null === $crypt_errors ) {
+			Transients::get_instance()->get_transient_by_name( 'propstack_connector_crypt_database_warning' )->delete();
+			return;
+		}
+
+		// check the errors for the special case "insecure_place_database".
+		foreach ( $crypt_errors->get_error_codes() as $error_code ) {
+			// bail if this is not the error we are looking for.
+			if ( 'insecure_place_database' !== $error_code ) {
+				continue;
+			}
+
+			// create the text for the hint.
+			$text  = '<p><strong>' . __( 'The key used to encrypt your privacy data is currently stored in the database along with that data. <u>This is strongly discouraged.</u>', 'connector-for-propstack' ) . '</strong></p>';
+			$text .= '<p>' . __( 'To resolve this, please check why your <code>wp-config.php</code> file is not writable. Alternatively, at least the directory <code>/wp-content/mu-plugins/</code> must be writable. If you have any questions about this, please contact your hosting support team.', 'connector-for-propstack' ) . '</p>';
+
+			// show a hint about this problem.
+			$transient_obj = Transients::get_instance()->add();
+			$transient_obj->set_dismissible_days( 2 );
+			$transient_obj->set_name( 'propstack_connector_crypt_database_warning' );
+			$transient_obj->set_message( $text );
+			$transient_obj->set_type( 'error' );
+			$transient_obj->set_prioritized( true );
+			$transient_obj->save();
+		}
+
+		// add them in the log.
+		Log::get_instance()->add( __( 'Error in crypt support:', 'connector-for-propstack' ) . '<code>' . Helper::get_json( $crypt_errors->get_error_messages() ) . '</code>', 'error', 'system' );
 	}
 }
