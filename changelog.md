@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.2] - 20.07.2026
 
 ### Changed
 
@@ -12,7 +12,7 @@
 
 - Fixed a logical error during the check of the object type on any object to import
 - Fixed a wrong filter for property types during import of objects with API v1
-- Fixed missing clearing of cache through wrong internal name
+- Fixed the missing clearing of cache through a wrong internal name
 
 ## [1.0.1] - 13.07.2026
 
