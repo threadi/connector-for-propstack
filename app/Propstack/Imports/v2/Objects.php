@@ -104,14 +104,6 @@ class Objects extends Import_Base {
 		 */
 		do_action( 'cfprop_import_object_before_start', $process_handler, $instance );
 
-		/**
-		 * Run additional tasks before starting the import of objects.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 * @param ProcessHandler $process_handler The process handler.
-		 */
-		do_action( 'cfprop_import_object_before_start', $process_handler );
-
 		// if any error occurred during import of objects, collect and log it.
 		try {
 			// loop through each enabled language and import its objects.
