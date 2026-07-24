@@ -1,6 +1,6 @@
 {
   "name": "@connector-for-propstack/connector-for-propstack",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Provides Blocks for Connector for Propstack.",
   "author": "laOlaWeb GmbH",
   "license": "GPL-2.0-or-later",
