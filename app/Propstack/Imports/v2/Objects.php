@@ -47,7 +47,7 @@ class Objects extends Import_Base {
 	 */
 	public function run(): void {
 		// bail if an import is still running.
-		if ( absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 ) {
+		if ( $this->is_process_running( CFPROP_IMPORT_RUNNING ) ) {
 			// add the error.
 			$this->add_error( 'propstack_object_import_is_running', __( 'Import of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -59,7 +59,7 @@ class Objects extends Import_Base {
 		}
 
 		// bail if the deletion is still running.
-		if ( absint( get_option( CFPROP_DELETE_RUNNING ) ) > 0 ) {
+		if ( $this->is_process_running( CFPROP_DELETE_RUNNING ) ) {
 			// add the error.
 			$this->add_error( 'propstack_object_deletion_is_running', __( 'Deletion of objects is still running. Please wait.', 'connector-for-propstack' ) );
 

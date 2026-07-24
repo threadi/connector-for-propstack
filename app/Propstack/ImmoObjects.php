@@ -251,7 +251,7 @@ class ImmoObjects {
 	 */
 	public function delete_all( string $process_id ): void {
 		// bail if import or deletion are still running.
-		if ( absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 || absint( get_option( CFPROP_DELETE_RUNNING ) ) > 0 ) {
+		if ( $this->is_process_running( CFPROP_IMPORT_RUNNING ) || $this->is_process_running( CFPROP_DELETE_RUNNING ) ) {
 			return;
 		}
 

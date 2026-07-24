@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Automatic unlock import after 1 hour
+
 ## [1.0.2] - 20.07.2026
 
 ### Changed
