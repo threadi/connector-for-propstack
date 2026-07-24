@@ -57,11 +57,11 @@ jobs:
               run:  vendor/bin/phpstan analyse
 
             - name: Run WordPress Coding Standard fixes
-              run: vendor/bin/phpcbf --standard=ruleset.xml .
+              run: vendor/bin/phpcbf .
               continue-on-error: true
 
             - name: Run WordPress Coding Standard checks
-              run: vendor/bin/phpcs --standard=ruleset.xml .
+              run: vendor/bin/phpcs .
 
             - name: Set version number 1
               uses: richardrigutins/replace-in-files@v2
@@ -114,7 +114,7 @@ jobs:
             - name: Create ZIP release
               run: |
                 cd ..
-                zip -rq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/ -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/docs/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/ruleset.xml" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/assets/*" "*/phpstan.neon" "*/Taskfile.yml" "*/libs/*" "*/src/*"
+                zip -rq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/ -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/docs/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/phpcs.xml.dist" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/assets/*" "*/phpstan.neon" "*/Taskfile.yml" "*/libs/*" "*/src/*"
                 zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/autoload.php
                 zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/composer/*
                 zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/easy-setup-for-wordpress/lib/
