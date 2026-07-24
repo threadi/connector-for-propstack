@@ -6,6 +6,7 @@
 
 - Automatic unlock import after 1 hour
 - Optimized the log definition and usage in debug mode
+- Optimized the usage of all Blocks
 
 ### Fixed
 

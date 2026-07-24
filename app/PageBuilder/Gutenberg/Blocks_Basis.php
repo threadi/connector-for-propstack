@@ -114,6 +114,7 @@ class Blocks_Basis {
 			'window.propstack_connector_config = ' . wp_json_encode(
 				array(
 					'enable_help' => 1 === absint( get_option( 'propstack_connector_show_help' ) ),
+					'icon_url' => Helper::get_plugin_url() . 'gfx/propstack_menu_logo.png',
 					/**
 					 * Change the block help URL.
 					 *

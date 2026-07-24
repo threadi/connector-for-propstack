@@ -76,7 +76,13 @@ jobs:
           npm run build
           cd ../../../
           npm run build:archive
+          npm run build:broker-field
+          npm run build:description
+          npm run build:field
+          npm run build:filter
           npm run build:single
+          npm run build:gallery
+          npm run build:lightbox
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

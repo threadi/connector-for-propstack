@@ -10,7 +10,6 @@ namespace ConnectorForPropstack\Propstack;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use WP_REST_Request;
 use WP_REST_Server;
 
 /**
@@ -72,6 +71,18 @@ class Rest {
 				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
+				'args' => array(
+					'field_category' => array(
+						'type'              => 'string',
+						'required'          => false,
+						'sanitize_callback' => 'sanitize_key',
+					),
+					'query' => array(
+						'type'              => 'string',
+						'required'          => false,
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
 			)
 		);
 		foreach ( Taxonomies::get_instance()->get_taxonomies_as_objects() as $taxonomy ) {
