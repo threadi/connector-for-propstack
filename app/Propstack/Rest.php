@@ -133,7 +133,7 @@ class Rest {
 		foreach ( Filters::get_instance()->get_filters_as_objects() as $index1 => $filter_obj ) {
 			foreach ( $filter_obj->get() as $index2 => $filter ) {
 				$list[] = array(
-					'id'    => ( $index1 + $index2 + 1 ),
+					'id'    => ( absint( $index1 ) + absint( $index2 ) + 1 ),
 					'label' => $filter->get_label(),
 					'value' => $filter->get_filter_name(),
 				);

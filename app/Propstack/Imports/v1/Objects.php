@@ -250,6 +250,12 @@ class Objects extends Import_Base {
 						// update the counter.
 						$this->set_count( $process_handler, $process_handler->get_count() + 1 );
 
+						// add a log entry if debug is enabled.
+						if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+							/* translators: %1$s will be replaced by the object title. */
+							Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+						}
+
 						// update tick.
 						$progress ? $progress->tick() : '';
 
