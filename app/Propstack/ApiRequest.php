@@ -188,7 +188,15 @@ class ApiRequest {
 			$log_text  = __( 'URL:', 'connector-for-propstack' ) . ' <code>' . esc_url( $this->get_url() ) . '</code>';
 			$log_text .= '<br><br>' . __( 'Request:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $args ) . '</code>';
 			$log_text .= '<br><br>' . __( 'HTTP-Status:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $this->get_http_status() ) . '</code>';
-			$log_text .= '<br><br>' . __( 'Response:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $this->get_response() ) . '</code>';
+
+			// get the raw response and limit its length for the log entry.
+			$response   = $this->get_response();
+			$max_length = absint( apply_filters( 'cfprop_log_max_response_length', 100000 ) );
+			if ( strlen( $response ) > $max_length ) {
+				/* translators: %1$d will be replaced by the total length in bytes. */
+				$response = substr( $response, 0, $max_length ) . ' … ' . sprintf( __( '[truncated, %1$d bytes in total]', 'connector-for-propstack' ), strlen( $response ) );
+			}
+			$log_text .= '<br><br>' . __( 'Response:', 'connector-for-propstack' ) . ' <code>' . esc_html( $response ) . '</code>';
 			Log::get_instance()->add( $log_text, 'info', 'import', $this->get_md5() );
 		}
 

@@ -55,13 +55,16 @@ class Log {
 
 		// definition for the table for log-entries.
 		$sql = 'CREATE TABLE ' . $wpdb->prefix . "propstack_logs (
-            `id` mediumint(9) NOT NULL AUTO_INCREMENT,
-            `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `log` longtext DEFAULT '' NOT NULL,
-            `md5` text DEFAULT '' NOT NULL,
-            `category` varchar(40) DEFAULT '' NOT NULL,
-            `state` varchar(40) DEFAULT '' NOT NULL,
-            UNIQUE KEY id (id)
+            `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            `time` datetime DEFAULT '1970-01-01 00:00:00' NOT NULL,
+            `log` text NOT NULL,
+            `md5` text NOT NULL,
+            `category` varchar(40) NOT NULL DEFAULT '',
+            `state` varchar(40) NOT NULL DEFAULT '',
+            UNIQUE KEY id (id),
+            KEY `time` (`time`),
+            KEY `category_time` (`category`, `time`),
+            KEY `state_time` (`state`, `time`)
         ) $charset_collate;";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
