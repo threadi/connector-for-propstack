@@ -251,7 +251,7 @@ class ImmoObjects {
 	 */
 	public function delete_all( string $process_id ): void {
 		// bail if import or deletion are still running.
-		if ( $this->is_process_running( CFPROP_IMPORT_RUNNING ) || $this->is_process_running( CFPROP_DELETE_RUNNING ) ) {
+		if ( Helper::is_process_running( CFPROP_IMPORT_RUNNING ) || Helper::is_process_running( CFPROP_DELETE_RUNNING ) ) {
 			return;
 		}
 
@@ -1727,57 +1727,5 @@ class ImmoObjects {
 
 		// show hint.
 		echo '<div class="cfprop-pro-hint">' . esc_html__( 'Use this in Pro', 'connector-for-propstack' ) . '</div>';
-	}
-
-	/**
-	 * Check for running import processes.
-	 *
-	 * @param string $option_name The name of the option to check.
-	 *
-	 * @return bool True, if a process is running, false otherwise.
-	 */
-	private function is_process_running( string $option_name ): bool {
-		// get the timestamp of the lock.
-		$started = absint( get_option( $option_name ) );
-
-		// no lock is set.
-		if ( 0 === $started ) {
-			return false;
-		}
-
-		$hour = HOUR_IN_SECONDS;
-		/**
-		 * Filter the timeout for the process lock (which is by default 1 hour).
-		 *
-		 * @since 1.0.3 Available since 1.0.3.
-		 *
-		 * @param int    $timeout     The timeframe in seconds.
-		 * @param string $option_name The name of the option to check.
-		 */
-		$timeout = absint( apply_filters( 'cfprop_process_lock_timeout', $hour, $option_name ) );
-
-		// lock is too new and still running.
-		if ( ( time() - $started ) < $timeout ) {
-			// return true, as the process is still running.
-			return true;
-		}
-
-		// log this event.
-		Log::get_instance()->add(
-			sprintf(
-			/* translators: %1$s will be replaced by the option name, %2$d by the age in seconds. */
-				__( 'A previous process (%1$s) did not end properly and blocked further runs for %2$d seconds. The lock has been released automatically. Check the log for a preceding fatal error, e.g. memory limit or timeout.', 'connector-for-propstack' ),
-				'<code>' . $option_name . '</code>',
-				time() - $started
-			),
-			'error',
-			'import'
-		);
-
-		// reset the lock.
-		update_option( $option_name, 0 );
-
-		// return false, as no process is running.
-		return false;
 	}
 }
