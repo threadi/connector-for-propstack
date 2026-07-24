@@ -22,9 +22,11 @@ const { useEffect } = wp.element;
 export default function Edit( object ) {
 
 	// secure id of this block
-	useEffect(() => {
-		object.setAttributes({blockId: object.clientId});
-	});
+  useEffect( () => {
+    if ( ! object.attributes.blockId ) {
+      object.setAttributes( { blockId: object.clientId } );
+    }
+  }, [ object.attributes.blockId, object.clientId ] );
 
 	/**
 	 * Collect return for the edit-function

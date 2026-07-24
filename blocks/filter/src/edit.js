@@ -37,9 +37,11 @@ export default function Edit( object ) {
   const [ query, setQuery ] = useState( '' );
 
 	// secure ID of this block
-	useEffect(() => {
-		object.setAttributes({blockId: object.clientId});
-	});
+  useEffect( () => {
+    if ( ! object.attributes.blockId ) {
+      object.setAttributes( { blockId: object.clientId } );
+    }
+  }, [ object.attributes.blockId, object.clientId ] );
 
   const isPreview = !! object.attributes.preview;
 

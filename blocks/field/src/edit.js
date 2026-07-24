@@ -28,8 +28,12 @@ export default function Edit( object ) {
   const isLoaded = useSelect( (select) => select( 'connector-for-propstack/fields' ).isLoaded() );
 
   useEffect( () => {
-    object.setAttributes( { blockId: object.clientId } );
+    if ( ! object.attributes.blockId ) {
+      object.setAttributes( { blockId: object.clientId } );
+    }
+  }, [ object.attributes.blockId, object.clientId ] );
 
+  useEffect( () => {
     // only load once.
     if ( isLoaded || isFetching ) return;
 

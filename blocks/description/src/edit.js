@@ -35,9 +35,11 @@ import {
 export default function Edit( object ) {
 
 	// secure ID of this block
-	useEffect(() => {
-		object.setAttributes({blockId: object.clientId});
-	});
+  useEffect( () => {
+    if ( ! object.attributes.blockId ) {
+      object.setAttributes( { blockId: object.clientId } );
+    }
+  }, [ object.attributes.blockId, object.clientId ] );
 
   // get possible description types.
   let description_types = [];
