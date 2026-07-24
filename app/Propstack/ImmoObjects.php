@@ -251,7 +251,7 @@ class ImmoObjects {
 	 */
 	public function delete_all( string $process_id ): void {
 		// bail if import or deletion are still running.
-		if ( absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 || absint( get_option( CFPROP_DELETE_RUNNING ) ) > 0 ) {
+		if ( $this->is_process_running( CFPROP_IMPORT_RUNNING ) || $this->is_process_running( CFPROP_DELETE_RUNNING ) ) {
 			return;
 		}
 
@@ -1091,7 +1091,7 @@ class ImmoObjects {
 
 		// bail if "property_status_id" (API v2) is set.
 		if ( ! empty( $immo_object['property_status_id'] ) ) {
-			return $this->prevent_import_by_taxonomy( 'propstack_connector_import_states', (string) $immo_object['property_status_id'], $prevent_import );
+			return 'Vermarktung' !== $immo_object['property_status_id'];
 		}
 
 		// prevent the import if no state is set.
@@ -1159,10 +1159,8 @@ class ImmoObjects {
 		// check if "rs_type" (API v1) is set.
 		if ( ! empty( $immo_object['rs_type']['id'] ) ) {
 			$object_type_name = $immo_object['rs_type']['id'];
-		}
-
-		// check if "rs_type" (API v2) is set.
-		if ( ! empty( $immo_object['rs_type'] ) ) {
+		} elseif ( ! empty( $immo_object['rs_type'] ) ) {
+			// check if "rs_type" (API v2) is set.
 			$object_type_name = $immo_object['rs_type'];
 		}
 
@@ -1194,7 +1192,7 @@ class ImmoObjects {
 	public function prevent_import_by_property_type( bool $prevent_import, array $immo_object ): bool {
 		// check if "rs_type" (API v1) is set.
 		if ( ! empty( $immo_object['rs_category']['id'] ) ) {
-			return $this->prevent_import_by_taxonomy( 'propstack_connector_import_object_type', (string) $immo_object['rs_category']['id'], $prevent_import );
+			return $this->prevent_import_by_taxonomy( 'propstack_connector_import_property_type', (string) $immo_object['rs_category']['id'], $prevent_import );
 		}
 
 		// check if "rs_type" (API v2) is set.
@@ -1248,7 +1246,7 @@ class ImmoObjects {
 	}
 
 	/**
-	 * Assign feature image during import.
+	 * Assign the feature image during the import.
 	 *
 	 * @param array<string,mixed> $object_data  The object data from API.
 	 * @param int                 $post_id The post-ID of the object.
@@ -1257,18 +1255,20 @@ class ImmoObjects {
 	 */
 	public function assign_feature_image_during_import( array $object_data, int $post_id ): void {
 		// update the position for each image from what we got from the Propstack API.
-		foreach ( $object_data['images'] as $file_data ) {
-			// get the file by its ID in media library.
-			$attachment_id = Files::get_instance()->is_file_in_media_library( $file_data['id'] );
+		if ( isset( $object_data['images'] ) ) {
+			foreach ( $object_data['images'] as $file_data ) {
+				// get the file by its ID in the media library.
+				$attachment_id = Files::get_instance()->is_file_in_media_library( $file_data['id'] );
 
-			// bail if attachment ID is not known.
-			if ( 0 === $attachment_id ) {
-				continue;
-			}
+				// bail if attachment ID is not known.
+				if ( 0 === $attachment_id ) {
+					continue;
+				}
 
-			// update the position from Propstack to the file, if given.
-			if ( ! empty( $file_data['position'] ) ) {
-				update_post_meta( $attachment_id, 'propstack_file_position', $file_data['position'] );
+				// update the position from Propstack to the file, if given.
+				if ( ! empty( $file_data['position'] ) ) {
+					update_post_meta( $attachment_id, 'propstack_file_position', $file_data['position'] );
+				}
 			}
 		}
 
@@ -1561,6 +1561,11 @@ class ImmoObjects {
 	public function get_import_dialog_by_ajax(): void {
 		// check nonce.
 		check_ajax_referer( 'cfprop-get-import-dialog', 'nonce' );
+
+		// bail if the capability check fails.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
 
 		// return the dialog.
 		wp_send_json( array( 'detail' => $this->get_import_dialog() ) );

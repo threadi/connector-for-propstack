@@ -60,6 +60,9 @@ class Objects extends Schedules_Base {
 
 		// get the import objects for immo objects.
 		$import_obj = new \ConnectorForPropstack\Propstack\Imports\v1\Objects();
+		if ( 'v2' === get_option( 'propstack_connector_api_version' ) ) {
+			$import_obj = new \ConnectorForPropstack\Propstack\Imports\v2\Objects();
+		}
 
 		// run the import.
 		$import_obj->run();

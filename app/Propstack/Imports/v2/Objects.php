@@ -47,7 +47,7 @@ class Objects extends Import_Base {
 	 */
 	public function run(): void {
 		// bail if an import is still running.
-		if ( absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 ) {
+		if ( $this->is_process_running( CFPROP_IMPORT_RUNNING ) ) {
 			// add the error.
 			$this->add_error( 'propstack_object_import_is_running', __( 'Import of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -59,7 +59,7 @@ class Objects extends Import_Base {
 		}
 
 		// bail if the deletion is still running.
-		if ( absint( get_option( CFPROP_DELETE_RUNNING ) ) > 0 ) {
+		if ( $this->is_process_running( CFPROP_DELETE_RUNNING ) ) {
 			// add the error.
 			$this->add_error( 'propstack_object_deletion_is_running', __( 'Deletion of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -103,14 +103,6 @@ class Objects extends Import_Base {
 		 * @param Import_Base $instance        The import object.
 		 */
 		do_action( 'cfprop_import_object_before_start', $process_handler, $instance );
-
-		/**
-		 * Run additional tasks before starting the import of objects.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 * @param ProcessHandler $process_handler The process handler.
-		 */
-		do_action( 'cfprop_import_object_before_start', $process_handler );
 
 		// if any error occurred during import of objects, collect and log it.
 		try {
@@ -354,34 +346,35 @@ class Objects extends Import_Base {
 				// report the success.
 				$process_handler->set_message( $this->get_success_dialog_config() );
 			}
-		} catch ( Error $e ) {
+		} catch ( \Throwable $e ) {
 			// log this event.
-			Log::get_instance()->add( __( 'Following error occurred during the import of objects via API v1:', 'connector-for-propstack' ) . '<br>' . __( 'Message:', 'connector-for-propstack' ) . '<code>' . $e->getMessage() . '</code><br>' . __( 'Code:', 'connector-for-propstack' ) . '<code>' . $e->getCode() . '</code><br>' . __( 'File:', 'connector-for-propstack' ) . '<code>' . $e->getFile() . '</code><br>' . __( 'Line:', 'connector-for-propstack' ) . '<code>' . $e->getLine() . '</code>', 'error', 'import' );
+			Log::get_instance()->add( __( 'Following error occurred during the import of objects via API v2:', 'connector-for-propstack' ) . '<br>' . __( 'Message:', 'connector-for-propstack' ) . '<code>' . $e->getMessage() . '</code><br>' . __( 'Code:', 'connector-for-propstack' ) . '<code>' . $e->getCode() . '</code><br>' . __( 'File:', 'connector-for-propstack' ) . '<code>' . $e->getFile() . '</code><br>' . __( 'Line:', 'connector-for-propstack' ) . '<code>' . $e->getLine() . '</code>', 'error', 'import' );
 
 			// show hint.
 			/* translators: %1$s will be replaced by a URL. */
 			$this->add_error( 'propstack_object_import_error', sprintf( __( 'Error occurred. Check <a href="%1$s">the log</a> for details.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_logs' ) ) ) );
+		} finally {
+			/**
+			 * Run additional tasks after any import of objects.
+			 *
+			 * @since 1.0.0 Available since 1.0.0.
+			 *
+			 * @param Objects $instance The import object.
+			 */
+			do_action( 'cfprop_import_object_after', $instance );
+
+			// log the errors.
+			$this->save_errors_in_log();
+
+			// add a log entry if debug is enabled.
+			if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+				Log::get_instance()->add( __( 'Import of objects has been ended.', 'connector-for-propstack' ), 'info', 'import' );
+			}
+
+			// update the running marker.
+			$process_handler->set_running( 0 );
+			update_option( CFPROP_IMPORT_RUNNING, 0 );
 		}
-
-		/**
-		 * Run additional tasks after any import of objects.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 * @param Objects $instance The import object.
-		 */
-		do_action( 'cfprop_import_object_after', $instance );
-
-		// log the errors.
-		$this->save_errors_in_log();
-
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			Log::get_instance()->add( __( 'Import of objects has been ended.', 'connector-for-propstack' ), 'info', 'import' );
-		}
-
-		// update the running marker.
-		$process_handler->set_running( 0 );
-		update_option( CFPROP_IMPORT_RUNNING, 0 );
 	}
 
 	/**

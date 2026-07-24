@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
   /**
    * Copy strings via click.
    */
-  $("body.post-type-cfprop_object code").on("click", function() {
+  $("body.post-type-cfprop_object code, .etfw-transient code").on("click", function() {
     $(this).removeClass("copied");
     if( propstack_connector_copy_to_clipboard($(this).html().trim()) ) {
       $(this).addClass("copied");

@@ -77,7 +77,7 @@ class Input extends Filter_Type_Base {
 	 */
 	public function get_value(): string {
 		// get the filters.
-		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Read-only public endpoint, no nonce required.
+		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( (array) $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Read-only public endpoint, no nonce required.
 
 		// get the value from the request.
 		return isset( $filters[ $this->get_filter_name() ] ) ? $filters[ $this->get_filter_name() ] : '';

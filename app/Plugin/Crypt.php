@@ -57,7 +57,7 @@ class Crypt {
 	 *
 	 * @return \CryptForWordPress\Crypt
 	 */
-	private function get_crypt_obj(): \CryptForWordPress\Crypt {
+	public function get_crypt_obj(): \CryptForWordPress\Crypt {
 		if ( null === $this->crypt_obj ) {
 			// configure the crypt object.
 			$this->crypt_obj = new \CryptForWordPress\Crypt( CFPROP_PLUGIN );

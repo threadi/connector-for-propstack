@@ -104,7 +104,7 @@ class Cache {
 		global $wpdb;
 
 		// get the entries.
-		$entries = Db::get_instance()->get_results( $wpdb->prepare( 'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name like %s', 'propstack_connector_cache_%%' ) );
+		$entries = Db::get_instance()->get_results( $wpdb->prepare( 'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name like %s', 'cfprop_cache_%%' ) );
 
 		// delete the entries.
 		foreach ( $entries as $entry ) {

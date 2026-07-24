@@ -161,7 +161,7 @@ body.post-type-cfprop_object, body.settings_page_connector-for-propstack {
 	padding: 4px 8px;
 }
 
-body.post-type-cfprop_object {
+body.post-type-cfprop_object, .etfw-transient {
 	.copied {
 		position: relative;
 		z-index: 1;

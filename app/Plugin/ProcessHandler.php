@@ -79,6 +79,11 @@ class ProcessHandler {
 		// check nonce.
 		check_ajax_referer( 'get-propstack-process-info', 'nonce' );
 
+		// bail if the capability check fails.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// get the process ID from request.
 		$process_id = filter_input( INPUT_POST, 'process_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
