@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added more PHP Unit Tests to check for main functions this plugin is using
+
 ### Changed
 
 - Automatic unlock import after 1 hour

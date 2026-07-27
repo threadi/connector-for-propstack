@@ -32,6 +32,16 @@ class PropertyType extends ConnectorForPropstackTestCase {
 		parent::set_up();
 
 		$this->taxonomy_obj = \ConnectorForPropstack\Propstack\Taxonomies\PropertyType::get_instance();
+
+		// make sure the taxonomy is registered in this request ...
+		$this->taxonomy_obj->register();
+
+		// ... and (re)create the default terms for this test. The activation in the
+		// base test case runs only once per class, and WP_UnitTestCase rolls back the
+		// database after every test, so the terms have to be installed here explicitly.
+		if ( empty( $this->get_installed_terms() ) ) {
+			$this->taxonomy_obj->activation();
+		}
 	}
 
 	/**

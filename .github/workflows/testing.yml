@@ -65,7 +65,6 @@ jobs:
       - name: Run package installs and builds
         run: |
           composer install
-          composer update
           npm i
           npm i concurrently
           cd vendor/threadi/easy-dialog-for-wordpress/
