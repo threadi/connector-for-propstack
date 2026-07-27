@@ -1,0 +1,52 @@
+{
+  "data": [
+    {
+      "id": 42,
+      "name": "Musterstraße 1 Hinterhaus",
+      "title": "Musterhaus",
+      "property_status_id": "Vermarktung",
+      "broker_id": 64,
+      "marketing_type": "BUY",
+      "rs_type": "APARTMENT",
+      "rs_category": "MAISONETTE",
+      "number_of_rooms": 3.5,
+      "living_space": 82.5,
+      "price": 349000,
+      "short_address": "Musterstadt",
+      "description_note": "Ein gepflegtes Musterobjekt in zentraler Lage.",
+      "images": []
+    },
+    {
+      "id": 43,
+      "name": "Beispielweg 7",
+      "title": "Beispielwohnung",
+      "property_status_id": "Vermarktung",
+      "broker_id": 64,
+      "marketing_type": "RENT",
+      "rs_type": "APARTMENT",
+      "rs_category": "PENTHOUSE",
+      "number_of_rooms": 2,
+      "living_space": 55,
+      "price": 780,
+      "short_address": "Beispielstadt",
+      "description_note": "Helle Beispielwohnung mit Balkon.",
+      "images": []
+    },
+    {
+      "id": 44,
+      "name": "Archivstraße 3",
+      "title": "Archiviertes Objekt",
+      "property_status_id": "Archiviert",
+      "broker_id": 64,
+      "marketing_type": "BUY",
+      "rs_type": "HOUSE",
+      "rs_category": "SINGLE_FAMILY_HOUSE",
+      "number_of_rooms": 5,
+      "living_space": 140,
+      "price": 520000,
+      "short_address": "Archivstadt",
+      "description_note": "Dieses Objekt darf nicht importiert werden.",
+      "images": []
+    }
+  ]
+}

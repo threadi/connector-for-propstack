@@ -78,7 +78,7 @@ class Cli {
 
 		// show error if objects still exist.
 		if ( $immo_objects_object->has_objects() ) {
-			\WP_CLI::error( 'Deletion was not successfully!' );
+			\WP_CLI::error( 'Deletion was not successful!' );
 		}
 
 		// output success-message.

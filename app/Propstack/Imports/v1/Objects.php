@@ -45,7 +45,7 @@ class Objects extends Import_Base {
 	 */
 	public function run(): void {
 		// bail if an import is still running.
-		if ( $this->is_process_running( CFPROP_IMPORT_RUNNING ) ) {
+		if ( Helper::is_process_running( CFPROP_IMPORT_RUNNING ) ) {
 			// add the error.
 			$this->add_error( 'propstack_object_import_is_running', __( 'Import of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -57,7 +57,7 @@ class Objects extends Import_Base {
 		}
 
 		// bail if the deletion is still running.
-		if ( $this->is_process_running( CFPROP_DELETE_RUNNING ) ) {
+		if ( Helper::is_process_running( CFPROP_DELETE_RUNNING ) ) {
 			// add the error.
 			$this->add_error( 'propstack_object_deletion_is_running', __( 'Deletion of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -249,6 +249,12 @@ class Objects extends Import_Base {
 					if ( apply_filters( 'cfprop_prevent_import_of_object', $prevent_import, $object ) ) {
 						// update the counter.
 						$this->set_count( $process_handler, $process_handler->get_count() + 1 );
+
+						// add a log entry if debug is enabled.
+						if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+							/* translators: %1$s will be replaced by the object title. */
+							Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+						}
 
 						// update tick.
 						$progress ? $progress->tick() : '';

@@ -35,9 +35,11 @@ const { useEffect } = wp.element;
 export default function Edit( object ) {
 
 	// secure ID of this block
-	useEffect(() => {
-		object.setAttributes({blockId: object.clientId});
-	});
+  useEffect( () => {
+    if ( ! object.attributes.blockId ) {
+      object.setAttributes( { blockId: object.clientId } );
+    }
+  }, [ object.attributes.blockId, object.clientId ] );
 
   // useSelect to retrieve all entries on our own cpt
   const immo_objects = useSelect(

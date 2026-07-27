@@ -2,14 +2,20 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added more PHP Unit Tests to check for main functions this plugin is using
+
 ### Changed
 
 - Automatic unlock import after 1 hour
 - Optimized the log definition and usage in debug mode
+- Optimized the usage of all Blocks
 
 ### Fixed
 
 - Fixed a double action in V2 import
+- Fixed a missing action in V2 import
 
 ## [1.0.2] - 20.07.2026
 

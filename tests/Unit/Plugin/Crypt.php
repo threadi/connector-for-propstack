@@ -3,7 +3,7 @@
  * File for tests against \ConnectorForPropstack\Plugin\Crypt.
  */
 
-namespace ConnectorForPropstack\Tests\Unit;
+namespace ConnectorForPropstack\Tests\Unit\Plugin;
 
 use ConnectorForPropstack\Tests\ConnectorForPropstackTestCase;
 

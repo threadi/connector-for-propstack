@@ -7,8 +7,6 @@
   "scripts": {
     "build": "concurrently --kill-others \"npm run build:archive\" \"npm run build:single\" \"npm run build:description\" \"npm run build:field\" \"npm run build:broker-field\" \"npm run build:filter\" \"npm run build:lightbox\" \"npm run build:gallery\"",
     "format": "wp-scripts format",
-    "lint:css": "wp-scripts lint-style",
-    "lint:js": "wp-scripts lint-js",
     "start": "concurrently --kill-others \"npm run start:archive\" \"npm run start:single\" \"npm run start:description\" \"npm run start:field\" \"npm run start:broker-field\" \"npm run start:filter\" \"npm run start:lightbox\" \"npm run start:gallery\"",
     "packages-update": "wp-scripts packages-update",
     "start:description": "wp-scripts start blocks/description/src/index.js --output-path=blocks/description/build/",

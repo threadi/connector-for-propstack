@@ -41,8 +41,11 @@ jobs:
       - name: Run PHPStan check
         run: vendor/bin/phpstan analyse
 
+      - name: Run WordPress Coding Standard checks
+        run: vendor/bin/phpcs .
+
       - name: PHP Compatibility check
-        run: vendor/bin/phpcs -p app --standard=PHPCompatibilityWP --runtime-set testVersion 8.1- --ignore=*/Crypt.php
+        run: vendor/bin/phpcs -p app --standard=PHPCompatibilityWP --runtime-set testVersion 8.2- --ignore=*/Crypt.php
 
   phpunit:
     name: Run tests
@@ -65,7 +68,6 @@ jobs:
       - name: Run package installs and builds
         run: |
           composer install
-          composer update
           npm i
           npm i concurrently
           cd vendor/threadi/easy-dialog-for-wordpress/
@@ -76,7 +78,13 @@ jobs:
           npm run build
           cd ../../../
           npm run build:archive
+          npm run build:broker-field
+          npm run build:description
+          npm run build:field
+          npm run build:filter
           npm run build:single
+          npm run build:gallery
+          npm run build:lightbox
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

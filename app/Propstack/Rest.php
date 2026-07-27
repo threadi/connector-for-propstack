@@ -72,6 +72,18 @@ class Rest {
 				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
+				'args'                => array(
+					'field_category' => array(
+						'type'              => 'string',
+						'required'          => false,
+						'sanitize_callback' => 'sanitize_key',
+					),
+					'query'          => array(
+						'type'              => 'string',
+						'required'          => false,
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
 			)
 		);
 		foreach ( Taxonomies::get_instance()->get_taxonomies_as_objects() as $taxonomy ) {
@@ -103,10 +115,12 @@ class Rest {
 	/**
 	 * Return the list of available fields.
 	 *
+	 * @param WP_REST_Request $request The object with the data of the request.
+	 *
 	 * @return array<int,mixed>
 	 */
-	public function get_fields(): array {
-		return Fields::get_instance()->get_fields_by_request( '', '', true );
+	public function get_fields( WP_REST_Request $request ): array {
+		return Fields::get_instance()->get_fields_by_request( $request->get_param( 'field_category' ), $request->get_param( 'query' ), true );
 	}
 
 	/**
@@ -122,7 +136,7 @@ class Rest {
 		foreach ( Filters::get_instance()->get_filters_as_objects() as $index1 => $filter_obj ) {
 			foreach ( $filter_obj->get() as $index2 => $filter ) {
 				$list[] = array(
-					'id'    => ( $index1 + $index2 + 1 ),
+					'id'    => ( absint( $index1 ) + absint( $index2 ) + 1 ),
 					'label' => $filter->get_label(),
 					'value' => $filter->get_filter_name(),
 				);

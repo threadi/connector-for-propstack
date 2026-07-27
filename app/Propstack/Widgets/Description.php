@@ -81,7 +81,7 @@ class Description extends Widget_Base {
 			return '';
 		}
 
-		// bail if requested post type is not ours.
+		// bail if requested post-type is not ours.
 		if ( get_post_type( $immo_object->get_id() ) !== ImmoObject::get_instance()->get_name() ) {
 			return '';
 		}

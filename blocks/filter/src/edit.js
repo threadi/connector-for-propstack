@@ -37,27 +37,36 @@ export default function Edit( object ) {
   const [ query, setQuery ] = useState( '' );
 
 	// secure ID of this block
-	useEffect(() => {
-		object.setAttributes({blockId: object.clientId});
-	});
+  useEffect( () => {
+    if ( ! object.attributes.blockId ) {
+      object.setAttributes( { blockId: object.clientId } );
+    }
+  }, [ object.attributes.blockId, object.clientId ] );
 
-  // get the possible filters.
-  let filters = [];
-  if( !object.attributes.preview ) {
-    useEffect( () => {
-      dispatch( 'core' ).addEntities( [
-        {
-          name: 'filters',
-          kind: 'connector-for-propstack/v1',
-          baseURL: '/connector-for-propstack/v1/filters'
-        }
-      ] );
-    }, [ query ] );
-    filters = useSelect( (select) => {
-        return select( 'core' ).getEntityRecords( 'connector-for-propstack/v1', 'filters', { per_page: 10, query: query } ) || [];
+  const isPreview = !! object.attributes.preview;
+
+  useEffect( () => {
+    if ( isPreview ) {
+      return;
+    }
+    dispatch( 'core' ).addEntities( [
+      {
+        name: 'filters',
+        kind: 'connector-for-propstack/v1',
+        baseURL: '/connector-for-propstack/v1/filters'
       }
-    );
-  }
+    ] );
+  }, [ isPreview ] );
+
+  const filters = useSelect(
+    ( select ) => {
+      if ( isPreview ) {
+        return [];
+      }
+      return select( 'core' ).getEntityRecords( 'connector-for-propstack/v1', 'filters', { per_page: 10, query: query } ) || [];
+    },
+    [ isPreview ]
+  );
 
 	/**
 	 * Collect return for the edit-function

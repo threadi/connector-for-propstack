@@ -47,7 +47,7 @@ class Objects extends Import_Base {
 	 */
 	public function run(): void {
 		// bail if an import is still running.
-		if ( $this->is_process_running( CFPROP_IMPORT_RUNNING ) ) {
+		if ( Helper::is_process_running( CFPROP_IMPORT_RUNNING ) ) {
 			// add the error.
 			$this->add_error( 'propstack_object_import_is_running', __( 'Import of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -59,7 +59,7 @@ class Objects extends Import_Base {
 		}
 
 		// bail if the deletion is still running.
-		if ( $this->is_process_running( CFPROP_DELETE_RUNNING ) ) {
+		if ( Helper::is_process_running( CFPROP_DELETE_RUNNING ) ) {
 			// add the error.
 			$this->add_error( 'propstack_object_deletion_is_running', __( 'Deletion of objects is still running. Please wait.', 'connector-for-propstack' ) );
 
@@ -173,6 +173,15 @@ class Objects extends Import_Base {
 					/* translators: a title will replace %1$s. */
 					Log::get_instance()->add( sprintf( __( 'The objects in the %1$s language have not been modified. The import will not be performed.', 'connector-for-propstack' ), ' <em>' . $language_code . '</em>' ), 'info', 'import' );
 
+					/**
+					 * Run actions if objects in Propstack did not change.
+					 *
+					 * @since 1.0.0 Available since 1.0.0.
+					 *
+					 * @param string $md5 The md5-hash from the content of the response.
+					 */
+					do_action( 'cfprop_import_content_not_change', $md5 );
+
 					// do nothing more.
 					continue;
 				}
@@ -181,7 +190,7 @@ class Objects extends Import_Base {
 				$post_type_name = ImmoObject::get_instance()->get_name();
 
 				// update the markers.
-				$this->set_max_count( $process_handler, count( $data ) );
+				$this->set_max_count( $process_handler, count( $data['data'] ) );
 				$this->set_new_status( $process_handler, __( 'Import of objects is running', 'connector-for-propstack' ) );
 
 				// add a log entry if debug is enabled.
