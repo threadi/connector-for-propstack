@@ -666,4 +666,13 @@ class Helper {
 		// return false, as no process is running.
 		return false;
 	}
+
+	/**
+	 * Return whether plugin developer modus is enabled.
+	 *
+	 * @return bool
+	 */
+	public static function is_development_mode_active(): bool {
+		return function_exists( 'wp_is_development_mode' ) && wp_is_development_mode( 'plugin' );
+	}
 }

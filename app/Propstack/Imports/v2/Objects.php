@@ -199,7 +199,7 @@ class Objects extends Import_Base {
 				}
 
 				// show cli hint.
-				$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import objects in language ' . $language_code, count( $data ) ) : false;
+				$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import objects in language ' . $language_code, count( $data['data'] ) ) : false;
 
 				// loop through the data and import or update each object.
 				foreach ( $data['data'] as $object ) {
@@ -344,7 +344,7 @@ class Objects extends Import_Base {
 				$process_handler->set_message( $this->get_error_dialog_config() );
 			} else {
 				/**
-				 * Run additional tasks after successfully import of objects.
+				 * Run additional tasks after successful import of objects.
 				 *
 				 * @since 1.0.0 Available since 1.0.0.
 				 *

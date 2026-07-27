@@ -376,7 +376,7 @@ class Objects extends Import_Base {
 				$process_handler->set_message( $this->get_error_dialog_config() );
 			} else {
 				/**
-				 * Run additional tasks after successfully import of objects.
+				 * Run additional tasks after successful import of objects.
 				 *
 				 * @since 1.0.0 Available since 1.0.0.
 				 *

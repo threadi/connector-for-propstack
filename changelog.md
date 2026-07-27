@@ -5,6 +5,7 @@
 ### Added
 
 - Added more PHP Unit Tests to check for main functions this plugin is using
+- Added method to run updates after a plugin update
 
 ### Changed
 
