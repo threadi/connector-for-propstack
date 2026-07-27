@@ -10,6 +10,7 @@ namespace ConnectorForPropstack\Propstack;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use WP_REST_Request;
 use WP_REST_Server;
 
 /**
@@ -116,8 +117,8 @@ class Rest {
 	 *
 	 * @return array<int,mixed>
 	 */
-	public function get_fields(): array {
-		return Fields::get_instance()->get_fields_by_request( '', '', true );
+	public function get_fields( WP_REST_Request $request ): array {
+		return Fields::get_instance()->get_fields_by_request( $request->get_param( 'field_category' ), $request->get_param( 'query' ), true );
 	}
 
 	/**

@@ -41,8 +41,11 @@ jobs:
       - name: Run PHPStan check
         run: vendor/bin/phpstan analyse
 
+      - name: Run WordPress Coding Standard checks
+        run: vendor/bin/phpcs .
+
       - name: PHP Compatibility check
-        run: vendor/bin/phpcs -p app --standard=PHPCompatibilityWP --runtime-set testVersion 8.1- --ignore=*/Crypt.php
+        run: vendor/bin/phpcs -p app --standard=PHPCompatibilityWP --runtime-set testVersion 8.2- --ignore=*/Crypt.php
 
   phpunit:
     name: Run tests

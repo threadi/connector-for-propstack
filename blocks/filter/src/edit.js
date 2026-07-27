@@ -63,7 +63,7 @@ export default function Edit( object ) {
       if ( isPreview ) {
         return [];
       }
-      return select( 'core' ).getEntityRecords( 'connector-for-propstack/v1', 'fields', { per_page: 10, query: query } ) || [];
+      return select( 'core' ).getEntityRecords( 'connector-for-propstack/v1', 'filters', { per_page: 10, query: query } ) || [];
     },
     [ isPreview ]
   );

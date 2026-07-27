@@ -18,7 +18,7 @@ import {
 } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 const { dispatch, useSelect } = wp.data;
-const { useEffect } = wp.element;
+const { useEffect, useState } = wp.element;
 import {
   onChange,
 } from '../../components';
@@ -34,6 +34,8 @@ import {
  */
 export default function Edit( object ) {
 
+  const [ query, setQuery ] = useState( '' );
+
 	// secure ID of this block
   useEffect( () => {
     if ( ! object.attributes.blockId ) {
@@ -41,23 +43,30 @@ export default function Edit( object ) {
     }
   }, [ object.attributes.blockId, object.clientId ] );
 
-  // get possible description types.
-  let description_types = [];
-  if( !object.attributes.preview ) {
-    useEffect( () => {
-      dispatch( 'core' ).addEntities( [
-        {
-          name: 'fields',
-          kind: 'connector-for-propstack/v1',
-          baseURL: '/connector-for-propstack/v1/fields'
-        }
-      ] );
-    }, [] );
-    description_types = useSelect( (select) => {
-        return select( 'core' ).getEntityRecords( 'connector-for-propstack/v1', 'fields', { field_category: 'descriptions', per_page: 20 } ) || [];
+  const isPreview = !! object.attributes.preview;
+
+  useEffect( () => {
+    if ( isPreview ) {
+      return;
+    }
+    dispatch( 'core' ).addEntities( [
+      {
+        name: 'fields',
+        kind: 'connector-for-propstack/v1',
+        baseURL: '/connector-for-propstack/v1/fields'
       }
-    );
-  }
+    ] );
+  }, [ isPreview ] );
+
+  const description_types = useSelect(
+    ( select ) => {
+      if ( isPreview ) {
+        return [];
+      }
+      return select( 'core' ).getEntityRecords( 'connector-for-propstack/v1', 'fields', { field_category: 'descriptions', per_page: 20 } ) || [];
+    },
+    [ isPreview ]
+  );
 
 	/**
 	 * Collect return for the edit-function
