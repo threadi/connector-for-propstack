@@ -72,13 +72,13 @@ class Rest {
 				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
-				'args' => array(
+				'args'                => array(
 					'field_category' => array(
 						'type'              => 'string',
 						'required'          => false,
 						'sanitize_callback' => 'sanitize_key',
 					),
-					'query' => array(
+					'query'          => array(
 						'type'              => 'string',
 						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
@@ -114,6 +114,8 @@ class Rest {
 
 	/**
 	 * Return the list of available fields.
+	 *
+	 * @param WP_REST_Request $request The object with the data of the request.
 	 *
 	 * @return array<int,mixed>
 	 */
