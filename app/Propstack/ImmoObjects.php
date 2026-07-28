@@ -1574,9 +1574,9 @@ class ImmoObjects {
 	/**
 	 * Remove documents from the Propstack API response as we do not use them in the websites.
 	 *
-	 * @param array<string,mixed> $response_data The API response.
+	 * @param array<int,mixed> $response_data The API response.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function remove_document_from_response( array $response_data ): array {
 		foreach ( $response_data as $key => $value ) {
@@ -1590,9 +1590,9 @@ class ImmoObjects {
 	/**
 	 * Save the API response
 	 *
-	 * @param array<string,mixed> $data The API response.
+	 * @param array<int,mixed> $data The API response.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function save_response( array $data ): array {
 		update_option( 'cfprop_last_api_response', $data );

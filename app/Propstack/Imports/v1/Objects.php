@@ -132,59 +132,17 @@ class Objects extends Import_Base {
 					Log::get_instance()->add( sprintf( __( 'Import of objects in language %1$s starting', 'connector-for-propstack' ), ' <em>' . $language_code . '</em>' ), 'info', 'import' );
 				}
 
-				// create and send API request.
-				$request_object = new ApiRequest();
-				$request_object->set_url( $this->get_url( $language_code ) );
-				$request_object->set_post_data( '' );
-				$request_object->set_method( 'GET' );
-				$request_object->set_md5( md5( $this->get_url( $language_code ) ) );
-				$request_object->set_header( $this->get_header() );
-				$request_object->send();
+				// load all objects for this language, page by page.
+				$objects = $this->get_objects_from_api( $language_code );
 
-				// bail on error.
-				if ( 200 !== $request_object->get_http_status() ) {
-					// save the error.
-					$this->add_error( 'propstack_object_import_http_status', __( 'The Propstack API returned an unexpected HTTP status when retrieving objects:', 'connector-for-propstack' ) . ' <code>' . $request_object->get_http_status() . '</code>' );
-
-					// get the details of the error from the response.
-					$response = $request_object->get_response();
-
-					// convert the response to an array.
-					$data = json_decode( $response, true );
-
-					// add the error.
-					if ( is_array( $data ) && isset( $data['errors'] ) ) {
-						foreach ( $data['errors'] as $error ) {
-							// get help entry by the given error message.
-							$knowledge_center_entry = KnowledgeCenter::get_instance()->get_entry_by_text( $error );
-
-							// prepare the error entry.
-							$error_entry = __( 'Error from Propstack API for objects:', 'connector-for-propstack' ) . ' <code>' . $error . '</code>';
-
-							// add the help text if it has a match.
-							if ( $knowledge_center_entry ) {
-								$error_entry .= $knowledge_center_entry->get_text();
-							}
-							$this->add_error( 'propstack_object_import_http_status_details', $error_entry );
-						}
-					}
-
-					// do nothing more in this language.
+				// bail on error (already logged inside the method).
+				if ( false === $objects ) {
 					continue;
 				}
 
-				// get the response body.
-				$response = $request_object->get_response();
-
-				// convert the response to an array.
-				$data = json_decode( $response, true );
-
-				// bail on any error.
-				if ( ! is_array( $data ) ) {
-					// add a log entry if debug is enabled.
-					Log::get_instance()->add( __( 'Error during decoding the API response.', 'connector-for-propstack' ), 'error', 'import' );
-
-					// do nothing more.
+				// bail if nothing was returned.
+				if ( empty( $objects ) ) {
+					Log::get_instance()->add( __( 'Got no data from Propstack API v1.', 'connector-for-propstack' ), 'error', 'import' );
 					continue;
 				}
 
@@ -192,9 +150,9 @@ class Objects extends Import_Base {
 				 * Filter the response data from Propstack.
 				 *
 				 * @since 1.0.0 Available since 1.0.0.
-				 * @param array<string,mixed> $data The response data.
+				 * @param array<int,mixed> $objects The list of objects from the response.
 				 */
-				$data = apply_filters( 'cfprop_object_import_response', $data );
+				$data = apply_filters( 'cfprop_object_import_response', $objects );
 
 				// get the md5 hash of this content.
 				$md5 = md5( Helper::get_json( $data ) );
@@ -253,7 +211,7 @@ class Objects extends Import_Base {
 						// add a log entry if debug is enabled.
 						if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
 							/* translators: %1$s will be replaced by the object title. */
-							Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+							Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title']['value'] . '</em>' ), 'info', 'import' );
 						}
 
 						// update tick.
@@ -389,7 +347,7 @@ class Objects extends Import_Base {
 			}
 		} catch ( \Throwable $e ) {
 			// log this event.
-			Log::get_instance()->add( __( 'Following error occurred during the import of objects via API v2:', 'connector-for-propstack' ) . '<br>' . __( 'Message:', 'connector-for-propstack' ) . '<code>' . $e->getMessage() . '</code><br>' . __( 'Code:', 'connector-for-propstack' ) . '<code>' . $e->getCode() . '</code><br>' . __( 'File:', 'connector-for-propstack' ) . '<code>' . $e->getFile() . '</code><br>' . __( 'Line:', 'connector-for-propstack' ) . '<code>' . $e->getLine() . '</code>', 'error', 'import' );
+			Log::get_instance()->add( __( 'Following error occurred during the import of objects via API v1:', 'connector-for-propstack' ) . '<br>' . __( 'Message:', 'connector-for-propstack' ) . '<code>' . $e->getMessage() . '</code><br>' . __( 'Code:', 'connector-for-propstack' ) . '<code>' . $e->getCode() . '</code><br>' . __( 'File:', 'connector-for-propstack' ) . '<code>' . $e->getFile() . '</code><br>' . __( 'Line:', 'connector-for-propstack' ) . '<code>' . $e->getLine() . '</code>', 'error', 'import' );
 
 			// show hint.
 			/* translators: %1$s will be replaced by a URL. */
@@ -423,17 +381,21 @@ class Objects extends Import_Base {
 	 * Return the API URL to import objects.
 	 *
 	 * @param string $language_code The language to use for the URL.
+	 * @param int    $page The page to request.
+	 * @param int    $per  The amount of objects per page.
 	 *
 	 * @return string
 	 */
-	private function get_url( string $language_code ): string {
+	private function get_url( string $language_code, int $page = 1, int $per = 100 ): string {
 		// get the URL.
 		$url = add_query_arg(
 			array(
-				'locale'   => $language_code,
-				'expand'   => 1,
-				'archived' => -1,
-				'per'      => 500,
+				'locale'    => $language_code,
+				'expand'    => 1,
+				'archived'  => -1,
+				'with_meta' => 1,
+				'page'      => $page,
+				'per'       => $per,
 			),
 			$this->url
 		);
@@ -531,5 +493,140 @@ class Objects extends Import_Base {
 		 * @param string $new_status The new status.
 		 */
 		do_action( 'cfprop_import_object_set_status', $new_status );
+	}
+
+	/**
+	 * Load all objects for the given language, page by page.
+	 *
+	 * Uses the documented pagination (page + per) and the total_count from
+	 * "with_meta=1" as the reliable stop condition.
+	 *
+	 * @source https://docs.propstack.de/paginierung
+	 *
+	 * @param string $language_code The language to load.
+	 *
+	 * @return array<int,mixed>|false The list of objects, or false on error.
+	 */
+	private function get_objects_from_api( string $language_code ): array|false {
+		$max_per_value = 500;
+		/**
+		 * Filter the max. per page objects for every import from Propstack.
+		 *
+		 * @since 1.0.3 Available since 1.0.3.
+		 * @param int $max_per_value The max per value.
+		 */
+		$per = min( 500, absint( apply_filters( 'cfprop_import_per_page', $max_per_value ) ) );
+
+		$max_pages = 1000;
+		/**
+		 * Filter the max pages for every import from Propstack.
+		 *
+		 * @since 1.0.3 Available since 1.0.3.
+		 * @param int $max_pages The max pages value.
+		 */
+		$max_pages = absint( apply_filters( 'cfprop_import_max_pages', $max_pages ) );
+
+		$objects            = array();
+		$page               = 1;
+		$total              = null;
+		$previous_page_hash = '';
+
+		do {
+			// request one page.
+			$request_object = new ApiRequest();
+			$request_object->set_url( $this->get_url( $language_code, $page, $per ) );
+			$request_object->set_post_data( '' );
+			$request_object->set_method( 'GET' );
+			$request_object->set_md5( md5( $this->get_url( $language_code, $page, $per ) ) );
+			$request_object->set_header( $this->get_header() );
+			$request_object->send();
+
+			// bail on HTTP error.
+			if ( 200 !== $request_object->get_http_status() ) {
+				// save the error.
+				$this->add_error( 'propstack_object_import_http_status', __( 'The Propstack API returned an unexpected HTTP status when retrieving objects:', 'connector-for-propstack' ) . ' <code>' . $request_object->get_http_status() . '</code>' );
+
+				// get the details of the error from the response.
+				$response = $request_object->get_response();
+
+				// convert the response to an array.
+				$data = json_decode( $response, true );
+
+				// add the error.
+				if ( is_array( $data ) && isset( $data['errors'] ) ) {
+					foreach ( $data['errors'] as $error ) {
+						// get help entry by the given error message.
+						$knowledge_center_entry = KnowledgeCenter::get_instance()->get_entry_by_text( $error );
+
+						// prepare the error entry.
+						$error_entry = __( 'Error from Propstack API for objects:', 'connector-for-propstack' ) . ' <code>' . $error . '</code>';
+
+						// add the help text if it has a match.
+						if ( $knowledge_center_entry ) {
+							$error_entry .= $knowledge_center_entry->get_text();
+						}
+						$this->add_error( 'propstack_object_import_http_status_details', $error_entry );
+					}
+				}
+
+				// do nothing more in this language.
+				return false;
+			}
+
+			// decode.
+			$data = json_decode( $request_object->get_response(), true );
+			if ( ! is_array( $data ) || ! isset( $data['data'] ) || ! is_array( $data['data'] ) ) {
+				Log::get_instance()->add( __( 'Error during decoding the API response.', 'connector-for-propstack' ), 'error', 'import' );
+				return false;
+			}
+
+			// read the total count once (from the first page).
+			if ( null === $total && isset( $data['meta']['total_count'] ) ) {
+				$total = absint( $data['meta']['total_count'] );
+			}
+
+			// stop on an empty page.
+			if ( empty( $data['data'] ) ) {
+				break;
+			}
+
+			// safeguard: stop if the API ignores pagination and repeats a page.
+			$page_hash = md5( Helper::get_json( $data['data'] ) );
+			if ( $page_hash === $previous_page_hash ) {
+				break;
+			}
+			$previous_page_hash = $page_hash;
+
+			// collect this page.
+			$objects = array_merge( $objects, $data['data'] );
+
+			++$page;
+			$object_count = count( $objects );
+			$data_count   = count( $data['data'] );
+		} while (
+			$page <= $max_pages
+			&& (
+				// primary stop: we have everything the API reports.
+				( null !== $total && $object_count < $total )
+				// fallback if total_count is ever missing: stop on a non-full page.
+				|| ( null === $total && $data_count >= $per )
+			)
+		);
+
+		// safety check: warn if we ended up with fewer than reported.
+		if ( null !== $total && count( $objects ) < $total ) {
+			Log::get_instance()->add(
+				sprintf(
+				/* translators: %1$d received, %2$d total. */
+					__( 'Only %1$d of %2$d objects were imported. The rest could not be loaded.', 'connector-for-propstack' ),
+					count( $objects ),
+					$total
+				),
+				'error',
+				'import'
+			);
+		}
+
+		return $objects;
 	}
 }

@@ -14,9 +14,11 @@ Import and display your objects from [Propstack](https://www.propstack.de) direc
 
 Import and display your objects from [Propstack](https://www.propstack.de) directly on your website. Get full control over how they are displayed.
 
+You do not need to prepare your hosting to use this plugin. Just install it and run the setup to use it in minutes.
+
 #### Features
 
-- automatic import of marketing objects from Propstack in German or Englisch
+- automatic import of marketing objects from Propstack in German or Englisch without limit
 - import of objects from type "Apartment", "House" and "Garage" with their respective fields
 - objects are indexable for search engines (SEO)
 - each object gets its own URL on your website

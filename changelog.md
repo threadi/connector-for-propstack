@@ -9,6 +9,7 @@
 
 ### Changed
 
+- Now using paginated imports for V1 and V2 which allows the import of hundreds of Propstack objects in one rush
 - Automatic unlock import after 1 hour
 - Optimized the log definition and usage in debug mode
 - Optimized the usage of all Blocks
