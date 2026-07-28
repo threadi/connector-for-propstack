@@ -20,6 +20,10 @@
 - Fixed a double action in V2 import
 - Fixed a missing action in V2 import
 
+### Removed
+
+- Removed some now unused code
+
 ## [1.0.2] - 20.07.2026
 
 ### Changed

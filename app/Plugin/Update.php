@@ -10,6 +10,8 @@ namespace ConnectorForPropstack\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use ConnectorForPropstack\Propstack\Taxonomies;
+
 /**
  * Helper-function for updates of this plugin.
  */
@@ -89,6 +91,13 @@ class Update {
 	 * @return void
 	 */
 	private function version103(): void {
+		// update the database tables.
 		Init::get_instance()->install_db_tables();
+
+		// update the terms.
+		foreach ( Taxonomies::get_instance()->get_taxonomies_as_objects() as $taxonomy ) {
+			$taxonomy->register();
+			$taxonomy->activation();
+		}
 	}
 }

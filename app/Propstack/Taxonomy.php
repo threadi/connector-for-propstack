@@ -65,13 +65,6 @@ class Taxonomy {
 	protected bool $can_be_used_as_filter = true;
 
 	/**
-	 * Mark if this taxonomy can be used as a template.
-	 *
-	 * @var bool
-	 */
-	protected bool $do_not_use_as_template = false;
-
-	/**
 	 * Initialize this object.
 	 *
 	 * @return void
@@ -475,38 +468,6 @@ class Taxonomy {
 	}
 
 	/**
-	 * Return the list of fields in a specific category.
-	 *
-	 * @param string $category_name The name of the category.
-	 * @param bool   $check_for_public_view Whether to check for public view.
-	 *
-	 * @return array<int,Field_Base>
-	 */
-	public function get_fields_by_category( string $category_name, bool $check_for_public_view = false ): array {
-		// prepare the list.
-		$list = array();
-
-		// loop through all fields in this taxonomy.
-		foreach ( $this->get_fields() as $field ) {
-			// bail if this field is not in the requested category.
-			if ( $category_name !== $field->get_category()->get_name() ) {
-				continue;
-			}
-
-			// bail if a public view check is run and the field should be hidden.
-			if ( $check_for_public_view && ( $field->hide() || $field->hide_in_frontend() ) ) {
-				continue;
-			}
-
-			// add this field to the list.
-			$list[] = $field;
-		}
-
-		// return the resulting list of fields in this category .
-		return $list;
-	}
-
-	/**
 	 * Return a category title preset for this taxonomy to use in template generation.
 	 *
 	 * @param string $category_title The category title.
@@ -617,14 +578,5 @@ class Taxonomy {
 		// show hint for our plugin.
 		/* translators: %1$s will be replaced by the plugin name. */
 		return $content . ' ' . sprintf( __( 'This page is provided by the plugin %1$s.', 'connector-for-propstack' ), '<em>' . Helper::get_plugin_name() . '</em>' );
-	}
-
-	/**
-	 * Return whether this taxonomy should NOT be used as a template.
-	 *
-	 * @return bool
-	 */
-	public function do_not_use_as_template(): bool {
-		return $this->do_not_use_as_template;
 	}
 }
