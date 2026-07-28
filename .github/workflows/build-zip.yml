@@ -64,21 +64,21 @@ jobs:
               run: vendor/bin/phpcs .
 
             - name: Set version number 1
-              uses: richardrigutins/replace-in-files@v2
+              uses: richardrigutins/replace-in-files@v3
               with:
                   files: 'connector-for-propstack.php'
                   search-text: '@@VersionNumber@@'
                   replacement-text: ${{ github.ref_name }}
 
             - name: Set version number 2
-              uses: richardrigutins/replace-in-files@v2
+              uses: richardrigutins/replace-in-files@v3
               with:
                   files: 'uninstall.php'
                   search-text: '@@VersionNumber@@'
                   replacement-text: ${{ github.ref_name }}
 
             - name: Set version number 3
-              uses: richardrigutins/replace-in-files@v2
+              uses: richardrigutins/replace-in-files@v3
               with:
                   files: 'readme.txt'
                   search-text: '@@VersionNumber@@'
@@ -88,11 +88,11 @@ jobs:
               run: |
                 rm .gitattributes
                 rm .gitignore
-                rm -fr .github
                 rm .editorconfig
                 rm -fr doc
                 rm -fr bin
                 rm dev-composer.sh
+                rm phpcs.xml.dist
                 rm phpunit.xml.dist
                 rm -fr tests
                 rm -fr languages
@@ -101,7 +101,7 @@ jobs:
               uses: wordpress/plugin-check-action@v1
               with:
                   exclude-directories:
-                      app/Dependencies/easyTransientsForWordPress/
+                      .github/,app/Dependencies/easyTransientsForWordPress/
                   ignore-codes:
                       WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
                   include-experimental: false
