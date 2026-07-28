@@ -72,6 +72,9 @@ class Propstack {
 		// initialize the broker.
 		Broker::get_instance()->init();
 
+		// initialize the states.
+		States::get_instance()->init();
+
 		// initialize the immo objects.
 		ImmoObjects::get_instance()->init();
 
@@ -121,6 +124,7 @@ class Propstack {
 		$taxonomies[] = 'ConnectorForPropstack\Propstack\Taxonomies\MarketingType';
 		$taxonomies[] = 'ConnectorForPropstack\Propstack\Taxonomies\ObjectType';
 		$taxonomies[] = 'ConnectorForPropstack\Propstack\Taxonomies\PropertyType';
+		$taxonomies[] = 'ConnectorForPropstack\Propstack\Taxonomies\Status';
 
 		// return the list of taxonomie.
 		return $taxonomies;

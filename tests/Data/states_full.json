@@ -1,0 +1,67 @@
+{
+    "data": [
+        {
+            "id": 222049,
+            "name": "Akquise",
+            "position": 1,
+            "color": "#419588",
+            "exclude_from_search_profile_matching": true,
+            "disable_expose_landing_page": true,
+            "remove_from_portal": true
+        },
+        {
+            "id": 222050,
+            "name": "Vorbereitung",
+            "position": 2,
+            "color": "#2E85F0",
+            "exclude_from_search_profile_matching": true,
+            "disable_expose_landing_page": true,
+            "remove_from_portal": true
+        },
+        {
+            "id": 222051,
+            "name": "Vermarktung",
+            "position": 3,
+            "color": "#DC143C",
+            "exclude_from_search_profile_matching": false,
+            "disable_expose_landing_page": false,
+            "remove_from_portal": false
+        },
+        {
+            "id": 222052,
+            "name": "Reserviert",
+            "position": 4,
+            "color": "#DC143C",
+            "exclude_from_search_profile_matching": false,
+            "disable_expose_landing_page": false,
+            "remove_from_portal": false
+        },
+        {
+            "id": 222053,
+            "name": "Abgeschlossen",
+            "position": 5,
+            "color": "#9932CC",
+            "exclude_from_search_profile_matching": true,
+            "disable_expose_landing_page": true,
+            "remove_from_portal": true
+        },
+        {
+            "id": 224425,
+            "name": "Aktiv",
+            "position": 6,
+            "color": null,
+            "exclude_from_search_profile_matching": false,
+            "disable_expose_landing_page": false,
+            "remove_from_portal": false
+        },
+        {
+            "id": 224426,
+            "name": "Inaktiv",
+            "position": 7,
+            "color": null,
+            "exclude_from_search_profile_matching": false,
+            "disable_expose_landing_page": false,
+            "remove_from_portal": false
+        }
+    ]
+}

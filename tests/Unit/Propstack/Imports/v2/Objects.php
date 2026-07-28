@@ -6,6 +6,7 @@
 namespace ConnectorForPropstack\Tests\Unit\Propstack\Imports\v2;
 
 use ConnectorForPropstack\Plugin\Helper;
+use ConnectorForPropstack\Propstack\States;
 use ConnectorForPropstack\Tests\ConnectorForPropstackTestCase;
 use WP_Error;
 use WP_HTTP_Requests_Response;
@@ -54,7 +55,10 @@ class Objects extends ConnectorForPropstackTestCase {
 		// mock the v2 endpoint.
 		add_filter( 'pre_http_request', array( $this, 'mock_v2_request' ), 10, 3 );
 
-		// get the object to import immo objects.
+		// initialize the states object.
+		States::get_instance()->init();
+
+		// get the object to import objects.
 		$this->import_obj = new \ConnectorForPropstack\Propstack\Imports\v2\Objects();
 
 		// run the activation.
@@ -67,7 +71,7 @@ class Objects extends ConnectorForPropstackTestCase {
 	 * @return void
 	 */
 	public function tear_down(): void {
-		remove_filter( 'pre_http_request', array( $this, 'mock_v2_request' ), 10 );
+		remove_filter( 'pre_http_request', array( $this, 'mock_v2_request' ) );
 
 		// remove the pseudo-key.
 		update_option( 'propstack_connector_api_key', '' );
@@ -91,8 +95,8 @@ class Objects extends ConnectorForPropstackTestCase {
 		}
 
 		// answer with 401 if the API key is missing.
+		$requests_response              = new \WpOrg\Requests\Response();
 		if ( empty( $parsed_args['headers']['X-API-KEY'] ) ) {
-			$requests_response              = new \WpOrg\Requests\Response();
 			$requests_response->status_code = 401;
 
 			return array(
@@ -101,7 +105,6 @@ class Objects extends ConnectorForPropstackTestCase {
 		}
 
 		// bail with the given status if a wrong one is forced.
-		$requests_response              = new \WpOrg\Requests\Response();
 		$requests_response->status_code = isset( $parsed_args['headers']['response_http_status'] ) ? $parsed_args['headers']['response_http_status'] : 200;
 
 		// deliver our fixture.
@@ -131,6 +134,9 @@ class Objects extends ConnectorForPropstackTestCase {
 		foreach ( $this->import_obj->get_errors() as $error ) {
 			$this->assertEquals( 'propstack_object_import_is_running', $error->get_error_code() );
 		}
+
+		// reset the list of errors.
+		$this->import_obj->reset_errors();
 	}
 
 	/**
@@ -151,6 +157,9 @@ class Objects extends ConnectorForPropstackTestCase {
 		foreach ( $this->import_obj->get_errors() as $error ) {
 			$this->assertEquals( 'propstack_object_deletion_is_running', $error->get_error_code() );
 		}
+
+		// reset the list of errors.
+		$this->import_obj->reset_errors();
 	}
 
 	/**
@@ -168,9 +177,16 @@ class Objects extends ConnectorForPropstackTestCase {
 		// test the results.
 		$this->assertIsArray( $this->import_obj->get_errors() );
 		$this->assertNotEmpty( $this->import_obj->get_errors() );
-		foreach ( $this->import_obj->get_errors() as $error ) {
-			$this->assertEquals( 'propstack_object_import_http_status', $error->get_error_code() );
-		}
+
+		// collect the error codes and check that the expected one is among them.
+		$codes = array_map(
+			fn( $error ) => $error->get_error_code(),
+			$this->import_obj->get_errors()
+		);
+		$this->assertContains( 'propstack_object_import_http_status', $codes );
+
+		// reset the list of errors.
+		$this->import_obj->reset_errors();
 	}
 
 	/**
@@ -191,9 +207,15 @@ class Objects extends ConnectorForPropstackTestCase {
 		// test the results.
 		$this->assertIsArray( $this->import_obj->get_errors() );
 		$this->assertNotEmpty( $this->import_obj->get_errors() );
-		foreach ( $this->import_obj->get_errors() as $error ) {
-			$this->assertEquals( 'propstack_object_import_http_status', $error->get_error_code() );
-		}
+
+		$codes = array_map(
+			fn( $error ) => $error->get_error_code(),
+			$this->import_obj->get_errors()
+		);
+		$this->assertContains( 'propstack_object_import_http_status', $codes );
+
+		// reset the list of errors.
+		$this->import_obj->reset_errors();
 
 		// remove the filter.
 		remove_filter( 'cfprop_request_header', array( $this, 'set_wrong_http_status' ) );

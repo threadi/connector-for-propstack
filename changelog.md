@@ -5,17 +5,24 @@
 ### Added
 
 - Added more PHP Unit Tests to check for main functions this plugin is using
+- Added method to run updates after a plugin update
 
 ### Changed
 
+- Now using paginated imports for V1 and V2 which allows the import of hundreds of Propstack objects in one rush
 - Automatic unlock import after 1 hour
 - Optimized the log definition and usage in debug mode
 - Optimized the usage of all Blocks
+- Import supported object states with API v2
 
 ### Fixed
 
 - Fixed a double action in V2 import
 - Fixed a missing action in V2 import
+
+### Removed
+
+- Removed some now unused code
 
 ## [1.0.2] - 20.07.2026
 

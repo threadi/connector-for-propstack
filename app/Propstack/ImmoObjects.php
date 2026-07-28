@@ -115,6 +115,7 @@ class ImmoObjects {
 		add_filter( 'cfprop_prevent_import_of_object', array( $this, 'prevent_import_by_object_type' ), 10, 2 );
 		add_filter( 'cfprop_prevent_import_of_object', array( $this, 'prevent_import_by_property_type' ), 10, 2 );
 		add_filter( 'cfprop_prevent_import_of_object', array( $this, 'prevent_import_by_missing_fields' ), 10, 2 );
+		add_action( 'cfprop_import_object_before_start', array( $this, 'import_object_states_before_objects' ), 10, 2 );
 		add_action( 'cfprop_import_object_after', array( $this, 'set_has_objects' ), 10, 0 );
 		add_action( 'cfprop_files_for_object_imported_via_ajax', array( $this, 'assign_feature_image' ) );
 		add_action( 'cfprop_queue_after_processing', array( $this, 'assign_feature_image_via_queue' ), 10, 0 );
@@ -1084,14 +1085,13 @@ class ImmoObjects {
 	 * @return bool
 	 */
 	public function prevent_import_by_state( bool $prevent_import, array $immo_object ): bool {
+		if ( 'v2' === get_option( 'propstack_connector_api_version' ) ) {
+			return $prevent_import;
+		}
+
 		// check if "property_status" (API v1) is set.
 		if ( ! empty( $immo_object['property_status']['id'] ) ) {
 			return 'Vermarktung' !== $immo_object['property_status']['name'];
-		}
-
-		// bail if "property_status_id" (API v2) is set.
-		if ( ! empty( $immo_object['property_status_id'] ) ) {
-			return 'Vermarktung' !== $immo_object['property_status_id'];
 		}
 
 		// prevent the import if no state is set.
@@ -1574,9 +1574,9 @@ class ImmoObjects {
 	/**
 	 * Remove documents from the Propstack API response as we do not use them in the websites.
 	 *
-	 * @param array<string,mixed> $response_data The API response.
+	 * @param array<int,mixed> $response_data The API response.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function remove_document_from_response( array $response_data ): array {
 		foreach ( $response_data as $key => $value ) {
@@ -1590,9 +1590,9 @@ class ImmoObjects {
 	/**
 	 * Save the API response
 	 *
-	 * @param array<string,mixed> $data The API response.
+	 * @param array<int,mixed> $data The API response.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function save_response( array $data ): array {
 		update_option( 'cfprop_last_api_response', $data );
@@ -1727,5 +1727,32 @@ class ImmoObjects {
 
 		// show hint.
 		echo '<div class="cfprop-pro-hint">' . esc_html__( 'Use this in Pro', 'connector-for-propstack' ) . '</div>';
+	}
+
+	/**
+	 * Import the object states before the objects are imported.
+	 *
+	 * @param ProcessHandler $process_handler The process handler object.
+	 * @param Import_Base    $import_object The import object.
+	 *
+	 * @return void
+	 */
+	public function import_object_states_before_objects( ProcessHandler $process_handler, Import_Base $import_object ): void {
+		// bail if not the v2 API is used.
+		if ( 'v2' !== get_option( 'propstack_connector_api_version' ) ) {
+			return;
+		}
+
+		// update the markers.
+		$process_handler->set_status( __( 'Checking for new object states', 'connector-for-propstack' ) );
+
+		// import them.
+		$status_import = new Imports\v2\States();
+		$status_import->run();
+		if ( $status_import->has_errors() ) {
+			foreach ( $status_import->get_errors() as $error ) {
+				$import_object->add_error( (string) $error->get_error_code(), $error->get_error_message() );
+			}
+		}
 	}
 }

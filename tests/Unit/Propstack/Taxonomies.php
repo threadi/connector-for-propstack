@@ -103,7 +103,7 @@ class Taxonomies extends ConnectorForPropstackTestCase {
 	 */
 	public function test_taxonomy_fields( \ConnectorForPropstack\Propstack\Taxonomy $obj ): void {
 		$this->assertIsArray( $obj->get_fields() );
-		if( ! in_array( $obj->get_name(), array( 'cfprop_object_category', 'cfprop_object_marketing_type', 'cfprop_object_property_type' ), true) ) {
+		if( ! in_array( $obj->get_name(), array( 'cfprop_object_category', 'cfprop_object_marketing_type', 'cfprop_object_property_type', 'cfprop_object_status' ), true) ) {
 			$this->assertNotEmpty( $obj->get_fields() );
 		}
 	}

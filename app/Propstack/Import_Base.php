@@ -85,6 +85,15 @@ class Import_Base {
 	}
 
 	/**
+	 * Reset the list of errors.
+	 *
+	 * @return void
+	 */
+	public function reset_errors(): void {
+		$this->errors = array();
+	}
+
+	/**
 	 * Return a list of all error messages.
 	 *
 	 * @return string

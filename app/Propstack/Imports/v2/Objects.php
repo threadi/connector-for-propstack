@@ -1,6 +1,6 @@
 <?php
 /**
- * File to object to handle the import of objects from Propstack via API v2.
+ * File to handle the import of objects from Propstack via API v2.
  *
  * @source https://api.propstack.de/docs/index.html
  *
@@ -12,7 +12,6 @@ namespace ConnectorForPropstack\Propstack\Imports\v2;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use Error;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Languages;
 use ConnectorForPropstack\Plugin\Log;
@@ -114,45 +113,17 @@ class Objects extends Import_Base {
 					Log::get_instance()->add( sprintf( __( 'Import of objects via API v2 in language %1$s starting', 'connector-for-propstack' ), ' <em>' . $language_code . '</em>' ), 'info', 'import' );
 				}
 
-				// create and send API request.
-				$request_object = new ApiRequest();
-				$request_object->set_url( $this->get_url( $language_code ) );
-				$request_object->set_post_data( '' );
-				$request_object->set_method( 'GET' );
-				$request_object->set_md5( md5( $this->get_url( $language_code ) ) );
-				$request_object->set_header( $this->get_header() );
-				$request_object->send();
+				// load all objects for this language, page by page.
+				$objects = $this->get_objects_from_api( $language_code );
 
-				// bail on error.
-				if ( 200 !== $request_object->get_http_status() ) {
-					// save the error.
-					$this->add_error( 'propstack_object_import_http_status', __( 'Propstack API answered with wrong HTTP-status:', 'connector-for-propstack' ) . ' <code>' . $request_object->get_http_status() . '</code>' );
-
-					// do nothing more in this language.
+				// bail on error (already logged inside the method).
+				if ( false === $objects ) {
 					continue;
 				}
 
-				// get the response body.
-				$body = $request_object->get_response();
-
-				// convert the response to an array.
-				$data = json_decode( $body, true );
-
-				// bail on any error.
-				if ( ! is_array( $data ) ) {
-					// add a log entry.
-					Log::get_instance()->add( __( 'Error during decoding the API response.', 'connector-for-propstack' ), 'error', 'import' );
-
-					// do nothing more.
-					continue;
-				}
-
-				// bail if data is empty.
-				if ( empty( $data['data'] ) ) {
-					// add a log entry.
+				// bail if nothing was returned.
+				if ( empty( $objects ) ) {
 					Log::get_instance()->add( __( 'Got no data from Propstack API v2.', 'connector-for-propstack' ), 'error', 'import' );
-
-					// do nothing more.
 					continue;
 				}
 
@@ -160,12 +131,12 @@ class Objects extends Import_Base {
 				 * Filter the response data from Propstack.
 				 *
 				 * @since 1.0.0 Available since 1.0.0.
-				 * @param array<string,mixed> $data The response data.
+				 * @param array<int,mixed> $data The response data.
 				 */
-				$data['data'] = apply_filters( 'cfprop_object_import_response', $data['data'] );
+				$objects = apply_filters( 'cfprop_object_import_response', $objects );
 
 				// get the md5 hash of this content.
-				$md5 = md5( Helper::get_json( $data['data'] ) );
+				$md5 = md5( Helper::get_json( $objects ) );
 
 				// bail if the md5 of this content has not changed and debug mode is not enabled.
 				if ( get_option( 'cfprop_md5_' . $language_code ) === $md5 && 1 !== absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
@@ -190,7 +161,7 @@ class Objects extends Import_Base {
 				$post_type_name = ImmoObject::get_instance()->get_name();
 
 				// update the markers.
-				$this->set_max_count( $process_handler, count( $data['data'] ) );
+				$this->set_max_count( $process_handler, count( $objects ) );
 				$this->set_new_status( $process_handler, __( 'Import of objects is running', 'connector-for-propstack' ) );
 
 				// add a log entry if debug is enabled.
@@ -199,10 +170,10 @@ class Objects extends Import_Base {
 				}
 
 				// show cli hint.
-				$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import objects in language ' . $language_code, count( $data ) ) : false;
+				$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import objects in language ' . $language_code, count( $objects ) ) : false;
 
 				// loop through the data and import or update each object.
-				foreach ( $data['data'] as $object ) {
+				foreach ( $objects as $object ) {
 					$prevent_import = false;
 					/**
 					 * Prevent import of this object under custom conditions.
@@ -344,7 +315,7 @@ class Objects extends Import_Base {
 				$process_handler->set_message( $this->get_error_dialog_config() );
 			} else {
 				/**
-				 * Run additional tasks after successfully import of objects.
+				 * Run additional tasks after successful import of objects.
 				 *
 				 * @since 1.0.0 Available since 1.0.0.
 				 *
@@ -390,16 +361,21 @@ class Objects extends Import_Base {
 	 * Return the API URL to import objects.
 	 *
 	 * @param string $language_code The language to use for the URL.
+	 * @param int    $page The page to request.
+	 * @param int    $per The amount of objects per page.
 	 *
 	 * @return string
 	 */
-	private function get_url( string $language_code ): string {
+	private function get_url( string $language_code, int $page = 1, int $per = 100 ): string {
 		// get the URL.
 		$url = add_query_arg(
 			array(
-				'locale'   => $language_code,
-				'expand'   => 1,
-				'archived' => -1,
+				'locale'    => $language_code,
+				'expand'    => 1,
+				'archived'  => -1,
+				'with_meta' => 1,
+				'page'      => $page,
+				'per'       => $per,
 			),
 			$this->url
 		);
@@ -497,5 +473,112 @@ class Objects extends Import_Base {
 		 * @param string $new_status The new status.
 		 */
 		do_action( 'cfprop_import_object_set_status', $new_status );
+	}
+
+	/**
+	 * Load all objects for the given language, page by page.
+	 *
+	 * Uses the documented pagination (page + per) and the total_count from
+	 * "with_meta=1" as the reliable stop condition.
+	 *
+	 * @param string $language_code The language to load.
+	 *
+	 * @return array<int,mixed>|false The list of objects, or false on error.
+	 */
+	private function get_objects_from_api( string $language_code ): array|false {
+		$max_per_value = 500;
+		/**
+		 * Filter the max. per page objects for every import from Propstack.
+		 *
+		 * @since 1.0.3 Available since 1.0.3.
+		 * @param int $max_per_value The max per value.
+		 */
+		$per = min( 500, absint( apply_filters( 'cfprop_import_per_page', $max_per_value ) ) );
+
+		$max_pages = 1000;
+		/**
+		 * Filter the max pages for every import from Propstack.
+		 *
+		 * @since 1.0.3 Available since 1.0.3.
+		 * @param int $max_pages The max pages value.
+		 */
+		$max_pages = absint( apply_filters( 'cfprop_import_max_pages', $max_pages ) );
+
+		$objects            = array();
+		$page               = 1;
+		$total              = null;
+		$previous_page_hash = '';
+
+		do {
+			// request one page.
+			$request_object = new ApiRequest();
+			$request_object->set_url( $this->get_url( $language_code, $page, $per ) );
+			$request_object->set_post_data( '' );
+			$request_object->set_method( 'GET' );
+			$request_object->set_md5( md5( $this->get_url( $language_code, $page, $per ) ) );
+			$request_object->set_header( $this->get_header() );
+			$request_object->send();
+
+			// bail on HTTP error.
+			if ( 200 !== $request_object->get_http_status() ) {
+				$this->add_error( 'propstack_object_import_http_status', __( 'Propstack API answered with wrong HTTP-status:', 'connector-for-propstack' ) . ' <code>' . $request_object->get_http_status() . '</code>' );
+				return false;
+			}
+
+			// decode.
+			$data = json_decode( $request_object->get_response(), true );
+			if ( ! is_array( $data ) || ! isset( $data['data'] ) || ! is_array( $data['data'] ) ) {
+				Log::get_instance()->add( __( 'Error during decoding the API response.', 'connector-for-propstack' ), 'error', 'import' );
+				return false;
+			}
+
+			// read the total count once (from the first page).
+			if ( null === $total && isset( $data['meta']['total_count'] ) ) {
+				$total = absint( $data['meta']['total_count'] );
+			}
+
+			// stop on an empty page.
+			if ( empty( $data['data'] ) ) {
+				break;
+			}
+
+			// safeguard: stop if the API ignores pagination and repeats a page.
+			$page_hash = md5( Helper::get_json( $data['data'] ) );
+			if ( $page_hash === $previous_page_hash ) {
+				break;
+			}
+			$previous_page_hash = $page_hash;
+
+			// collect this page.
+			$objects = array_merge( $objects, $data['data'] );
+
+			++$page;
+			$object_count = count( $objects );
+			$data_count   = count( $data['data'] );
+		} while (
+			$page <= $max_pages
+			&& (
+				// primary stop: we have everything the API reports.
+				( null !== $total && $object_count < $total )
+				// fallback if total_count is ever missing: stop on a non-full page.
+				|| ( null === $total && $data_count >= $per )
+			)
+		);
+
+		// safety check: warn if we ended up with fewer than reported.
+		if ( null !== $total && count( $objects ) < $total ) {
+			Log::get_instance()->add(
+				sprintf(
+				/* translators: %1$d received, %2$d total. */
+					__( 'Only %1$d of %2$d objects were imported. The rest could not be loaded.', 'connector-for-propstack' ),
+					count( $objects ),
+					$total
+				),
+				'error',
+				'import'
+			);
+		}
+
+		return $objects;
 	}
 }

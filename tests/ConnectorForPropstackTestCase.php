@@ -23,6 +23,13 @@ abstract class ConnectorForPropstackTestCase extends WP_UnitTestCase {
 	private static string $units_url = 'https://api.propstack.de/v1/units';
 
 	/**
+	 * The API status URL.
+	 *
+	 * @var string
+	 */
+	private static string $status_url = 'https://api.propstack.de/v2/property_statuses';
+
+	/**
 	 * The test API key.
 	 *
 	 * @var string
@@ -63,7 +70,7 @@ abstract class ConnectorForPropstackTestCase extends WP_UnitTestCase {
 	 * @return false|array|WP_Error
 	 */
 	public static function add_url_filter( false|array|WP_Error $false, array $parsed_args, string $url ): false|array|WP_Error {
-		// create a local response for the GET request for immo objects.
+		// create a local response for the GET request for objects.
 		if ( 'GET' === $parsed_args['method'] && str_starts_with( $url, self::$units_url ) ) {
 			// if the API key is missing.
 			if ( empty( $parsed_args['headers']['X-API-KEY'] ) ) {
@@ -107,6 +114,34 @@ abstract class ConnectorForPropstackTestCase extends WP_UnitTestCase {
 					'body'          => $xml
 				);
 			}
+		}
+
+		// create a local response for the GET request for object states.
+		if ( 'GET' === $parsed_args['method'] && str_starts_with( $url, self::$status_url ) ) {
+			// if the API key is missing.
+			if ( empty( $parsed_args['headers']['X-API-KEY'] ) ) {
+				// create the response object.
+				$requests_response              = new \WpOrg\Requests\Response();
+				$requests_response->status_code = 401;
+
+				// create the header response.
+				return array(
+					'http_response' => new WP_HTTP_Requests_Response( $requests_response, $parsed_args['filename'] ),
+				);
+			}
+
+			// get our XML file and return its content.
+			$xml = \ConnectorForPropstack\Plugin\Helper::get_wp_filesystem()->get_contents( UNIT_TESTS_DATA_PLUGIN_DIR . 'states_full.json' );
+
+			// create the response object.
+			$requests_response              = new \WpOrg\Requests\Response();
+			$requests_response->status_code = isset( $parsed_args['headers']['response_http_status'] ) ? $parsed_args['headers']['response_http_status'] : 200;
+
+			// create the header response.
+			return array(
+				'http_response' => new WP_HTTP_Requests_Response( $requests_response, $parsed_args['filename'] ),
+				'body'          => $xml
+			);
 		}
 
 		// return the given value.

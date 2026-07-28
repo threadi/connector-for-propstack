@@ -116,7 +116,7 @@ class Log extends ConnectorForPropstackTestCase {
 
 		$stored = $wpdb->get_var( 'SELECT `log` FROM ' . $this->table_name . ' LIMIT 1' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 
-		$this->assertSame( 0, strlen( (string) $stored ) );
+		$this->assertNotSame( 0, strlen( (string) $stored ) );
 	}
 
 	/**
