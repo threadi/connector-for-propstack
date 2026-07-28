@@ -1,0 +1,15 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "preferredVersions": { "php": "8.4", "wp": "latest" },
+    "login": true,
+    "steps": [
+        {
+            "step": "activatePlugin",
+            "pluginPath": "connector-for-propstack/connector-for-propstack.php"
+        },
+        {
+            "step": "runPHP",
+            "code": "<?php require_once '/wordpress/wp-load.php'; if ( ! defined( 'CFPROP_VERSION' ) ) { throw new Exception( 'plugin constants missing' ); } file_put_contents( '/wordpress/wp-content/plugins/connector-for-propstack/smoke-result.txt', 'SMOKE_OK' );"
+        }
+    ]
+}
