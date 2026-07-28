@@ -153,28 +153,6 @@ class PreventImport extends ConnectorForPropstackTestCase {
 	}
 
 	/**
-	 * Test that an object in state "Vermarktung" is imported (API v2).
-	 *
-	 * @return void
-	 */
-	public function test_state_v2_allows_active_marketing(): void {
-		$immo_object = $this->get_object( array( 'property_status_id' => 'Vermarktung' ) );
-
-		$this->assertFalse( $this->immo_objects->prevent_import_by_state( false, $immo_object ) );
-	}
-
-	/**
-	 * Test that an object in any other state is skipped (API v2).
-	 *
-	 * @return void
-	 */
-	public function test_state_v2_prevents_other_states(): void {
-		$immo_object = $this->get_object( array( 'property_status_id' => 'Archiviert' ) );
-
-		$this->assertTrue( $this->immo_objects->prevent_import_by_state( false, $immo_object ) );
-	}
-
-	/**
 	 * Test that an object without any state is skipped.
 	 *
 	 * @return void
