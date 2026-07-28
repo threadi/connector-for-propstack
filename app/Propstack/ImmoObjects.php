@@ -1085,6 +1085,10 @@ class ImmoObjects {
 	 * @return bool
 	 */
 	public function prevent_import_by_state( bool $prevent_import, array $immo_object ): bool {
+		if ( 'v2' === get_option( 'propstack_connector_api_version' ) ) {
+			return $prevent_import;
+		}
+
 		// check if "property_status" (API v1) is set.
 		if ( ! empty( $immo_object['property_status']['id'] ) ) {
 			return 'Vermarktung' !== $immo_object['property_status']['name'];

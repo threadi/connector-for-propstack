@@ -71,6 +71,17 @@ class Status extends Taxonomy {
 	}
 
 	/**
+	 * Return the labels for this taxonomy.
+	 *
+	 * @return array<string,string>
+	 */
+	protected function get_labels(): array {
+		return array(
+			'name' => _x( 'Object state', 'taxonomy general name', 'connector-for-propstack' ),
+		);
+	}
+
+	/**
 	 * Change the setting for this taxonomy to hide it.
 	 *
 	 * @param array<string,mixed> $taxonomy_array The settings.

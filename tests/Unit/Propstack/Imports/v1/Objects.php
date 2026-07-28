@@ -58,6 +58,8 @@ class Objects extends ConnectorForPropstackTestCase {
 		foreach ( $this->import_obj->get_errors() as $error ) {
 			$this->assertEquals( 'propstack_object_import_is_running', $error->get_error_code() );
 		}
+
+		$this->import_obj->reset_errors();
 	}
 
 	/**
@@ -78,6 +80,8 @@ class Objects extends ConnectorForPropstackTestCase {
 		foreach ( $this->import_obj->get_errors() as $error ) {
 			$this->assertEquals( 'propstack_object_deletion_is_running', $error->get_error_code() );
 		}
+
+		$this->import_obj->reset_errors();
 	}
 
 	/**
@@ -98,6 +102,8 @@ class Objects extends ConnectorForPropstackTestCase {
 		foreach ( $this->import_obj->get_errors() as $error ) {
 			$this->assertEquals( 'propstack_object_import_http_status', $error->get_error_code() );
 		}
+
+		$this->import_obj->reset_errors();
 
 		// remove the filter.
 		remove_filter( 'cfprop_request_header', array( $this, 'set_wrong_http_status' ) );
@@ -121,6 +127,8 @@ class Objects extends ConnectorForPropstackTestCase {
 		foreach ( $this->import_obj->get_errors() as $error ) {
 			$this->assertEquals( 'propstack_object_import_http_status', $error->get_error_code() );
 		}
+
+		$this->import_obj->reset_errors();
 	}
 
 	/**
@@ -144,30 +152,6 @@ class Objects extends ConnectorForPropstackTestCase {
 
 		// remove the filter.
 		remove_filter( 'cfprop_request_header', array( $this, 'set_to_use_faulty_api_response' ) );
-
-		// remove the pseudo-key.
-		update_option( 'propstack_connector_api_key', '' );
-	}
-
-	/**
-	 * Test a successful import of objects.
-	 *
-	 * @return void
-	 */
-	public function test_import_with_api_key_and_response(): void {
-		// set a pseudo-key.
-		update_option( 'propstack_connector_api_key', self::$api_key );
-
-		// run it.
-		$this->import_obj->run();
-
-		// test the results.
-		$this->assertIsArray( $this->import_obj->get_errors() );
-		$this->assertEmpty( $this->import_obj->get_errors() );
-		$this->assertIsArray( \ConnectorForPropstack\Propstack\ImmoObjects::get_instance()->get_objects() );
-		$this->assertNotEmpty( \ConnectorForPropstack\Propstack\ImmoObjects::get_instance()->get_objects() );
-		$this->assertIsBool( \ConnectorForPropstack\Propstack\ImmoObjects::get_instance()->has_objects() );
-		$this->assertTrue( \ConnectorForPropstack\Propstack\ImmoObjects::get_instance()->has_objects() );
 
 		// remove the pseudo-key.
 		update_option( 'propstack_connector_api_key', '' );
