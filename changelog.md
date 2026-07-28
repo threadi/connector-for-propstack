@@ -13,6 +13,7 @@
 - Automatic unlock import after 1 hour
 - Optimized the log definition and usage in debug mode
 - Optimized the usage of all Blocks
+- Import supported object states with API v2
 
 ### Fixed
 

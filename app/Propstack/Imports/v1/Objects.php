@@ -1,6 +1,6 @@
 <?php
 /**
- * File to object to handle the import of objects from Propstack via API v1.
+ * File to handle the import of objects from Propstack via API v1.
  *
  * @package connector-for-propstack
  */

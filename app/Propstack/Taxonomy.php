@@ -97,7 +97,16 @@ class Taxonomy {
 	 * @return string
 	 */
 	public function get_title(): string {
-		return $this->get_labels()['name'];
+		// get the labels.
+		$labels = $this->get_labels();
+
+		// bail if they are empty or no name for the title is set.
+		if ( empty( $labels ) || empty( $labels['name'] ) ) {
+			return '';
+		}
+
+		// return the title.
+		return $labels['name'];
 	}
 
 	/**

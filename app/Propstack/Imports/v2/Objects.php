@@ -1,6 +1,6 @@
 <?php
 /**
- * File to object to handle the import of objects from Propstack via API v2.
+ * File to handle the import of objects from Propstack via API v2.
  *
  * @source https://api.propstack.de/docs/index.html
  *
