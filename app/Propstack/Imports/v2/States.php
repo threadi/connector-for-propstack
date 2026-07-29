@@ -12,7 +12,9 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Languages;
+use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\ProcessHandler;
+use ConnectorForPropstack\Plugin\Settings;
 use ConnectorForPropstack\Propstack\ApiRequest;
 use ConnectorForPropstack\Propstack\Import_Base;
 use ConnectorForPropstack\Propstack\Taxonomies\Status;
@@ -96,83 +98,98 @@ class States extends Import_Base {
 		 */
 		$languages = apply_filters( 'cfprop_import_object_states_languages', $languages );
 
-		// loop through each enabled language and import its objects.
-		foreach ( $languages as $language_code => $language_enabled ) {
-			// create and send the API request.
-			$request_object = new ApiRequest();
-			$request_object->set_url( $this->get_url( $language_code ) );
-			$request_object->set_post_data( '' );
-			$request_object->set_method( 'GET' );
-			$request_object->set_md5( md5( $this->get_url( $language_code ) ) );
-			$request_object->set_header( $this->get_header() );
-			$request_object->send();
+		// if any error occurred during import of objects, collect and log it.
+		try {
+			// loop through each enabled language and import its objects.
+			foreach ( $languages as $language_code => $language_enabled ) {
+				// create and send the API request.
+				$request_object = new ApiRequest();
+				$request_object->set_url( $this->get_url( $language_code ) );
+				$request_object->set_post_data( '' );
+				$request_object->set_method( 'GET' );
+				$request_object->set_md5( md5( $this->get_url( $language_code ) ) );
+				$request_object->set_header( $this->get_header() );
+				$request_object->send();
 
-			// bail on error.
-			if ( 200 !== $request_object->get_http_status() ) {
-				// save this error.
-				$this->add_error( 'propstack_states_import_http_status', __( 'Propstack API answered with wrong HTTP-status.', 'connector-for-propstack' ) );
+				// bail on error.
+				if ( 200 !== $request_object->get_http_status() ) {
+					// save this error.
+					$this->add_error( 'propstack_states_import_http_status', __( 'Propstack API answered with wrong HTTP-status.', 'connector-for-propstack' ) );
 
-				// do nothing more in this language.
-				continue;
-			}
-
-			// get the response body.
-			$body = $request_object->get_response();
-
-			// convert the response to an array.
-			$data = json_decode( $body, true );
-
-			// bail if no data is given.
-			if ( empty( $data['data'] ) ) {
-				// save this error.
-				$this->add_error( 'propstack_states_import_no_data', __( 'Propstack API answered with wrong data.', 'connector-for-propstack' ) );
-
-				// do nothing more in this language.
-				continue;
-			}
-
-			// update the markers.
-			$process_handler->set_max_count( count( $data['data'] ) );
-			/* translators: %1$s will be replaced by a language name. */
-			$process_handler->set_status( sprintf( __( 'Import of object states in language %1$s is running', 'connector-for-propstack' ), '<em>' . $language_code . '</em>' ) );
-
-			// loop over the data and add the states.
-			foreach ( $data['data'] as $state ) {
-				// update the status.
-				/* translators: %1$s will be replaced by the object title. */
-				$process_handler->set_status( sprintf( __( 'Import of object state %1$s in language %2$s', 'connector-for-propstack' ), '<em>' . $state['name'] . '</em>', '<em>' . $language_code . '</em>' ) );
-
-				// get the term by given state ID.
-				$term_id = \ConnectorForPropstack\Propstack\States::get_instance()->get_term_id_by_id( absint( $state['id'] ), $language_code );
-
-				// if the state does not exist, create it.
-				if ( ! is_int( $term_id ) ) {
-					// add the term.
-					$term_data = wp_insert_term( $state['name'], Status::get_instance()->get_name() );
-
-					// bail on error.
-					if ( is_wp_error( $term_data ) ) {
-						continue;
-					}
-
-					// set the term ID as metadata.
-					$term_id = $term_data['term_id'];
+					// do nothing more in this language.
+					continue;
 				}
 
-				// set the language code.
-				update_term_meta( $term_id, 'language_code', $language_code );
+				// get the response body.
+				$body = $request_object->get_response();
 
-				// update the counter.
-				$process_handler->set_count( $process_handler->get_count() + 1 );
+				// convert the response to an array.
+				$data = json_decode( $body, true );
+
+				// bail if no data is given.
+				if ( empty( $data['data'] ) ) {
+					// save this error.
+					$this->add_error( 'propstack_states_import_no_data', __( 'Propstack API answered with wrong data.', 'connector-for-propstack' ) );
+
+					// do nothing more in this language.
+					continue;
+				}
+
+				// update the markers.
+				$process_handler->set_max_count( count( $data['data'] ) );
+				/* translators: %1$s will be replaced by a language name. */
+				$process_handler->set_status( sprintf( __( 'Import of object states in language %1$s is running', 'connector-for-propstack' ), '<em>' . $language_code . '</em>' ) );
+
+				// loop over the data and add the states.
+				foreach ( $data['data'] as $state ) {
+					// update the status.
+					/* translators: %1$s will be replaced by the object title. */
+					$process_handler->set_status( sprintf( __( 'Import of object state %1$s in language %2$s', 'connector-for-propstack' ), '<em>' . $state['name'] . '</em>', '<em>' . $language_code . '</em>' ) );
+
+					// get the term by given state ID.
+					$term_id = \ConnectorForPropstack\Propstack\States::get_instance()->get_term_id_by_id( absint( $state['id'] ), $language_code );
+
+					// if the state does not exist, create it.
+					if ( ! is_int( $term_id ) ) {
+						// add the term.
+						$term_data = wp_insert_term( $state['name'], Status::get_instance()->get_name() );
+
+						// bail on error.
+						if ( is_wp_error( $term_data ) ) {
+							continue;
+						}
+
+						// set the term ID as metadata.
+						$term_id = $term_data['term_id'];
+					}
+
+					// set the language code.
+					update_term_meta( $term_id, 'language_code', $language_code );
+
+					// update the counter.
+					$process_handler->set_count( $process_handler->get_count() + 1 );
+				}
 			}
-		}
+		} catch ( \Throwable $e ) {
+			// log this event.
+			Log::get_instance()->add( __( 'Following error occurred during the import of states via API v2:', 'connector-for-propstack' ) . '<br>' . __( 'Message:', 'connector-for-propstack' ) . '<code>' . $e->getMessage() . '</code><br>' . __( 'Code:', 'connector-for-propstack' ) . '<code>' . $e->getCode() . '</code><br>' . __( 'File:', 'connector-for-propstack' ) . '<code>' . $e->getFile() . '</code><br>' . __( 'Line:', 'connector-for-propstack' ) . '<code>' . $e->getLine() . '</code>', 'error', 'import' );
 
-		// update the marker.
-		update_option( CFPROP_STATES_IMPORT_RUNNING, 0 );
-		if ( $this->has_errors() ) {
-			$process_handler->set_message( $this->get_error_dialog_config() );
-		} else {
-			$process_handler->set_message( $this->get_success_dialog_config() );
+			// show hint.
+			/* translators: %1$s will be replaced by a URL. */
+			$this->add_error( 'propstack_states_import_error', sprintf( __( 'Error occurred. Check <a href="%1$s">the log</a> for details.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_logs' ) ) ) );
+		} finally {
+			// stop process handler.
+			$process_handler->set_running( 0 );
+
+			// update the marker.
+			update_option( CFPROP_STATES_IMPORT_RUNNING, 0 );
+
+			// show messages.
+			if ( $this->has_errors() ) {
+				$process_handler->set_message( $this->get_error_dialog_config() );
+			} else {
+				$process_handler->set_message( $this->get_success_dialog_config() );
+			}
 		}
 	}
 

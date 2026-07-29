@@ -3,7 +3,7 @@
  * File for tests against the prevent-import-filters in \ConnectorForPropstack\Propstack\ImmoObjects.
  */
 
-namespace ConnectorForPropstack\Tests\Unit\Propstack\ImmoObjects;
+namespace ConnectorForPropstack\Tests\Unit\Propstack;
 
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Tests\ConnectorForPropstackTestCase;
