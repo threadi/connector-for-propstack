@@ -1,6 +1,6 @@
 === Connector for Propstack ===
 Contributors: laolaweb, threadi
-Tags: propstack, real estate, immobilien, immo, crm
+Tags: propstack, real estate, immobilien, rental, property
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.2
@@ -14,32 +14,34 @@ Import and display your objects from [Propstack](https://www.propstack.de) direc
 
 Import and display your objects from [Propstack](https://www.propstack.de) directly on your website. Get full control over how they are displayed.
 
-You do not need to prepare your hosting to use this plugin. Just install it and run the setup to use it in minutes.
+You don't need to make any special preparations on your hosting account to use this plugin. Simply install and activate the plugin and complete the setup to start showcasing your objects from Propstack in just a few minutes.
+
+[youtube https://www.youtube.com/watch?v=dhsQX7-3APY]
 
 #### Features
 
-- automatic import of marketing objects from Propstack in German or Englisch without limit
-- import of objects from type "Apartment", "House" and "Garage" with their respective fields
-- objects are indexable for search engines (SEO)
-- each object gets its own URL on your website
-- data-protection compliant as Propstack did not get any data from your visitors
-- 7 Blocks for Block Editor and [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
-- support for classic as well as block themes
-- filter for archive listings using City and Object ID
+✅ automatic import of marketing objects from Propstack in German or Englisch without limit
+✅ import of objects from type "Apartment", "House" and "Garage" with their respective fields
+✅ objects are indexable for search engines (SEO)
+✅ each object gets its own URL on your website
+✅ data-protection compliant as Propstack did not get any data from your visitors
+✅ 7 Blocks for Block Editor and [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
+✅ support for classic as well as block themes
+✅ filter for archive listings using City and Object ID
 
 #### Requirements
 
-- Propstack account with API credentials
+🔌 Propstack account with API credentials
 
 #### The Pro license includes:
 
-* Use all object types Propstack offers, like "Office" and "Store"
-* Get more fields for your Propstack objects data
-* Use eight widgets and prepared templates in page builders like Avada, Bricks or Elementor
-* Submit your contact enquiries directly to Propstack by using Avada Forms, Elementor Forms, Contact Form 7 or WPForms as a contact form
-* More blocks for Block Editor (like object status)
+➕ Use all object types Propstack offers, like "Office" and "Store"
+➕ Get more fields for your Propstack objects data
+➕ Use eight widgets and prepared templates in page builders like Avada, Bricks or Elementor
+➕ Submit your contact enquiries directly to Propstack by using Avada Forms, Elementor Forms, Contact Form 7 or WPForms as a contact form
+➕ More blocks for Block Editor (like object status)
 
-[get the Pro-version](https://laolaweb.com/en/plugins/propstack-wordpress-plugin/order-propstack-plugin-pro/)
+🆙 [Get the Pro-version](https://laolaweb.com/en/plugins/propstack-wordpress-plugin/order-propstack-plugin-pro/)
 
 #### External services
 
@@ -57,9 +59,9 @@ The Propstack logo as part of all distributed icons is a trademark of [Propstack
 
 Each release of this plugin will only be published if it fulfills the following conditions:
 
-- Compliance with WordPress Coding Standards
-- PHPStan check for possible bugs
-- PHP Unit tests
+✅ Compliance with WordPress Coding Standards.
+✅ PHPStan check for possible bugs.
+✅ No exceptions during PHP Unit Tests.
 
 ---
 
@@ -68,7 +70,7 @@ Each release of this plugin will only be published if it fulfills the following 
 1. Upload "connector-for-propstack" to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Enter your API credentials in the settings.
-4. Include one of the different output options for immo objects in your website.
+4. Embed one of the various display options for your Propstack properties on your website.
 
 == Frequently Asked Questions ==
 
@@ -88,7 +90,11 @@ With Connector for Propstack Pro, this transfer can take place automatically wit
 
 == Screenshots ==
 
-1.
+1. Setup leads you through the first steps
+2. The Plugin settings
+3. Configure which objects you want to import
+4. Import the images of your objects
+5. View your objects in frontend
 
 == Changelog ==
 
