@@ -37,7 +37,7 @@ You don't need to make any special preparations on your hosting account to use t
 
 ➕ Use all object types Propstack offers, like "Office" and "Store"
 ➕ Get more fields for your Propstack objects data
-➕ Use eight widgets and prepared templates in page builders like Avada, Bricks or Elementor
+➕ Use eight widgets and prepared templates in page builders like Avada, Bricks, Elementor, Salient and WPBakery
 ➕ Submit your contact enquiries directly to Propstack by using Avada Forms, Elementor Forms, Contact Form 7 or WPForms as a contact form
 ➕ More blocks for Block Editor (like object status)
 
