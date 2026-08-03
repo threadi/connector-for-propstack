@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Updated crypt lib to 3.0.0
+- Updated dialog lib to 2.0.0
+- Updated settings lib to 2.0.0
+
 ## [1.0.3] - 30.07.2026
 
 ### Added

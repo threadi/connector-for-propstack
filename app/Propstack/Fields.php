@@ -118,6 +118,7 @@ class Fields {
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
 		$setting->set_section( $all_fields_section );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'The fields', 'connector-for-propstack' ) );
 		/* translators: %1$s: link to the Connector for Propstack Pro page */

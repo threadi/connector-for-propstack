@@ -150,6 +150,7 @@ class Roles {
 		$setting->set_default( array() );
 		$setting->set_section( $permission_section );
 		$setting->set_save_callback( array( $this, 'save' ) );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new MultiSelect( $settings_obj );
 		$field->set_title( __( 'Choose roles', 'connector-for-propstack' ) );
 		$field->set_description( __( 'Mark roles, which will have access to objects in the backend. These roles could also control each object-regarding setting except the permissions.', 'connector-for-propstack' ) );

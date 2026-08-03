@@ -17,6 +17,7 @@ use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\Settings;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
+use WP_Error;
 
 /**
  * Object for admin tasks for this plugin.
@@ -61,6 +62,7 @@ class Admin {
 		// use hooks.
 		add_action( 'init', array( $this, 'configure_transients' ), 5 );
 		add_action( 'admin_init', array( $this, 'save_slugs' ) );
+		add_action( 'admin_init', array( $this, 'get_setting_errors' ), 100 );
 		add_action( 'shutdown', array( $this, 'check_crypt' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_js_and_styles' ), 10, 0 );
 		add_filter( 'admin_body_class', array( $this, 'add_body_classes' ) );
@@ -68,6 +70,9 @@ class Admin {
 		// use admin actions.
 		add_action( 'admin_action_cfprop_log_export', array( $this, 'export_log' ) );
 		add_action( 'admin_action_cfprop_log_empty', array( $this, 'empty_log' ) );
+
+		// use our own hooks.
+		add_action( 'connector-for-propstack_error', array( $this, 'save_crypt_error' ), 10, 3 );
 	}
 
 	/**
@@ -351,5 +356,67 @@ class Admin {
 
 		// add them in the log.
 		Log::get_instance()->add( __( 'Error in crypt support:', 'connector-for-propstack' ) . '<code>' . Helper::get_json( $crypt_errors->get_error_messages() ) . '</code>', 'error', 'system' );
+	}
+
+	/**
+	 * Collect errors from settings library.
+	 *
+	 * @return void
+	 */
+	public function get_setting_errors(): void {
+		// get the settings object.
+		$settings_obj = Settings::get_instance()->get_settings_obj();
+
+		// bail if no errors occurred.
+		if ( $settings_obj->has_errors() ) {
+			return;
+		}
+
+		// get the errors.
+		$errors = $settings_obj->get_errors();
+
+		// bail if errors are not set.
+		if ( ! $errors instanceof WP_Error ) {
+			return;
+		}
+
+		// log these errors.
+		foreach ( $errors->errors as $key => $errors ) {
+			Log::get_instance()->add( __( 'Error in plugin settings:', 'connector-for-propstack' ) . ' <em>' . esc_html( $key ) . '</em>: ' . esc_html( implode( ' ', $errors ) ), 'error', 'system' );
+		}
+	}
+
+	/**
+	 * Save any error from the crypt library.
+	 *
+	 * @param string              $code    The error code.
+	 * @param string              $message The message.
+	 * @param array<string,mixed> $data    The data.
+	 *
+	 * @return void
+	 */
+	public function save_crypt_error( string $code, string $message, array $data ): void {
+		// collect the data for the log entry.
+		$log_entry = array(
+			__( 'Error Code', 'connector-for-propstack' ) => '<code>' . $code . '</code>',
+			__( 'Message', 'connector-for-propstack' )    => '<code>' . $message . '</code>',
+			__( 'Data', 'connector-for-propstack' )       => '<code>' . Helper::get_json( $data ) . '</code>',
+		);
+
+		// log the data.
+		Log::get_instance()->add(
+			'<strong>' . __( 'Error in encryption:', 'connector-for-propstack' ) . '</strong><br>' . wp_kses_post(
+				implode(
+					'<br>',
+					array_map(
+						static fn( $key, $value ) => "$key: $value",
+						array_keys( $log_entry ),
+						$log_entry
+					)
+				)
+			),
+			'error',
+			'system'
+		);
 	}
 }

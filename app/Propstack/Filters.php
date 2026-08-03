@@ -110,6 +110,7 @@ class Filters {
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
 		$setting->set_section( $filter_section );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'The filters', 'connector-for-propstack' ) );
 		/* translators: %1$s: Connector for Propstack Pro URL */
