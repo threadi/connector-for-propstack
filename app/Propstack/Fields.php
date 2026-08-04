@@ -226,7 +226,6 @@ class Fields {
 
 				// add setting.
 				$disable_field_setting = $settings_obj->add_setting( 'propstack_connector_fields_' . $object_type->get_slug() . '_' . $immo_field->get_name() . '_disabled' );
-				$disable_field_setting->set_type( 'integer' );
 				$disable_field_setting->set_default( $object_type->is_field_default_disabled( $immo_field ) ? 1 : 0 );
 				$disable_field_setting->set_section( $hidden_section );
 				$disable_field_setting_field = new Checkbox( $settings_obj );
@@ -237,7 +236,6 @@ class Fields {
 
 				// add setting.
 				$content_field_setting = $settings_obj->add_setting( 'propstack_connector_fields_' . $object_type->get_slug() . '_' . $immo_field->get_name() . '_content' );
-				$content_field_setting->set_type( 'integer' );
 				$content_field_setting->set_default( $object_type->get_default_content_field()->get_name() === $immo_field->get_name() ? 1 : 0 );
 				$content_field_setting->set_section( $hidden_section );
 				$content_field_setting_field = new Checkbox( $settings_obj );
@@ -318,7 +316,6 @@ class Fields {
 
 				// add setting.
 				$disable_field_setting = $settings_obj->add_setting( 'propstack_connector_fields_' . $taxonomy->get_name() . '_' . $immo_field->get_name() . '_disabled' );
-				$disable_field_setting->set_type( 'integer' );
 				$disable_field_setting->set_default( $taxonomy->is_field_default_disabled( $immo_field ) ? 1 : 0 );
 				$disable_field_setting->set_section( $hidden_section );
 				$disable_field_setting_field = new Checkbox( $settings_obj );

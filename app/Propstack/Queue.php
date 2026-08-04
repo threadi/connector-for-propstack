@@ -113,7 +113,6 @@ class Queue {
 		// add setting.
 		$queue_setting = $settings_obj->add_setting( 'propstack_connector_queue' );
 		$queue_setting->set_section( $queue_settings_section );
-		$queue_setting->set_type( 'integer' );
 		$queue_setting->set_default( 1 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Enable queue', 'connector-for-propstack' ) );

@@ -463,7 +463,6 @@ class ImmoObjects {
 		// add setting.
 		$import_schedule_setting = $settings_obj->add_setting( 'propstack_connector_import_schedule' );
 		$import_schedule_setting->set_section( $import_options_section );
-		$import_schedule_setting->set_type( 'integer' );
 		$import_schedule_setting->set_default( 1 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Enable automatic import', 'connector-for-propstack' ) );
@@ -484,7 +483,6 @@ class ImmoObjects {
 
 		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_preserve_files' );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->set_section( $import_options_section );
 		$field = new Checkbox( $settings_obj );

@@ -268,7 +268,6 @@ class Settings {
 
 		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_disable_archive_slug' );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->set_section( $advanced_section );
 		$setting->set_save_callback( array( $this, 'update_slugs' ) );
@@ -278,7 +277,6 @@ class Settings {
 
 		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_disable_single_slug' );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->set_section( $advanced_section );
 		$setting->set_save_callback( array( $this, 'update_slugs' ) );
@@ -289,7 +287,6 @@ class Settings {
 		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_show_help' );
 		$setting->set_section( $advanced_section );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 1 );
 		$field = new Checkbox( $this->get_settings_obj() );
 		$field->set_title( __( 'Show help', 'connector-for-propstack' ) );
@@ -299,7 +296,6 @@ class Settings {
 		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_max_age_log_entries' );
 		$setting->set_section( $advanced_section );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 20 );
 		$field = new Number( $this->get_settings_obj() );
 		$field->set_title( __( 'max. Age for log entries in days', 'connector-for-propstack' ) );
@@ -308,7 +304,6 @@ class Settings {
 		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_debug' );
 		$setting->set_section( $advanced_section );
-		$setting->set_type( 'integer' );
 		$setting->set_default( Helper::is_development_mode() ? 1 : 0 );
 		$field = new Checkbox( $this->get_settings_obj() );
 		$field->set_title( __( 'Enable debug mode', 'connector-for-propstack' ) );
@@ -360,7 +355,7 @@ class Settings {
 		$field->set_title( __( 'Import', 'connector-for-propstack' ) );
 		$field->set_button_title( __( 'Import now', 'connector-for-propstack' ) );
 		$field->add_class( 'easy-dialog-for-wordpress' );
-		$field->set_custom_attributes( array( 'data-dialog' => (string) wp_json_encode( $dialog ) ) );
+		$field->add_data( 'dialog', Helper::get_json( $dialog ) );
 		$setting->set_field( $field );
 
 		// create export dialog.
@@ -395,7 +390,7 @@ class Settings {
 		$field->set_button_title( __( 'Export now', 'connector-for-propstack' ) );
 		$field->set_button_url( $this->get_settings_obj()->get_export_obj()->get_download_url() );
 		$field->add_class( 'easy-dialog-for-wordpress' );
-		$field->set_custom_attributes( array( 'data-dialog' => (string) wp_json_encode( $dialog ) ) );
+		$field->add_data( 'dialog', Helper::get_json( $dialog ) );
 		$setting->set_field( $field );
 
 		// add a section.
@@ -480,7 +475,6 @@ class Settings {
 
 		// add setting for a TextInfo.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_trademark' );
-		$setting->do_not_register( true );
 		$setting->prevent_export( true );
 		$setting->set_section( $trademark_section );
 		$field = new TextInfo( $this->get_settings_obj() );
