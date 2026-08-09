@@ -110,6 +110,7 @@ class Filters {
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
 		$setting->set_section( $filter_section );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'The filters', 'connector-for-propstack' ) );
 		/* translators: %1$s: Connector for Propstack Pro URL */
@@ -166,7 +167,6 @@ class Filters {
 
 				// add setting.
 				$hide_setting = $settings_obj->add_setting( 'propstack_connector_filters_' . $filter->get_filter_name() . '_hidden' );
-				$hide_setting->set_type( 'integer' );
 				$hide_setting->set_default( 0 );
 				$hide_setting->set_section( $hidden_section );
 				$hide_setting_field = new Checkbox( $settings_obj );
@@ -185,7 +185,6 @@ class Filters {
 
 		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_filter_use_post' );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->set_section( $filter_settings_section );
 		$field = new Checkbox( $settings_obj );

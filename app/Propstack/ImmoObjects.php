@@ -463,7 +463,6 @@ class ImmoObjects {
 		// add setting.
 		$import_schedule_setting = $settings_obj->add_setting( 'propstack_connector_import_schedule' );
 		$import_schedule_setting->set_section( $import_options_section );
-		$import_schedule_setting->set_type( 'integer' );
 		$import_schedule_setting->set_default( 1 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Enable automatic import', 'connector-for-propstack' ) );
@@ -484,7 +483,6 @@ class ImmoObjects {
 
 		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_preserve_files' );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->set_section( $import_options_section );
 		$field = new Checkbox( $settings_obj );
@@ -519,6 +517,7 @@ class ImmoObjects {
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
 		$setting->set_section( $import_restrictions_section );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Value( $settings_obj );
 		$field->set_title( __( 'States to import', 'connector-for-propstack' ) );
 		/* translators: %1$s: Connector for Propstack Pro URL */
@@ -550,6 +549,7 @@ class ImmoObjects {
 		$setting->set_default( array() );
 		$setting->set_section( $import_restrictions_section );
 		$setting->set_save_callback( array( $this, 'check_for_changed_restriction_value' ) );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new MultiSelect( $settings_obj );
 		$field->set_title( __( 'Broker to import', 'connector-for-propstack' ) );
 		$field->set_description( __( 'Only objects with the selected broker will be imported. All other will be ignored. Selecting none will import objects for each broker.', 'connector-for-propstack' ) );
@@ -580,6 +580,7 @@ class ImmoObjects {
 		$setting->set_default( array() );
 		$setting->set_section( $import_restrictions_section );
 		$setting->set_save_callback( array( $this, 'check_for_changed_restriction_value' ) );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new MultiSelect( $settings_obj );
 		$field->set_title( __( 'Marketing types to import', 'connector-for-propstack' ) );
 		$field->set_description( __( 'Only objects with the selected marketing types will be imported. All other will be ignored. Selecting none will import objects for each marketing type.', 'connector-for-propstack' ) );
@@ -651,6 +652,7 @@ class ImmoObjects {
 		$setting->set_default( array() );
 		$setting->set_section( $import_restrictions_section );
 		$setting->set_save_callback( array( $this, 'check_for_changed_restriction_value' ) );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new MultiSelect( $settings_obj );
 		$field->set_title( __( 'Property types to import', 'connector-for-propstack' ) );
 		$field->set_description( __( 'Only objects with the property types will be imported. All other will be ignored. Selecting none will import objects for each property type.', 'connector-for-propstack' ) );
@@ -685,6 +687,7 @@ class ImmoObjects {
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
 		$setting->prevent_export( true );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 	}
 
 	/**

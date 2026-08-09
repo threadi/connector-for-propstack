@@ -70,9 +70,6 @@ jobs:
           composer install
           npm i
           npm i concurrently
-          cd vendor/threadi/easy-dialog-for-wordpress/
-          npm i
-          npm run build
           cd ../easy-setup-for-wordpress/
           npm i
           npm run build
