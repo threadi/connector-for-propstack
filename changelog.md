@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added option to switch to modern DataView for settings pages
+
 ### Changed
 
 - Updated crypt lib to 3.0.0
