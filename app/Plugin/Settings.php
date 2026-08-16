@@ -80,6 +80,7 @@ class Settings {
 		// misc.
 		add_filter( 'admin_footer_text', array( $this, 'show_plugin_hint_in_footer' ), 0 );
 		add_filter( 'connector_for_propstack_enqueue_styles_and_scripts', array( $this, 'enqueue_styles_and_scripts' ), 10, 2 );
+		add_action( 'admin_action_propstack_connector_use_classic_view', array( $this, 'use_classic_view' ) );
 	}
 
 	/**
@@ -113,6 +114,25 @@ class Settings {
 		$settings_obj->set_menu_parent_slug( 'options-general.php' ); // set where the settings are assigned to, e.g., 'options-general.php' for the WordPress-own settings menu.
 		if ( Setup::get_instance()->is_completed() ) {
 			$settings_obj->show_settings_link_in_plugin_list( true );
+		}
+		if ( method_exists( $settings_obj, 'set_view' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$settings_obj->set_view( get_option( 'propstack_connector_setting_view', 'dataview' ) );
+		}
+		if ( method_exists( $settings_obj, 'set_update_version' ) ) {
+			$settings_obj->set_update_version( CFPROP_VERSION );
+		}
+
+		// create help in case of error during loading of the settings.
+		if ( method_exists( $settings_obj, 'set_error_help' ) ) {
+			$url = add_query_arg(
+				array(
+					'action' => 'propstack_connector_use_classic_view',
+					'nonce' => wp_create_nonce( 'propstack-connector-use-classic-view' ),
+				),
+				admin_url( 'admin.php' )
+			);
+			$error_help = '<div class="propstack-connector-transient notice notice-success"><h3>' . wp_kses_post( Helper::get_logo_img() ) . ' ' . esc_html( Helper::get_plugin_name() ) . '</h3><p><strong>' . __( 'Page is loading', 'connector-for-propstack' ) . '</strong><br>' . __( 'Please wait while we load the page.', 'connector-for-propstack' ) . '<br>' . __( 'This may take a moment.', 'connector-for-propstack' ) . '<br>' . sprintf( __( '<a href="%1$s">Click this link</a> to switch to the classic view.', 'connector-for-propstack' ), $url ) . '</p></div>';
+			$settings_obj->set_error_help( $error_help );
 		}
 
 		// get the settings page.
@@ -183,8 +203,15 @@ class Settings {
 		$field->set_options( $api_versions );
 		$setting->set_field( $field );
 
+		// create a hidden page for hidden settings.
+		$hidden_page = $settings_obj->add_page( 'hidden_page' );
+
+		// create a hidden tab on this page.
+		$hidden_tab = $hidden_page->add_tab( 'hidden_tab', 10 );
+		$hidden_tab->set_tab_class( 'nav-tab-hidden' );
+
 		// create a hidden section.
-		$hidden_section = $api_tab->add_section( 'propstack_connector_hidden', 10 );
+		$hidden_section = $hidden_tab->add_section( 'propstack_connector_hidden', 10 );
 		$hidden_section->set_hidden( true );
 
 		// add setting.
@@ -192,27 +219,18 @@ class Settings {
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
-		$setting->set_field( $field );
 
 		// add setting.
 		$setting = $settings_obj->add_setting( 'cfprop_update_slugs' );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
-		$setting->set_field( $field );
 
 		// the log tab.
 		$logs_tab = $settings_page->add_tab( 'propstack_connector_logs', 80 );
 		$logs_tab->set_title( __( 'Logs', 'connector-for-propstack' ) );
 		$logs_tab->set_hide_save( true );
 		$logs_tab->set_callback( array( $this, 'show_logs' ) );
-
-		// add a hidden tab.
-		$hidden_tab = $settings_page->add_tab( 'propstack_connector_hidden', 1000 );
-		$hidden_tab->set_show_in_menu( true );
-
-		// add a section.
-		$hidden_tab->add_section( 'propstack_connector_hidden', 10 );
 
 		// initialize these settings.
 		$settings_obj->init();
@@ -224,8 +242,8 @@ class Settings {
 	 * @return Section|false
 	 */
 	public function get_hidden_section(): Section|false {
-		// get the settings page.
-		$page = $this->get_settings_obj()->get_page( 'connector-for-propstack' );
+		// get the hidden settings page.
+		$page = $this->get_settings_obj()->get_page( 'hidden_page' );
 
 		// bail if the page could not be loaded.
 		if ( ! $page instanceof Page ) {
@@ -299,6 +317,22 @@ class Settings {
 		$setting->set_default( 20 );
 		$field = new Number( $this->get_settings_obj() );
 		$field->set_title( __( 'max. Age for log entries in days', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
+
+		// add setting.
+		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_setting_view' );
+		$setting->set_section( $advanced_section );
+		$setting->set_type( 'string' );
+		$setting->set_default( 'classic' );
+		$field = new Select( $this->get_settings_obj() );
+		$field->set_title( __( 'Settings view', 'personio-integration-light' ) );
+		$field->set_description( __( 'Choose the view for the settings of this plugin. DataView is only available for WordPress 7 or newer and should be considered as beta.', 'personio-integration-light' ) );
+		$field->set_options(
+			array(
+				'classic'  => __( 'Classic', 'personio-integration-light' ),
+				'dataview' => __( 'DataView', 'personio-integration-light' ),
+			)
+		);
 		$setting->set_field( $field );
 
 		// add setting.
@@ -466,7 +500,8 @@ class Settings {
 
 		// add a tab on this page to show trademark hints.
 		$trademark_tab = $settings_page->add_tab( 'propstack_connector_trademark', 200 );
-		$trademark_tab->set_title( '&copy;' );
+		$trademark_tab->set_title( ' ' );
+		$trademark_tab->set_tab_class( 'copyright' );
 		$trademark_tab->set_hide_save( true );
 
 		// add a section.
@@ -650,5 +685,23 @@ class Settings {
 			return $result;
 		}
 		return true;
+	}
+
+	/**
+	 * Set to use the classic view by request.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function use_classic_view(): void {
+		// check nonce.
+		check_admin_referer( 'propstack-connector-use-classic-view', 'nonce' );
+
+		// change the setting.
+		update_option( 'propstack_connector_setting_view', 'classic' );
+
+		// forward user to the dashboard.
+		wp_safe_redirect( (string) wp_get_referer() );
+		exit;
 	}
 }

@@ -190,3 +190,33 @@ body.post-type-cfprop_object, .etfw-transient {
 	margin-left: 1em;
 	width: 120px;
 }
+
+.nav-tab.copyright {
+	padding: 17px 10px;
+	position: relative;
+	z-index: 1
+}
+
+.nav-tab.copyright:after {
+	content: '®';
+	font-size: 22px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	z-index: 1;
+	text-align: center;
+}
+
+.copyright.components-button:before {
+	content: '®';
+	font-size: 22px;
+	position: absolute;
+	top: 10px;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	z-index: 1;
+	text-align: center;
+}
