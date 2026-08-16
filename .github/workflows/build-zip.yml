@@ -22,7 +22,7 @@ jobs:
                   composer install
                   npm i
                   npm i concurrently
-                  cd ../easy-setup-for-wordpress/
+                  cd vendor/threadi/easy-setup-for-wordpress/
                   npm i
                   npm run build
                   cd ../../../
