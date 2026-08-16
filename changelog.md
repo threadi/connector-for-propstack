@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Optimized the log cleanup
+
 ## [1.0.4] - 17.08.2026
 
 ### Added

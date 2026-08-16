@@ -121,12 +121,25 @@ class Log {
 	 * @noinspection PhpUnused
 	 */
 	public function clean_log(): void {
+		// prevent re-entry: on a log-table error add() calls clean_log() again → infinite loop.
+		static $is_running = false;
+		if ( $is_running ) {
+			return;
+		}
+
 		// bail on uninstalling.
 		if ( defined( 'CFPROP_DEACTIVATION_RUNNING' ) ) {
 			return;
 		}
 
+		// bail if "cfprop_sqlite" is set.
+		if ( 1 === absint( get_option( 'cfprop_sqlite', 0 ) ) ) {
+			return;
+		}
+
 		global $wpdb;
+
+		$is_running = true;
 
 		$table_name = (string) esc_sql( $wpdb->prefix . 'propstack_logs' ); // @phpstan-ignore cast.string
 		$max_age    = absint( get_option( 'propstack_connector_max_age_log_entries' ) );
@@ -139,6 +152,8 @@ class Log {
 			/* translators: %1$s will be replaced by a DB-error-message. */
 			$this->add( sprintf( __( 'Database error during plugin activation: %1$s - This usually indicates that the database system of your hosting does not meet the minimum requirements of WordPress. Please contact your hosts support team for clarification.', 'connector-for-propstack' ), '<code>' . esc_html( $wpdb->last_error ) . '</code>' ), 'error', 'system' );
 		}
+
+		$is_running = false;
 	}
 
 	/**
