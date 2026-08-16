@@ -109,6 +109,9 @@ class Queue {
 		// add a section.
 		$queue_settings_section = $queue_tab->add_section( 'propstack_connector_queue_settings', 20 );
 		$queue_settings_section->set_title( __( 'Settings', 'connector-for-propstack' ) );
+		if( method_exists( $queue_settings_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$queue_settings_section->set_collapsed( 1 !== absint( get_option( 'propstack_connector_queue' ) ) );
+		}
 
 		// add setting.
 		$queue_setting = $settings_obj->add_setting( 'propstack_connector_queue' );

@@ -21,7 +21,6 @@ use ConnectorForPropstack\Plugin\Templates;
 use ConnectorForPropstack\Propstack\FieldCategories;
 use ConnectorForPropstack\Propstack\FieldCategories\Images;
 use ConnectorForPropstack\Propstack\Fields;
-use ConnectorForPropstack\Propstack\Files;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\Post_Type;
 use ConnectorForPropstack\Propstack\Taxonomies;
@@ -90,6 +89,21 @@ class ImmoObject extends Post_Type {
 		// edit objects.
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
 		add_action( 'add_meta_boxes', array( $this, 'remove_third_party_meta_boxes' ), PHP_INT_MAX );
+
+		// change third party support.
+		add_filter( 'brizy_settings_post_types', array( $this, 'brizy_settings_post_types' ) );
+		add_filter( 'manage_edit-' . ImmoObject::get_instance()->get_name() . '_columns', array( $this, 'remove_yoast_columns' ) );
+		add_filter( 'manage_edit-' . ImmoObject::get_instance()->get_name() . '_columns', array( $this, 'remove_rank_math_columns' ) );
+		add_filter( 'trp_translating_capability', array( $this, 'translatepress_hide_option' ) );
+		add_action( 'admin_init', array( $this, 'scpo_remove_filter' ), 11 );
+		add_filter( 'og_array', array( $this, 'og_optimizer' ) );
+		add_filter( 'the_seo_framework_meta_render_data', array( $this, 'seoframework' ) );
+		add_filter( 'the_seo_framework_schema_graph_data', array( $this, 'seoframework_schema' ) );
+		add_filter( 'seopress_social_og_desc', array( $this, 'seopress_og_description' ) );
+		add_filter( 'seopress_titles_desc', array( $this, 'seopress_titles' ) );
+		add_filter( 'manage_' . ImmoObject::get_instance()->get_name() . '_posts_columns', array( $this, 'remove_wpml_column' ), 20 );
+		add_action( 'wp_before_admin_bar_render', array( $this, 'duplicate_page_prevent_options' ), 20 );
+		add_filter( 'wp_consent_api_registered_' . plugin_basename( CFPROP_PLUGIN ), array( $this, 'wp_consent_api_register' ) );
 
 		// use our own hooks.
 		add_filter( 'cfprop_help_tabs', array( $this, 'add_help' ) );
@@ -670,5 +684,269 @@ class ImmoObject extends Post_Type {
 
 		// return the image we found.
 		return absint( $attachment->ID );
+	}
+
+	/**
+	 * Remove our post type from the list of supported post types in Brizy.
+	 *
+	 * @param array<string,mixed> $post_types List of post types.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function brizy_settings_post_types( array $post_types ): array {
+		// bail if our cpt is not in list.
+		if ( ! isset( $post_types[ ImmoObject::get_instance()->get_name() ] ) ) {
+			return $post_types;
+		}
+
+		// remove the entry.
+		unset( $post_types[ ImmoObject::get_instance()->get_name() ] );
+
+		// return the resulting post types.
+		return $post_types;
+	}
+
+	/**
+	 * Remove Yoast's columns from our own cpt.
+	 *
+	 * @param array<string,mixed> $columns List of columns.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function remove_yoast_columns( array $columns ): array {
+		if ( isset( $columns['wpseo-score'] ) ) {
+			unset( $columns['wpseo-score'], $columns['wpseo-score-readability'], $columns['wpseo-title'], $columns['wpseo-metadesc'], $columns['wpseo-focuskw'], $columns['wpseo-links'], $columns['wpseo-linked'] );
+		}
+		return $columns;
+	}
+
+	/**
+	 * Remove Rank Math's columns from our own cpt.
+	 *
+	 * @param array<string,mixed> $columns List of columns.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function remove_rank_math_columns( array $columns ): array {
+		if ( isset( $columns['rank_math_seo_details'] ) ) {
+			unset( $columns['rank_math_seo_details'], $columns['rank_math_title'], $columns['rank_math_description'] );
+		}
+		return $columns;
+	}
+
+	/**
+	 * Hide translation-option on our own custom post-type pages.
+	 *
+	 * @param string $capability The actual capability.
+	 *
+	 * @return string
+	 */
+	public function translatepress_hide_option( string $capability ): string {
+		// bail if this is admin.
+		if ( is_admin() ) {
+			return $capability;
+		}
+
+		// get actual object.
+		$object_id = get_queried_object_id();
+
+		// bail if this is not our cpt.
+		if ( get_post_type( $object_id ) !== ImmoObject::get_instance()->get_name() ) {
+			return $capability;
+		}
+
+		// return 'god' to disable any translation-options on our cpt.
+		return 'god';
+	}
+
+	/**
+	 * Prevent usage of order our own ctp positions via plugin Simple Custom Order.
+	 *
+	 * @return void
+	 */
+	public function scpo_remove_filter(): void {
+		global $pagenow;
+		if ( 'edit-' . ImmoObject::get_instance()->get_name() . '.php' === $pagenow ) {
+			wp_dequeue_script( 'scporderjs' );
+		}
+	}
+
+	/**
+	 * Optimize output of plugin OG.
+	 *
+	 * @source https://de.wordpress.org/plugins/og/
+	 * @param array<string,array<mixed>> $og_array List of OpenGraph-settings from OG-plugin.
+	 * @return array<string,array<mixed>>
+	 */
+	public function og_optimizer( array $og_array ): array {
+		// bail if requested object is not ours.
+		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+			return $og_array;
+		}
+
+		// update settings.
+		$immo_object                           = new \ConnectorForPropstack\Propstack\ImmoObject( get_queried_object_id() );
+		$og_array['og']['title']            = $immo_object->get_title();
+		$og_array['og']['description']      = '';
+		$og_array['twitter']['title']       = $immo_object->get_title();
+		$og_array['twitter']['description'] = '';
+		$og_array['schema']['title']        = $immo_object->get_title();
+		$og_array['schema']['description']  = '';
+
+		// return the resulting list.
+		return $og_array;
+	}
+
+	/**
+	 * Optimize output for description with plugin SEOFramework.
+	 *
+	 * @param array<string,mixed> $fields The SEO-fields the framework has collected.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function seoframework( array $fields ): array {
+		// bail if requested object is not ours.
+		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+			return $fields;
+		}
+
+		// update settings.
+		$fields['description']['attributes']['content']    = '';
+		$fields['og:description']['attributes']['content'] = '';
+		$fields['twitter:description']['attributes']['content'] = '';
+
+		// return resulting fields.
+		return $fields;
+	}
+
+	/**
+	 * Optimize output for schema with plugin SEOFramework.
+	 *
+	 * @param array<string,mixed> $graph A list of fields for SEO-output.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function seoframework_schema( array $graph ): array {
+		// bail if requested object is not ours.
+		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+			return $graph;
+		}
+
+		foreach ( $graph as $index => $entry ) {
+			if ( ! empty( $entry['description'] ) && 'WebPage' === $entry['@type'] ) {
+				$graph[ $index ]['description'] = '';
+			}
+		}
+
+		// return the resulting graph.
+		return $graph;
+	}
+
+	/**
+	 * Optimize the output for SEO-og:description with plugin SEOPress.
+	 *
+	 * @param string $meta_og_description The meta-tag the plugin would use as the description.
+	 *
+	 * @return string
+	 */
+	public function seopress_og_description( string $meta_og_description ): string {
+		// bail if requested object is not ours.
+		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+			return $meta_og_description;
+		}
+
+		// get og:description.
+		return '<meta property="og:description" content="" />';
+	}
+
+	/**
+	 * Optimize the output for SEO-description with plugin SEOPress.
+	 *
+	 * @param string $description The SEO-description text.
+	 *
+	 * @return string
+	 */
+	public function seopress_titles( string $description ): string {
+		// bail if requested object is not ours.
+		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+			return $description;
+		}
+
+		// get description.
+		return '';
+	}
+
+	/**
+	 * Remove WPML translation columns.
+	 *
+	 * @param array<string,mixed> $columns List of columns.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function remove_wpml_column( array $columns ): array {
+		if ( isset( $columns['icl_translations'] ) ) {
+			unset( $columns['icl_translations'] );
+		}
+
+		// return the resulting list.
+		return $columns;
+	}
+
+	/**
+	 * Prevent visibility of duplicate options on position details during usage if plugin Duplicate Page.
+	 *
+	 * @return void
+	 */
+	public function duplicate_page_prevent_options(): void {
+		// bail if we are not logged in.
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+
+		// bail if the plugin Duplicate Page is not active.
+		if ( ! Helper::is_plugin_active( 'duplicate-page/duplicatepage.php' ) ) {
+			return;
+		}
+
+		// bail if we are in the backend.
+		if ( is_admin() ) {
+			return;
+		}
+
+		// bail if this is not our cpt.
+		if ( ! $this->is_single_page_called() ) {
+			return;
+		}
+
+		global $wp_admin_bar;
+		$wp_admin_bar->remove_node( 'duplicate_this' );
+	}
+
+	/**
+	 * Return whether a single page of our own custom post type is called in frontend.
+	 *
+	 * @return bool
+	 */
+	private function is_single_page_called(): bool {
+		// bail if single is not called.
+		if ( ! is_single() ) {
+			return false;
+		}
+
+		// get the queried object.
+		$object = get_queried_object();
+
+		// return true if the object is from our own cpt.
+		return ( $object instanceof WP_Post && $this->get_name() === $object->post_type );
+	}
+
+	/**
+	 * We simply return true to register the plugin with WP Consent API, although we do not use it
+	 * as this plugin does not set any cookies or collect any personal data.
+	 *
+	 * @return bool
+	 */
+	public function wp_consent_api_register(): bool {
+		return true;
 	}
 }

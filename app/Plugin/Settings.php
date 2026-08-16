@@ -116,14 +116,14 @@ class Settings {
 			$settings_obj->show_settings_link_in_plugin_list( true );
 		}
 		if ( method_exists( $settings_obj, 'set_view' ) ) { // @phpstan-ignore function.alreadyNarrowedType
-			$settings_obj->set_view( get_option( 'propstack_connector_setting_view', 'dataview' ) );
+			$settings_obj->set_view( get_option( 'propstack_connector_setting_view', 'classic' ) );
 		}
-		if ( method_exists( $settings_obj, 'set_update_version' ) ) {
+		if ( method_exists( $settings_obj, 'set_update_version' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$settings_obj->set_update_version( CFPROP_VERSION );
 		}
 
 		// create help in case of error during loading of the settings.
-		if ( method_exists( $settings_obj, 'set_error_help' ) ) {
+		if ( method_exists( $settings_obj, 'set_error_help' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$url = add_query_arg(
 				array(
 					'action' => 'propstack_connector_use_classic_view',
@@ -333,6 +333,9 @@ class Settings {
 				'dataview' => __( 'DataView', 'personio-integration-light' ),
 			)
 		);
+		if( method_exists( $setting, 'set_reload_on_save' ) ) {
+			$setting->set_reload_on_save( true );
+		}
 		$setting->set_field( $field );
 
 		// add setting.
@@ -357,6 +360,9 @@ class Settings {
 		// add a section.
 		$import_export_section = $advanced_tab->add_section( 'propstack_connector_import_export_section', 20 );
 		$import_export_section->set_title( __( 'Secure settings', 'connector-for-propstack' ) );
+		if( method_exists( $import_export_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$import_export_section->set_collapsed( true );
+		}
 
 		// create import dialog.
 		$dialog = array(
@@ -430,6 +436,9 @@ class Settings {
 		// add a section.
 		$plugin_handling_section = $advanced_tab->add_section( 'propstack_connector_plugin_section', 30 );
 		$plugin_handling_section->set_title( __( 'Plugin handling', 'connector-for-propstack' ) );
+		if( method_exists( $plugin_handling_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$plugin_handling_section->set_collapsed( true );
+		}
 
 		// create reset URL.
 		$reset_url = add_query_arg(
