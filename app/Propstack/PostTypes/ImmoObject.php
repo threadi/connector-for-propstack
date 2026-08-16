@@ -614,76 +614,56 @@ class ImmoObject extends Post_Type {
 	 * @return int
 	 */
 	public function get_example_image_id(): int {
-		$query  = array(
-			'post_type'      => 'attachment',
-			'post_status'    => 'any',
-			'meta_query'     => array(
-				array(
-					'key'     => 'cfprop_example_image',
-					'compare' => 'EXISTS',
-				),
-			),
-			'posts_per_page' => 1,
-		);
-		$result = new WP_Query( $query );
-
-		// if no image could be found, import it.
-		if ( ! $result->have_posts() ) {
-			// embed some required files.
-			require_once ABSPATH . 'wp-admin/includes/image.php'; // @phpstan-ignore requireOnce.fileNotFound
-			require_once ABSPATH . 'wp-admin/includes/file.php'; // @phpstan-ignore requireOnce.fileNotFound
-			require_once ABSPATH . 'wp-admin/includes/media.php'; // @phpstan-ignore requireOnce.fileNotFound
-
-			// get the WP_Filesystem object.
-			$wp_filesystem = Helper::get_wp_filesystem();
-
-			// create a tmp file with a path.
-			$tmp_file = wp_tempnam( 'immo-object-default-image.jpg' );
-
-			// copy our example image as media_handle_sideload() will delete it.
-			if ( ! $wp_filesystem->copy( Helper::get_plugin_path() . 'gfx/immo-object-default-image.jpg', $tmp_file, true ) ) {
-				Log::get_instance()->add( __( 'Could not copy the example image. Please check your file system permissions.', 'connector-for-propstack' ), 'error', 'system' );
-				return 0;
-			}
-
-			// create the array to add the image.
-			$file_array    = array(
-				'type'     => 'image/png',
-				'name'     => 'immo-object-default-image.jpg',
-				'tmp_name' => $tmp_file,
-				'error'    => '0',
-				'size'     => (string) $wp_filesystem->size( $tmp_file ),
-			);
-			$attachment_id = media_handle_sideload( $file_array, 0, null, array( 'post_author' => get_current_user_id() ) );
-
-			// delete the tmp file if media_handle_sideload() does it not.
-			if ( $wp_filesystem->exists( $tmp_file ) ) {
-				$wp_filesystem->delete( $tmp_file );
-			}
-
-			// bail if no image could be imported.
-			if ( $attachment_id instanceof WP_Error ) {
-				Log::get_instance()->add( __( 'Could not save the example image. Following error occurred:', 'connector-for-propstack' ) . ' <code>' . $attachment_id->get_error_message() . '</code>', 'error', 'system' );
-				return 0;
-			}
-
-			// mark this image as the example image.
-			update_post_meta( $attachment_id, 'cfprop_example_image', true );
-
-			// return the attachment ID.
+		// use the cached attachment ID if it still points to a valid attachment.
+		$attachment_id = absint( get_option( 'cfprop_example_image_id', 0 ) );
+		if ( $attachment_id > 0 && 'attachment' === get_post_type( $attachment_id ) ) {
 			return $attachment_id;
 		}
 
-		// get the first match.
-		$attachment = $result->posts[0];
+		// otherwise import the example image.
+		require_once ABSPATH . 'wp-admin/includes/image.php'; // @phpstan-ignore requireOnce.fileNotFound
+		require_once ABSPATH . 'wp-admin/includes/file.php';  // @phpstan-ignore requireOnce.fileNotFound
+		require_once ABSPATH . 'wp-admin/includes/media.php'; // @phpstan-ignore requireOnce.fileNotFound
 
-		// bail if the match is not an image.
-		if ( ! $attachment instanceof WP_Post ) {
+		// get the WP_Filesystem object.
+		$wp_filesystem = Helper::get_wp_filesystem();
+
+		// create a tmp file with a path.
+		$tmp_file = wp_tempnam( 'immo-object-default-image.jpg' );
+
+		// copy our example image as media_handle_sideload() will delete it.
+		if ( ! $wp_filesystem->copy( Helper::get_plugin_path() . 'gfx/immo-object-default-image.jpg', $tmp_file, true ) ) {
+			Log::get_instance()->add( __( 'Could not copy the example image. Please check your file system permissions.', 'connector-for-propstack' ), 'error', 'system' );
 			return 0;
 		}
 
-		// return the image we found.
-		return absint( $attachment->ID );
+		// create the array to add the image.
+		$file_array    = array(
+			'type'     => 'image/png',
+			'name'     => 'immo-object-default-image.jpg',
+			'tmp_name' => $tmp_file,
+			'error'    => '0',
+			'size'     => (string) $wp_filesystem->size( $tmp_file ),
+		);
+		$attachment_id = media_handle_sideload( $file_array, 0, null, array( 'post_author' => get_current_user_id() ) );
+
+		// delete the tmp file if media_handle_sideload() does it not.
+		if ( $wp_filesystem->exists( $tmp_file ) ) {
+			$wp_filesystem->delete( $tmp_file );
+		}
+
+		// bail if no image could be imported.
+		if ( $attachment_id instanceof WP_Error ) {
+			Log::get_instance()->add( __( 'Could not save the example image. Following error occurred:', 'connector-for-propstack' ) . ' <code>' . $attachment_id->get_error_message() . '</code>', 'error', 'system' );
+			return 0;
+		}
+
+		// mark this image as the example image and cache its ID.
+		update_post_meta( $attachment_id, 'cfprop_example_image', true );
+		update_option( 'cfprop_example_image_id', $attachment_id );
+
+		// return the resulting attachment ID.
+		return $attachment_id;
 	}
 
 	/**

@@ -227,6 +227,12 @@ class Settings {
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_example_image_id' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+
 		// the log tab.
 		$logs_tab = $settings_page->add_tab( 'propstack_connector_logs', 80 );
 		$logs_tab->set_title( __( 'Logs', 'connector-for-propstack' ) );
