@@ -99,15 +99,14 @@ With Connector for Propstack Pro, this transfer can take place automatically wit
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added more PHP Unit Tests to check for main functions this plugin is using
-- Added method to run updates after a plugin update
-- Now using paginated imports for V1 and V2 which allows the import of hundreds of Propstack objects in one rush
-- Automatic unlock import after 1 hour
-- Optimized the log definition and usage in debug mode
-- Optimized the usage of all Blocks
-- Import supported object states with API v2
-- Fixed a double action in V2 import
-- Fixed a missing action in V2 import
-- Removed some now unused code
+- Added option to switch to modern DataView for settings pages
+- Added support for WP Consent API
+- Set compatibility with WordPress 7.1
+- Updated crypt lib to 3.0.0
+- Updated dialog lib to 2.0.0
+- Updated settings lib to 2.0.0
+- Remove cpt support for our own objects in Brizy as they are not edited in WordPress
+- Remove custom columns from some SEO plugins from our own cpt
+- Optimized log statements
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)
