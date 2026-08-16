@@ -5,12 +5,16 @@
 ### Added
 
 - Added option to switch to modern DataView for settings pages
+- Added support for WP Consent API
 
 ### Changed
 
+- Set compatibility with WordPress 7.1
 - Updated crypt lib to 3.0.0
 - Updated dialog lib to 2.0.0
 - Updated settings lib to 2.0.0
+- Remove cpt support for our own objects in Brizy as they are not edited in WordPress
+- Remove custom columns from some SEO plugins from our own cpt
 
 ## [1.0.3] - 30.07.2026
 
@@ -21,7 +25,7 @@
 
 ### Changed
 
-- Now using paginated imports for V1 and V2 which allows the import of hundreds of Propstack objects in one rush
+- Now using paginated imports for V1 and V2, which allows the import of hundreds of Propstack objects in one rush
 - Automatic unlock import after 1 hour
 - Optimized the log definition and usage in debug mode
 - Optimized the usage of all Blocks

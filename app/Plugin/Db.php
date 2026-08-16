@@ -108,7 +108,7 @@ class Db {
 		}
 
 		// get the results.
-		$results = $wpdb->get_results( $sql, $data_type ); // @phpcs - got already prepared statements.
+		$results = $wpdb->get_results( $sql, $data_type ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is always a prepared statement supplied by the caller (see method contract).
 
 		// check for any errors.
 		if ( $wpdb->last_error ) {

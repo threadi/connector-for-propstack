@@ -19,7 +19,6 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Init;
 use ConnectorForPropstack\Plugin\Installer;
-use ConnectorForPropstack\Plugin\Update;
 
 // do nothing if the PHP version is not 8.2 or newer.
 if ( PHP_VERSION_ID < 80200 ) { // @phpstan-ignore smaller.alwaysFalse
@@ -44,7 +43,6 @@ register_deactivation_hook( CFPROP_PLUGIN, array( Init::get_instance(), 'deactiv
 add_action(
 	'plugins_loaded',
 	static function () {
-		Update::get_instance()->init();
 		Init::get_instance()->init();
 	}
 );

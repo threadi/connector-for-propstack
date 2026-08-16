@@ -116,21 +116,22 @@ class Settings {
 			$settings_obj->show_settings_link_in_plugin_list( true );
 		}
 		if ( method_exists( $settings_obj, 'set_view' ) ) { // @phpstan-ignore function.alreadyNarrowedType
-			$settings_obj->set_view( get_option( 'propstack_connector_setting_view', 'dataview' ) );
+			$settings_obj->set_view( get_option( 'propstack_connector_setting_view', 'classic' ) );
 		}
-		if ( method_exists( $settings_obj, 'set_update_version' ) ) {
+		if ( method_exists( $settings_obj, 'set_update_version' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$settings_obj->set_update_version( CFPROP_VERSION );
 		}
 
 		// create help in case of error during loading of the settings.
-		if ( method_exists( $settings_obj, 'set_error_help' ) ) {
+		if ( method_exists( $settings_obj, 'set_error_help' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$url = add_query_arg(
 				array(
 					'action' => 'propstack_connector_use_classic_view',
-					'nonce' => wp_create_nonce( 'propstack-connector-use-classic-view' ),
+					'nonce'  => wp_create_nonce( 'propstack-connector-use-classic-view' ),
 				),
 				admin_url( 'admin.php' )
 			);
+			/* translators: %1$s will be replaced by a URL */
 			$error_help = '<div class="propstack-connector-transient notice notice-success"><h3>' . wp_kses_post( Helper::get_logo_img() ) . ' ' . esc_html( Helper::get_plugin_name() ) . '</h3><p><strong>' . __( 'Page is loading', 'connector-for-propstack' ) . '</strong><br>' . __( 'Please wait while we load the page.', 'connector-for-propstack' ) . '<br>' . __( 'This may take a moment.', 'connector-for-propstack' ) . '<br>' . sprintf( __( '<a href="%1$s">Click this link</a> to switch to the classic view.', 'connector-for-propstack' ), $url ) . '</p></div>';
 			$settings_obj->set_error_help( $error_help );
 		}
@@ -222,6 +223,12 @@ class Settings {
 
 		// add setting.
 		$setting = $settings_obj->add_setting( 'cfprop_update_slugs' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_example_image_id' );
 		$setting->set_section( $hidden_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
@@ -325,14 +332,17 @@ class Settings {
 		$setting->set_type( 'string' );
 		$setting->set_default( 'classic' );
 		$field = new Select( $this->get_settings_obj() );
-		$field->set_title( __( 'Settings view', 'personio-integration-light' ) );
-		$field->set_description( __( 'Choose the view for the settings of this plugin. DataView is only available for WordPress 7 or newer and should be considered as beta.', 'personio-integration-light' ) );
+		$field->set_title( __( 'Settings view', 'connector-for-propstack' ) );
+		$field->set_description( __( 'Choose the view for the settings of this plugin. DataView is only available for WordPress 7 or newer and should be considered as beta.', 'connector-for-propstack' ) );
 		$field->set_options(
 			array(
-				'classic'  => __( 'Classic', 'personio-integration-light' ),
-				'dataview' => __( 'DataView', 'personio-integration-light' ),
+				'classic'  => __( 'Classic', 'connector-for-propstack' ),
+				'dataview' => __( 'DataView', 'connector-for-propstack' ),
 			)
 		);
+		if ( method_exists( $setting, 'set_reload_on_save' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$setting->set_reload_on_save( true );
+		}
 		$setting->set_field( $field );
 
 		// add setting.
@@ -357,6 +367,9 @@ class Settings {
 		// add a section.
 		$import_export_section = $advanced_tab->add_section( 'propstack_connector_import_export_section', 20 );
 		$import_export_section->set_title( __( 'Secure settings', 'connector-for-propstack' ) );
+		if ( method_exists( $import_export_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$import_export_section->set_collapsed( true );
+		}
 
 		// create import dialog.
 		$dialog = array(
@@ -430,6 +443,9 @@ class Settings {
 		// add a section.
 		$plugin_handling_section = $advanced_tab->add_section( 'propstack_connector_plugin_section', 30 );
 		$plugin_handling_section->set_title( __( 'Plugin handling', 'connector-for-propstack' ) );
+		if ( method_exists( $plugin_handling_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$plugin_handling_section->set_collapsed( true );
+		}
 
 		// create reset URL.
 		$reset_url = add_query_arg(
