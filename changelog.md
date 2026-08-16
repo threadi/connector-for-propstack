@@ -15,6 +15,7 @@
 - Updated settings lib to 2.0.0
 - Remove cpt support for our own objects in Brizy as they are not edited in WordPress
 - Remove custom columns from some SEO plugins from our own cpt
+- Optimized log statements
 
 ## [1.0.3] - 30.07.2026
 

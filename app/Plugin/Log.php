@@ -178,12 +178,8 @@ class Log {
 		if ( is_null( $order_by ) || ! in_array( $order_by, $allowed_order_by, true ) ) {
 			$order_by = 'date';
 		}
-		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_string( $order ) ) {
-			$order = sanitize_sql_orderby( $order );
-		} else {
-			$order = 'DESC';
-		}
+		$order = strtoupper( (string) filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
+		$order = in_array( $order, array( 'ASC', 'DESC' ), true ) ? $order : 'DESC';
 
 		$limit = 10000;
 		/**
@@ -225,7 +221,8 @@ class Log {
 		// if only category is set.
 		if ( ! empty( $category ) ) {
 			// get and return the entries.
-			return Db::get_instance()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+			return Db::get_instance()->get_results(
 				$wpdb->prepare(
 					'SELECT `state`, `time` AS `date`, `log`, `category`
                     FROM `' . $wpdb->prefix . 'propstack_logs`
@@ -236,11 +233,13 @@ class Log {
 				),
 				ARRAY_A
 			);
+			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
 		}
 
 		if ( 1 === $errors ) {
 			// return all.
-			return Db::get_instance()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+			return Db::get_instance()->get_results(
 				$wpdb->prepare(
 					'SELECT `state`, `time` AS `date`, `log`, `category`
                 FROM `' . $wpdb->prefix . 'propstack_logs`
@@ -251,10 +250,12 @@ class Log {
 				),
 				ARRAY_A
 			);
+			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
 		}
 
 		// return all.
-		return Db::get_instance()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+		return Db::get_instance()->get_results(
 			$wpdb->prepare(
 				'SELECT `state`, `time` AS `date`, `log`, `category`
                 FROM `' . $wpdb->prefix . 'propstack_logs`
@@ -264,5 +265,6 @@ class Log {
 			),
 			ARRAY_A
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
 	}
 }
