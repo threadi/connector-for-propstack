@@ -9,6 +9,7 @@
 
 ### Changed
 
+- Set compatibility with WordPress 7.1
 - Updated crypt lib to 3.0.0
 - Updated dialog lib to 2.0.0
 - Updated settings lib to 2.0.0

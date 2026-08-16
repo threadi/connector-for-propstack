@@ -92,8 +92,8 @@ class ImmoObject extends Post_Type {
 
 		// change third party support.
 		add_filter( 'brizy_settings_post_types', array( $this, 'brizy_settings_post_types' ) );
-		add_filter( 'manage_edit-' . ImmoObject::get_instance()->get_name() . '_columns', array( $this, 'remove_yoast_columns' ) );
-		add_filter( 'manage_edit-' . ImmoObject::get_instance()->get_name() . '_columns', array( $this, 'remove_rank_math_columns' ) );
+		add_filter( 'manage_edit-' . self::get_instance()->get_name() . '_columns', array( $this, 'remove_yoast_columns' ) );
+		add_filter( 'manage_edit-' . self::get_instance()->get_name() . '_columns', array( $this, 'remove_rank_math_columns' ) );
 		add_filter( 'trp_translating_capability', array( $this, 'translatepress_hide_option' ) );
 		add_action( 'admin_init', array( $this, 'scpo_remove_filter' ), 11 );
 		add_filter( 'og_array', array( $this, 'og_optimizer' ) );
@@ -101,7 +101,7 @@ class ImmoObject extends Post_Type {
 		add_filter( 'the_seo_framework_schema_graph_data', array( $this, 'seoframework_schema' ) );
 		add_filter( 'seopress_social_og_desc', array( $this, 'seopress_og_description' ) );
 		add_filter( 'seopress_titles_desc', array( $this, 'seopress_titles' ) );
-		add_filter( 'manage_' . ImmoObject::get_instance()->get_name() . '_posts_columns', array( $this, 'remove_wpml_column' ), 20 );
+		add_filter( 'manage_' . self::get_instance()->get_name() . '_posts_columns', array( $this, 'remove_wpml_column' ), 20 );
 		add_action( 'wp_before_admin_bar_render', array( $this, 'duplicate_page_prevent_options' ), 20 );
 		add_filter( 'wp_consent_api_registered_' . plugin_basename( CFPROP_PLUGIN ), array( $this, 'wp_consent_api_register' ) );
 
@@ -695,12 +695,12 @@ class ImmoObject extends Post_Type {
 	 */
 	public function brizy_settings_post_types( array $post_types ): array {
 		// bail if our cpt is not in list.
-		if ( ! isset( $post_types[ ImmoObject::get_instance()->get_name() ] ) ) {
+		if ( ! isset( $post_types[ self::get_instance()->get_name() ] ) ) {
 			return $post_types;
 		}
 
 		// remove the entry.
-		unset( $post_types[ ImmoObject::get_instance()->get_name() ] );
+		unset( $post_types[ self::get_instance()->get_name() ] );
 
 		// return the resulting post types.
 		return $post_types;
@@ -751,7 +751,7 @@ class ImmoObject extends Post_Type {
 		$object_id = get_queried_object_id();
 
 		// bail if this is not our cpt.
-		if ( get_post_type( $object_id ) !== ImmoObject::get_instance()->get_name() ) {
+		if ( get_post_type( $object_id ) !== self::get_instance()->get_name() ) {
 			return $capability;
 		}
 
@@ -766,7 +766,7 @@ class ImmoObject extends Post_Type {
 	 */
 	public function scpo_remove_filter(): void {
 		global $pagenow;
-		if ( 'edit-' . ImmoObject::get_instance()->get_name() . '.php' === $pagenow ) {
+		if ( 'edit-' . self::get_instance()->get_name() . '.php' === $pagenow ) {
 			wp_dequeue_script( 'scporderjs' );
 		}
 	}
@@ -780,12 +780,12 @@ class ImmoObject extends Post_Type {
 	 */
 	public function og_optimizer( array $og_array ): array {
 		// bail if requested object is not ours.
-		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+		if ( ! is_singular( self::get_instance()->get_name() ) ) {
 			return $og_array;
 		}
 
 		// update settings.
-		$immo_object                           = new \ConnectorForPropstack\Propstack\ImmoObject( get_queried_object_id() );
+		$immo_object                        = new \ConnectorForPropstack\Propstack\ImmoObject( get_queried_object_id() );
 		$og_array['og']['title']            = $immo_object->get_title();
 		$og_array['og']['description']      = '';
 		$og_array['twitter']['title']       = $immo_object->get_title();
@@ -806,13 +806,13 @@ class ImmoObject extends Post_Type {
 	 */
 	public function seoframework( array $fields ): array {
 		// bail if requested object is not ours.
-		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+		if ( ! is_singular( self::get_instance()->get_name() ) ) {
 			return $fields;
 		}
 
 		// update settings.
-		$fields['description']['attributes']['content']    = '';
-		$fields['og:description']['attributes']['content'] = '';
+		$fields['description']['attributes']['content']         = '';
+		$fields['og:description']['attributes']['content']      = '';
 		$fields['twitter:description']['attributes']['content'] = '';
 
 		// return resulting fields.
@@ -828,7 +828,7 @@ class ImmoObject extends Post_Type {
 	 */
 	public function seoframework_schema( array $graph ): array {
 		// bail if requested object is not ours.
-		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+		if ( ! is_singular( self::get_instance()->get_name() ) ) {
 			return $graph;
 		}
 
@@ -851,7 +851,7 @@ class ImmoObject extends Post_Type {
 	 */
 	public function seopress_og_description( string $meta_og_description ): string {
 		// bail if requested object is not ours.
-		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+		if ( ! is_singular( self::get_instance()->get_name() ) ) {
 			return $meta_og_description;
 		}
 
@@ -868,7 +868,7 @@ class ImmoObject extends Post_Type {
 	 */
 	public function seopress_titles( string $description ): string {
 		// bail if requested object is not ours.
-		if ( ! is_singular( ImmoObject::get_instance()->get_name() ) ) {
+		if ( ! is_singular( self::get_instance()->get_name() ) ) {
 			return $description;
 		}
 
