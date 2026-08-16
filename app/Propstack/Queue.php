@@ -295,7 +295,7 @@ class Queue {
 			'post_type'      => PostTypes\Queue::get_instance()->get_name(),
 			'post_status'    => 'publish',
 			'posts_per_page' => $limit,
-			'meta_query'     => array(
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
 				array(
 					'key'     => 'failed',
 					'compare' => 'NOT EXISTS',
@@ -667,7 +667,7 @@ class Queue {
 			'post_type'      => PostTypes\Queue::get_instance()->get_name(),
 			'post_status'    => 'any',
 			'posts_per_page' => 1,
-			'meta_query'     => array(
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
 				array(
 					'key'   => 'id',
 					'value' => $propstack_id,

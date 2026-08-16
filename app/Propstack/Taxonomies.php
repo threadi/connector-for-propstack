@@ -555,7 +555,7 @@ class Taxonomies {
 			$query   = array(
 				'taxonomy'   => $taxonomy->get_name(),
 				'hide_empty' => false,
-				'meta_query' => array(
+				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
 					array(
 						'key'     => 'changed',
 						'compare' => 'NOT EXISTS',

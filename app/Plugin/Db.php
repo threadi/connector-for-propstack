@@ -58,7 +58,7 @@ class Db {
 		global $wpdb;
 
 		// add the data.
-		$wpdb->insert( $table, $data );
+		$wpdb->insert( $table, $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Custom plugin log table; WP caching/query APIs don't apply.
 
 		// check for any errors, but not if this is the log table itself as it might cause an infinite loop.
 		if ( $wpdb->last_error && ( $wpdb->prefix . 'propstack_logs' ) !== $table && ! isset( $data['log'] ) ) {

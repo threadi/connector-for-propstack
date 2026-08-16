@@ -78,7 +78,11 @@ class Log {
 	 */
 	public function delete_table(): void {
 		global $wpdb;
-		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', (string) esc_sql( $wpdb->prefix . 'propstack_logs' ) ) ); // @phpstan-ignore cast.string
+
+		$table_name = (string) esc_sql( $wpdb->prefix . 'propstack_logs' ); // @phpstan-ignore cast.string
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Custom plugin log table; WP caching/query APIs don't apply.
+		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $table_name ) );
 	}
 
 	/**
@@ -95,7 +99,7 @@ class Log {
 		global $wpdb;
 
 		// insert the log entry.
-		Db::get_instance()->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		Db::get_instance()->insert(
 			$wpdb->prefix . 'propstack_logs',
 			array(
 				'time'     => gmdate( 'Y-m-d H:i:s' ),
@@ -122,11 +126,13 @@ class Log {
 			return;
 		}
 
-		// get db connection.
 		global $wpdb;
 
-		// run the deletion.
-		$wpdb->query( sprintf( 'DELETE FROM %s WHERE `time` < DATE_SUB(NOW(), INTERVAL %d DAY) LIMIT 10000', (string) esc_sql( $wpdb->prefix . 'propstack_logs' ), absint( get_option( 'propstack_connector_max_age_log_entries' ) ) ) ); // @phpstan-ignore cast.string
+		$table_name = (string) esc_sql( $wpdb->prefix . 'propstack_logs' ); // @phpstan-ignore cast.string
+		$max_age    = absint( get_option( 'propstack_connector_max_age_log_entries' ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Custom plugin log table; WP caching/query APIs don't apply.
+		$wpdb->query( sprintf( 'DELETE FROM %s WHERE `time` < DATE_SUB(NOW(), INTERVAL %d DAY) LIMIT 10000', $table_name, $max_age ) );
 
 		// log if any error occurred.
 		if ( ! empty( $wpdb->last_error ) ) {

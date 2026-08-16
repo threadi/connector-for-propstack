@@ -329,7 +329,7 @@ class Files {
 		$query   = array(
 			'post_type'   => 'attachment',
 			'post_status' => 'any',
-			'meta_query'  => array(
+			'meta_query'  => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
 				array(
 					'key'     => 'propstack_file_id',
 					'value'   => $id,
@@ -640,7 +640,7 @@ class Files {
 		$query = array(
 			'post_type'      => 'attachment',
 			'post_status'    => 'any',
-			'meta_query'     => array(
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
 				array(
 					'key'     => 'propstack_file_id',
 					'compare' => 'EXIST',
