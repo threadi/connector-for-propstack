@@ -220,7 +220,7 @@ class ImmoObjects {
 	public function get_object_by_object_id( string $object_id, string $language_code ): false|ImmoObject {
 		// create the query.
 		$query = array(
-			'meta_query' => array(
+			'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
 				'relation' => 'AND',
 				array(
 					'key'     => 'object_id',
@@ -1382,7 +1382,7 @@ class ImmoObjects {
 			'post_type'      => PostTypes\ImmoObject::get_instance()->get_name(),
 			'post_status'    => 'any',
 			'posts_per_page' => -1,
-			'meta_query'     => array(
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
 				array(
 					'key'     => 'changed',
 					'compare' => 'NOT EXISTS',
