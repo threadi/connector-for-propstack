@@ -582,7 +582,7 @@ class ImmoObject extends Post_Type {
 		$immo_object = ImmoObjects::get_instance()->get_object( $post->ID );
 
 		// show the link as a button.
-		echo '<a href="' . esc_url( $immo_object->get_url_to_propstack() ) . '" target="_blank" class="button">' . esc_html__( 'Edit in Propstack', 'connector-for-propstack' ) . '</a>';
+		echo '<a href="' . esc_url( $immo_object->get_url_to_propstack() ) . '" target="_blank" class="button button-primary">' . esc_html__( 'Edit in Propstack', 'connector-for-propstack' ) . '</a>';
 	}
 
 	/**
