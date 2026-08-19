@@ -7,6 +7,10 @@
 - Optimized the log cleanup
 - Optimized button styling in edit view
 
+### Fixed
+
+- Fixed the statement to get our own Block templates from the database
+
 ## [1.0.4] - 17.08.2026
 
 ### Added
