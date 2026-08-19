@@ -248,9 +248,19 @@ class Templates {
 			),
 		);
 
-		if ( count( $slugs ) > 0 ) {
-			$query['post_name__in'] = $slugs;
+		// get our own template slug.
+		$own_slugs = array_keys( $this->get_templates() );
+
+		// intersect them with the given slugs.
+		$slugs = count( $slugs ) > 0 ? array_intersect( $slugs, $own_slugs ) : $own_slugs;
+
+		// bail early: an empty post_name__in is ignored by WP_Query and would match everything.
+		if ( empty( $slugs ) ) {
+			return array();
 		}
+
+		// filter for the slugs of our own templates.
+		$query['post_name__in'] = $slugs;
 
 		// run the query.
 		$check_query = new WP_Query( $query );
