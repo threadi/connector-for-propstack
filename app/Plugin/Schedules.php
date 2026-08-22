@@ -56,7 +56,7 @@ class Schedules {
 		Intervals::get_instance()->init();
 
 		// use our own hooks.
-		if ( is_admin() ) {
+		if ( is_admin() || wp_doing_cron() ) {
 			add_filter( 'cfprop_schedule_our_events', array( $this, 'check_events' ) );
 		}
 		add_action( 'init', array( $this, 'add_the_settings' ), 20 );
@@ -191,8 +191,19 @@ class Schedules {
 				// reinstall the missing event.
 				$obj->install();
 
+				// log this event.
+				/* translators: %1$s will be replaced by the event name. */
+				Log::get_instance()->add( sprintf( __( 'Missing cron event <i>%1$s</i> automatically re-installed.', 'connector-for-propstack' ), esc_html( $obj->get_name() ) ), 'success', $obj->get_log_category() );
+
 				// re-run the check for WP-cron-events.
 				$our_events = $this->get_wp_events();
+			} elseif ( $obj->is_enabled() && isset( $our_events[ $obj->get_name() ] ) ) {
+				// the event exists and is enabled: make sure its interval still
+				// matches the configuration. install() reschedules only if the
+				// interval drifted (e.g. after the user picked another interval);
+				// otherwise it is a no-op. This is what makes a changed interval
+				// take effect without any extra wiring.
+				$obj->install();
 			}
 
 			// delete it if the schedule is in the list of our events and not enabled.

@@ -5,6 +5,7 @@
 ### Changed
 
 - Optimized the log cleanup
+- Optimized cronjob handling
 
 ### Fixed
 
