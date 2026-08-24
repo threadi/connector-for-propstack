@@ -11,6 +11,7 @@
 
 - Fixed the statement to get our own Block templates from the database
 - Fixed visibility of save button in settings
+- Fixed wrong cronjob interval name for queue running
 
 ## [1.0.4] - 17.08.2026
 
