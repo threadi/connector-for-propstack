@@ -10,6 +10,7 @@
 ### Fixed
 
 - Fixed the statement to get our own Block templates from the database
+- Fixed visibility of save button in settings
 
 ## [1.0.4] - 17.08.2026
 

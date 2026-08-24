@@ -98,7 +98,6 @@ class Fields {
 		// add a tab on this page.
 		$fields_tab = $settings_page->add_tab( 'propstack_connector_fields', 30 );
 		$fields_tab->set_title( __( 'Fields', 'connector-for-propstack' ) );
-		$fields_tab->set_hide_save( true );
 
 		// check if this tab is called.
 		$fields_tab_called = $fields_tab->get_name() === filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
