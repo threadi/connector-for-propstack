@@ -8,6 +8,7 @@
 - Optimized button styling in edit view
 - Show the internal field name in list of all fields in the settings
 - Allow to override some default values via shortcode
+- Optimized styling of settings in both views
 - Updated the settings and the dialog lib
 - Typos
 
