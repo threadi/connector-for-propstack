@@ -6,6 +6,9 @@
 
 - Optimized the log cleanup
 - Optimized button styling in edit view
+- Show the internal field name in list of all fields in the settings
+- Allow to override some default values via shortcode
+- Typos
 
 ### Fixed
 

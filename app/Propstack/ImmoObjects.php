@@ -133,7 +133,7 @@ class ImmoObjects {
 	}
 
 	/**
-	 * Return Position object of the given ID.
+	 * Return immo object of the given ID.
 	 *
 	 * @param int    $post_id The ID of the post-object.
 	 * @param string $language_code The language-code to use for contents of the requested object (optional).

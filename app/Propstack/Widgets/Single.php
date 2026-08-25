@@ -82,8 +82,8 @@ class Single extends Widget_Base {
 
 		// set some attributes to configure the rendering.
 		$attributes['classes']   = 'cfprop-object default-max-width';
-		$attributes['template']  = 'default';
-		$attributes['templates'] = array(
+		$attributes['template']  = ! empty( $attributes['template'] ) ? $attributes['template'] : 'default';
+		$attributes['templates'] = ! empty( $attributes['templates'] ) ? $attributes['templates'] : array(
 			'thumbnail',
 			'marketing_type',
 			'key_facts',

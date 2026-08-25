@@ -77,8 +77,8 @@ class Archive extends Widget_Base {
 
 		// add settings to use the templates.
 		$attributes['classes']          = 'cfprop-objects default-max-width';
-		$attributes['listing_template'] = 'default';
-		$attributes['templates']        = array(
+		$attributes['listing_template'] = ! empty( $attributes['listing_template'] ) ? $attributes['listing_template'] : 'default';
+		$attributes['templates']        = ! empty( $attributes['templates'] ) ? $attributes['templates'] : array(
 			'thumbnail',
 			'location_object_type',
 			'title',

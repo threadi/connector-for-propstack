@@ -23,13 +23,38 @@ jQuery(document).ready(function($) {
   /**
    * Copy strings via click.
    */
-  $("body.post-type-cfprop_object code, .etfw-transient code").on("click", function() {
+  $("body.post-type-cfprop_object code, .etfw-transient code, body.settings_page_connector-for-propstack code").on("click", function() {
     $(this).removeClass("copied");
     if( propstack_connector_copy_to_clipboard($(this).html().trim()) ) {
       $(this).addClass("copied");
     }
   });
 });
+
+/**
+ * Bind events in DataView.
+ */
+( function ( hooks ) {
+  'use strict';
+
+  hooks.addAction(
+    'esfw.settingsPage.mounted',
+    'connector-pro-propstack/copy',
+    function () {
+      jQuery( document ).on(
+        "click",
+        "body.settings_page_connector-for-propstack code",
+        function() {
+          jQuery(this).removeClass("copied");
+          if( propstack_connector_copy_to_clipboard(jQuery(this).html().trim()) ) {
+            jQuery(this).addClass("copied");
+          }
+        }
+      );
+    }
+  );
+
+} )( wp.hooks );
 
 /**
  * Get the import dialog via AJAX.
