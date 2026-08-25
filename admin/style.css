@@ -123,6 +123,25 @@ body.settings_page_connector-for-propstack {
 	z-index: 1;
 }
 
+.nav-tab-help:not(.components-button):before {
+	content: "\f125";
+	display: inline-block;
+	font-family: "dashicons", sans-serif;
+	font-size: 12px;
+	margin-right: 8px;
+}
+
+.nav-tab-help.components-button {
+	margin-left: auto;
+	.esfw-tab-title:before {
+		content: "\f125";
+		display: inline-block;
+		font-family: "dashicons", sans-serif;
+		font-size: 12px;
+		margin-right: 8px;
+	}
+}
+
 body.post-type-cfprop_object a:not(.review-hint-button)[target="_blank"]:after {
 	content: "\f504";
 	display: inline-block;
