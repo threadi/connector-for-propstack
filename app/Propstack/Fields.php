@@ -98,7 +98,6 @@ class Fields {
 		// add a tab on this page.
 		$fields_tab = $settings_page->add_tab( 'propstack_connector_fields', 30 );
 		$fields_tab->set_title( __( 'Fields', 'connector-for-propstack' ) );
-		$fields_tab->set_hide_save( true );
 
 		// check if this tab is called.
 		$fields_tab_called = $fields_tab->get_name() === filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
@@ -126,6 +125,7 @@ class Fields {
 		$field->set_columns(
 			array(
 				__( 'The field', 'connector-for-propstack' ),
+				__( 'Internal name', 'connector-for-propstack' ),
 				__( 'Example from your objects', 'connector-for-propstack' ),
 			)
 		);
@@ -156,6 +156,16 @@ class Fields {
 			$field->add_setting( $name_setting, $row, 0 );
 
 			// add setting.
+			$name_setting = $settings_obj->add_setting( 'propstack_connector_fields_all_' . $immo_field->get_name() . '_internal_name' );
+			$name_setting->prevent_export( true );
+			$name_setting->set_type( 'string' );
+			$name_setting->set_section( $hidden_section );
+			$name_setting_field = new Value( $settings_obj );
+			$name_setting_field->set_value( '<code data-copied-label="' . esc_attr__( 'copied', 'connector-for-propstack' ) . '" title="' . esc_attr__( 'Click to copy this code in your clipboard', 'connector-for-propstack' ) . '">' . $immo_field->get_name() . '</code>' );
+			$name_setting->set_field( $name_setting_field );
+			$field->add_setting( $name_setting, $row, 1 );
+
+			// add setting.
 			$name_setting = $settings_obj->add_setting( 'propstack_connector_fields_all_' . $immo_field->get_name() . '_example' );
 			$name_setting->prevent_export( true );
 			$name_setting->set_type( 'string' );
@@ -163,7 +173,7 @@ class Fields {
 			$name_setting_field = new Value( $settings_obj );
 			$name_setting_field->set_value( $fields_tab_called ? Cache::get( $immo_field->get_name() . '_example' ) : '' );
 			$name_setting->set_field( $name_setting_field );
-			$field->add_setting( $name_setting, $row, 1 );
+			$field->add_setting( $name_setting, $row, 2 );
 
 			// next row.
 			++$row;
@@ -286,6 +296,7 @@ class Fields {
 			$field->set_columns(
 				array(
 					__( 'The field', 'connector-for-propstack' ),
+					__( 'Internal name', 'connector-for-propstack' ),
 					__( 'Hide in frontend', 'connector-for-propstack' ),
 				)
 			);
@@ -315,6 +326,16 @@ class Fields {
 				$field->add_setting( $name_setting, $row, 0 );
 
 				// add setting.
+				$name_setting = $settings_obj->add_setting( 'propstack_connector_fields_' . $taxonomy->get_name() . '_' . $immo_field->get_name() . '_internal_name' );
+				$name_setting->prevent_export( true );
+				$name_setting->set_type( 'string' );
+				$name_setting->set_section( $hidden_section );
+				$name_setting_field = new Value( $settings_obj );
+				$name_setting_field->set_value( '<code data-copied-label="' . esc_attr__( 'copied', 'connector-for-propstack' ) . '" title="' . esc_attr__( 'Click to copy this code in your clipboard', 'connector-for-propstack' ) . '">' . $immo_field->get_name() . '</code>' );
+				$name_setting->set_field( $name_setting_field );
+				$field->add_setting( $name_setting, $row, 1 );
+
+				// add setting.
 				$disable_field_setting = $settings_obj->add_setting( 'propstack_connector_fields_' . $taxonomy->get_name() . '_' . $immo_field->get_name() . '_disabled' );
 				$disable_field_setting->set_default( $taxonomy->is_field_default_disabled( $immo_field ) ? 1 : 0 );
 				$disable_field_setting->set_section( $hidden_section );
@@ -322,7 +343,7 @@ class Fields {
 				$disable_field_setting_field->set_title( $immo_field->get_label() );
 				$disable_field_setting_field->set_readonly( true );
 				$disable_field_setting->set_field( $disable_field_setting_field );
-				$field->add_setting( $disable_field_setting, $row, 1 );
+				$field->add_setting( $disable_field_setting, $row, 2 );
 
 				// next row.
 				++$row;

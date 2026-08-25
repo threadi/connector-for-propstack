@@ -6,10 +6,15 @@
 
 - Optimized the log cleanup
 - Optimized button styling in edit view
+- Show the internal field name in list of all fields in the settings
+- Allow to override some default values via shortcode
+- Typos
 
 ### Fixed
 
 - Fixed the statement to get our own Block templates from the database
+- Fixed visibility of save button in settings
+- Fixed wrong cronjob interval name for queue running
 
 ## [1.0.4] - 17.08.2026
 
