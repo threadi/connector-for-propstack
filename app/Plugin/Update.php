@@ -114,9 +114,8 @@ class Update {
 		$queue_interval = get_option( 'propstackConnectorQueueScheduleInterval' );
 
 		// update it if the old value is still set.
-		if( 'propstack_connector_15minutely' === $queue_interval ) {
+		if ( 'propstack_connector_15minutely' === $queue_interval ) {
 			update_option( 'propstackConnectorQueueScheduleInterval', 'cfprop_15minutely' );
 		}
 	}
-
 }
