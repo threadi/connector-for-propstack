@@ -50,7 +50,7 @@ The Pro version removes the limits of the free version and adds everything you n
 
 ➕ Import and display of all property types Propstack offers, such as "Plot", "Office" or "Store"
 ➕ Considerably more data fields for your Propstack properties
-➕ Eight widgets and ready-made templates for page builders such as Avada, Bricks, Brizy, Elementor, Salient and WPBakery
+➕ Eight widgets and ready-made templates for page builders such as Avada, Bricks, Brizy, Elementor, GeneratePress Elements, Salient and WPBakery
 ➕ Send contact enquiries straight into Propstack using Avada Forms, Elementor Forms, Contact Form 7 or WPForms
 ➕ Additional blocks for the block editor, for example object status
 ➕ Personal support by the developers
