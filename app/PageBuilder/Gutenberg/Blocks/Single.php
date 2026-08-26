@@ -37,7 +37,7 @@ class Single extends Blocks_Basis {
 	 * @var array<string,array<string,mixed>>
 	 */
 	protected array $attributes = array(
-		'id'                  => array(
+		'object_id'                  => array(
 			'type'    => 'integer',
 			'default' => 0,
 		),

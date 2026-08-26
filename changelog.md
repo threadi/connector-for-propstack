@@ -18,7 +18,7 @@
 - Fixed the visibility of the save button in settings
 - Fixed the wrong cronjob interval name for queue running
 - Fixed check for development mode in WordPress < 6.3
-- Optimized button styling in the edit view
+- Fixed a wrong variable name for the "Single" block
 
 ## [1.0.4] - 17.08.2026
 
