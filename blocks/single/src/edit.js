@@ -81,7 +81,7 @@ export default function Edit( object ) {
 						label={__('Select object', 'connector-for-propstack')}
 						options={ immoObjectsOptions }
 						value={object.attributes.id}
-						onChange={(value) => onChange( 'id', parseInt(value), object )}
+						onChange={(value) => onChange( 'object_id', parseInt(value), object )}
 					/>
 				</PanelBody>
 			</InspectorControls>

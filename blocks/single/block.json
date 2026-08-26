@@ -27,7 +27,7 @@
 	"editorStyle": "file:build/index.css",
 	"style": "file:build/style-index.css",
 	"attributes": {
-		"id": {
+		"object_id": {
 			"type": "integer",
 			"default": 0
 		},

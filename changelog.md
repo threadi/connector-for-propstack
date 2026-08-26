@@ -5,9 +5,9 @@
 ### Changed
 
 - Optimized the log cleanup
-- Optimized button styling in edit view
-- Show the internal field name in list of all fields in the settings
-- Allow to override some default values via shortcode
+- Optimized button styling in the edit view
+- Show the internal field name in the list of all fields in the settings
+- Allow overriding some default values via shortcode
 - Optimized styling of settings in both views
 - Updated the settings and the dialog lib
 - Typos
@@ -15,9 +15,10 @@
 ### Fixed
 
 - Fixed the statement to get our own Block templates from the database
-- Fixed visibility of save button in settings
-- Fixed wrong cronjob interval name for queue running
+- Fixed the visibility of the save button in settings
+- Fixed the wrong cronjob interval name for queue running
 - Fixed check for development mode in WordPress < 6.3
+- Fixed a wrong variable name for the "Single" block
 
 ## [1.0.4] - 17.08.2026
 
