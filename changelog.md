@@ -5,7 +5,7 @@
 ### Changed
 
 - Optimized the log cleanup
-- Optimized button styling in edit view
+- Optimized button styling in the edit view
 
 ## [1.0.4] - 17.08.2026
 
