@@ -75,6 +75,9 @@ class Update {
 			if ( version_compare( $db_plugin_version, '1.0.3', '<' ) ) {
 				$this->version103();
 			}
+			if ( version_compare( $db_plugin_version, '1.0.5', '<' ) ) {
+				$this->version105();
+			}
 
 			// log that this update has been run.
 			/* translators: %1$s and %2$s are replaced by the old and new version. */
@@ -98,6 +101,21 @@ class Update {
 		foreach ( Taxonomies::get_instance()->get_taxonomies_as_objects() as $taxonomy ) {
 			$taxonomy->register();
 			$taxonomy->activation();
+		}
+	}
+
+	/**
+	 * Run on update to 1.0.5.
+	 *
+	 * @return void
+	 */
+	private function version105(): void {
+		// get the actual value.
+		$queue_interval = get_option( 'propstackConnectorQueueScheduleInterval' );
+
+		// update it if the old value is still set.
+		if ( 'propstack_connector_15minutely' === $queue_interval ) {
+			update_option( 'propstackConnectorQueueScheduleInterval', 'cfprop_15minutely' );
 		}
 	}
 }

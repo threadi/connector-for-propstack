@@ -281,7 +281,7 @@ class Propstack {
 	}
 
 	/**
-	 * Support for custom post-type slugs with dynamic parts for our own Position cpt.
+	 * Support for custom post-type slugs with dynamic parts for our own object cpt.
 	 *
 	 * @param string           $permalink The permalink.
 	 * @param stdClass|WP_Post $post The post-object of the post.

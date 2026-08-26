@@ -133,7 +133,7 @@ class ImmoObjects {
 	}
 
 	/**
-	 * Return Position object of the given ID.
+	 * Return immo object of the given ID.
 	 *
 	 * @param int    $post_id The ID of the post-object.
 	 * @param string $language_code The language-code to use for contents of the requested object (optional).
@@ -357,7 +357,6 @@ class ImmoObjects {
 		// add a tab on this page.
 		$import_tab = $settings_page->add_tab( 'propstack_connector_import', 20 );
 		$import_tab->set_title( __( 'Imports', 'connector-for-propstack' ) );
-		$import_tab->set_hide_save( true );
 
 		// add a tab for the objects.
 		$import_objects_tab = $import_tab->add_tab( 'propstack_connector_objects_import', 10 );
@@ -501,7 +500,6 @@ class ImmoObjects {
 		// add a tab on this page.
 		$objects_tab = $settings_page->add_tab( 'propstack_connector_objects', 45 );
 		$objects_tab->set_title( __( 'Objects', 'connector-for-propstack' ) );
-		$objects_tab->set_hide_save( true );
 
 		// add a sub tab for restrictions.
 		$restrictions_tab = $objects_tab->add_tab( 'propstack_connector_import_restrictions', 10 );

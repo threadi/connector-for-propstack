@@ -117,7 +117,7 @@ class Admin {
 		wp_enqueue_script(
 			'connector-for-propstack',
 			Helper::get_plugin_url() . 'admin/main.js',
-			array(),
+			array( 'wp-hooks' ),
 			Helper::get_file_version( trailingslashit( Helper::get_plugin_path() ) . 'admin/main.js' ),
 			true
 		);
