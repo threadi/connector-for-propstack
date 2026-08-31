@@ -46,6 +46,6 @@ class HeatingType extends Field_Base {
 	 * @return Field_Category_Base
 	 */
 	public function get_category(): Field_Category_Base {
-		return new \ConnectorForPropstack\Propstack\FieldCategories\BuildingConditions();
+		return new \ConnectorForPropstack\Propstack\FieldCategories\Energy();
 	}
 }

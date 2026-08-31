@@ -10,6 +10,7 @@
 - Allow overriding some default values via shortcode
 - Optimized styling of settings in both views
 - Updated the settings and the dialog lib
+- Moved the field "Heating Type" and "Firing Types" from Building to Firing Types
 - Typos
 
 ### Fixed
