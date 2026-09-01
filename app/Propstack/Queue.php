@@ -233,7 +233,7 @@ class Queue {
 				'post_parent'  => $post_id, // the ID we want this file to be assigned to.
 				'post_content' => '',
 			);
-			$queue_post_id = wp_insert_post( $query );
+			$queue_post_id = wp_insert_post( $query, true );
 
 			// bail on any error.
 			if ( is_wp_error( $queue_post_id ) ) { // @phpstan-ignore function.impossibleType

@@ -11,6 +11,7 @@
 - Optimized styling of settings in both views
 - Updated the settings and the dialog lib
 - Moved the field "Heating Type" and "Firing Types" from Building to Firing Types
+- Changed to get errors during creation and update of open positions from WordPress
 - Typos
 
 ### Fixed
