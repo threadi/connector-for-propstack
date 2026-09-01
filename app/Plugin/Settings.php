@@ -258,7 +258,7 @@ class Settings {
 		}
 
 		// add a hidden tab.
-		$hidden_tab = $page->get_tab( 'propstack_connector_hidden' );
+		$hidden_tab = $page->get_tab( 'hidden_tab' );
 
 		// bail if the tab could not be found.
 		if ( ! $hidden_tab instanceof Tab ) {

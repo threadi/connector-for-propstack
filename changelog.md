@@ -21,6 +21,7 @@
 - Fixed the wrong cronjob interval name for queue running
 - Fixed check for development mode in WordPress < 6.3
 - Fixed a wrong variable name for the "Single" block
+- Fixed a wrong name for the hidden tab to load the hidden section for settings
 
 ## [1.0.4] - 17.08.2026
 
