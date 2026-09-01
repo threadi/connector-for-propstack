@@ -243,7 +243,7 @@ class Objects extends Import_Base {
 						$query = apply_filters( 'cfprop_new_object_query', $query, $object );
 
 						// add the object.
-						$post_id = wp_insert_post( $query );
+						$post_id = wp_insert_post( $query, true );
 
 						// bail if inserting failed.
 						if ( $post_id instanceof WP_Error ) { // @phpstan-ignore instanceof.alwaysFalse
