@@ -144,7 +144,7 @@ class ImmoObjects {
 		if ( empty( $this->objects[ $post_id . $language_code ] ) ) {
 			$immo_object = new ImmoObject( $post_id );
 			/**
-			 * Filter the requested position object.
+			 * Filter the requested immo object.
 			 *
 			 * @since 1.0.0 Available since 1.0.0.
 			 *
