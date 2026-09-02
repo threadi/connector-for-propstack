@@ -5,6 +5,7 @@
 ### Added
 
 - Added option on the shortcode for fields to show the value of a specific field from a given object
+- Added compatibility checks and hints
 
 ### Changed
 
