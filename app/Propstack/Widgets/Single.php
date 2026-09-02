@@ -103,7 +103,7 @@ class Single extends Widget_Base {
 		// secure the post-ID for the template.
 		$post_id = $attributes['object']->get_id();
 
-		// get the object for the immo objects.
+		// get the object for the Immo objects.
 		$immo_object = \ConnectorForPropstack\Propstack\ImmoObjects::get_instance()->get_object( $attributes['object']->get_id(), $attributes['lang'] );
 
 		// collect the output.
