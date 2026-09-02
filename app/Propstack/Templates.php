@@ -355,13 +355,13 @@ class Templates {
 	/**
 	 * Show the object data of the given object for a given category type.
 	 *
-	 * @param \ConnectorForPropstack\Propstack\ImmoObject $immo_object        The immo object.
-	 * @param string                                      $category_type_name The category type name.
-	 * @param array<string,mixed>                         $attributes         The used attributes.
+	 * @param ImmoObject          $immo_object        The immo object.
+	 * @param string              $category_type_name The category type name.
+	 * @param array<string,mixed> $attributes         The used attributes.
 	 *
 	 * @return void
 	 */
-	public function show_category_type( \ConnectorForPropstack\Propstack\ImmoObject $immo_object, string $category_type_name, array $attributes ): void {
+	public function show_category_type( ImmoObject $immo_object, string $category_type_name, array $attributes ): void {
 		// get the object type term for this object.
 		$object_type_terms = wp_get_object_terms( $immo_object->get_id(), ObjectType::get_instance()->get_name() );
 
@@ -496,22 +496,42 @@ class Templates {
 	/**
 	 * Show the key facts.
 	 *
-	 * @param ImmoObject $immo_object
+	 * @param ImmoObject $immo_object The immo object.
 	 *
 	 * @return void
 	 */
 	public function show_key_facts( ImmoObject $immo_object ): void {
 		// get the price.
-		$price = Field::get_instance()->render( array( 'field_name' => ( new Price() )->get_name(), 'object' => $immo_object ) );
+		$price = Field::get_instance()->render(
+			array(
+				'field_name' => ( new Price() )->get_name(),
+				'object'     => $immo_object,
+			)
+		);
 
 		// get the price per sqm.
-		$price_per_sqm = Field::get_instance()->render( array( 'field_name' => ( new PricePerSqm() )->get_name(), 'object' => $immo_object ) );
+		$price_per_sqm = Field::get_instance()->render(
+			array(
+				'field_name' => ( new PricePerSqm() )->get_name(),
+				'object'     => $immo_object,
+			)
+		);
 
 		// get the city.
-		$city = Field::get_instance()->render( array( 'field_name' => ( new City() )->get_name(), 'object' => $immo_object ) );
+		$city = Field::get_instance()->render(
+			array(
+				'field_name' => ( new City() )->get_name(),
+				'object'     => $immo_object,
+			)
+		);
 
 		// get the short address.
-		$address = Field::get_instance()->render( array( 'field_name' => ( new ShortAddress() )->get_name(), 'object' => $immo_object ) );
+		$address = Field::get_instance()->render(
+			array(
+				'field_name' => ( new ShortAddress() )->get_name(),
+				'object'     => $immo_object,
+			)
+		);
 
 		// show them.
 		?>
@@ -534,6 +554,8 @@ class Templates {
 
 	/**
 	 * Show the property details.
+	 *
+	 * @param ImmoObject $immo_object The immo object.
 	 *
 	 * @return void
 	 */
@@ -561,7 +583,14 @@ class Templates {
 		<div class="cfprop-property-details">
 			<?php
 			foreach ( $fields as $field ) {
-				echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post( Field::get_instance()->render( array( 'field_name' => $field->get_name(), 'object' => $immo_object ) ) ) . '</div>';
+				echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
+					Field::get_instance()->render(
+						array(
+							'field_name' => $field->get_name(),
+							'object'     => $immo_object,
+						)
+					)
+				) . '</div>';
 			}
 			?>
 		</div>
@@ -673,22 +702,57 @@ class Templates {
 					<div>
 						<h2><?php echo esc_html__( 'Description', 'connector-for-propstack' ); ?></h2>
 						<?php
-							echo wp_kses_post( Field::get_instance()->render( array( 'field_name' => ( new DescriptionNote() )->get_name(), 'object' => $immo_object ) ) );
-							echo wp_kses_post( Field::get_instance()->render( array( 'field_name' => ( new FurnishingNote() )->get_name(), 'object' => $immo_object ) ) );
-							echo wp_kses_post( Field::get_instance()->render( array( 'field_name' => ( new OtherNote() )->get_name(), 'object' => $immo_object ) ) );
+							echo wp_kses_post(
+								Field::get_instance()->render(
+									array(
+										'field_name' => ( new DescriptionNote() )->get_name(),
+										'object'     => $immo_object,
+									)
+								)
+							);
+							echo wp_kses_post(
+								Field::get_instance()->render(
+									array(
+										'field_name' => ( new FurnishingNote() )->get_name(),
+										'object'     => $immo_object,
+									)
+								)
+							);
+							echo wp_kses_post(
+								Field::get_instance()->render(
+									array(
+										'field_name' => ( new OtherNote() )->get_name(),
+										'object'     => $immo_object,
+									)
+								)
+							);
 						?>
 					</div>
 					<div class="cfprop-costs">
 						<?php
 						foreach ( $costs_fields as $field ) {
-							echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post( Field::get_instance()->render( array( 'field_name' => $field->get_name(), 'object' => $immo_object ) ) ) . '</div>';
+							echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
+								Field::get_instance()->render(
+									array(
+										'field_name' => $field->get_name(),
+										'object'     => $immo_object,
+									)
+								)
+							) . '</div>';
 						}
 						?>
 					</div>
 					<div>
 						<h2><?php echo esc_html__( 'Location', 'connector-for-propstack' ); ?></h2>
 						<?php
-						echo wp_kses_post( Field::get_instance()->render( array( 'field_name' => ( new LocationNote() )->get_name(), 'object' => $immo_object ) ) );
+						echo wp_kses_post(
+							Field::get_instance()->render(
+								array(
+									'field_name' => ( new LocationNote() )->get_name(),
+									'object'     => $immo_object,
+								)
+							)
+						);
 						?>
 					</div>
 					<div>
@@ -696,7 +760,14 @@ class Templates {
 						<div class="cfprop-features">
 							<?php
 							foreach ( $feature_fields as $field ) {
-								echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . '</span></p>' . wp_kses_post( Field::get_instance()->render( array( 'field_name' => $field->get_name(), 'object' => $immo_object ) ) ) . '</div>';
+								echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . '</span></p>' . wp_kses_post(
+									Field::get_instance()->render(
+										array(
+											'field_name' => $field->get_name(),
+											'object'     => $immo_object,
+										)
+									)
+								) . '</div>';
 							}
 							?>
 						</div>
@@ -707,14 +778,28 @@ class Templates {
 							<div class="cfprop-building-conditions">
 								<?php
 								foreach ( $buildings_conditions_fields as $field ) {
-									echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post( Field::get_instance()->render( array( 'field_name' => $field->get_name(), 'object' => $immo_object ) ) ) . '</div>';
+									echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
+										Field::get_instance()->render(
+											array(
+												'field_name' => $field->get_name(),
+												'object' => $immo_object,
+											)
+										)
+									) . '</div>';
 								}
 								?>
 							</div>
 							<div class="cfprop-energy">
 								<?php
 								foreach ( $energy_fields as $field ) {
-									echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post( Field::get_instance()->render( array( 'field_name' => $field->get_name(), 'object' => $immo_object ) ) ) . '</div>';
+									echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
+										Field::get_instance()->render(
+											array(
+												'field_name' => $field->get_name(),
+												'object' => $immo_object,
+											)
+										)
+									) . '</div>';
 								}
 								?>
 							</div>
@@ -723,16 +808,44 @@ class Templates {
 					<div>
 						<h2><?php echo esc_html__( 'Detailed description', 'connector-for-propstack' ); ?></h2>
 						<?php
-						echo wp_kses_post( Field::get_instance()->render( array( 'field_name' => ( new LongFurnishingNote() )->get_name(), 'object' => $immo_object ) ) );
-						echo wp_kses_post( Field::get_instance()->render( array( 'field_name' => ( new LongDescriptionNote() )->get_name(), 'object' => $immo_object ) ) );
-						echo wp_kses_post( Field::get_instance()->render( array( 'field_name' => ( new LongLocationNote() )->get_name(), 'object' => $immo_object ) ) );
+						echo wp_kses_post(
+							Field::get_instance()->render(
+								array(
+									'field_name' => ( new LongFurnishingNote() )->get_name(),
+									'object'     => $immo_object,
+								)
+							)
+						);
+						echo wp_kses_post(
+							Field::get_instance()->render(
+								array(
+									'field_name' => ( new LongDescriptionNote() )->get_name(),
+									'object'     => $immo_object,
+								)
+							)
+						);
+						echo wp_kses_post(
+							Field::get_instance()->render(
+								array(
+									'field_name' => ( new LongLocationNote() )->get_name(),
+									'object'     => $immo_object,
+								)
+							)
+						);
 						?>
 					</div>
 					<div>
 						<div class="cfprop-distances">
 							<?php
 							foreach ( $distance_fields as $field ) {
-								echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post( Field::get_instance()->render( array( 'field_name' => $field->get_name(), 'object' => $immo_object ) ) ) . '</div>';
+								echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
+									Field::get_instance()->render(
+										array(
+											'field_name' => $field->get_name(),
+											'object'     => $immo_object,
+										)
+									)
+								) . '</div>';
 							}
 							?>
 						</div>
@@ -744,13 +857,27 @@ class Templates {
 						<div class="cfprop-contact">
 							<div class="cfprop-broker-image">
 								<?php
-									echo wp_kses_post( Broker_Field::get_instance()->render( array( 'field_name' => ( new Thumbnail() )->get_name(), 'object' => $immo_object ) ) );
+									echo wp_kses_post(
+										Broker_Field::get_instance()->render(
+											array(
+												'field_name' => ( new Thumbnail() )->get_name(),
+												'object' => $immo_object,
+											)
+										)
+									);
 								?>
 							</div>
 							<div class="cfprop-broker">
 								<?php
 								foreach ( $broker_fields as $field ) {
-									echo '<div class="wp-block-group">' . wp_kses_post( Broker_Field::get_instance()->render( array( 'field_name' => $field->get_name(), 'object' => $immo_object ) ) ) . '</div>';
+									echo '<div class="wp-block-group">' . wp_kses_post(
+										Broker_Field::get_instance()->render(
+											array(
+												'field_name' => $field->get_name(),
+												'object' => $immo_object,
+											)
+										)
+									) . '</div>';
 								}
 								?>
 							</div>

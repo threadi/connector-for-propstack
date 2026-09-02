@@ -75,7 +75,7 @@ class Broker_Field extends Widget_Base {
 		}
 
 		// get the object for this request, if no object is given as attribute.
-		if( ! isset( $attributes['object'] ) ) {
+		if ( ! isset( $attributes['object'] ) ) {
 			$immo_object = $this->get_object_by_request();
 
 			// bail if no object could be found.
@@ -87,8 +87,7 @@ class Broker_Field extends Widget_Base {
 			if ( get_post_type( $immo_object->get_id() ) !== ImmoObject::get_instance()->get_name() ) {
 				return '';
 			}
-		}
-		else {
+		} else {
 			$immo_object = $attributes['object'];
 		}
 

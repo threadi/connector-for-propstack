@@ -70,6 +70,6 @@ class Elementor extends Compatibilities_Base {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		return did_action( 'elementor/loaded' );
+		return 1 === did_action( 'elementor/loaded' );
 	}
 }
