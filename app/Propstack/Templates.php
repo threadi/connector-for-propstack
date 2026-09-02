@@ -355,13 +355,13 @@ class Templates {
 	/**
 	 * Show the object data of the given object for a given category type.
 	 *
-	 * @param \ConnectorForPropstack\Propstack\ImmoObject $immo_object        The immo object.
-	 * @param string                                      $category_type_name The category type name.
-	 * @param array<string,mixed>                         $attributes         The used attributes.
+	 * @param ImmoObject          $immo_object        The immo object.
+	 * @param string              $category_type_name The category type name.
+	 * @param array<string,mixed> $attributes         The used attributes.
 	 *
 	 * @return void
 	 */
-	public function show_category_type( \ConnectorForPropstack\Propstack\ImmoObject $immo_object, string $category_type_name, array $attributes ): void {
+	public function show_category_type( ImmoObject $immo_object, string $category_type_name, array $attributes ): void {
 		// get the object type term for this object.
 		$object_type_terms = wp_get_object_terms( $immo_object->get_id(), ObjectType::get_instance()->get_name() );
 
@@ -496,7 +496,7 @@ class Templates {
 	/**
 	 * Show the key facts.
 	 *
-	 * @param ImmoObject $immo_object
+	 * @param ImmoObject $immo_object The immo object.
 	 *
 	 * @return void
 	 */
@@ -554,6 +554,8 @@ class Templates {
 
 	/**
 	 * Show the property details.
+	 *
+	 * @param ImmoObject $immo_object The immo object.
 	 *
 	 * @return void
 	 */
