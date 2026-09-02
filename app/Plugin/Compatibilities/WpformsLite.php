@@ -24,7 +24,7 @@ class WpformsLite extends Compatibilities_Base {
 	 *
 	 * @var string
 	 */
-	protected string $name = 'personio_integration_compatibility_wpforms_lite';
+	protected string $name = 'cfprop_compatibility_wpforms_lite';
 
 	/**
 	 * Instance of this object.
@@ -55,7 +55,7 @@ class WpformsLite extends Compatibilities_Base {
 			$transient_obj = $transients_obj->add();
 			$transient_obj->set_name( $this->get_name() );
 			/* translators: %1$s will be replaced by the URL to the Pro-version-info-page. */
-			$transient_obj->set_message( sprintf( __( '<strong>We realized that you are using WPForms Lite - very nice!</strong> <a href="%1$s" target="_blank"><i>Personio Integration Pro</i> (opens a new window)</a> allows you to design your application forms with WPForms and Filenzo.', 'personio-integration-light' ), esc_url( Helper::get_pro_url() ) ) );
+			$transient_obj->set_message( sprintf( __( '<strong>We realized that you are using WPForms Lite - very nice!</strong> <a href="%1$s" target="_blank"><i>Connector for Propstack Pro</i> (opens a new window)</a> allows you to submit request with WPForms and Filenzo direct to Propstack.', 'connector-for-propstack' ), esc_url( Helper::get_pro_url() ) ) );
 			$transient_obj->set_type( 'success' );
 			$transient_obj->set_dismissible_days( 30 );
 			$transient_obj->save();

@@ -33,9 +33,9 @@ class ImmoObject {
 	private string $lang = 'de';
 
 	/**
-	 * Constructor for this position.
+	 * Constructor for this object.
 	 *
-	 * @param int $post_id The post_id of this position.
+	 * @param int $post_id The post_id of this object.
 	 */
 	public function __construct( int $post_id ) {
 		$this->post_id = $post_id;

@@ -254,7 +254,7 @@ class Propstack {
 	}
 
 	/**
-	 * Hide a single view of positions if the option is enabled for this.
+	 * Hide a single view of objects if the option is enabled for this.
 	 *
 	 * @return void
 	 */
