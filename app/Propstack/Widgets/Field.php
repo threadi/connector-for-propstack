@@ -13,6 +13,7 @@ namespace ConnectorForPropstack\Propstack\Widgets;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
+use ConnectorForPropstack\Plugin\Languages;
 use ConnectorForPropstack\Plugin\Templates;
 use ConnectorForPropstack\Propstack\Field_Base;
 use ConnectorForPropstack\Propstack\FieldFormat_Base;
@@ -20,6 +21,7 @@ use ConnectorForPropstack\Propstack\FieldFormats;
 use ConnectorForPropstack\Propstack\Fields;
 use ConnectorForPropstack\Propstack\FieldType_Base;
 use ConnectorForPropstack\Propstack\FieldTypes;
+use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use ConnectorForPropstack\Propstack\Taxonomies\ObjectType;
 use ConnectorForPropstack\Propstack\Widget_Base;
@@ -80,17 +82,27 @@ class Field extends Widget_Base {
 			return '';
 		}
 
-		// get the object for this request.
-		$immo_object = $this->get_object_by_request();
-
-		// bail if no object could be found.
-		if ( ! $immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
-			return '';
+		// if 'object_id' is given, get the object for it.
+		if( ! empty( $attributes['object_id'] ) ) {
+			$attributes['object'] = ImmoObjects::get_instance()->get_object_by_object_id( $attributes['object_id'], Languages::get_instance()->get_current_lang() );
 		}
 
-		// bail if requested post-type is not ours.
-		if ( get_post_type( $immo_object->get_id() ) !== ImmoObject::get_instance()->get_name() ) {
-			return '';
+		// get the object for this request, if no object is given as attribute.
+		if( ! isset( $attributes['object'] ) ) {
+			$immo_object = $this->get_object_by_request();
+
+			// bail if no object could be found.
+			if ( ! $immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
+				return '';
+			}
+
+			// bail if requested post-type is not ours.
+			if ( get_post_type( $immo_object->get_id() ) !== ImmoObject::get_instance()->get_name() ) {
+				return '';
+			}
+		}
+		else {
+			$immo_object = $attributes['object'];
 		}
 
 		// get the field object.
