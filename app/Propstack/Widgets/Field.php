@@ -83,12 +83,12 @@ class Field extends Widget_Base {
 		}
 
 		// if 'object_id' is given, get the object for it.
-		if( ! empty( $attributes['object_id'] ) ) {
+		if ( ! empty( $attributes['object_id'] ) ) {
 			$attributes['object'] = ImmoObjects::get_instance()->get_object_by_object_id( $attributes['object_id'], Languages::get_instance()->get_current_lang() );
 		}
 
 		// get the object for this request, if no object is given as attribute.
-		if( ! isset( $attributes['object'] ) ) {
+		if ( ! isset( $attributes['object'] ) ) {
 			$immo_object = $this->get_object_by_request();
 
 			// bail if no object could be found.
@@ -100,8 +100,7 @@ class Field extends Widget_Base {
 			if ( get_post_type( $immo_object->get_id() ) !== ImmoObject::get_instance()->get_name() ) {
 				return '';
 			}
-		}
-		else {
+		} else {
 			$immo_object = $attributes['object'];
 		}
 
