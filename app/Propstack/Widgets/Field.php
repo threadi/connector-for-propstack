@@ -159,7 +159,6 @@ class Field extends Widget_Base {
 
 		// return the template with this value.
 		ob_start();
-
 		/**
 		 * Run custom actions before the output of the archive listing.
 		 *
