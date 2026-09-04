@@ -6,6 +6,7 @@
 
 - Added option on the shortcode for fields to show the value of a specific field from a given object
 - Added compatibility checks and hints
+- Added some new hooks to allow developers to extend the plugin
 
 ### Changed
 
@@ -28,6 +29,7 @@
 - Fixed check for development mode in WordPress < 6.3
 - Fixed a wrong variable name for the "Single" block
 - Fixed a wrong name for the hidden tab to load the hidden section for settings
+- Fixed a wrong natural sorting of field lists by name
 
 ## [1.0.4] - 17.08.2026
 

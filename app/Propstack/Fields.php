@@ -845,15 +845,32 @@ class Fields {
 		$output = $field_format->get_value();
 
 		// strip all tags if parameter is set.
+		$true = true;
 		if ( $without_html ) {
-			if ( empty( $output ) && is_admin() ) {
+			/**
+			 * Filter the output of a hint if a field has no output.
+			 *
+			 * @since 1.0.5 Available since 1.0.5.
+			 * @param bool $true True to show the hint.
+			 *
+			 * @noinspection PhpConditionAlreadyCheckedInspection
+			 */
+			if ( empty( $output ) && is_admin() && apply_filters( 'cfprop_show_not_set_hint', $true ) ) {
 				return __( 'not set', 'connector-for-propstack' );
 			}
 			return wp_strip_all_tags( $output );
 		}
 
 		// use hint if the value is not set.
-		if ( empty( $output ) && is_admin() ) {
+		/**
+		 * Filter the output of a hint if a field has no output.
+		 *
+		 * @since 1.0.5 Available since 1.0.5.
+		 * @param bool $true True to show the hint.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		if ( empty( $output ) && is_admin() && apply_filters( 'cfprop_show_not_set_hint', $true ) ) {
 			$output = '<em>' . __( 'not set', 'connector-for-propstack' ) . '</em>';
 		}
 

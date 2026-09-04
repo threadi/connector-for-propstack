@@ -596,7 +596,7 @@ class Helper {
 			// use natural sort via PHP intl extension.
 			$collator = new Collator( Languages::get_instance()->get_current_lang() );
 			$collator->setAttribute( Collator::NUMERIC_COLLATION, Collator::ON );
-			uksort(
+			uasort(
 				$array_to_sort,
 				// @phpstan-ignore argument.type
 				static function ( $a, $b ) use ( $collator ) {
@@ -605,7 +605,7 @@ class Helper {
 			);
 		} else {
 			// use simple sort.
-			uksort( $array_to_sort, 'strcoll' );
+			uasort( $array_to_sort, 'strcoll' );
 		}
 
 		// return the sorted array.
