@@ -199,6 +199,9 @@ class ProcessHandler {
 	 * @return void
 	 */
 	public function set_id( string $process_id ): void {
+		if ( empty( $process_id ) && ! empty( $this->process_id ) ) {
+			return;
+		}
 		$this->process_id = $process_id;
 	}
 
