@@ -30,6 +30,7 @@
 - Fixed a wrong variable name for the "Single" block
 - Fixed a wrong name for the hidden tab to load the hidden section for settings
 - Fixed a wrong natural sorting of field lists by name
+- Fixed the progressbar in the plugin setup
 
 ## [1.0.4] - 17.08.2026
 
