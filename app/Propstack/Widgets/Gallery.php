@@ -15,6 +15,7 @@ namespace ConnectorForPropstack\Propstack\Widgets;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
+use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use ConnectorForPropstack\Propstack\Widget_Base;
 
 /**
@@ -79,12 +80,21 @@ class Gallery extends Widget_Base {
 	 * @return string
 	 */
 	public function render( array $attributes ): string {
-		// get the object for this request.
-		$immo_object = $this->get_object_by_request();
+		// get the object for this request, if no object is given as attribute.
+		if ( ! isset( $attributes['object'] ) ) {
+			$immo_object = $this->get_object_by_request();
 
-		// bail if this is not our cpt.
-		if ( ! $immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
-			return '';
+			// bail if no object could be found.
+			if ( ! $immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
+				return '';
+			}
+
+			// bail if requested post-type is not ours.
+			if ( get_post_type( $immo_object->get_id() ) !== ImmoObject::get_instance()->get_name() ) {
+				return '';
+			}
+		} else {
+			$immo_object = $attributes['object'];
 		}
 
 		// check the columns.

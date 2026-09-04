@@ -104,6 +104,12 @@ Aufbau des Shortcodes:
 * Standard: leer (d.h. es wird nichts ausgegeben)
 * verfügbare Felder: siehe Einstellungen > Connector for Propstack > Felder > Spalte "Interner Name"
 
+#### object_id
+
+* Angabe einer Object ID dessen Wert von dem angegebenen Feld angezeigt werden soll
+* Standard: leer (d.h. es wird versucht as Objekt aus dem Aufruf der Seite zu erkennen)
+* verfügbare Werte: alle Object IDs von in WordPress importierten Objekten
+
 ### Beispiel
 
 `[cfprop_widget_field field_name="address"]`

@@ -84,6 +84,9 @@ class Init {
 		// initialize the cache.
 		Cache::get_instance()->init();
 
+		// initialize the compatibility checks.
+		Compatibilities::get_instance()->init();
+
 		// register cli.
 		add_action( 'cli_init', array( $this, 'cli' ) );
 

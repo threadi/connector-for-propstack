@@ -144,7 +144,7 @@ class ImmoObjects {
 		if ( empty( $this->objects[ $post_id . $language_code ] ) ) {
 			$immo_object = new ImmoObject( $post_id );
 			/**
-			 * Filter the requested position object.
+			 * Filter the requested immo object.
 			 *
 			 * @since 1.0.0 Available since 1.0.0.
 			 *
@@ -504,6 +504,8 @@ class ImmoObjects {
 		// add a sub tab for restrictions.
 		$restrictions_tab = $objects_tab->add_tab( 'propstack_connector_import_restrictions', 10 );
 		$restrictions_tab->set_title( __( 'Restrictions', 'connector-for-propstack' ) );
+		/* translators: %1$s: Connector for Propstack Pro URL */
+		$restrictions_tab->set_description( '<span class="cfprop-pro-hint">' . sprintf( __( 'With <a href="%1$s" target="_blank">Connector for Propstack Pro</a>, take advantage of more options for excluding objects from the import, such as by specifying the object ID to exclude.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
 		$objects_tab->set_default_tab( $restrictions_tab );
 
 		// add a section.

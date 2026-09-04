@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added option on the shortcode for fields to show the value of a specific field from a given object
+- Added compatibility checks and hints
 - Added some new hooks to allow developers to extend the plugin
 
 ### Changed
@@ -20,6 +22,7 @@
 
 ### Fixed
 
+- Fixed the loading of field values if they are used in other post types as our own
 - Fixed the statement to get our own Block templates from the database
 - Fixed the visibility of the save button in settings
 - Fixed the wrong cronjob interval name for queue running
