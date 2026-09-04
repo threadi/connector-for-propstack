@@ -8,7 +8,7 @@ License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Stable tag: @@VersionNumber@@
 
-Import your [Propstack](https://www.propstack.de) properties into WordPress and show them as your own SEO-friendly pages. No iFrame, no duplicate data entry.
+Import your [Propstack](https://www.propstack.de) properties into SEO-friendly pages WordPress pages. No iFrame, no duplicate data entry.
 
 == Description ==
 
@@ -154,14 +154,26 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added option to switch to modern DataView for settings pages
-- Added support for WP Consent API
-- Set compatibility with WordPress 7.1
-- Updated crypt lib to 3.0.0
-- Updated dialog lib to 2.0.0
-- Updated settings lib to 2.0.0
-- Remove cpt support for our own objects in Brizy as they are not edited in WordPress
-- Remove custom columns from some SEO plugins from our own cpt
-- Optimized log statements
+- Added option on the shortcode for fields to show the value of a specific field from a given object
+- Added compatibility checks and hints
+- Added some new hooks to allow developers to extend the plugin
+- Optimized the log cleanup
+- Optimized button styling in the edit view
+- Show the internal field name in the list of all fields in the settings
+- Allow overriding some default values via shortcode
+- Optimized styling of settings in both views
+- Updated the settings and the dialog lib
+- Moved the field "Heating Type" and "Firing Types" from Building to Firing Types
+- Changed to get errors during creation and update of open positions from WordPress
+- Typos
+- Fixed the loading of field values if they are used in other post types as our own
+- Fixed the statement to get our own Block templates from the database
+- Fixed the visibility of the save button in settings
+- Fixed the wrong cronjob interval name for queue running
+- Fixed check for development mode in WordPress < 6.3
+- Fixed a wrong variable name for the "Single" block
+- Fixed a wrong name for the hidden tab to load the hidden section for settings
+- Fixed a wrong natural sorting of field lists by name
+- Fixed the progressbar in the plugin setup
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)
