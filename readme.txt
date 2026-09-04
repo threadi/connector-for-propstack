@@ -8,7 +8,7 @@ License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Stable tag: @@VersionNumber@@
 
-Import your [Propstack](https://www.propstack.de) properties into SEO-friendly pages WordPress pages. No iFrame, no duplicate data entry.
+Import your [Propstack](https://www.propstack.de) properties into SEO-friendly pages within your WordPress. No iFrame, no duplicate data entry.
 
 == Description ==
 
