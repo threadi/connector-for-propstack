@@ -308,7 +308,7 @@ class Setup {
 	 * @return void
 	 */
 	public function update_process_step( int $step = 1 ): void {
-		update_option( 'esfw_step', absint( get_option( 'esfw_step' ) + $step ) );
+		update_option( 'esfw_step', absint( get_option( 'esfw_step' ) ) + $step );
 	}
 
 	/**
@@ -456,6 +456,10 @@ class Setup {
 			return;
 		}
 
+		// set the progress to 100%.
+		update_option( 'esfw_step', absint( get_option( 'esfw_max_steps' ) ) );
+
+		// prepare the completed text.
 		$completed_text = '<strong>' . __( 'Setup has been run.', 'connector-for-propstack' ) . '</strong> ' . __( 'Your objects from Propstack has been imported. Click on "Completed" to view them.', 'connector-for-propstack' );
 
 		/**
