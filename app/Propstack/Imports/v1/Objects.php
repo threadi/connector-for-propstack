@@ -245,7 +245,7 @@ class Objects extends Import_Base {
 						// prepare the query to insert a new object.
 						$query = array(
 							'post_type'    => $post_type_name,
-							'post_title'   => $object['title']['value'],
+							'post_title'   => (string) $object['title']['value'],
 							'post_status'  => 'publish',
 							'post_author'  => Helper::get_author_during_object_creation(),
 							'post_content' => '',

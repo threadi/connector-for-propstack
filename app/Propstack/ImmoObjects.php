@@ -1591,14 +1591,22 @@ class ImmoObjects {
 	}
 
 	/**
-	 * Save the API response
+	 * Save the API response, if debug is enabled.
 	 *
 	 * @param array<int,mixed> $data The API response.
 	 *
 	 * @return array<int,mixed>
 	 */
 	public function save_response( array $data ): array {
+		// bail if debug is disabled.
+		if ( 1 !== absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+			return $data;
+		}
+
+		// save the response.
 		update_option( 'cfprop_last_api_response', $data );
+
+		// return the response data.
 		return $data;
 	}
 

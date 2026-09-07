@@ -18,6 +18,7 @@
 - Updated the settings and the dialog lib
 - Moved the field "Heating Type" and "Firing Types" from Building to Firing Types
 - Changed to get errors during creation and update of open positions from WordPress
+- Only log the API response if debug mode is enabled
 - Typos
 
 ### Fixed
@@ -31,6 +32,7 @@
 - Fixed a wrong name for the hidden tab to load the hidden section for settings
 - Fixed a wrong natural sorting of field lists by name
 - Fixed the progressbar in the plugin setup
+- Fixed faulty reading of object titles for log entries during the import
 
 ## [1.0.4] - 17.08.2026
 

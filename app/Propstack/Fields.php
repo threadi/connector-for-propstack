@@ -657,7 +657,7 @@ class Fields {
 	public function import_fields( array $immo_object, int $post_id ): void {
 		// get the immo object title.
 		$title = '';
-		if ( ! empty( $immo_object['title']['value'] ) ) {
+		if ( is_array( $immo_object['title'] ) ) {
 			$title = $immo_object['title']['value'];
 		} elseif ( ! empty( $immo_object['title'] ) ) {
 			$title = $immo_object['title'];
