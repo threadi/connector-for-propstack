@@ -29,6 +29,13 @@ use ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base;
  */
 class Fields {
 	/**
+	 * List of fields already logged during the running import.
+	 *
+	 * @var array<string,bool>
+	 */
+	private array $logged_field_errors = array();
+
+	/**
 	 * Variable for the instance of this Singleton object.
 	 *
 	 * @var ?Fields
@@ -75,6 +82,7 @@ class Fields {
 		add_action( 'cfprop_import_object_field', array( $this, 'import_example' ), 10, 2 );
 		add_action( 'cfprop_import_object_field', array( $this, 'set_post_content' ), 10, 4 );
 		add_filter( 'cfprop_import_object_field_value', array( $this, 'clean_field_value_during_import' ), 10, 2 );
+		add_action( 'cfprop_import_object_before_start', array( $this, 'reset_logged_field_errors' ) );
 		add_filter( 'cfprop_rest_fields', array( $this, 'sort_rest_fields' ) );
 	}
 
@@ -1015,11 +1023,63 @@ class Fields {
 			return $value;
 		}
 
+		// log if Propstack delivered something this field type cannot handle.
+		$this->log_unexpected_field_value( $field, $value );
+
 		// set the value on the type.
 		$field_type->set_value( $value );
 
 		// return the cleaned value.
 		return $field_type->get_cleaned_value();
+	}
+
+	/**
+	 * Log if Propstack delivered a non-scalar value for a field which does not expect one.
+	 *
+	 * @param Field_Base $field The field object.
+	 * @param mixed      $value The value from the API.
+	 *
+	 * @return void
+	 */
+	private function log_unexpected_field_value( Field_Base $field, mixed $value ): void {
+		// bail if the value is scalar or not set - that is what we expect.
+		if ( is_scalar( $value ) || is_null( $value ) ) {
+			return;
+		}
+
+		// bail for field types which do expect structured values.
+		if ( in_array( $field->get_type(), array( 'array', 'code' ), true ) ) {
+			return;
+		}
+
+		// log each field only once per request.
+		if ( isset( $this->logged_field_errors[ $field->get_name() ] ) ) {
+			return;
+		}
+		$this->logged_field_errors[ $field->get_name() ] = true;
+
+		// log this error.
+		Log::get_instance()->add(
+			sprintf(
+			/* translators: %1$s is the field name, %2$s the configured type, %3$s the delivered type. */
+				__( 'Propstack delivered <code>%3$s</code> for field <code>%1$s</code>, which is configured as type <code>%2$s</code>. The value has been ignored. Please <a href="%4$s">contact our support</a> about this problem.', 'connector-for-propstack' ),
+				esc_html( $field->get_name() ),
+				esc_html( $field->get_type() ),
+				esc_html( get_debug_type( $value ) ),
+				esc_url( Helper::get_plugin_support_url() )
+			),
+			'error',
+			'import'
+		);
+	}
+
+	/**
+	 * Reset the list of logged field errors.
+	 *
+	 * @return void
+	 */
+	public function reset_logged_field_errors(): void {
+		$this->logged_field_errors = array();
 	}
 
 	/**

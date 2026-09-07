@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use Collator;
 use DateTime;
+use Throwable;
 use WP_Error;
 use WP_Filesystem_Base;
 use WP_Filesystem_Direct;
@@ -671,5 +672,35 @@ class Helper {
 	 */
 	public static function is_development_mode_active(): bool {
 		return function_exists( 'wp_is_development_mode' ) && wp_is_development_mode( 'plugin' );
+	}
+
+	/**
+	 * Return a Throwable as formatted text for the log, including its trace
+	 * and any chained previous exceptions.
+	 *
+	 * @param Throwable $e The throwable.
+	 *
+	 * @return string
+	 */
+	public static function get_throwable_as_log_text( Throwable $e ): string {
+		$texts = array();
+		$depth = 0;
+
+		do {
+			$texts[] = sprintf(
+				'<strong>%1$s</strong>: %2$s<br><code>%3$s:%4$d</code><pre>%5$s</pre>',
+				esc_html( get_class( $e ) ),
+				esc_html( $e->getMessage() ),
+				esc_html( $e->getFile() ),
+				absint( $e->getLine() ),
+				esc_html( $e->getTraceAsString() )
+			);
+
+			++$depth;
+			$e = $e->getPrevious();
+		} while ( $e instanceof Throwable && $depth < 5 );
+
+		// return the resulting list of errors.
+		return implode( '<hr>', $texts );
 	}
 }

@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Optimized import via API v1 and v2 if objects are prevented to be imported
+- Use an extended logging for any API error
+- Log if Propstack API is using an unexpected field type
+- More PHP Unit Tests to reduce possible errors with the Propstack API
+
+### Fixed
+
+- Fixed missing dialog for the button to empty the log
+
 ## [1.0.5] - 07.09.2026
 
 ### Added

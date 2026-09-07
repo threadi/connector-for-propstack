@@ -21,6 +21,7 @@ use ConnectorForPropstack\Propstack\ApiRequest;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\Import_Base;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
+use Throwable;
 use WP_Error;
 
 /**
@@ -169,119 +170,150 @@ class Objects extends Import_Base {
 					Log::get_instance()->add( __( 'Import of objects is running', 'connector-for-propstack' ), 'info', 'import' );
 				}
 
+				// count the objects which could not be imported in this language.
+				$skipped = 0;
+
 				// show cli hint.
 				$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import objects in language ' . $language_code, count( $objects ) ) : false;
 
 				// loop through the data and import or update each object.
 				foreach ( $objects as $object ) {
-					$prevent_import = false;
-					/**
-					 * Prevent import of this object under custom conditions.
-					 *
-					 * @since        1.0.0 Available since 1.0.0.
-					 *
-					 * @param bool  $prevent_import True to prevent the import.
-					 * @param array $object         The object data from API.
-					 *
-					 * @noinspection PhpConditionAlreadyCheckedInspection
-					 */
-					if ( apply_filters( 'cfprop_prevent_import_of_object', $prevent_import, $object ) ) {
-						// update the counter.
-						$this->set_count( $process_handler, $process_handler->get_count() + 1 );
-
-						// add a log entry if debug is enabled.
-						if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-							/* translators: %1$s will be replaced by the object title. */
-							Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
-						}
-
-						// update tick.
-						$progress ? $progress->tick() : '';
-
-						// do nothing more.
-						continue;
-					}
-
-					// update the status.
-					/* translators: %1$s will be replaced by the object title. */
-					$this->set_new_status( $process_handler, sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ) );
-
-					// add a log entry if debug is enabled.
-					if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-						/* translators: %1$s will be replaced by the object title. */
-						Log::get_instance()->add( sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
-					}
-
-					// get the object with the given ID.
-					$propstack_immo_object = ImmoObjects::get_instance()->get_object_by_object_id( $object['id'], $language_code );
-
-					// if the object does not exist, create it.
-					if ( ! $propstack_immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
-						// add a log entry if debug is enabled.
-						if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-							/* translators: %1$s will be replaced by the object title. */
-							Log::get_instance()->add( sprintf( __( 'Creating new entry for the object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
-						}
-
-						// prepare the query to insert a new object.
-						$query = array(
-							'post_type'    => $post_type_name,
-							'post_title'   => (string) $object['title'],
-							'post_status'  => 'publish',
-							'post_author'  => Helper::get_author_during_object_creation(),
-							'post_content' => '',
-						);
-
+					try {
+						$prevent_import = false;
 						/**
-						 * Filter the query to add a new object during import.
+						 * Prevent import of this object under custom conditions.
 						 *
-						 * @since 1.0.0 Available since 1.0.0.
+						 * @since        1.0.0 Available since 1.0.0.
 						 *
-						 * @param array<string,mixed> $query  The query.
-						 * @param array<string,mixed> $object The object data from API.
+						 * @param bool  $prevent_import True to prevent the import.
+						 * @param array $object         The object data from API.
+						 *
+						 * @noinspection PhpConditionAlreadyCheckedInspection
 						 */
-						$query = apply_filters( 'cfprop_new_object_query', $query, $object );
-
-						// add the object.
-						$post_id = wp_insert_post( $query, true );
-
-						// bail if inserting failed.
-						if ( $post_id instanceof WP_Error ) { // @phpstan-ignore instanceof.alwaysFalse
-							// save the error.
-							$this->add_error( 'propstack_object_could_not_be_saved', __( 'New object could not be created. The following error occurred:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $post_id ) . '</code>' );
-
+						if ( apply_filters( 'cfprop_prevent_import_of_object', $prevent_import, $object ) ) {
 							// update the counter.
 							$this->set_count( $process_handler, $process_handler->get_count() + 1 );
+
+							// add a log entry if debug is enabled.
+							if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+								/* translators: %1$s will be replaced by the object title. */
+								Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+							}
+
+							// update tick.
+							$progress ? $progress->tick() : '';
 
 							// do nothing more.
 							continue;
 						}
-					} else {
-						$post_id = $propstack_immo_object->get_id();
+
+						// update the status.
+						/* translators: %1$s will be replaced by the object title. */
+						$this->set_new_status( $process_handler, sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ) );
+
+						// add a log entry if debug is enabled.
+						if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+							/* translators: %1$s will be replaced by the object title. */
+							Log::get_instance()->add( sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+						}
+
+						// get the object with the given ID.
+						$propstack_immo_object = ImmoObjects::get_instance()->get_object_by_object_id( $object['id'], $language_code );
+
+						// if the object does not exist, create it.
+						if ( ! $propstack_immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
+							// add a log entry if debug is enabled.
+							if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+								/* translators: %1$s will be replaced by the object title. */
+								Log::get_instance()->add( sprintf( __( 'Creating new entry for the object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+							}
+
+							// prepare the query to insert a new object.
+							$query = array(
+								'post_type'    => $post_type_name,
+								'post_title'   => (string) $object['title'],
+								'post_status'  => 'publish',
+								'post_author'  => Helper::get_author_during_object_creation(),
+								'post_content' => '',
+							);
+
+							/**
+							 * Filter the query to add a new object during import.
+							 *
+							 * @since 1.0.0 Available since 1.0.0.
+							 *
+							 * @param array<string,mixed> $query  The query.
+							 * @param array<string,mixed> $object The object data from API.
+							 */
+							$query = apply_filters( 'cfprop_new_object_query', $query, $object );
+
+							// add the object.
+							$post_id = wp_insert_post( $query, true );
+
+							// bail if inserting failed.
+							if ( $post_id instanceof WP_Error ) { // @phpstan-ignore instanceof.alwaysFalse
+								// save the error.
+								$this->add_error( 'propstack_object_could_not_be_saved', __( 'New object could not be created. The following error occurred:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $post_id ) . '</code>' );
+
+								// update the counter.
+								$this->set_count( $process_handler, $process_handler->get_count() + 1 );
+
+								// do nothing more.
+								continue;
+							}
+						} else {
+							$post_id = $propstack_immo_object->get_id();
+						}
+
+						/**
+						 * Run additional tasks for a single language-specific object import.
+						 *
+						 * @since 1.0.0 Available since 1.0.0.
+						 *
+						 * @param array<string,mixed> $object        The object data from API.
+						 * @param int                 $post_id       The post-ID of the object.
+						 * @param string              $language_code The used language.
+						 */
+						do_action( 'cfprop_import_object', $object, $post_id, $language_code );
+
+						// set the language.
+						update_post_meta( $post_id, 'language_code', $language_code );
+
+						// mark the object as changed.
+						update_post_meta( $post_id, 'changed', time() );
+
+						// update the counter.
+						$this->set_count( $process_handler, $process_handler->get_count() + 1 );
+
+						// update tick.
+						$progress ? $progress->tick() : '';
+					} catch ( Throwable $e ) {
+						// count this object as skipped.
+						++$skipped;
+
+						// log this event with the object which caused it.
+						Log::get_instance()->add(
+							sprintf(
+							/* translators: %1$s will be replaced by the object title, %2$d by its Propstack-ID. */
+								__( 'Following error occurred during the import of object %1$s (Propstack-ID %2$d). The object has been skipped.', 'connector-for-propstack' ),
+								'<em>' . esc_html( $object['title'] ?? '' ) . '</em>',
+								absint( $object['id'] ?? 0 )
+							) . '<br>' . Helper::get_throwable_as_log_text( $e ),
+							'error',
+							'import'
+						);
+
+						// mark the import as faulty so the error dialog is shown.
+						$this->add_error(
+							'propstack_object_import_error',
+							/* translators: %1$s will be replaced by a URL. */
+							sprintf( __( 'At least one object could not be imported. Check <a href="%1$s">the log</a> for details.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_logs' ) ) )
+						);
+
+						// update the counter and the progress for the skipped object.
+						$this->set_count( $process_handler, $process_handler->get_count() + 1 );
+						$progress ? $progress->tick() : '';
 					}
-
-					/**
-					 * Run additional tasks for a single language-specific object import.
-					 *
-					 * @since 1.0.0 Available since 1.0.0.
-					 *
-					 * @param array<string,mixed> $object        The object data from API.
-					 * @param int                 $post_id       The post-ID of the object.
-					 * @param string              $language_code The used language.
-					 */
-					do_action( 'cfprop_import_object', $object, $post_id, $language_code );
-
-					// set the language.
-					update_post_meta( $post_id, 'language_code', $language_code );
-
-					// mark the object as changed.
-					update_post_meta( $post_id, 'changed', time() );
-
-					// update the counter.
-					$this->set_count( $process_handler, $process_handler->get_count() + 1 );
-
-					// update tick.
-					$progress ? $progress->tick() : '';
 				}
 
 				/**
@@ -294,7 +326,9 @@ class Objects extends Import_Base {
 				do_action( 'cfprop_import_language', $language_code );
 
 				// save the md5 hash.
-				update_option( 'cfprop_md5_' . $language_code, $md5 );
+				if ( 0 === $skipped ) {
+					update_option( 'cfprop_md5_' . $language_code, $md5 );
+				}
 
 				// set finished.
 				$progress ? $progress->finish() : '';
@@ -328,7 +362,12 @@ class Objects extends Import_Base {
 			}
 		} catch ( \Throwable $e ) {
 			// log this event.
-			Log::get_instance()->add( __( 'Following error occurred during the import of objects via API v2:', 'connector-for-propstack' ) . '<br>' . __( 'Message:', 'connector-for-propstack' ) . '<code>' . $e->getMessage() . '</code><br>' . __( 'Code:', 'connector-for-propstack' ) . '<code>' . $e->getCode() . '</code><br>' . __( 'File:', 'connector-for-propstack' ) . '<code>' . $e->getFile() . '</code><br>' . __( 'Line:', 'connector-for-propstack' ) . '<code>' . $e->getLine() . '</code>', 'error', 'import' );
+			Log::get_instance()->add(
+				__( 'Following error occurred during the import of objects via API v2:', 'connector-for-propstack' )
+				. '<br>' . Helper::get_throwable_as_log_text( $e ),
+				'error',
+				'import'
+			);
 
 			// show hint.
 			/* translators: %1$s will be replaced by a URL. */

@@ -17,7 +17,7 @@ use ConnectorForPropstack\Propstack\FieldType_Base;
  */
 class PriceField extends FieldType_Base {
 	/**
-	 * The internal name of the category.
+	 * The internal name of the type.
 	 *
 	 * @var string
 	 */
@@ -29,12 +29,12 @@ class PriceField extends FieldType_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
-		// bail if the value is not an array.
-		if ( empty( $this->value ) ) {
+		// bail if the value is empty or not numeric.
+		if ( empty( $this->value ) || ! is_numeric( $this->value ) ) {
 			return '';
 		}
 
 		// format the value.
-		return number_format( $this->value, 0, '', '.' ) . ' &euro;';
+		return number_format( (float) $this->value, 0, '', '.' ) . ' &euro;';
 	}
 }

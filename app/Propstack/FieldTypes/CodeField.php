@@ -18,7 +18,7 @@ use ConnectorForPropstack\Propstack\FieldType_Base;
  */
 class CodeField extends FieldType_Base {
 	/**
-	 * The internal name of the category.
+	 * The internal name of the type.
 	 *
 	 * @var string
 	 */

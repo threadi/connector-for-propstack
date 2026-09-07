@@ -172,7 +172,12 @@ class States extends Import_Base {
 			}
 		} catch ( \Throwable $e ) {
 			// log this event.
-			Log::get_instance()->add( __( 'Following error occurred during the import of states via API v2:', 'connector-for-propstack' ) . '<br>' . __( 'Message:', 'connector-for-propstack' ) . '<code>' . $e->getMessage() . '</code><br>' . __( 'Code:', 'connector-for-propstack' ) . '<code>' . $e->getCode() . '</code><br>' . __( 'File:', 'connector-for-propstack' ) . '<code>' . $e->getFile() . '</code><br>' . __( 'Line:', 'connector-for-propstack' ) . '<code>' . $e->getLine() . '</code>', 'error', 'import' );
+			Log::get_instance()->add(
+				__( 'Following error occurred during the import of states via API v2:', 'connector-for-propstack' )
+				. '<br>' . Helper::get_throwable_as_log_text( $e ),
+				'error',
+				'import'
+			);
 
 			// show hint.
 			/* translators: %1$s will be replaced by a URL. */

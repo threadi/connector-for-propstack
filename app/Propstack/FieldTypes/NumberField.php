@@ -17,7 +17,7 @@ use ConnectorForPropstack\Propstack\FieldType_Base;
  */
 class NumberField extends FieldType_Base {
 	/**
-	 * The internal name of the category.
+	 * The internal name of the type.
 	 *
 	 * @var string
 	 */
@@ -30,11 +30,11 @@ class NumberField extends FieldType_Base {
 	 */
 	public function get_value(): string {
 		// bail if the value is not set.
-		if ( empty( $this->value ) ) {
+		if ( empty( $this->value ) || ! is_numeric( $this->value ) ) {
 			return '';
 		}
 
 		// format the value.
-		return number_format( $this->value, 0, '', '.' );
+		return number_format( (float) $this->value, 0, '', '.' );
 	}
 }

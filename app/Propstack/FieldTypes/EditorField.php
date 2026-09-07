@@ -17,7 +17,7 @@ use ConnectorForPropstack\Propstack\FieldType_Base;
  */
 class EditorField extends FieldType_Base {
 	/**
-	 * The internal name of the category.
+	 * The internal name of the type.
 	 *
 	 * @var string
 	 */
@@ -29,11 +29,16 @@ class EditorField extends FieldType_Base {
 	 * @return mixed
 	 */
 	public function get_value(): mixed {
+		// bail if the value is not scalar (e.g. arrays or objects from the API).
+		if ( ! is_scalar( $this->value ) ) {
+			return '';
+		}
+
 		// remove any <p>-elements.
-		$pre_cleaned_value = preg_replace( '/^\s*<p[^>]*>|<\/p>\s*$/i', '', $this->value );
+		$pre_cleaned_value = preg_replace( '/^\s*<p[^>]*>|<\/p>\s*$/i', '', (string) $this->value );
 
 		// add line breaks.
-		return nl2br( $pre_cleaned_value );
+		return nl2br( (string) $pre_cleaned_value );
 	}
 
 	/**
@@ -43,7 +48,7 @@ class EditorField extends FieldType_Base {
 	 */
 	public function get_cleaned_value(): mixed {
 		// bail if no value is set.
-		if ( empty( $this->value ) ) {
+		if ( ! is_scalar( $this->value ) ) {
 			return '';
 		}
 
@@ -55,7 +60,7 @@ class EditorField extends FieldType_Base {
 				'/^\s*<p[^>]*>|<\/p>\s*$/i',   // remove any <p>-elements.
 			),
 			'',
-			$this->value
+			(string) $this->value
 		);
 	}
 }

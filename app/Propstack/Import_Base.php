@@ -99,11 +99,16 @@ class Import_Base {
 	 * @return string
 	 */
 	private function get_error_messages(): string {
-		$messages = '';
+		// prepare the list of errors.
+		$messages = array();
+
+		// add them to the list.
 		foreach ( $this->get_errors() as $error ) {
-			$messages .= $error->get_error_message() . '<br>';
+			$messages[] = $error->get_error_message();
 		}
-		return $messages;
+
+		// return the list with linebreak and only unique entries (no doubles).
+		return implode( '<br>', array_unique( $messages ) );
 	}
 
 	/**

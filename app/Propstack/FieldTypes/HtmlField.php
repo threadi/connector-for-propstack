@@ -17,7 +17,7 @@ use ConnectorForPropstack\Propstack\FieldType_Base;
  */
 class HtmlField extends FieldType_Base {
 	/**
-	 * The internal name of the category.
+	 * The internal name of the type.
 	 *
 	 * @var string
 	 */
@@ -29,7 +29,13 @@ class HtmlField extends FieldType_Base {
 	 * @return mixed
 	 */
 	public function get_value(): mixed {
-		return nl2br( $this->value );
+		// bail if the value is not scalar (e.g. arrays or objects from the API).
+		if ( ! is_scalar( $this->value ) ) {
+			return '';
+		}
+
+		// return the value.
+		return nl2br( (string) $this->value );
 	}
 
 	/**
@@ -39,12 +45,12 @@ class HtmlField extends FieldType_Base {
 	 */
 	public function get_cleaned_value(): mixed {
 		// bail if the value is empty.
-		if ( empty( $this->value ) ) {
+		if ( ! is_scalar( $this->value ) ) {
 			return '';
 		}
 
 		// remove the style and id attributes.
-		$pre_cleaned_value = preg_replace( '/ style=("|\')(.*?)("|\')/', '', $this->value );
+		$pre_cleaned_value = preg_replace( '/ style=("|\')(.*?)("|\')/', '', (string) $this->value );
 		return preg_replace( '/ id=("|\')(.*?)("|\')/', '', $pre_cleaned_value );
 	}
 }
