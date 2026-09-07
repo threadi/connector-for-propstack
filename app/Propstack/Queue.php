@@ -164,7 +164,7 @@ class Queue {
 
 		// get the immo object title.
 		$title = '';
-		if ( ! empty( $immo_object['title']['value'] ) ) {
+		if ( is_array( $immo_object['title'] ) ) {
 			$title = $immo_object['title']['value'];
 		} elseif ( ! empty( $immo_object['title'] ) ) {
 			$title = $immo_object['title'];
