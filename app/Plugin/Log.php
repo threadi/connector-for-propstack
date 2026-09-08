@@ -98,6 +98,13 @@ class Log {
 	public function add( string $log, string $state, string $category = '', string $md5 = '' ): void {
 		global $wpdb;
 
+		// add error counter if this is an error.
+		if ( 'error' === $state ) {
+			$error_counter = absint( get_option( 'cfprop_log_error_count' ) );
+			++$error_counter;
+			update_option( 'cfprop_log_error_count', $error_counter );
+		}
+
 		// insert the log entry.
 		Db::get_instance()->insert(
 			$wpdb->prefix . 'propstack_logs',

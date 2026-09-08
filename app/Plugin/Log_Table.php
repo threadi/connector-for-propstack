@@ -208,6 +208,46 @@ class Log_Table extends WP_List_Table {
 			<a href="<?php echo esc_url( $download_url ); ?>" class="button button-secondary easy-dialog-for-wordpress<?php echo ( 0 === count( $this->items ) ? ' disabled' : '' ); ?>" data-dialog="<?php echo esc_attr( Helper::get_json( $download_dialog ) ); ?>"><?php echo esc_html__( 'Export as CSV', 'connector-for-propstack' ); ?></a>
 			<a href="<?php echo esc_url( $empty_url ); ?>" class="button button-secondary easy-dialog-for-wordpress<?php echo ( 0 === count( $this->items ) ? ' disabled' : '' ); ?>" data-dialog="<?php echo esc_attr( Helper::get_json( $empty_dialog ) ); ?>"><?php echo esc_html__( 'Empty the log', 'connector-for-propstack' ); ?></a>
 			<?php
+
+			// show button only if setting is enabled.
+			if ( 1 === absint( get_option( 'cfprop_enable_log_error_count' ) ) ) {
+				// define reset-marker-URL.
+				$reset_error_marker_url = add_query_arg(
+					array(
+						'action' => 'cfprop_log_reset_marker',
+						'nonce'  => wp_create_nonce( 'cfprop-log-reset-marker' ),
+					),
+					get_admin_url() . 'admin.php'
+				);
+
+				// create reset-marker-dialog.
+				$reset_error_marker_dialog = array(
+					'title'   => __( 'Reset error marker', 'connector-for-propstack' ),
+					'texts'   => array(
+						'<p><strong>' . __( 'Are you sure you want to reset the error marker?', 'connector-for-propstack' ) . '</strong></p>',
+						'<p>' . __( 'As soon as a new error occurs, the marker reappears on the screen..', 'connector-for-propstack' ) . '</p>',
+					),
+					'buttons' => array(
+						array(
+							'action'  => 'location.href="' . esc_url( $reset_error_marker_url ) . '";',
+							'variant' => 'primary',
+							'text'    => __( 'Yes, reset the marker', 'connector-for-propstack' ),
+						),
+						array(
+							'action'  => 'closeDialog();',
+							'variant' => 'secondary',
+							'text'    => __( 'Cancel', 'connector-for-propstack' ),
+						),
+					),
+				);
+
+				// get the error count.
+				$errors = absint( get_option( 'cfprop_log_error_count' ) );
+
+				?>
+				<a href="<?php echo esc_url( $reset_error_marker_url ); ?>" class="button button-secondary easy-dialog-for-wordpress<?php echo ( 0 === count( $this->items ) || 0 === $errors ? ' disabled' : '' ); ?>" data-dialog="<?php echo esc_attr( Helper::get_json( $reset_error_marker_dialog ) ); ?>"><?php echo esc_html__( 'Reset error marker', 'connector-for-propstack' ); ?></a>
+				<?php
+			}
 		}
 	}
 

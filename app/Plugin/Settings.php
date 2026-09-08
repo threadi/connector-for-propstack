@@ -237,7 +237,15 @@ class Settings {
 		$logs_tab = $settings_page->add_tab( 'propstack_connector_logs', 80 );
 		$logs_tab->set_title( __( 'Logs', 'connector-for-propstack' ) );
 		$logs_tab->set_hide_save( true );
+		$logs_tab->set_tab_class( 1 === absint( get_option( 'cfprop_enable_log_error_count' ) ) && absint( get_option( 'cfprop_log_error_count' ) ) > 0 ? 'errors' : '' );
 		$logs_tab->set_callback( array( $this, 'show_logs' ) );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_log_error_count' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+		$setting->prevent_export( true );
 
 		// initialize these settings.
 		$settings_obj->init();
@@ -362,6 +370,15 @@ class Settings {
 		$field = new Number( $this->get_settings_obj() );
 		$field->set_title( __( 'Default timeout', 'connector-for-propstack' ) );
 		$field->set_description( __( 'This timeout will be used for any API connection.', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
+
+		// add setting.
+		$setting = $this->get_settings_obj()->add_setting( 'cfprop_enable_log_error_count' );
+		$setting->set_section( $advanced_section );
+		$setting->set_default( 1 );
+		$field = new Checkbox( $this->get_settings_obj() );
+		$field->set_title( __( 'Show error marker', 'connector-for-propstack' ) );
+		$field->set_description( __( 'When enabled, a marker appears in the backend menu as soon as any error is logged. Clicking the markers path takes you directly to the log, where you can review the error.', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
 		// add a section.

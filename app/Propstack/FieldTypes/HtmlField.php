@@ -51,6 +51,6 @@ class HtmlField extends FieldType_Base {
 
 		// remove the style and id attributes.
 		$pre_cleaned_value = preg_replace( '/ style=("|\')(.*?)("|\')/', '', (string) $this->value );
-		return preg_replace( '/ id=("|\')(.*?)("|\')/', '', $pre_cleaned_value );
+		return preg_replace( '/ id=("|\')(.*?)("|\')/', '', (string) $pre_cleaned_value );
 	}
 }

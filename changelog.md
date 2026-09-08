@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added error marker in menu and settings for any events where an error was logged
+
 ### Changed
 
 - Optimized import via API v1 and v2 if objects are prevented to be imported

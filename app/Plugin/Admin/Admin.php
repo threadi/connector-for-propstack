@@ -63,6 +63,7 @@ class Admin {
 		add_action( 'init', array( $this, 'configure_transients' ), 5 );
 		add_action( 'admin_init', array( $this, 'save_slugs' ) );
 		add_action( 'admin_init', array( $this, 'get_setting_errors' ), 100 );
+		add_action( 'admin_menu', array( $this, 'mark_errors_in_menu' ), 999 );
 		add_action( 'shutdown', array( $this, 'check_crypt' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_js_and_styles' ), 10, 0 );
 		add_filter( 'admin_body_class', array( $this, 'add_body_classes' ) );
@@ -70,6 +71,7 @@ class Admin {
 		// use admin actions.
 		add_action( 'admin_action_cfprop_log_export', array( $this, 'export_log' ) );
 		add_action( 'admin_action_cfprop_log_empty', array( $this, 'empty_log' ) );
+		add_action( 'admin_action_cfprop_log_reset_marker', array( $this, 'reset_error_marker_by_request' ) );
 
 		// use our own hooks.
 		add_action( 'connector-for-propstack_error', array( $this, 'save_crypt_error' ), 10, 3 );
@@ -418,5 +420,68 @@ class Admin {
 			'error',
 			'system'
 		);
+	}
+
+	/**
+	 * Mark errors in log in menu.
+	 *
+	 * @return void
+	 */
+	public function mark_errors_in_menu(): void {
+		global $menu, $submenu;
+
+		// bail if user has no capability to change settings.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
+		// bail if setting is disabled.
+		if ( 1 !== absint( get_option( 'cfprop_enable_log_error_count' ) ) ) {
+			return;
+		}
+
+		// get the count of errors.
+		$error_count = absint( get_option( 'cfprop_log_error_count' ) );
+
+		// bail if no errors are given or our submenu is missing.
+		if ( $error_count < 1 || ! isset( $submenu['options-general.php'] ) ) {
+			return;
+		}
+
+		// change the main menu item.
+		foreach ( $menu as $key => $item ) {
+			if ( isset( $item[2] ) && $item[2] === 'options-general.php' ) {
+				$menu[ $key ][0] .= ' <span class="update-plugins"><span class="update-count">!</span></span>';
+			}
+		}
+
+		// change the settings menu item.
+		foreach ( $submenu['options-general.php'] as $key => $item ) {
+			if ( 'connector-for-propstack' === $item[2] ) {
+				$submenu['options-general.php'][ $key ][0] .= ' <span class="update-plugins"><span class="update-count">!</span></span>';
+			}
+		}
+	}
+
+	/**
+	 * Reset the error marker.
+	 *
+	 * @return void
+	 */
+	public function reset_error_marker_by_request(): void {
+		// check nonce.
+		check_admin_referer( 'cfprop-log-reset-marker', 'nonce' );
+
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
+		// reset the marker.
+		update_option( 'cfprop_log_error_count', 0 );
+
+		// redirect user.
+		wp_safe_redirect( (string) wp_get_referer() );
+		exit;
 	}
 }

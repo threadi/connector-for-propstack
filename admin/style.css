@@ -239,3 +239,16 @@ body.post-type-cfprop_object, .etfw-transient, body.settings_page_connector-for-
 	z-index: 1;
 	text-align: center;
 }
+
+.nav-tab.errors { position: relative;z-index: 1 }
+
+.nav-tab.errors:after {
+	content: '!';
+	display: inline-block;
+	background-color: #d63638;
+	color: #fff;
+	border-radius: 16px;
+	margin-left: .4em;
+	padding: 0 8px;
+	font-size: .9em;
+}
