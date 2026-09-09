@@ -387,14 +387,27 @@ class Taxonomy {
 			// add the term and get the result.
 			$term_data = wp_insert_term( $default_term['label'], $this->get_name(), array( 'slug' => $default_term['slug'] ) );
 
-			// if an error occurred, get the term ID from it.
+			// if an error occurred, check what kind of error it is.
 			if ( $term_data instanceof WP_Error ) {
-				// log this event.
-				/* translators: %1$s will be replaced by a string, $2$s by another name. */
-				Log::get_instance()->add( sprintf( __( 'Error during creating the term %1$s for the taxonomy %2$s', 'connector-for-propstack' ), $default_term['label'], $this->get_name() ), 'error', 'system' );
+				// the term already exists - the normal case on re-activation, use its ID.
+				if ( 'term_exists' === $term_data->get_error_code() ) {
+					$term_id = $term_data->get_error_data();
+				} else {
+					// log this event.
+					Log::get_instance()->add(
+						sprintf(
+						/* translators: %1$s will be replaced by the term name, %2$s by the taxonomy name. */
+							__( 'Error during creating the term %1$s for the taxonomy %2$s:', 'connector-for-propstack' ),
+							'<code>' . esc_html( $default_term['label'] ) . '</code>',
+							'<code>' . esc_html( $this->get_name() ) . '</code>'
+						) . ' <code>' . esc_html( $term_data->get_error_message() ) . '</code>',
+						'error',
+						'system'
+					);
 
-				// use the returning ID from error-response.
-				$term_id = $term_data->get_error_data();
+					// do nothing more with this term.
+					continue;
+				}
 			} else {
 				$term_id = $term_data['term_id'];
 			}

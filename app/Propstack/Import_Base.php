@@ -32,6 +32,27 @@ class Import_Base {
 	private string $process_id = '';
 
 	/**
+	 * Marker whether this import needs another run to be completed.
+	 *
+	 * @var bool
+	 */
+	protected bool $load_more = false;
+
+	/**
+	 * The option which holds the work list of a paginated import.
+	 *
+	 * @var string
+	 */
+	protected string $work_list_option = 'cfprop_objects_to_import';
+
+	/**
+	 * The option which holds the position of a paginated import.
+	 *
+	 * @var string
+	 */
+	protected string $offset_option = 'cfprop_objects_import_offset';
+
+	/**
 	 * Return the header to be used for any API request.
 	 *
 	 * @return array<string,mixed>
@@ -203,5 +224,47 @@ class Import_Base {
 
 		// reset the running-flag so the user is not stuck.
 		update_option( CFPROP_IMPORT_RUNNING, 0 );
+		$this->clear_work_list();
+	}
+
+	/**
+	 * Return whether this import needs another run to be completed.
+	 *
+	 * @return bool
+	 */
+	public function has_load_more(): bool {
+		return $this->load_more;
+	}
+
+	/**
+	 * Set whether this import needs another run to be completed.
+	 *
+	 * @param bool $load_more True if another run is needed.
+	 *
+	 * @return void
+	 */
+	public function set_load_more( bool $load_more ): void {
+		$this->load_more = $load_more;
+	}
+
+	/**
+	 * Remove the complete state of a paginated import.
+	 *
+	 * @return void
+	 */
+	protected function clear_work_list(): void {
+		// get the metadata to know how many blocks exist.
+		$import_data = get_option( $this->work_list_option, array() );
+
+		// delete every block.
+		if ( is_array( $import_data ) && isset( $import_data['blocks'] ) ) {
+			for ( $i = 0; $i < absint( $import_data['blocks'] ); $i++ ) {
+				delete_option( $this->work_list_option . '_block_' . $i );
+			}
+		}
+
+		// reset the metadata and the position.
+		update_option( $this->work_list_option, array() );
+		update_option( $this->offset_option, 0 );
 	}
 }

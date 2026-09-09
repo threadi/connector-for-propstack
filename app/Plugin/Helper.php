@@ -666,15 +666,6 @@ class Helper {
 	}
 
 	/**
-	 * Return whether plugin developer modus is enabled.
-	 *
-	 * @return bool
-	 */
-	public static function is_development_mode_active(): bool {
-		return function_exists( 'wp_is_development_mode' ) && wp_is_development_mode( 'plugin' );
-	}
-
-	/**
 	 * Return a Throwable as formatted text for the log, including its trace
 	 * and any chained previous exceptions.
 	 *

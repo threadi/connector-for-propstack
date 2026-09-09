@@ -14,6 +14,7 @@ use ConnectorForPropstack\Plugin\Setup;
 use easySettingsForWordPress\Fields\Button;
 use easySettingsForWordPress\Fields\Checkbox;
 use easySettingsForWordPress\Fields\MultiSelect;
+use easySettingsForWordPress\Fields\Number;
 use easySettingsForWordPress\Fields\Select;
 use easySettingsForWordPress\Fields\TextInfo;
 use easySettingsForWordPress\Fields\Value;
@@ -481,6 +482,16 @@ class ImmoObjects {
 		$setting->set_field( $field );
 
 		// add setting.
+		$setting = $settings_obj->add_setting( 'propstack_connector_ajax_object_limit' );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 100 );
+		$setting->set_section( $import_options_section );
+		$field = new Number( $settings_obj );
+		$field->set_title( __( 'Limit for import of objects', 'connector-for-propstack' ) );
+		$field->set_description( __( 'The higher this number is, the greater the likelihood of a timeout when importing objects.', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
+
+		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_preserve_files' );
 		$setting->set_default( 0 );
 		$setting->set_section( $import_options_section );
@@ -745,7 +756,12 @@ class ImmoObjects {
 		}
 
 		// run the import.
-		$this->import( $process_id );
+		$import_obj = $this->import( $process_id );
+
+		// request another run if the import is not completed yet.
+		if ( $import_obj->has_load_more() ) {
+			wp_send_json( array( 'load_more' => 1 ) );
+		}
 
 		// send ok.
 		wp_send_json_success();
@@ -1376,6 +1392,19 @@ class ImmoObjects {
 
 		// update status.
 		$process_handler->set_status( __( 'Get the objects in tip-top shape', 'connector-for-propstack' ) );
+
+		// bail if the import did not process any object - deleting everything would be wrong.
+		if ( 0 === $process_handler->get_max_count() ) {
+			// log this event.
+			Log::get_instance()->add(
+				__( 'The import did not deliver any object, so no cleanup has been run. No objects have been changed or deleted.', 'connector-for-propstack' ),
+				'info',
+				'import'
+			);
+
+			// do nothing more.
+			return;
+		}
 
 		// get the not updated objects.
 		$query   = array(

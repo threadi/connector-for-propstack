@@ -231,6 +231,9 @@ class Admin {
 		// empty the table.
 		$wpdb->query( sprintf( 'TRUNCATE TABLE %s', (string) esc_sql( $wpdb->prefix . 'propstack_logs' ) ) ); // @phpstan-ignore cast.string
 
+		// reset the marker.
+		update_option( 'cfprop_log_error_count', 0 );
+
 		// redirect user.
 		wp_safe_redirect( (string) wp_get_referer() );
 		exit;

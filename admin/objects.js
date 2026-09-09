@@ -74,12 +74,49 @@ function propstack_connector_object_file_delete( process_id ) {
 let import_running = false;
 // marker for progress timeout.
 let propstack_connector_progress_timeout = false;
+// marker to show the result dialog only once per process.
+let propstack_connector_result_shown = false;
 
 /**
  * Function to handle any AJAX process.
+ *
+ * Creates the dialog and starts the polling exactly once. The process itself can run
+ * in multiple requests, see propstack_connector_run_ajax_chunk().
  */
 function propstack_connector_start_ajax_process( config ) {
-  // start the process.
+  // show progress.
+  let dialog_config = {
+    detail: {
+      className: 'cfprop-dialog',
+      title: config.process_title,
+      progressbar: {
+        active: true,
+        progress: 0,
+        id: 'progress',
+        label_id: 'progress_status'
+      },
+    }
+  }
+  propstack_connector_create_dialog( dialog_config );
+
+  // mark in JS as running.
+  import_running = true;
+  propstack_connector_result_shown = false;
+
+  // get info about progress.
+  propstack_connector_progress_timeout = setTimeout(function() { propstack_connector_ajax_process( config ) }, 1000 );
+
+  // run the first chunk.
+  propstack_connector_run_ajax_chunk( config );
+}
+
+/**
+ * Run a single chunk of an AJAX process.
+ *
+ * Restarts itself as long as the server answers with "load_more". The dialog and the
+ * polling of the progress are not touched here, they belong to the whole process.
+ */
+function propstack_connector_run_ajax_chunk( config ) {
   jQuery.ajax({
     type: "POST",
     url: propstackConnectorImportJsVars.ajax_url,
@@ -89,32 +126,10 @@ function propstack_connector_start_ajax_process( config ) {
       'post': config.post,
       'process_id': config.process_id
     },
-    beforeSend: function() {
-      // show progress.
-      let dialog_config = {
-        detail: {
-          className: 'cfprop-dialog',
-          title: config.process_title,
-          progressbar: {
-            active: true,
-            progress: 0,
-            id: 'progress',
-            label_id: 'progress_status'
-          },
-        }
-      }
-      propstack_connector_create_dialog( dialog_config );
-
-      // mark in JS as running.
-      import_running = true;
-
-      // get info about progress.
-      propstack_connector_progress_timeout = setTimeout(function() { propstack_connector_ajax_process( config ) }, 1000 );
-    },
     success: function( response ) {
       if( response.load_more ) {
-        clearInterval(propstack_connector_progress_timeout);
-        propstack_connector_start_ajax_process( config );
+        // continue with the next chunk.
+        propstack_connector_run_ajax_chunk( config );
       }
       else {
         // mark import as not running.
@@ -122,8 +137,12 @@ function propstack_connector_start_ajax_process( config ) {
       }
     },
     error: function( jqXHR, textStatus, errorThrown ) {
-      // mark import as not running.
+      // mark import as not running and stop the polling.
       import_running = false;
+      clearTimeout( propstack_connector_progress_timeout );
+
+      // show the error instead of the result.
+      propstack_connector_result_shown = true;
       propstack_connector_ajax_error_dialog( errorThrown )
     }
   });
@@ -142,6 +161,15 @@ function propstack_connector_ajax_process( config ) {
       'process_id': config.process_id
     },
     error: function( jqXHR, textStatus, errorThrown ) {
+      // retry while the process is still running, the request may have been dropped.
+      if ( import_running ) {
+        propstack_connector_progress_timeout = setTimeout( function () {
+          propstack_connector_ajax_process( config )
+        }, 1000 );
+
+        return;
+      }
+
       propstack_connector_ajax_error_dialog( errorThrown )
     },
     success: function (data) {
@@ -161,10 +189,13 @@ function propstack_connector_ajax_process( config ) {
        * If import is not running and no error occurred, show ok-message.
        */
       if (running >= 1 || import_running) {
-        setTimeout( function () {
+        // remember the timeout so it can be stopped on an error.
+        propstack_connector_progress_timeout = setTimeout( function () {
           propstack_connector_ajax_process( config )
         }, 500 );
-      } else {
+      } else if ( ! propstack_connector_result_shown ) {
+        // show the result only once.
+        propstack_connector_result_shown = true;
         propstack_connector_create_dialog( dialog_config );
       }
     }

@@ -38,6 +38,8 @@ class Objects extends ConnectorForPropstackTestCase {
 
 		// run the activation.
 		\ConnectorForPropstack\Propstack\Propstack::get_instance()->activation();
+
+		parent::set_up();
 	}
 
 	/**

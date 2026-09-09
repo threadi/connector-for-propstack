@@ -247,6 +247,21 @@ class Settings {
 		$setting->set_default( 0 );
 		$setting->prevent_export( true );
 
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_objects_to_import' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'array' );
+		$setting->set_default( array() );
+		$setting->prevent_export( true );
+		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'object' ) ) ) );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_objects_import_offset' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+		$setting->prevent_export( true );
+
 		// initialize these settings.
 		$settings_obj->init();
 	}

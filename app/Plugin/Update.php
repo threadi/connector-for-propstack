@@ -68,7 +68,7 @@ class Update {
 		$db_plugin_version = get_option( 'cfprop_version', '1.0.0' );
 
 		// compare version if we are not in development-mode.
-		if ( ! Helper::is_development_mode_active() && version_compare( $installed_plugin_version, $db_plugin_version, '>' ) ) {
+		if ( ! Helper::is_development_mode() && version_compare( $installed_plugin_version, $db_plugin_version, '>' ) ) {
 			if ( ! defined( 'CFPROP_UPDATE_RUNNING' ) ) {
 				define( 'CFPROP_UPDATE_RUNNING', 1 );
 			}

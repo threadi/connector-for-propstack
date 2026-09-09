@@ -61,7 +61,7 @@ body.settings_page_connector-for-propstack {
 		tr:first-child, tr:nth-child(2n+3) { background-color: #c3c4c7; }
 	}
 	#options {
-		width: 160px;
+		width: 180px;
 	}
 	#state {
 		width: 60px;

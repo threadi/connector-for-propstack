@@ -5,6 +5,7 @@
 ### Added
 
 - Added error marker in menu and settings for any events where an error was logged
+- Introducing paginated import for objects using API v1 and v2 in backend to prevent timeouts during manual imports
 
 ### Changed
 
@@ -14,12 +15,20 @@
 - Log if Propstack API is using an unexpected field type
 - More PHP Unit Tests to reduce possible errors with the Propstack API
 - Clearer hint for unsupported object types in log
+- Optimized AJAX-driven progress dialog to be less flickering
+- Optimized memory usage during import process
+- Optimized styling of the logging table
+- Prevent deletion of all objects if Propstack API does not response
 
 ### Fixed
 
 - Fixed wrong handling of taxonomy term slug during import, which results in missing imported objects if slugs are used multiple times
 - Fixed missing dialog for the button to empty the log
 - Fixed missing subfield definition for status terms, which results in PHP-warnings during imports
+
+### Removed
+
+- Removed now unused double function to check for an active WordPress development mode
 
 ## [1.0.5] - 07.09.2026
 
