@@ -371,7 +371,7 @@ class Templates {
 		}
 
 		// get the object type object for this term.
-		$object_type = ObjectType::get_instance()->get_object_type_by_slug( $object_type_terms[0]->slug );
+		$object_type = ObjectType::get_instance()->get_object_type_by_term( $object_type_terms[0] );
 
 		// bail if the object type could not be loaded.
 		if ( ! $object_type instanceof Object_Type_Base ) {

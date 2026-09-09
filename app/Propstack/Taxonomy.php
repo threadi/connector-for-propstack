@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Languages;
+use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\Setup;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use WP_Error;
@@ -103,17 +104,6 @@ class Taxonomy {
 	}
 
 	/**
-	 * Return whether this cpt is assigned to a given plugin.
-	 *
-	 * @param string $plugin_path The plugin path (like __FILE__).
-	 *
-	 * @return bool
-	 */
-	public function is_from_plugin( string $plugin_path ): bool {
-		return CFPROP_PLUGIN === $plugin_path;
-	}
-
-	/**
 	 * Register this taxonomy.
 	 *
 	 * @return void
@@ -198,6 +188,11 @@ class Taxonomy {
 	 * @return int|false
 	 */
 	public function get_term_id_by_api_value( mixed $value, string $language_code ): int|false {
+		// bail if the value is not usable for a meta comparison.
+		if ( ! is_scalar( $value ) ) {
+			return false;
+		}
+
 		// check if the given value exists.
 		$query   = array(
 			'taxonomy'   => $this->get_name(),
@@ -394,6 +389,11 @@ class Taxonomy {
 
 			// if an error occurred, get the term ID from it.
 			if ( $term_data instanceof WP_Error ) {
+				// log this event.
+				/* translators: %1$s will be replaced by a string, $2$s by another name. */
+				Log::get_instance()->add( sprintf( __( 'Error during creating the term %1$s for the taxonomy %2$s', 'connector-for-propstack' ), $default_term['label'], $this->get_name() ), 'error', 'system' );
+
+				// use the returning ID from error-response.
 				$term_id = $term_data->get_error_data();
 			} else {
 				$term_id = $term_data['term_id'];

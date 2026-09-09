@@ -150,6 +150,50 @@ class ObjectType extends Taxonomy {
 	}
 
 	/**
+	 * Return an object type object by its API name.
+	 *
+	 * @param string $api The API name of the object type.
+	 *
+	 * @return Object_Type_Base|false
+	 */
+	public function get_object_type_by_api( string $api ): Object_Type_Base|false {
+		foreach ( $this->get_object_types_as_objects() as $object_type ) {
+			if ( $api === $object_type->get_api() ) {
+				return $object_type;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Return an object type object for a given term.
+	 *
+	 * Uses the "api" term meta as identifier, as the slug in the database can differ
+	 * from the configured one if WordPress had to make it unique on term creation.
+	 *
+	 * @param WP_Term $term The term object.
+	 *
+	 * @return Object_Type_Base|false
+	 */
+	public function get_object_type_by_term( WP_Term $term ): Object_Type_Base|false {
+		// get the API name from the term meta.
+		$api = get_term_meta( $term->term_id, 'api', true );
+
+		// use it if it is set.
+		if ( is_string( $api ) && ! empty( $api ) ) {
+			$object_type = $this->get_object_type_by_api( $api );
+
+			if ( $object_type instanceof Object_Type_Base ) {
+				return $object_type;
+			}
+		}
+
+		// fall back to the slug for terms without the meta.
+		return $this->get_object_type_by_slug( $term->slug );
+	}
+
+	/**
 	 * Return the object type object for a given post-ID.
 	 *
 	 * @param int $post_id The post-ID.
@@ -174,7 +218,7 @@ class ObjectType extends Taxonomy {
 		$object_type = $object_types[0];
 
 		// get the object type object by the given slug.
-		$object_type_object = $this->get_object_type_by_slug( $object_type->slug );
+		$object_type_object = $this->get_object_type_by_term( $object_type );
 
 		// bail if the object type object is not set.
 		if ( ! $object_type_object instanceof Object_Type_Base ) {
@@ -256,7 +300,7 @@ class ObjectType extends Taxonomy {
 			}
 
 			// get the object for this term slug.
-			$obj = $this->get_object_type_by_slug( $term->slug );
+			$obj = $this->get_object_type_by_term( $term );
 
 			// bail if the object could not be found.
 			if ( ! $obj instanceof Term_Base ) {

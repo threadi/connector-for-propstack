@@ -13,10 +13,13 @@
 - Use an extended logging for any API error
 - Log if Propstack API is using an unexpected field type
 - More PHP Unit Tests to reduce possible errors with the Propstack API
+- Clearer hint for unsupported object types in log
 
 ### Fixed
 
+- Fixed wrong handling of taxonomy term slug during import, which results in missing imported objects if slugs are used multiple times
 - Fixed missing dialog for the button to empty the log
+- Fixed missing subfield definition for status terms, which results in PHP-warnings during imports
 
 ## [1.0.5] - 07.09.2026
 
