@@ -9,6 +9,7 @@
 ### Changed
 
 - Optimized import via API v1 and v2 if objects are prevented to be imported
+- Optimized catch of fatal error during import via XML or API v2
 - Use an extended logging for any API error
 - Log if Propstack API is using an unexpected field type
 - More PHP Unit Tests to reduce possible errors with the Propstack API

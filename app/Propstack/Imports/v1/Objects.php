@@ -123,6 +123,9 @@ class Objects extends Import_Base {
 			Log::get_instance()->add( __( 'Import of objects starting', 'connector-for-propstack' ), 'info', 'import' );
 		}
 
+		// register a shutdown handler to catch fatal errors during the import.
+		register_shutdown_function( array( $this, 'handle_fatal_shutdown' ) );
+
 		// if any error occurred during import of objects, collect and log it.
 		try {
 			// loop through each enabled language and import its objects.
