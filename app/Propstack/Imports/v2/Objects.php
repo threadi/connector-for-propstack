@@ -95,10 +95,8 @@ class Objects extends Import_Base {
 		$process_handler->set_status( __( 'Import of objects starting', 'connector-for-propstack' ) );
 		$process_handler->set_running( time() );
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			Log::get_instance()->add( __( 'Import of objects starting', 'connector-for-propstack' ), 'info', 'import' );
-		}
+		// add a log entry.
+		Log::get_instance()->add( __( 'Import of objects starting', 'connector-for-propstack' ), 'info', 'import' );
 
 		// get the enabled languages.
 		$languages = array( get_option( 'propstack_connector_languages' ) => 1 );
@@ -145,11 +143,9 @@ class Objects extends Import_Base {
 
 				// loop through each enabled language and collect its objects.
 				foreach ( $languages as $language_code => $language_enabled ) {
-					// add a log entry if debug is enabled.
-					if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-						/* translators: a title will replace %1$s. */
-						Log::get_instance()->add( sprintf( __( 'Import of objects via API v2 in language %1$s starting', 'connector-for-propstack' ), ' <em>' . $language_code . '</em>' ), 'info', 'import' );
-					}
+					// add a log entry.
+					/* translators: a title will replace %1$s. */
+					Log::get_instance()->add( sprintf( __( 'Import of objects via API v2 in language %1$s starting', 'connector-for-propstack' ), ' <em>' . $language_code . '</em>' ), 'info', 'import' );
 
 					// load all objects for this language, page by page.
 					$objects = $this->get_objects_from_api( $language_code );
@@ -215,10 +211,8 @@ class Objects extends Import_Base {
 				$this->set_max_count( $process_handler, count( $import_data['objects'] ) );
 				$this->set_new_status( $process_handler, __( 'Import of objects is running', 'connector-for-propstack' ) );
 
-				// add a log entry if debug is enabled.
-				if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-					Log::get_instance()->add( __( 'Import of objects is running', 'connector-for-propstack' ), 'info', 'import' );
-				}
+				// add a log entry.
+				Log::get_instance()->add( __( 'Import of objects is running', 'connector-for-propstack' ), 'info', 'import' );
 			}
 
 			// get the name of the post-type to use.
@@ -261,11 +255,9 @@ class Objects extends Import_Base {
 						// update the counter.
 						$this->set_count( $process_handler, $process_handler->get_count() + 1 );
 
-						// add a log entry if debug is enabled.
-						if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-							/* translators: %1$s will be replaced by the object title. */
-							Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
-						}
+						// add a log entry.
+						/* translators: %1$s will be replaced by the object title. */
+						Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
 
 						// update tick.
 						$progress ? $progress->tick() : '';
@@ -278,22 +270,18 @@ class Objects extends Import_Base {
 					/* translators: %1$s will be replaced by the object title. */
 					$this->set_new_status( $process_handler, sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ) );
 
-					// add a log entry if debug is enabled.
-					if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-						/* translators: %1$s will be replaced by the object title. */
-						Log::get_instance()->add( sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
-					}
+					// add a log entry.
+					/* translators: %1$s will be replaced by the object title. */
+					Log::get_instance()->add( sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
 
 					// get the object with the given ID.
 					$propstack_immo_object = ImmoObjects::get_instance()->get_object_by_object_id( $object['id'], $language_code );
 
 					// if the object does not exist, create it.
 					if ( ! $propstack_immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
-						// add a log entry if debug is enabled.
-						if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-							/* translators: %1$s will be replaced by the object title. */
-							Log::get_instance()->add( sprintf( __( 'Creating new entry for the object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
-						}
+						// add a log entry.
+						/* translators: %1$s will be replaced by the object title. */
+						Log::get_instance()->add( sprintf( __( 'Creating new entry for the object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
 
 						// prepare the query to insert a new object.
 						$query = array(
@@ -480,10 +468,8 @@ class Objects extends Import_Base {
 				// log the errors.
 				$this->save_errors_in_log();
 
-				// add a log entry if debug is enabled.
-				if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-					Log::get_instance()->add( __( 'Import of objects has been ended.', 'connector-for-propstack' ), 'info', 'import' );
-				}
+				// add a log entry.
+				Log::get_instance()->add( __( 'Import of objects has been ended.', 'connector-for-propstack' ), 'info', 'import' );
 
 				// update the running marker.
 				$process_handler->set_running( 0 );

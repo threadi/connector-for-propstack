@@ -4,8 +4,9 @@
 
 ### Added
 
-- Added error marker in menu and settings for any events where an error was logged
 - Introducing paginated import for objects using API v1 and v2 in backend to prevent timeouts during manual imports
+- Added error marker in menu and settings for any events where an error was logged
+- Added option to debug only single topics, e.g., to get complete logs for import of objects but not for system-messages
 
 ### Changed
 
@@ -19,6 +20,8 @@
 - Optimized memory usage during import process
 - Optimized styling of the logging table
 - Prevent deletion of all objects if Propstack API does not response
+- Updated crypt lib and settings lib
+- Save the collapsible states of sections in the settings
 
 ### Fixed
 

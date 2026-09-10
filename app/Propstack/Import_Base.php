@@ -200,7 +200,7 @@ class Import_Base {
 	/**
 	 * Testable core of the shutdown handling.
 	 *
-	 * @param array{type:int,message:string,file:string,line:int}|null $error
+	 * @param array{type:int,message:string,file:string,line:int}|null $error The error.
 	 *
 	 * @return void
 	 */
@@ -258,7 +258,8 @@ class Import_Base {
 
 		// delete every block.
 		if ( is_array( $import_data ) && isset( $import_data['blocks'] ) ) {
-			for ( $i = 0; $i < absint( $import_data['blocks'] ); $i++ ) {
+			$count = absint( $import_data['blocks'] );
+			for ( $i = 0; $i < $count; $i++ ) {
 				delete_option( $this->work_list_option . '_block_' . $i );
 			}
 		}

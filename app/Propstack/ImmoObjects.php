@@ -268,10 +268,8 @@ class ImmoObjects {
 		$process_handler->set_running( time() );
 		update_option( CFPROP_DELETE_RUNNING, time() );
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			Log::get_instance()->add( __( 'Delete of all Propstack objects has been started.', 'connector-for-propstack' ), 'info', 'system' );
-		}
+		// add a log entry.
+		Log::get_instance()->add( __( 'Delete of all Propstack objects has been started.', 'connector-for-propstack' ), 'info', 'system' );
 
 		// get all objects.
 		$objects = $this->get_objects( array( 'posts_per_page' => -1 ) );
@@ -300,7 +298,7 @@ class ImmoObjects {
 				foreach ( $object->get_images() as $attachment_id ) {
 					$delete_result = wp_delete_post( $attachment_id, true );
 
-					// add a log entry if debug is enabled.
+					// add a log entry.
 					if ( ! $delete_result instanceof WP_Post ) {
 						/* translators: a title will replace %1$s. */
 						Log::get_instance()->add( sprintf( __( 'Object %1$s could not be deleted.', 'connector-for-propstack' ), ' <em>' . $object->get_title() . '</em>' ), 'error', 'system' );
@@ -327,10 +325,8 @@ class ImmoObjects {
 		// clean up the database.
 		$this->remove_changed_flag();
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			Log::get_instance()->add( __( 'Delete of all Propstack objects has been ended.', 'connector-for-propstack' ), 'info', 'system' );
-		}
+		// add a log entry.
+		Log::get_instance()->add( __( 'Delete of all Propstack objects has been ended.', 'connector-for-propstack' ), 'info', 'system' );
 
 		// update the marker.
 		$process_handler->set_message( $this->get_success_dialog_config() );
@@ -1358,11 +1354,9 @@ class ImmoObjects {
 				return;
 			}
 
-			// add a log entry if debug is enabled.
-			if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-				/* translators: %1$s will be replaced by the attachment ID. */
-				Log::get_instance()->add( sprintf( __( 'Assign image %1$s as thumbnail to object %2$s.', 'connector-for-propstack' ), '<em>' . $attachment_id_for_thumbnail . '</em>', '<em>' . $object_post_id . '</em>' ), 'info', 'import' );
-			}
+			// add a log entry.
+			/* translators: %1$s will be replaced by the attachment ID. */
+			Log::get_instance()->add( sprintf( __( 'Assign image %1$s as thumbnail to object %2$s.', 'connector-for-propstack' ), '<em>' . $attachment_id_for_thumbnail . '</em>', '<em>' . $object_post_id . '</em>' ), 'info', 'import' );
 
 			// assign this image as the featured image to the position.
 			set_post_thumbnail( $object_post_id, $attachment_id_for_thumbnail );

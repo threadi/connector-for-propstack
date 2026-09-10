@@ -453,7 +453,7 @@ class Admin {
 
 		// change the main menu item.
 		foreach ( $menu as $key => $item ) {
-			if ( isset( $item[2] ) && $item[2] === 'options-general.php' ) {
+			if ( isset( $item[2] ) && 'options-general.php' === $item[2] ) {
 				$menu[ $key ][0] .= ' <span class="update-plugins"><span class="update-count">!</span></span>';
 			}
 		}

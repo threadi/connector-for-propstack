@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easySettingsForWordPress\Fields\Button;
 use easySettingsForWordPress\Fields\Checkbox;
+use easySettingsForWordPress\Fields\MultiSelect;
 use easySettingsForWordPress\Fields\Number;
 use easySettingsForWordPress\Fields\Password;
 use easySettingsForWordPress\Fields\Radio;
@@ -120,6 +121,9 @@ class Settings {
 		}
 		if ( method_exists( $settings_obj, 'set_update_version' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$settings_obj->set_update_version( CFPROP_VERSION );
+		}
+		if ( method_exists( $settings_obj, 'set_persist_section_collapse' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$settings_obj->set_persist_section_collapse( true );
 		}
 
 		// create help in case of error during loading of the settings.
@@ -369,15 +373,6 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add setting.
-		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_debug' );
-		$setting->set_section( $advanced_section );
-		$setting->set_default( Helper::is_development_mode() ? 1 : 0 );
-		$field = new Checkbox( $this->get_settings_obj() );
-		$field->set_title( __( 'Enable debug mode', 'connector-for-propstack' ) );
-		$field->set_description( __( 'If enabled the plugin will log much more events. Do not use this in a production environment.', 'connector-for-propstack' ) );
-		$setting->set_field( $field );
-
-		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_timeout' );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 30 );
@@ -397,10 +392,40 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
+		$debug_section = $advanced_tab->add_section( 'propstack_connector_debug_section', 20 );
+		$debug_section->set_title( __( 'Debug', 'connector-for-propstack' ) );
+		if ( method_exists( $debug_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$debug_section->set_collapsible( true );
+			$debug_section->set_collapsed( 1 !== absint( get_option( 'propstack_connector_debug' ) ) );
+		}
+
+		// add setting.
+		$debug_setting = $this->get_settings_obj()->add_setting( 'propstack_connector_debug' );
+		$debug_setting->set_section( $debug_section );
+		$debug_setting->set_default( Helper::is_development_mode() ? 1 : 0 );
+		$field = new Checkbox( $this->get_settings_obj() );
+		$field->set_title( __( 'Enable debug mode', 'connector-for-propstack' ) );
+		$field->set_description( __( 'If enabled the plugin will log much more events. Do not use this in a production environment.', 'connector-for-propstack' ) );
+		$debug_setting->set_field( $field );
+
+		// add setting.
+		$setting = $this->get_settings_obj()->add_setting( 'cfprop_debug_categories' );
+		$setting->set_section( $debug_section );
+		$setting->set_type( 'array' );
+		$setting->set_default( array() );
+		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'string' ) ) ) );
+		$field = new MultiSelect( $this->get_settings_obj() );
+		$field->set_title( __( 'Categories to debug', 'personio-integration-light' ) );
+		$field->set_description( __( 'Select the topics for which you want to see debug output in the log. If nothing is selected, everything will be logged.', 'personio-integration-light' ) );
+		$field->set_options( Log::get_instance()->get_categories() );
+		$field->add_depend( $debug_setting, 1 );
+		$setting->set_field( $field );
+
+		// add a section.
 		$import_export_section = $advanced_tab->add_section( 'propstack_connector_import_export_section', 20 );
 		$import_export_section->set_title( __( 'Secure settings', 'connector-for-propstack' ) );
-		if ( method_exists( $import_export_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
-			$import_export_section->set_collapsed( true );
+		if ( method_exists( $import_export_section, 'set_collapsible' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$import_export_section->set_collapsible( true );
 		}
 
 		// create import dialog.

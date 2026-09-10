@@ -170,11 +170,9 @@ class Queue {
 			$title = $immo_object['title'];
 		}
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			/* translators: %1$s: the given title. */
-			Log::get_instance()->add( sprintf( __( 'Adding files for %1$s during import.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'import' );
-		}
+		// add a log entry.
+		/* translators: %1$s: the given title. */
+		Log::get_instance()->add( sprintf( __( 'Adding files for %1$s during import.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'queue' );
 
 		// set the limit for requesting of queue entries to unlimited.
 		add_filter(
@@ -208,11 +206,9 @@ class Queue {
 			// bail if the given URL is already in the media library.
 			$attachment_id = Files::get_instance()->is_file_in_media_library( absint( $file['id'] ) );
 			if ( $attachment_id > 0 ) {
-				// add a log entry if debug is enabled.
-				if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-					/* translators: %1$s: the given URL. */
-					Log::get_instance()->add( sprintf( __( 'Given file ID %1$s is already in the media library and will not be added to the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'import' );
-				}
+				// add a log entry.
+				/* translators: %1$s: the given URL. */
+				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s is already in the media library and will not be added to the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'queue' );
 
 				// remove the queue entry.
 				if ( isset( $list_of_existing_files_in_queue[ $file['id'] ] ) ) {
@@ -238,7 +234,7 @@ class Queue {
 			// bail on any error.
 			if ( is_wp_error( $queue_post_id ) ) { // @phpstan-ignore function.impossibleType
 				// add a log entry.
-				Log::get_instance()->add( __( 'File could not be added to queue. Following error occurred:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $queue_post_id ) . '</code>', 'error', 'import' );
+				Log::get_instance()->add( __( 'File could not be added to queue. Following error occurred:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $queue_post_id ) . '</code>', 'error', 'queue' );
 
 				// do nothing more with this file.
 				continue;
@@ -263,15 +259,13 @@ class Queue {
 			// mark the object as changed.
 			update_post_meta( $queue_post_id, 'changed', time() );
 
-			// add a log entry if debug is enabled.
-			if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-				if ( 0 === $state ) {
-					/* translators: %1$s: the given URL. */
-					Log::get_instance()->add( sprintf( __( 'Given file ID %1$s has been added in the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'import' );
-				} else {
-					/* translators: %1$s: the given URL. */
-					Log::get_instance()->add( sprintf( __( 'Given file ID %1$s has been updated in the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'import' );
-				}
+			// add a log entry.
+			if ( 0 === $state ) {
+				/* translators: %1$s: the given URL. */
+				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s has been added in the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'queue' );
+			} else {
+				/* translators: %1$s: the given URL. */
+				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s has been updated in the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'queue' );
 			}
 		}
 	}

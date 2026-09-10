@@ -371,11 +371,9 @@ class Files {
 		// bail if the given URL is already in the media library.
 		$attachment_id = $this->is_file_in_media_library( $id );
 		if ( $attachment_id > 0 ) {
-			// add a log entry if debug is enabled.
-			if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-				/* translators: %1$s: the given URL. */
-				Log::get_instance()->add( sprintf( __( 'Given URL %1$s is already in the database.', 'connector-for-propstack' ), ' <em>' . $url . '</em>' ), 'info', 'import' );
-			}
+			// add a log entry.
+			/* translators: %1$s: the given URL. */
+			Log::get_instance()->add( sprintf( __( 'Given URL %1$s is already in the database.', 'connector-for-propstack' ), ' <em>' . $url . '</em>' ), 'info', 'import' );
 
 			// return the attachment ID.
 			return $attachment_id;
@@ -816,10 +814,8 @@ class Files {
 			$post_id = $post_id_from_request;
 		}
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			Log::get_instance()->add( __( 'Prepare the import of files for your objects', 'connector-for-propstack' ), 'info', 'import' );
-		}
+		// add a log entry.
+		Log::get_instance()->add( __( 'Prepare the import of files for your objects', 'connector-for-propstack' ), 'info', 'import' );
 
 		// if the list is empty, create it.
 		if ( empty( $files_to_import ) ) {
@@ -831,10 +827,8 @@ class Files {
 				// update status.
 				$process_handler->set_status( __( 'Collecting all files for your object to import', 'connector-for-propstack' ) );
 
-				// add a log entry if debug is enabled.
-				if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-					Log::get_instance()->add( __( 'Collecting all files for your object to import', 'connector-for-propstack' ), 'info', 'import' );
-				}
+				// add a log entry.
+				Log::get_instance()->add( __( 'Collecting all files for your object to import', 'connector-for-propstack' ), 'info', 'import' );
 
 				// a single object.
 				$immo_objects = array( $immo_objects_obj->get_object( $post_id ) );
@@ -842,10 +836,8 @@ class Files {
 				// update status.
 				$process_handler->set_status( __( 'Collecting all files for your objects to import', 'connector-for-propstack' ) );
 
-				// add a log entry if debug is enabled.
-				if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-					Log::get_instance()->add( __( 'Collecting all files for your objects to import', 'connector-for-propstack' ), 'info', 'import' );
-				}
+				// add a log entry.
+				Log::get_instance()->add( __( 'Collecting all files for your objects to import', 'connector-for-propstack' ), 'info', 'import' );
 
 				// all objects.
 				$immo_objects = $immo_objects_obj->get_objects( array( 'posts_per_page' => -1 ) );
@@ -879,10 +871,8 @@ class Files {
 			// save the list in the cache.
 			set_transient( 'propstack_object_files_to_import', $files_to_import );
 
-			// add a log entry if debug is enabled.
-			if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-				Log::get_instance()->add( __( 'Cache stored during import:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $files_to_import ) . '</code>', 'info', 'import' );
-			}
+			// add a log entry.
+			Log::get_instance()->add( __( 'Cache stored during import:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $files_to_import ) . '</code>', 'info', 'import' );
 
 			// reset the counter if we start a new import.
 			$process_handler->set_count( 0 );
@@ -892,10 +882,8 @@ class Files {
 		// update marker.
 		$process_handler->set_status( __( 'Import of files for your objects is starting', 'connector-for-propstack' ) );
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			Log::get_instance()->add( __( 'Import of files for your objects is starting', 'connector-for-propstack' ), 'info', 'import' );
-		}
+		// add a log entry.
+		Log::get_instance()->add( __( 'Import of files for your objects is starting', 'connector-for-propstack' ), 'info', 'import' );
 
 		// set the counter for this run and the limit.
 		$counter = 0;
@@ -1030,10 +1018,8 @@ class Files {
 		// clear the cache of files to import as we are completed the import.
 		delete_transient( 'propstack_object_files_to_import' );
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			Log::get_instance()->add( __( 'Import of files has been run', 'connector-for-propstack' ), 'info', 'import' );
-		}
+		// add a log entry.
+		Log::get_instance()->add( __( 'Import of files has been run', 'connector-for-propstack' ), 'info', 'import' );
 
 		/**
 		 * Run additional tasks after the files has been imported during the object import via AJAX.

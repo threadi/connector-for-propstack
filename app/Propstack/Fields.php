@@ -676,17 +676,15 @@ class Fields {
 
 		// bail if the object type is missing.
 		if ( ! $object_type_object instanceof Object_Type_Base ) {
-			// add a log entry if debug is enabled.
+			// add a log entry.
 			/* translators: %1$s will be replaced by the object title. */
 			Log::get_instance()->add( sprintf( __( 'Unknown object type used by the object %1$s. The object type may only be supported by <a href="%2$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), '<em>' . $title . '</em>', Helper::get_pro_url() ), 'error', 'import' );
 			return;
 		}
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			/* translators: %1$s will be replaced by the object title. */
-			Log::get_instance()->add( sprintf( __( 'Import the fields for the object %1$s.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'import' );
-		}
+		// add a log entry.
+		/* translators: %1$s will be replaced by the object title. */
+		Log::get_instance()->add( sprintf( __( 'Import the fields for the object %1$s.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'import' );
 
 		// get the list of fields.
 		$fields = $object_type_object->get_fields();

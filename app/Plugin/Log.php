@@ -88,6 +88,10 @@ class Log {
 	/**
 	 * Add a single log-entry.
 	 *
+	 * If debug is disabled, we log only errors and import-success and system-info.
+	 * If debug is enabled and one or more categories are selected, we log any error and anything from the selected categories.
+	 * If debug is enabled and no category is selected, we log everything.
+	 *
 	 * @param string $log   The text to log.
 	 * @param string $state The state to log.
 	 * @param string $category The category for this log entry (optional).
@@ -97,6 +101,58 @@ class Log {
 	 */
 	public function add( string $log, string $state, string $category = '', string $md5 = '' ): void {
 		global $wpdb;
+
+		// if debug is disabled, we only log errors or import success or system info.
+		if ( 1 !== absint( get_option( 'propstack_connector_debug' ) ) ) {
+			$is_error          = 'error' === $state;
+			$is_import_success = ( 'import' === $category && 'success' === $state ) || ( 'system' === $category && 'info' === $state );
+
+			$should_log = $is_error || $is_import_success;
+			/**
+			 * Filter whether a log entry should be written when debug mode is disabled.
+			 *
+			 * @since 1.1.0 Available since 1.1.0
+			 *
+			 * @param bool   $should_log Whether the entry should be logged.
+			 * @param string $category   The log entry category.
+			 * @param string $state      The log entry state.
+			 * @param string $log        The log message.
+			 * @param string $md5        The unique marker.
+			 */
+			$should_log = apply_filters( 'cfprop_log_without_debug', $should_log, $category, $state, $log, $md5 );
+		} else {
+			// get the debug categories.
+			$log_categories = get_option( 'cfprop_debug_categories' );
+
+			// check if it is an array.
+			if ( ! is_array( $log_categories ) ) {
+				$log_categories = array();
+			}
+
+			// check if this is a success import entry.
+			$is_import_success = ( 'import' === $category && 'success' === $state ) || ( 'system' === $category && 'info' === $state );
+
+			// check if we should log this entry.
+			$should_log = $is_import_success || empty( $log_categories ) || in_array( $category, $log_categories, true );
+
+			/**
+			 * Filter whether a log entry should be written when debug mode is enabled.
+			 *
+			 * @since 1.1.0 Available since 1.1.0.
+			 *
+			 * @param bool   $should_log Whether the entry should be logged.
+			 * @param string $category   The log entry category.
+			 * @param string $state      The log entry state.
+			 * @param string $log        The log message.
+			 * @param string $md5        The unique marker.
+			 */
+			$should_log = apply_filters( 'cfprop_log_with_debug', $should_log, $category, $state, $log, $md5 );
+		}
+
+		// bail if we should not log.
+		if ( ! $should_log ) {
+			return;
+		}
 
 		// add error counter if this is an error.
 		if ( 'error' === $state ) {
