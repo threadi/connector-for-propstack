@@ -72,7 +72,7 @@ class Settings {
 	public function init(): void {
 		// add the settings.
 		add_action( 'init', array( $this, 'add_main_settings' ) );
-		add_action( 'init', array( $this, 'add_plugin_settings' ), 20 );
+		add_action( 'init', array( $this, 'add_additional_settings' ), 20 );
 		add_action( 'init', array( $this, 'add_trademark_hint' ), 20 );
 
 		// use admin actions.
@@ -297,11 +297,11 @@ class Settings {
 	}
 
 	/**
-	 * Add setting for plugin management.
+	 * Add additional settings.
 	 *
 	 * @return void
 	 */
-	public function add_plugin_settings(): void {
+	public function add_additional_settings(): void {
 		// get the settings page.
 		$settings_page = $this->get_settings_page();
 
@@ -310,12 +310,17 @@ class Settings {
 			return;
 		}
 
-		// add a tab on this page to demonstration import and export of settings.
+		// add a tab for additional settings.
 		$advanced_tab = $settings_page->add_tab( 'propstack_connector_advanced', 70 );
 		$advanced_tab->set_title( __( 'Advanced settings', 'connector-for-propstack' ) );
 
+		// add a tab for additional settings.
+		$additional_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_settings', 10 );
+		$additional_settings_tab->set_title( __( 'More settings', 'connector-for-propstack' ) );
+		$advanced_tab->set_default_tab( $additional_settings_tab );
+
 		// add a section.
-		$advanced_section = $advanced_tab->add_section( 'propstack_connector_advanced', 10 );
+		$advanced_section = $additional_settings_tab->add_section( 'propstack_connector_advanced', 10 );
 		$advanced_section->set_title( __( 'Advanced settings', 'connector-for-propstack' ) );
 
 		// add setting.
@@ -392,7 +397,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$debug_section = $advanced_tab->add_section( 'propstack_connector_debug_section', 20 );
+		$debug_section = $additional_settings_tab->add_section( 'propstack_connector_debug_section', 20 );
 		$debug_section->set_title( __( 'Debug', 'connector-for-propstack' ) );
 		if ( method_exists( $debug_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$debug_section->set_collapsible( true );
@@ -422,7 +427,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$import_export_section = $advanced_tab->add_section( 'propstack_connector_import_export_section', 20 );
+		$import_export_section = $additional_settings_tab->add_section( 'propstack_connector_import_export_section', 20 );
 		$import_export_section->set_title( __( 'Secure settings', 'connector-for-propstack' ) );
 		if ( method_exists( $import_export_section, 'set_collapsible' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$import_export_section->set_collapsible( true );
@@ -498,7 +503,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$plugin_handling_section = $advanced_tab->add_section( 'propstack_connector_plugin_section', 30 );
+		$plugin_handling_section = $additional_settings_tab->add_section( 'propstack_connector_plugin_section', 30 );
 		$plugin_handling_section->set_title( __( 'Plugin handling', 'connector-for-propstack' ) );
 		if ( method_exists( $plugin_handling_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$plugin_handling_section->set_collapsed( true );
@@ -617,16 +622,26 @@ class Settings {
 	 * Return the settings URL for a specific tab.
 	 *
 	 * @param string $tab The slug of the tab (optional).
+	 * @param string $subtab The slug of the subtab (optional).
 	 *
 	 * @return string
 	 */
-	public function get_url( string $tab = '' ): string {
+	public function get_url( string $tab = '', string $subtab = '' ): string {
 		if ( empty( $tab ) ) {
 			return $this->get_settings_obj()->get_settings_link();
+		}
+		if( empty( $subtab ) ) {
+			return add_query_arg(
+				array(
+					'tab' => $tab,
+				),
+				$this->get_settings_obj()->get_settings_link()
+			);
 		}
 		return add_query_arg(
 			array(
 				'tab' => $tab,
+				'subtab' => $subtab
 			),
 			$this->get_settings_obj()->get_settings_link()
 		);

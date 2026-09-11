@@ -22,6 +22,7 @@
 - Prevent deletion of all objects if Propstack API does not response
 - Updated crypt lib and settings lib
 - Save the collapsible states of sections in the settings
+- Extended the function to get settings URL
 
 ### Fixed
 
