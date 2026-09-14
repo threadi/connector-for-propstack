@@ -10,12 +10,19 @@ namespace ConnectorForPropstack\Propstack;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use ConnectorForPropstack\Plugin\Log;
 use WP_Error;
 
 /**
  * Object to handle brokers from Propstack.
  */
 class Broker {
+	/**
+	 * The already imported broker avatars of this run, indexed by broker ID.
+	 *
+	 * @var array<int,int>
+	 */
+	private array $broker_avatars = array();
 
 	/**
 	 * Variable for the instance of this Singleton object.
@@ -113,8 +120,21 @@ class Broker {
 			return;
 		}
 
-		// import this file, not assigned to an immo object post as it will be assigned to the broker term.
-		$attachment_id = Files::get_instance()->import_file( 0, $immo_object['broker']['id'], $immo_object['broker']['avatar_url'], basename( $immo_object['broker']['avatar_url'] ), array() );
+		// bail if the term already has a thumbnail, the avatar does not have to be imported again.
+		if ( absint( get_term_meta( $broker_terms[0]->term_id, 'thumbnail_id', true ) ) > 0 ) {
+			return;
+		}
+
+		// get the ID of the broker.
+		$broker_id = absint( $immo_object['broker']['id'] );
+
+		// import the avatar only once per broker and run.
+		if ( isset( $this->broker_avatars[ $broker_id ] ) ) {
+			$attachment_id = $this->broker_avatars[ $broker_id ];
+		} else {
+			$attachment_id                      = Files::get_instance()->import_file( 0, $broker_id, $immo_object['broker']['avatar_url'], basename( $immo_object['broker']['avatar_url'] ), array() );
+			$this->broker_avatars[ $broker_id ] = $attachment_id;
+		}
 
 		// bail if no image has been imported.
 		if ( 0 === $attachment_id ) {

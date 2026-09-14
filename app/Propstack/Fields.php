@@ -78,7 +78,7 @@ class Fields {
 		add_action( 'init', array( $this, 'add_settings' ), 20 );
 
 		// use our own hooks.
-		add_action( 'cfprop_import_object', array( $this, 'import_fields' ), 10, 2 );
+		add_action( 'cfprop_import_object', array( $this, 'import_fields' ), 10, 4 );
 		add_action( 'cfprop_import_object_field', array( $this, 'import_example' ), 10, 2 );
 		add_action( 'cfprop_import_object_field', array( $this, 'set_post_content' ), 10, 4 );
 		add_filter( 'cfprop_import_object_field_value', array( $this, 'clean_field_value_during_import' ), 10, 2 );
@@ -658,11 +658,14 @@ class Fields {
 	 * Import the fields depending on the used object type during the import of a single immo object.
 	 *
 	 * @param array<string,mixed> $immo_object The object data from API.
-	 * @param int                 $post_id The post-ID.
+	 * @param int                 $post_id     The post-ID.
+	 * @param string              $language The language code.
+	 * @param bool                $is_new_object True if this is a new object.
 	 *
 	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function import_fields( array $immo_object, int $post_id ): void {
+	public function import_fields( array $immo_object, int $post_id, string $language, bool $is_new_object ): void {
 		// get the immo object title.
 		$title = '';
 		if ( is_array( $immo_object['title'] ) ) {
@@ -689,6 +692,9 @@ class Fields {
 		// get the list of fields.
 		$fields = $object_type_object->get_fields();
 
+		// collect the values first instead of writing each one on its own.
+		$values = array();
+
 		// update the object data in its fields.
 		foreach ( $fields as $field ) {
 			// get the field value from API.
@@ -704,9 +710,26 @@ class Fields {
 			 */
 			$value = apply_filters( 'cfprop_import_object_field_value', $value, $field, $post_id );
 
-			// save the field value from API.
-			update_post_meta( $post_id, $field->get_name(), $value );
+			// update the field value from API.
+			if ( ! $is_new_object ) {
+				$written = update_post_meta( $post_id, $field->get_name(), $value );
 
+				if ( $written && Helper::is_development_mode() ) {
+					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $field->get_name(), get_debug_type( $value ) ), 'info', 'system' );
+				}
+			}
+
+			$values[ $field->get_name() ] = $value;
+		}
+
+		// write them in a single statement.
+		if ( $is_new_object ) {
+			$this->save_field_values( $post_id, $values );
+		}
+
+		// run the per field actions afterwards.
+		foreach ( $fields as $field ) {
+			$value = isset( $values[ $field->get_name() ] ) ? $values[ $field->get_name() ] : null;
 			/**
 			 * Run additional tasks for a single field on an object during the import of them.
 			 *
@@ -736,7 +759,7 @@ class Fields {
 
 				// save the value.
 				if ( is_array( $field ) ) {
-					update_post_meta( $post_id, $field_name, $field_name );
+					update_post_meta( $post_id, $field_name, $field['value'] );
 				}
 			}
 		}
@@ -961,6 +984,13 @@ class Fields {
 	 * @return void
 	 */
 	public function import_example( Field_Base $field, mixed $value ): void {
+		// bail if an example for this field has already been saved during this request.
+		static $saved = array();
+		if ( isset( $saved[ $field->get_name() ] ) ) {
+			return;
+		}
+		$saved[ $field->get_name() ] = true;
+
 		// bail if no value is given.
 		if ( empty( $value ) ) {
 			return;
@@ -1122,5 +1152,105 @@ class Fields {
 
 		// return the resulting list.
 		return $fields; // @phpstan-ignore return.type
+	}
+
+	/**
+	 * Save multiple field values of a single object in one statement.
+	 *
+	 * Hint:
+	 * update_post_meta() drops the meta cache of the object after every write and reloads
+	 * all of its meta rows before the next one. With more than 200 fields per object that
+	 * results in a quadratic amount of queries during the first import of an object.
+	 * This method writes them in a single statement instead. It must only be used for
+	 * objects which do not have any of these meta keys yet, otherwise it would create
+	 * duplicate rows.
+	 *
+	 * @param int                 $post_id The post-ID of the object.
+	 * @param array<string,mixed> $values  The values to save, indexed by meta key.
+	 *
+	 * @return void
+	 */
+	private function save_field_values( int $post_id, array $values ): void {
+		// bail if no values are given.
+		if ( empty( $values ) ) {
+			return;
+		}
+
+		global $wpdb;
+
+		// prepare the rows to insert.
+		$rows = array();
+		foreach ( $values as $meta_key => $meta_value ) {
+			// run the same sanitizing the meta API would run.
+			$meta_value = sanitize_meta( (string) $meta_key, $meta_value, 'post' );
+
+			// collect the row.
+			$rows[] = array(
+				$post_id,
+				(string) $meta_key,
+				maybe_serialize( $meta_value ),
+			);
+		}
+
+		// insert them in batches to stay below max_allowed_packet.
+		$batch_size = 100;
+
+		/**
+		 * Filter the amount of meta rows written in a single statement.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param int $batch_size The batch size.
+		 */
+		$batch_size = max( 1, absint( apply_filters( 'cfprop_field_values_batch_size', $batch_size ) ) );
+
+		foreach ( array_chunk( $rows, $batch_size ) as $batch ) {
+			// build one placeholder group per row.
+			$placeholders = implode( ', ', array_fill( 0, count( $batch ), '(%d, %s, %s)' ) );
+
+			// flatten the rows into a single argument list.
+			$arguments = array();
+			foreach ( $batch as $row ) {
+				$arguments[] = $row[0];
+				$arguments[] = $row[1];
+				$arguments[] = $row[2];
+			}
+
+			// bail if the amount of arguments does not match the amount of placeholders.
+			if ( count( $arguments ) !== ( count( $batch ) * 3 ) ) {
+				continue;
+			}
+
+			// run the insert.
+			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWithoutPlaceholders -- Placeholders are generated above, values are passed as arguments.
+			$sql = $wpdb->prepare(
+				'INSERT INTO ' . $wpdb->postmeta . ' (post_id, meta_key, meta_value) VALUES ' . $placeholders,
+				$arguments
+			);
+			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWithoutPlaceholders
+
+			// bail if the statement could not be prepared.
+			if ( ! is_string( $sql ) ) {
+				continue;
+			}
+
+			$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Bulk insert of meta rows, see method description.
+
+			// log any error.
+			if ( $wpdb->last_error ) {
+				Log::get_instance()->add(
+					sprintf(
+					/* translators: %1$d will be replaced by the post-ID, %2$s by the error message. */
+						__( 'The field values of object %1$d could not be saved: %2$s', 'connector-for-propstack' ),
+						$post_id,
+						'<code>' . esc_html( $wpdb->last_error ) . '</code>'
+					),
+					'error',
+					'import'
+				);
+			}
+		}
+
+		// drop the meta cache of this object once, instead of once per field.
+		wp_cache_delete( $post_id, 'post_meta' );
 	}
 }

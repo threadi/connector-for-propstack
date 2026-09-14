@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.1.0] - 14.09.2026
 
 ### Added
 
@@ -11,6 +11,7 @@
 ### Changed
 
 - Optimized import via API v1 and v2 if objects are prevented to be imported
+- Optimized used memory and amount of database queries during the import for higher speed and to prevent memory_limit errors
 - Optimized catch of fatal error during import via XML or API v2
 - Use an extended logging for any API error
 - Log if Propstack API is using an unexpected field type
@@ -19,6 +20,8 @@
 - Optimized AJAX-driven progress dialog to be less flickering
 - Optimized memory usage during import process
 - Optimized styling of the logging table
+- Optimized styling of the object table
+- Optimized the process handler to remove older process information
 - Prevent deletion of all objects if Propstack API does not response
 - Updated crypt lib and settings lib
 - Save the collapsible states of sections in the settings
@@ -29,6 +32,8 @@
 - Fixed wrong handling of taxonomy term slug during import, which results in missing imported objects if slugs are used multiple times
 - Fixed missing dialog for the button to empty the log
 - Fixed missing subfield definition for status terms, which results in PHP-warnings during imports
+- Fixed missing value for custom fields (not the pretty value)
+- Fixed missing cache using for file import
 
 ### Removed
 

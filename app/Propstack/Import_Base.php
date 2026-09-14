@@ -219,7 +219,7 @@ class Import_Base {
 		Log::get_instance()->add(
 			__( 'Import was aborted by a fatal PHP error:', 'connector-for-propstack' ) . '<br><code>' . esc_html( $error['message'] ) . '</code> ' . esc_html( $error['file'] ) . ':' . absint( $error['line'] ),
 			'error',
-			'imports'
+			'import'
 		);
 
 		// reset the running-flag so the user is not stuck.
@@ -267,5 +267,23 @@ class Import_Base {
 		// reset the metadata and the position.
 		update_option( $this->work_list_option, array() );
 		update_option( $this->offset_option, 0 );
+	}
+
+	/**
+	 * Return the name of the option which holds the work list of a paginated import.
+	 *
+	 * @return string
+	 */
+	public function get_work_list_option(): string {
+		return $this->work_list_option;
+	}
+
+	/**
+	 * Return the name of the option which holds the position of a paginated import.
+	 *
+	 * @return string
+	 */
+	public function get_offset_option(): string {
+		return $this->offset_option;
 	}
 }

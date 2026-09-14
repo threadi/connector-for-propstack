@@ -41,6 +41,10 @@ class Log extends ConnectorForPropstackTestCase {
 		$this->log_obj    = \ConnectorForPropstack\Plugin\Log::get_instance();
 		$this->table_name = $wpdb->prefix . 'propstack_logs';
 
+		// enable the debug mode, otherwise info entries are not logged at all.
+		update_option( 'propstack_connector_debug', 1 );
+		delete_option( 'cfprop_debug_categories' );
+
 		// start each test with an empty log.
 		$wpdb->query( 'TRUNCATE TABLE ' . $this->table_name ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
 	}

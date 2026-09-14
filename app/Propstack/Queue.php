@@ -13,6 +13,7 @@ namespace ConnectorForPropstack\Propstack;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use ConnectorForPropstack\Plugin\Db;
 use easySettingsForWordPress\Fields\Checkbox;
 use easySettingsForWordPress\Fields\Number;
 use easySettingsForWordPress\Fields\Select;
@@ -31,6 +32,13 @@ use WP_Query;
  * Object to handle the queue to import files from Propstack.
  */
 class Queue {
+	/**
+	 * The map of Propstack file IDs to their queue post IDs.
+	 *
+	 * @var array<string,int>|null
+	 */
+	private ?array $queue_map = null;
+
 	/**
 	 * Variable for the instance of this Singleton object.
 	 *
@@ -174,24 +182,8 @@ class Queue {
 		/* translators: %1$s: the given title. */
 		Log::get_instance()->add( sprintf( __( 'Adding files for %1$s during import.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'queue' );
 
-		// set the limit for requesting of queue entries to unlimited.
-		add_filter(
-			'cfprop_queue_query',
-			static function ( array $query ): array {
-				$query['posts_per_page'] = -1;
-				return $query;
-			}
-		);
-
-		// get all files in the queue.
-		$queue = $this->get_queue();
-
-		// get their IDs.
-		$ids = array_map( static fn( $post ) => $post->ID, $queue );
-		// get their titles.
-		$titles = array_map( static fn( $post ) => $post->post_title, $queue );
-		// use one array for both.
-		$list_of_existing_files_in_queue = array_combine( $titles, $ids );
+		// get the map of file IDs already in the queue.
+		$list_of_existing_files_in_queue = $this->get_queue_map();
 
 		// add the images of this object to the queue.
 		foreach ( $immo_object['images'] as $file ) {
@@ -213,11 +205,31 @@ class Queue {
 				// remove the queue entry.
 				if ( isset( $list_of_existing_files_in_queue[ $file['id'] ] ) ) {
 					wp_delete_post( $list_of_existing_files_in_queue[ $file['id'] ], true );
+					unset( $this->queue_map[ (string) $file['id'] ] );
 				}
 
 				// do nothing more with this file.
 				continue;
 			}
+
+			// collect the fields of this file.
+			$meta = array();
+			foreach ( PostTypes\Queue::get_instance()->get_fields() as $category ) {
+				foreach ( $category['fields'] as $field_name => $field ) {
+					// bail if field is missing.
+					if ( ! isset( $file[ $field['api'] ] ) ) {
+						continue;
+					}
+
+					$meta[ $field_name ] = $file[ $field['api'] ];
+				}
+			}
+
+			// save the structure we get from the API.
+			$meta['api_response'] = $file;
+
+			// mark the object as changed.
+			$meta['changed'] = time();
 
 			// add this entry to the queue or update it.
 			$query         = array(
@@ -226,8 +238,9 @@ class Queue {
 				'post_status'  => 'publish',
 				'post_title'   => $file['id'],
 				'post_author'  => Helper::get_author_during_object_creation(),
-				'post_parent'  => $post_id, // the ID we want this file to be assigned to.
+				'post_parent'  => $post_id,
 				'post_content' => '',
+				'meta_input'   => $meta,
 			);
 			$queue_post_id = wp_insert_post( $query, true );
 
@@ -240,18 +253,8 @@ class Queue {
 				continue;
 			}
 
-			// add the fields of this file on the queue entry.
-			foreach ( PostTypes\Queue::get_instance()->get_fields() as $category ) {
-				foreach ( $category['fields'] as $field_name => $field ) {
-					// bail if field is missing.
-					if ( ! isset( $file[ $field['api'] ] ) ) {
-						continue;
-					}
-
-					// add the field.
-					update_post_meta( $queue_post_id, $field_name, $file[ $field['api'] ] );
-				}
-			}
+			// keep the map up to date.
+			$this->queue_map[ (string) $file['id'] ] = absint( $queue_post_id );
 
 			// save the structure we get from the API.
 			update_post_meta( $queue_post_id, 'api_response', $file );
@@ -673,5 +676,39 @@ class Queue {
 		if ( $result->found_posts > 0 && is_int( $result->posts[0] ) ) {
 			wp_delete_post( absint( $result->posts[0] ), true );
 		}
+	}
+
+	/**
+	 * Return the map of Propstack file IDs to their queue post IDs.
+	 *
+	 * Loaded once per request and kept up to date by this object itself, as reloading it
+	 * for every object would grow with the amount of entries already in the queue.
+	 *
+	 * @return array<string,int>
+	 */
+	private function get_queue_map(): array {
+		// return the map if it has already been built.
+		if ( is_array( $this->queue_map ) ) {
+			return $this->queue_map;
+		}
+
+		global $wpdb;
+
+		// load only the two columns we need.
+		$results = Db::get_instance()->get_results(
+			$wpdb->prepare(
+				'SELECT ID, post_title FROM ' . $wpdb->posts . ' WHERE post_type = %s AND post_status = %s',
+				PostTypes\Queue::get_instance()->get_name(),
+				'publish'
+			)
+		);
+
+		// build the map.
+		$this->queue_map = array();
+		foreach ( $results as $result ) {
+			$this->queue_map[ (string) $result['post_title'] ] = absint( $result['ID'] );
+		}
+
+		return $this->queue_map;
 	}
 }

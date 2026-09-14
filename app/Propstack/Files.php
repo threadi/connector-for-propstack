@@ -327,9 +327,9 @@ class Files {
 	public function is_file_in_media_library( int $id ): int {
 		// run the check.
 		$query   = array(
-			'post_type'   => 'attachment',
-			'post_status' => 'any',
-			'meta_query'  => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
+			'post_type'      => 'attachment',
+			'post_status'    => 'any',
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
 				array(
 					'key'     => 'propstack_file_id',
 					'value'   => $id,
@@ -337,23 +337,24 @@ class Files {
 					'type'    => 'NUMERIC',
 				),
 			),
-			'fields'      => 'ids',
+			'posts_per_page' => 1,
+			'no_found_rows'  => true,
+			'fields'         => 'ids',
 		);
 		$results = new WP_Query( $query );
 
-		// bail if the image is already in the media library.
-		if ( 1 === $results->found_posts ) {
-			// bail on a wrong object.
-			if ( ! is_int( $results->posts[0] ) ) {
-				return 0;
-			}
-
-			// return the resulting attachment ID.
-			return absint( $results->posts[0] );
+		// bail if nothing was found.
+		if ( empty( $results->posts ) ) {
+			return 0;
 		}
 
-		// return 0 as we found nothing.
-		return 0;
+		// bail on a wrong entry.
+		if ( ! is_int( $results->posts[0] ) ) {
+			return 0;
+		}
+
+		// return the resulting attachment ID.
+		return absint( $results->posts[0] );
 	}
 
 	/**
@@ -806,7 +807,7 @@ class Files {
 		update_option( CFPROP_FILES_IMPORT_RUNNING, time() );
 
 		// get the cached list of files to import.
-		$files_to_import = get_transient( 'propstack_object_files_to_import ' );
+		$files_to_import = get_transient( 'propstack_object_files_to_import' );
 
 		// get post-ID from the request.
 		$post_id_from_request = absint( filter_input( INPUT_POST, 'post', FILTER_SANITIZE_NUMBER_INT ) );
@@ -1034,7 +1035,8 @@ class Files {
 
 		// update the marker.
 		$process_handler->set_running( 0 );
-		$progress ? $progress->finish() : '';
+		if ( $progress ) {
+			$progress->finish(); }
 		update_option( CFPROP_FILES_IMPORT_RUNNING, 0 );
 	}
 

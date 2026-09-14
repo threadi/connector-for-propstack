@@ -7,6 +7,10 @@
 	--cfprop-pro-hint-font: #000;
 }
 
+.post-type-cfprop_object {
+	.column-cfprop-thumbnail { width: 160px }
+}
+
 .post-type-cfprop_object .postbox {
 	code {
 		display: block;

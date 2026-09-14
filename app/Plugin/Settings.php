@@ -630,7 +630,7 @@ class Settings {
 		if ( empty( $tab ) ) {
 			return $this->get_settings_obj()->get_settings_link();
 		}
-		if( empty( $subtab ) ) {
+		if ( empty( $subtab ) ) {
 			return add_query_arg(
 				array(
 					'tab' => $tab,
@@ -640,8 +640,8 @@ class Settings {
 		}
 		return add_query_arg(
 			array(
-				'tab' => $tab,
-				'subtab' => $subtab
+				'tab'    => $tab,
+				'subtab' => $subtab,
 			),
 			$this->get_settings_obj()->get_settings_link()
 		);

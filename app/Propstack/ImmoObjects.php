@@ -121,13 +121,13 @@ class ImmoObjects {
 		add_action( 'cfprop_files_for_object_imported_via_ajax', array( $this, 'assign_feature_image' ) );
 		add_action( 'cfprop_queue_after_processing', array( $this, 'assign_feature_image_via_queue' ), 10, 0 );
 		add_action( 'cfprop_import_object', array( $this, 'assign_feature_image_during_import' ), 10, 2 );
-		add_action( 'cfprop_import_object_after', array( $this, 'cleanup_after_import' ) );
 		add_action( 'cfprop_import_object_after', array( $this, 'set_main_object_type' ) );
 		add_filter( 'cfprop_object_type_fields', array( $this, 'hide_object_type_fields' ) );
 		add_filter( 'cfprop_object_import_response', array( $this, 'remove_document_from_response' ) );
 		add_filter( 'cfprop_object_import_response', array( $this, 'save_response' ) );
 		add_filter( 'cfprop_api_object_url', array( $this, 'add_marketing_type_to_import_url' ) );
 		add_filter( 'cfprop_api_object_url', array( $this, 'add_object_type_to_import_url' ) );
+		add_filter( 'cfprop_api_object_url', array( $this, 'add_status_to_import_url' ) );
 		add_action( 'cfprop_import_content_not_change', array( $this, 'mark_as_updated' ), 10, 0 );
 		add_action( 'cfprop_restriction_value_changed', array( $this, 'remove_changed_flag' ), 10, 0 );
 		add_action( 'cfprop_object_field_metabox', array( $this, 'show_pro_hint_on_field' ), 10, 2 );
@@ -480,11 +480,11 @@ class ImmoObjects {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_ajax_object_limit' );
 		$setting->set_type( 'integer' );
-		$setting->set_default( 100 );
+		$setting->set_default( 20 );
 		$setting->set_section( $import_options_section );
 		$field = new Number( $settings_obj );
-		$field->set_title( __( 'Limit for import of objects', 'connector-for-propstack' ) );
-		$field->set_description( __( 'The higher this number is, the greater the likelihood of a timeout when importing objects.', 'connector-for-propstack' ) );
+		$field->set_title( __( 'Limit for objects', 'connector-for-propstack' ) );
+		$field->set_description( __( 'This limits the amount of objects during one import run. If the limit is reached, a new import run is startet automatically. There is not hard limit to import objects. The higher this number is, the greater the likelihood of a timeout when importing objects.', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
 		// add setting.
@@ -717,8 +717,25 @@ class ImmoObjects {
 			$process_id = '';
 		}
 
-		// run the import.
-		$this->import( $process_id );
+		// count the runs to prevent an endless loop on a broken state.
+		$runs = 0;
+
+		// no time budget here, there is nothing which could continue an interrupted run.
+		add_filter( 'cfprop_object_import_time_budget', '__return_zero' );
+
+		// run the import until it is completed, every run processes one chunk.
+		do {
+			$import_obj = $this->import( $process_id );
+
+			++$runs;
+
+			// bail if the import does not finish.
+			if ( $runs > 10000 ) {
+				Log::get_instance()->add( __( 'The import did not finish and has been stopped.', 'connector-for-propstack' ), 'error', 'import' );
+
+				break;
+			}
+		} while ( $import_obj->has_load_more() );
 
 		// show hint.
 		$transient_obj = Transients::get_instance()->add();
@@ -1373,63 +1390,6 @@ class ImmoObjects {
 	}
 
 	/**
-	 * Clean up after import of objects.
-	 *
-	 * @param Import_Base $import_obj The import object.
-	 *
-	 * @return void
-	 */
-	public function cleanup_after_import( Import_Base $import_obj ): void {
-		// get the process handler with this ID.
-		$process_handler = ProcessHandler::get_instance();
-		$process_handler->set_id( $import_obj->get_process_id() );
-
-		// update status.
-		$process_handler->set_status( __( 'Get the objects in tip-top shape', 'connector-for-propstack' ) );
-
-		// bail if the import did not process any object - deleting everything would be wrong.
-		if ( 0 === $process_handler->get_max_count() ) {
-			// log this event.
-			Log::get_instance()->add(
-				__( 'The import did not deliver any object, so no cleanup has been run. No objects have been changed or deleted.', 'connector-for-propstack' ),
-				'info',
-				'import'
-			);
-
-			// do nothing more.
-			return;
-		}
-
-		// get the not updated objects.
-		$query   = array(
-			'post_type'      => PostTypes\ImmoObject::get_instance()->get_name(),
-			'post_status'    => 'any',
-			'posts_per_page' => -1,
-			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
-				array(
-					'key'     => 'changed',
-					'compare' => 'NOT EXISTS',
-				),
-			),
-			'fields'         => 'ids',
-		);
-		$results = new WP_Query( $query );
-
-		// loop through the posts of objects and delete them.
-		foreach ( $results->get_posts() as $post_id ) {
-			if ( $post_id instanceof WP_Post ) {
-				continue;
-			}
-			wp_delete_post( $post_id, true );
-		}
-
-		// remove the changed marker on each other object.
-		foreach ( $this->get_objects( array( 'posts_per_page' => -1 ) ) as $object ) {
-			delete_post_meta( $object->get_id(), 'changed' );
-		}
-	}
-
-	/**
 	 * Check for the main object type used by the objects of this Propstack account.
 	 *
 	 * We check how often the objects use an object type.
@@ -1681,6 +1641,26 @@ class ImmoObjects {
 
 		// add the marketing type to the URL.
 		return add_query_arg( array( 'rs_type' => $object_types[0] ), $url );
+	}
+
+	/**
+	 * Add the status as a parameter to the import-URL.
+	 *
+	 * @param string $url The URL.
+	 *
+	 * @return string
+	 */
+	public function add_status_to_import_url( string $url ): string {
+		// get the configured states.
+		$import_states = get_option( 'propstack_connector_import_states' );
+
+		// bail if no marketing types are configured.
+		if ( ! is_array( $import_states ) || empty( $import_states ) ) {
+			return $url;
+		}
+
+		// add the status to the URL.
+		return add_query_arg( array( 'status' => implode( ',', array_values( $import_states ) ) ), $url );
 	}
 
 	/**

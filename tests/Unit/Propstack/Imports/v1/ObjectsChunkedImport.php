@@ -28,14 +28,14 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	 *
 	 * @var string
 	 */
-	private static string $work_list_option = 'propstack_objects_to_import';
+	private static string $work_list_option = 'cfprop_objects_to_import';
 
 	/**
 	 * The option which holds the position of a paginated import.
 	 *
 	 * @var string
 	 */
-	private static string $offset_option = 'propstack_objects_import_offset';
+	private static string $offset_option = 'cfprop_objects_import_offset';
 
 	/**
 	 * Prepare the test environment for each test.
@@ -45,17 +45,18 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		// no import and no deletion is running.
+		// no import and no deletion are running.
 		update_option( CFPROP_IMPORT_RUNNING, 0 );
 		update_option( CFPROP_DELETE_RUNNING, 0 );
 
 		// no paginated import is in progress.
-		delete_option( self::$work_list_option );
-		delete_option( self::$offset_option );
+		$this->clear_import_state();
 
 		// set language to "de" and use API v1.
 		update_option( 'propstack_connector_languages', 'de' );
 		update_option( 'propstack_connector_api_version', 'v1' );
+		// make sure the terms are created with the same language the import uses.
+		add_filter( 'cfprop_current_language', array( $this, 'set_language_to_de' ) );
 
 		// set a pseudo-key.
 		update_option( 'propstack_connector_api_key', self::$api_key );
@@ -74,6 +75,7 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	 */
 	public function tear_down(): void {
 		remove_filter( 'cfprop_object_import_limit', array( $this, 'set_limit_to_one' ) );
+		remove_filter( 'cfprop_current_language', array( $this, 'set_language_to_de' ) );
 
 		// remove the pseudo-key.
 		update_option( 'propstack_connector_api_key', '' );
@@ -88,6 +90,36 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	 */
 	public function set_limit_to_one(): int {
 		return 1;
+	}
+
+	/**
+	 * Return the names of every block option of the work list.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_block_options(): array {
+		global $wpdb;
+
+		return (array) $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Test helper.
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+				$wpdb->esc_like( self::$work_list_option . '_block_' ) . '%'
+			)
+		);
+	}
+
+	/**
+	 * Remove the complete state of a paginated import, including every block.
+	 *
+	 * @return void
+	 */
+	private function clear_import_state(): void {
+		foreach ( $this->get_block_options() as $name ) {
+			delete_option( (string) $name );
+		}
+
+		delete_option( self::$work_list_option );
+		delete_option( self::$offset_option );
 	}
 
 	/**
@@ -154,11 +186,15 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 		$import_data = get_option( self::$work_list_option );
 
 		$this->assertIsArray( $import_data );
-		$this->assertArrayHasKey( 'objects', $import_data );
-		$this->assertGreaterThan( 1, count( $import_data['objects'] ), 'The fixture needs more than one object for this test.' );
+		$this->assertArrayHasKey( 'total', $import_data );
+		$this->assertGreaterThan( 1, absint( $import_data['total'] ), 'The fixture needs more than one object for this test.' );
 
-		// every entry carries its language.
-		foreach ( $import_data['objects'] as $entry ) {
+		// the objects live in the blocks, not in the main option.
+		$this->assertEmpty( $import_data['objects'] );
+		$this->assertGreaterThan( 0, count( $this->get_block_options() ) );
+
+		// every entry of the first block carries its language.
+		foreach ( (array) get_option( self::$work_list_option . '_block_0', array() ) as $entry ) {
 			$this->assertSame( 'de', $entry['language_code'] );
 			$this->assertIsArray( $entry['object'] );
 		}
@@ -199,8 +235,8 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 		$this->assertTrue( ImmoObjects::get_instance()->has_objects() );
 
 		// the state of the paginated import is gone.
-		$this->assertFalse( get_option( self::$work_list_option, false ) );
-		$this->assertFalse( get_option( self::$offset_option, false ) );
+		$this->assertEmpty( get_option( self::$work_list_option, array() ) );
+		$this->assertEmpty( $this->get_block_options() );
 
 		// the lock is released.
 		$this->assertSame( 0, absint( get_option( CFPROP_IMPORT_RUNNING ) ) );
@@ -216,6 +252,10 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	 */
 	public function test_chunked_import_is_idempotent(): void {
 		$this->run_complete_import();
+		$objects = ImmoObjects::get_instance()->get_objects();
+		$this->assertNotEmpty( $objects );
+		$this->assertNotEmpty( get_post_meta( $objects[0]->get_id(), 'object_id', true ), 'The object_id meta is missing.' );
+
 		$count_after_first_import = count( ImmoObjects::get_instance()->get_objects() );
 
 		// force a second import although nothing changed in Propstack.
@@ -309,23 +349,32 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	}
 
 	/**
-	 * Test that a prevented object still moves the position forward.
+	 * Test that prevented objects do not end up in the work list at all.
 	 *
-	 * If it did not, the next chunk would start at the same object again and the import
-	 * would never finish.
+	 * Since the work list is built page by page, the prevent filter is applied while
+	 * collecting. An object which would be skipped later is therefore never stored,
+	 * which keeps the blocks and the progress bar honest.
 	 *
 	 * @return void
 	 */
-	public function test_prevented_object_moves_the_position_forward(): void {
+	public function test_prevented_objects_are_not_collected(): void {
 		$prevent_all = fn() => true;
 
 		add_filter( 'cfprop_prevent_import_of_object', $prevent_all );
 
-		$this->run_chunk();
+		$import_obj = $this->run_chunk();
 
 		remove_filter( 'cfprop_prevent_import_of_object', $prevent_all );
 
-		$this->assertSame( 1, absint( get_option( self::$offset_option ) ) );
+		// nothing has to be done, so the import is completed at once.
+		$this->assertFalse( $import_obj->has_load_more() );
+
+		// no object has been imported.
+		$this->assertEmpty( ImmoObjects::get_instance()->get_objects() );
+
+		// the state is gone and the lock is released.
+		$this->assertEmpty( get_option( self::$work_list_option, array() ) );
+		$this->assertSame( 0, absint( get_option( CFPROP_IMPORT_RUNNING ) ) );
 	}
 
 	/**
@@ -352,11 +401,20 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 		$this->assertContains( 'propstack_object_import_error', $codes );
 
 		// the state of the paginated import is gone and the lock is released.
-		$this->assertFalse( get_option( self::$work_list_option, false ) );
-		$this->assertFalse( get_option( self::$offset_option, false ) );
+		$this->assertEmpty( get_option( self::$work_list_option, array() ) );
+		$this->assertEmpty( $this->get_block_options() );
 		$this->assertSame( 0, absint( get_option( CFPROP_IMPORT_RUNNING ) ) );
 
 		// the hash must not be saved as objects were skipped.
 		$this->assertEmpty( get_option( 'cfprop_md5_de' ) );
+	}
+
+	/**
+	 * Return "de" as current language, so the default terms match the imported objects.
+	 *
+	 * @return string
+	 */
+	public function set_language_to_de(): string {
+		return 'de';
 	}
 }

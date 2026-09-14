@@ -8,6 +8,7 @@
 namespace ConnectorForPropstack\Tests\Unit\Propstack\Imports\v2;
 
 use ConnectorForPropstack\Propstack\ImmoObjects;
+use ConnectorForPropstack\Propstack\Imports\v2\Objects;
 use ConnectorForPropstack\Tests\ConnectorForPropstackTestCase;
 use WP_Error;
 use WP_HTTP_Requests_Response;
@@ -20,6 +21,10 @@ use WP_HTTP_Requests_Response;
  * it reads "page" and "per" from the request URL, returns the matching slice and
  * always sends "meta.total_count", so the pagination loop can be exercised end to
  * end without a real request.
+ *
+ * Hint: since the import loads its pages through a generator and processes them in
+ * chunks, a complete import needs more than one call of run(). The helper below
+ * repeats the call until the import reports that it is done.
  */
 class ObjectsPagination extends ConnectorForPropstackTestCase {
 	/**
@@ -28,6 +33,20 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 	 * @var string
 	 */
 	private static string $properties_url = 'https://api.propstack.de/v2/properties';
+
+	/**
+	 * The option which holds the work list of a paginated import.
+	 *
+	 * @var string
+	 */
+	private static string $work_list_option = 'cfprop_objects_to_import';
+
+	/**
+	 * The option which holds the position of a paginated import.
+	 *
+	 * @var string
+	 */
+	private static string $offset_option = 'cfprop_objects_import_offset';
 
 	/**
 	 * The number of objects the mocked API "holds".
@@ -62,6 +81,9 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 		// no import or deletion is running.
 		update_option( CFPROP_IMPORT_RUNNING, 0 );
 		update_option( CFPROP_DELETE_RUNNING, 0 );
+
+		// no state of a paginated import is left over.
+		$this->clear_import_state();
 
 		// use API v2 and a single language.
 		update_option( 'propstack_connector_api_version', 'v2' );
@@ -107,6 +129,32 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 		update_option( 'propstack_connector_api_key', '' );
 
 		parent::tear_down();
+	}
+
+	/**
+	 * Remove the complete state of a paginated import, including every block.
+	 *
+	 * @return void
+	 */
+	private function clear_import_state(): void {
+		global $wpdb;
+
+		// get every option of the work list.
+		$names = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Test helper.
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name = %s OR option_name LIKE %s',
+				self::$work_list_option,
+				$wpdb->esc_like( self::$work_list_option . '_block_' ) . '%'
+			)
+		);
+
+		// delete them.
+		foreach ( (array) $names as $name ) {
+			delete_option( (string) $name );
+		}
+
+		// delete the position.
+		delete_option( self::$offset_option );
 	}
 
 	/**
@@ -200,15 +248,39 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 	}
 
 	/**
+	 * Run the import until it reports that it is completed.
+	 *
+	 * Every run is a separate import object, as every chunk is a separate request
+	 * in production.
+	 *
+	 * @return Objects The import object of the last run.
+	 */
+	private function run_complete_import(): Objects {
+		$runs = 0;
+
+		do {
+			$import_obj = new Objects();
+			$import_obj->run();
+
+			++$runs;
+
+			// safeguard so a broken offset cannot hang the test suite.
+			$this->assertLessThan( 50, $runs, 'The import did not finish.' );
+		} while ( $import_obj->has_load_more() );
+
+		return $import_obj;
+	}
+
+	/**
 	 * Run an import with the given number of objects and (optionally) a forced
 	 * per-page value.
 	 *
 	 * @param int      $total The number of objects the API should hold.
 	 * @param int|null $per   The per-page value to force via filter, or null.
 	 *
-	 * @return void
+	 * @return Objects The import object of the last run.
 	 */
-	private function run_import( int $total, ?int $per = null ): void {
+	private function run_import( int $total, ?int $per = null ): Objects {
 		$this->total_objects = $total;
 
 		$callback = null;
@@ -219,11 +291,13 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 			add_filter( 'cfprop_import_per_page', $callback );
 		}
 
-		( new \ConnectorForPropstack\Propstack\Imports\v2\Objects() )->run();
+		$import_obj = $this->run_complete_import();
 
 		if ( null !== $callback ) {
 			remove_filter( 'cfprop_import_per_page', $callback );
 		}
+
+		return $import_obj;
 	}
 
 	/**
@@ -271,6 +345,29 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 	}
 
 	/**
+	 * Test that the API is only requested during the first run of an import.
+	 *
+	 * The pages are written into blocks once, every following chunk works on the
+	 * stored blocks and must not hit the API again.
+	 *
+	 * @return void
+	 */
+	public function test_api_is_only_requested_during_the_first_run(): void {
+		// force one object per block so the import needs several runs.
+		$callback = static fn() => 1;
+		add_filter( 'cfprop_object_import_block_size', $callback );
+
+		$this->total_objects = 5;
+		$this->run_complete_import();
+
+		remove_filter( 'cfprop_object_import_block_size', $callback );
+
+		// one request per page, none for the following chunks.
+		$this->assertSame( 1, $this->request_count );
+		$this->assertCount( 5, ImmoObjects::get_instance()->get_objects() );
+	}
+
+	/**
 	 * Test that an API which ignores pagination does not create duplicates.
 	 *
 	 * The mock returns the same first page for every request. The page-hash
@@ -293,21 +390,28 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 	}
 
 	/**
-	 * Test that a repeated import of unchanged data is skipped.
+	 * Test that the state of the import is removed after a completed run.
 	 *
 	 * @return void
 	 */
-	public function test_unchanged_import_is_skipped(): void {
-		// first run imports everything.
+	public function test_state_is_removed_after_a_completed_import(): void {
 		$this->run_import( 3 );
-		$this->assertCount( 3, ImmoObjects::get_instance()->get_objects() );
 
-		// second run must detect the unchanged md5 and not request again.
-		$this->request_count = 0;
-		( new \ConnectorForPropstack\Propstack\Imports\v2\Objects() )->run();
+		// the main option is empty again.
+		$this->assertEmpty( get_option( self::$work_list_option, array() ) );
 
-		// the request still happens (to compare), but no further objects appear.
-		$this->assertCount( 3, ImmoObjects::get_instance()->get_objects() );
+		// no block is left over.
+		global $wpdb;
+		$blocks = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Test assertion.
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+				$wpdb->esc_like( self::$work_list_option . '_block_' ) . '%'
+			)
+		);
+		$this->assertEmpty( $blocks );
+
+		// the lock is released.
+		$this->assertSame( 0, absint( get_option( CFPROP_IMPORT_RUNNING ) ) );
 	}
 
 	/**
@@ -325,13 +429,43 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 		};
 		add_filter( 'cfprop_request_header', $callback );
 
-		$import_obj = new \ConnectorForPropstack\Propstack\Imports\v2\Objects();
+		$import_obj = new Objects();
 		$import_obj->run();
 
 		remove_filter( 'cfprop_request_header', $callback );
 
 		// nothing was imported and an error was recorded.
 		$this->assertEmpty( ImmoObjects::get_instance()->get_objects() );
+		$this->assertNotEmpty( $import_obj->get_errors() );
+	}
+
+	/**
+	 * Test that no cleanup is run if the API delivered nothing.
+	 *
+	 * This is the safeguard against deleting the complete catalogue because of a
+	 * single failing request.
+	 *
+	 * @return void
+	 */
+	public function test_failed_request_does_not_delete_existing_objects(): void {
+		// import three objects successfully.
+		$this->run_import( 3 );
+		$this->assertCount( 3, ImmoObjects::get_instance()->get_objects() );
+
+		// the next import fails on the API.
+		$callback = static function ( array $headers ): array {
+			$headers['response_http_status'] = 500;
+			return $headers;
+		};
+		add_filter( 'cfprop_request_header', $callback );
+
+		$import_obj = new Objects();
+		$import_obj->run();
+
+		remove_filter( 'cfprop_request_header', $callback );
+
+		// the objects of the run before are still there.
+		$this->assertCount( 3, ImmoObjects::get_instance()->get_objects() );
 		$this->assertNotEmpty( $import_obj->get_errors() );
 	}
 }

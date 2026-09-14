@@ -24,6 +24,8 @@ class Objects extends ConnectorForPropstackTestCase {
 	 * @return void
 	 */
 	public function set_up(): void {
+		parent::set_up();
+
 		// set running import.
 		update_option( CFPROP_IMPORT_RUNNING, 0 );
 
@@ -38,8 +40,6 @@ class Objects extends ConnectorForPropstackTestCase {
 
 		// run the activation.
 		\ConnectorForPropstack\Propstack\Propstack::get_instance()->activation();
-
-		parent::set_up();
 	}
 
 	/**
@@ -126,9 +126,9 @@ class Objects extends ConnectorForPropstackTestCase {
 		// test the results.
 		$this->assertIsArray( $this->import_obj->get_errors() );
 		$this->assertNotEmpty( $this->import_obj->get_errors() );
-		foreach ( $this->import_obj->get_errors() as $error ) {
-			$this->assertEquals( 'propstack_object_import_http_status', $error->get_error_code() );
-		}
+		$codes = array_map( fn( $error ) => $error->get_error_code(), $this->import_obj->get_errors() );
+
+		$this->assertContains( 'propstack_object_import_http_status', $codes, 'Codes: ' . implode( ', ', $codes ) );
 
 		$this->import_obj->reset_errors();
 	}

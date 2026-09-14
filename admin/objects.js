@@ -103,8 +103,8 @@ function propstack_connector_start_ajax_process( config ) {
   import_running = true;
   propstack_connector_result_shown = false;
 
-  // get info about progress.
-  propstack_connector_progress_timeout = setTimeout(function() { propstack_connector_ajax_process( config ) }, 1000 );
+  // get info about progress, start immediately so a very fast process is not missed.
+  propstack_connector_ajax_process( config );
 
   // run the first chunk.
   propstack_connector_run_ajax_chunk( config );
@@ -137,6 +137,14 @@ function propstack_connector_run_ajax_chunk( config ) {
       }
     },
     error: function( jqXHR, textStatus, errorThrown ) {
+      // a gateway timeout does not mean the import stopped - the server may still be working.
+      if( jqXHR.status === 0 || jqXHR.status === 502 || jqXHR.status === 504 ) {
+        // wait a moment and continue with the next chunk.
+        setTimeout( function() { propstack_connector_run_ajax_chunk( config ) }, 5000 );
+
+        return;
+      }
+
       // mark import as not running and stop the polling.
       import_running = false;
       clearTimeout( propstack_connector_progress_timeout );

@@ -10,6 +10,7 @@ namespace ConnectorForPropstack\Propstack\Schedules;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\Schedules_Base;
 
 /**
@@ -58,13 +59,28 @@ class Objects extends Schedules_Base {
 			return;
 		}
 
-		// get the import objects for immo objects.
-		$import_obj = new \ConnectorForPropstack\Propstack\Imports\v1\Objects();
-		if ( 'v2' === get_option( 'propstack_connector_api_version' ) ) {
-			$import_obj = new \ConnectorForPropstack\Propstack\Imports\v2\Objects();
-		}
+		// count the runs to prevent an endless loop on a broken state.
+		$runs = 0;
 
-		// run the import.
-		$import_obj->run();
+		// run the import until it is completed, every run processes one chunk.
+		do {
+			// get the import object for immo objects.
+			$import_obj = new \ConnectorForPropstack\Propstack\Imports\v1\Objects();
+			if ( 'v2' === get_option( 'propstack_connector_api_version' ) ) {
+				$import_obj = new \ConnectorForPropstack\Propstack\Imports\v2\Objects();
+			}
+
+			// run one chunk.
+			$import_obj->run();
+
+			++$runs;
+
+			// bail if the import does not finish.
+			if ( $runs > 10000 ) {
+				Log::get_instance()->add( __( 'The scheduled import did not finish and has been stopped.', 'connector-for-propstack' ), 'error', 'import' );
+
+				break;
+			}
+		} while ( $import_obj->has_load_more() );
 	}
 }
