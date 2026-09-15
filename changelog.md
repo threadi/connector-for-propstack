@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Updates setup and settings lib
+
 ### Fixed
 
 - Fixed 2 wrong textdomains in Settings.php
