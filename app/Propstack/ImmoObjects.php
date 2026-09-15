@@ -900,6 +900,7 @@ class ImmoObjects {
 				'delete_files_title'           => __( 'Deletion of files is running', 'connector-for-propstack' ),
 				'files_title'                  => __( 'Import of files is running', 'connector-for-propstack' ),
 				'queue_title'                  => __( 'Processing the queue to import images', 'connector-for-propstack' ),
+				'starting_text' => __( 'Starting, please wait…', 'connector-for-propstack' ),
 			)
 		);
 

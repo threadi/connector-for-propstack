@@ -5,6 +5,8 @@
 ### Changed
 
 - Optimized deletion of objects for more speed
+- Optimizations on import for more speed too
+- Better infos in import dialog about the start
 - Updates setup and settings lib
 
 ### Fixed

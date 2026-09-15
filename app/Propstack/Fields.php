@@ -36,6 +36,13 @@ class Fields {
 	private array $logged_field_errors = array();
 
 	/**
+	 * Additional meta values collected by the fields during the running import.
+	 *
+	 * @var array<string,mixed>
+	 */
+	private array $collected_field_meta = array();
+
+	/**
 	 * Variable for the instance of this Singleton object.
 	 *
 	 * @var ?Fields
@@ -710,21 +717,46 @@ class Fields {
 			 */
 			$value = apply_filters( 'cfprop_import_object_field_value', $value, $field, $post_id );
 
-			// update the field value from API.
-			if ( ! $is_new_object ) {
-				$written = update_post_meta( $post_id, $field->get_name(), $value );
-
-				if ( $written && Helper::is_development_mode() ) {
-					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $field->get_name(), get_debug_type( $value ) ), 'info', 'system' );
-				}
-			}
-
 			$values[ $field->get_name() ] = $value;
 		}
 
-		// write them in a single statement.
+		// add the values the fields collected on their own.
+		$values = array_merge( $values, $this->collected_field_meta );
+
+		// reset the collection for the next object.
+		$this->collected_field_meta = array();
+
+		// get the custom fields.
+		$custom_fields_list = array();
+		if ( is_array( $immo_object['custom_fields'] ) ) {
+			foreach ( $immo_object['custom_fields'] as $field_name => $field ) {
+				// add the field to the list.
+				$custom_fields_list[] = $field_name;
+
+				// collect the pretty value.
+				$values[ $field_name . '_pretty_value' ] = is_array( $field ) ? $field['pretty_value'] : $field;
+
+				// collect the value.
+				if ( is_array( $field ) ) {
+					$values[ $field_name ] = $field['value'];
+				}
+			}
+		}
+
+		// collect the list of custom fields.
+		$values['custom_fields'] = $custom_fields_list;
+
+		// write the values of a new object in a single statement, update them one by one otherwise.
 		if ( $is_new_object ) {
 			$this->save_field_values( $post_id, $values );
+		} else {
+			foreach ( $values as $meta_key => $meta_value ) {
+				$written = update_post_meta( $post_id, $meta_key, $meta_value );
+
+				if ( $written && Helper::is_development_mode() ) {
+					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $meta_key, get_debug_type( $meta_value ) ), 'info', 'system' );
+				}
+			}
 		}
 
 		// run the per field actions afterwards.
@@ -743,27 +775,6 @@ class Fields {
 			do_action( 'cfprop_import_object_field', $field, $value, $post_id, $object_type_object, $immo_object );
 		}
 
-		// get the custom fields.
-		$custom_fields_list = array();
-		if ( is_array( $immo_object['custom_fields'] ) ) {
-			foreach ( $immo_object['custom_fields'] as $field_name => $field ) {
-				// add the field to the list.
-				$custom_fields_list[] = $field_name;
-
-				// save the pretty value.
-				if ( is_array( $field ) ) {
-					update_post_meta( $post_id, $field_name . '_pretty_value', $field['pretty_value'] );
-				} else {
-					update_post_meta( $post_id, $field_name . '_pretty_value', $field );
-				}
-
-				// save the value.
-				if ( is_array( $field ) ) {
-					update_post_meta( $post_id, $field_name, $field['value'] );
-				}
-			}
-		}
-
 		/**
 		 * Run additional tasks for fields on an object during the import of them.
 		 *
@@ -774,9 +785,6 @@ class Fields {
 		 * @param array<string,mixed> $immo_object The data from API.
 		 */
 		do_action( 'cfprop_import_object_fields', $fields, $post_id, $object_type_object, $immo_object );
-
-		// save the list of custom fields.
-		update_post_meta( $post_id, 'custom_fields', $custom_fields_list );
 	}
 
 	/**
@@ -1252,5 +1260,21 @@ class Fields {
 
 		// drop the meta cache of this object once, instead of once per field.
 		wp_cache_delete( $post_id, 'post_meta' );
+	}
+
+	/**
+	 * Collect an additional meta value for the object which is currently imported.
+	 *
+	 * Hint:
+	 * Used by the fields instead of writing the value on their own, so it can be written
+	 * together with all other values in a single statement.
+	 *
+	 * @param string $meta_key   The meta key.
+	 * @param mixed  $meta_value The value.
+	 *
+	 * @return void
+	 */
+	public function collect_field_meta( string $meta_key, mixed $meta_value ): void {
+		$this->collected_field_meta[ $meta_key ] = $meta_value;
 	}
 }
