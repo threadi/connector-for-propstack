@@ -26,8 +26,15 @@ class Cli {
 	 * @noinspection PhpUnused
 	 */
 	public function import_objects(): void {
-		// import the objects.
-		$import_obj = ImmoObjects::get_instance()->import( '' );
+		// run the import until it is completed.
+		$runs = 0;
+		do {
+			$import_obj = ImmoObjects::get_instance()->import( '' );
+			++$runs;
+			if ( $runs > 10000 ) {
+				\WP_CLI::error( 'The import did not finish after 10000 runs and has been stopped.' );
+			}
+		} while ( $import_obj->has_load_more() );
 
 		// show errors if any occurred.
 		if ( $import_obj->has_errors() ) {
@@ -150,6 +157,86 @@ class Cli {
 
 		// output success-message.
 		\WP_CLI::success( 'Plugin has been reset.' );
+	}
+
+	/**
+	 * Reset the state of a running or aborted object import.
+	 *
+	 * Removes the work list including all of its blocks, the position and the running
+	 * marker, so the next import starts from scratch. The already imported objects are
+	 * kept. Use "--with-hashes" to also drop the md5 hashes, otherwise unchanged
+	 * languages are skipped on the next run.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--with-hashes]
+	 * : Also remove the md5 hashes so the next import is performed in any case.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<int,string>    $args       The arguments.
+	 * @param array<string,string> $assoc_args The associative arguments.
+	 *
+	 * @return void
+	 * @noinspection PhpUnused
+	 */
+	public function reset_import( array $args = array(), array $assoc_args = array() ): void {
+		global $wpdb;
+
+		// get the option names from the import object.
+		$import_obj       = new \ConnectorForPropstack\Propstack\Imports\v1\Objects();
+		$work_list_option = $import_obj->get_work_list_option();
+		$offset_option    = $import_obj->get_offset_option();
+
+		// remove the work list including every block, also if the amount of blocks is unknown.
+		$options = Db::get_instance()->get_results(
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name = %s OR option_name LIKE %s',
+				$work_list_option,
+				$wpdb->esc_like( $work_list_option . '_block_' ) . '%'
+			)
+		);
+
+		// delete them.
+		$removed = 0;
+		foreach ( $options as $option ) {
+			if ( ! isset( $option['option_name'] ) ) {
+				continue;
+			}
+
+			delete_option( (string) $option['option_name'] );
+
+			++$removed;
+		}
+
+		// remove the position.
+		delete_option( $offset_option );
+
+		// remove the running marker.
+		update_option( CFPROP_IMPORT_RUNNING, 0 );
+
+		// remove the md5 hashes if requested.
+		if ( isset( $assoc_args['with-hashes'] ) ) {
+			$hashes = Db::get_instance()->get_results(
+				$wpdb->prepare(
+					'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+					$wpdb->esc_like( 'cfprop_md5_' ) . '%'
+				)
+			);
+
+			foreach ( $hashes as $hash ) {
+				if ( ! isset( $hash['option_name'] ) ) {
+					continue;
+				}
+
+				delete_option( (string) $hash['option_name'] );
+
+				++$removed;
+			}
+		}
+
+		// output success-message.
+		\WP_CLI::success( sprintf( 'Import state has been reset, %1$d options removed.', $removed ) );
 	}
 
 	/**

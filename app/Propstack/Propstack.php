@@ -151,6 +151,7 @@ class Propstack {
 	 */
 	public function add_categories( array $categories ): array {
 		$categories['import'] = __( 'Import', 'connector-for-propstack' );
+		$categories['queue']  = __( 'Queue', 'connector-for-propstack' );
 		return $categories;
 	}
 

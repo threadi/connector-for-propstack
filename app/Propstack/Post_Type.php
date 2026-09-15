@@ -58,17 +58,6 @@ class Post_Type {
 	}
 
 	/**
-	 * Return whether this cpt is assigned to a given plugin.
-	 *
-	 * @param string $plugin_path The plugin path (like __FILE__).
-	 *
-	 * @return bool
-	 */
-	public function is_from_plugin( string $plugin_path ): bool {
-		return CFPROP_PLUGIN === $plugin_path;
-	}
-
-	/**
 	 * Return the archive URL of this post-type.
 	 *
 	 * @return string

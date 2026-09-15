@@ -183,7 +183,7 @@ class Objects extends ConnectorForPropstackTestCase {
 			fn( $error ) => $error->get_error_code(),
 			$this->import_obj->get_errors()
 		);
-		$this->assertContains( 'propstack_object_import_http_status', $codes );
+		$this->assertContains( 'propstack_states_import_http_status', $codes, 'Codes: ' . implode( ', ', $codes ) );
 
 		// reset the list of errors.
 		$this->import_obj->reset_errors();
@@ -208,11 +208,11 @@ class Objects extends ConnectorForPropstackTestCase {
 		$this->assertIsArray( $this->import_obj->get_errors() );
 		$this->assertNotEmpty( $this->import_obj->get_errors() );
 
-		$codes = array_map(
-			fn( $error ) => $error->get_error_code(),
-			$this->import_obj->get_errors()
-		);
-		$this->assertContains( 'propstack_object_import_http_status', $codes );
+		$codes = array_map( fn( $error ) => $error->get_error_code(), $this->import_obj->get_errors() );
+
+		// the states import runs first and already fails on the API, so the object import bails.
+		$this->assertNotEmpty( $codes );
+		$this->assertContains( 'propstack_states_import_http_status', $codes );
 
 		// reset the list of errors.
 		$this->import_obj->reset_errors();
@@ -231,7 +231,7 @@ class Objects extends ConnectorForPropstackTestCase {
 		update_option( 'propstack_connector_api_key', self::$api_key );
 
 		// run it.
-		$this->import_obj->run();
+		$this->import_obj = $this->run_complete_import();
 
 		// test the results.
 		$this->assertIsArray( $this->import_obj->get_errors() );
@@ -268,7 +268,7 @@ class Objects extends ConnectorForPropstackTestCase {
 		update_option( 'propstack_connector_api_key', self::$api_key );
 
 		// run it.
-		$this->import_obj->run();
+		$this->import_obj = $this->run_complete_import();
 
 		// the lock has to be released.
 		$this->assertSame( 0, absint( get_option( CFPROP_IMPORT_RUNNING ) ) );
@@ -304,5 +304,25 @@ class Objects extends ConnectorForPropstackTestCase {
 	public function set_wrong_http_status( array $headers ): array {
 		$headers['response_http_status'] = 401;
 		return $headers;
+	}
+
+	/**
+	 * Run the import until it reports that it is completed.
+	 *
+	 * @return \ConnectorForPropstack\Propstack\Imports\v2\Objects
+	 */
+	private function run_complete_import(): \ConnectorForPropstack\Propstack\Imports\v2\Objects {
+		$runs = 0;
+
+		do {
+			$import_obj = new \ConnectorForPropstack\Propstack\Imports\v2\Objects();
+			$import_obj->run();
+
+			++$runs;
+
+			$this->assertLessThan( 50, $runs, 'The import did not finish.' );
+		} while ( $import_obj->has_load_more() );
+
+		return $import_obj;
 	}
 }

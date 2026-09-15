@@ -32,6 +32,27 @@ class Import_Base {
 	private string $process_id = '';
 
 	/**
+	 * Marker whether this import needs another run to be completed.
+	 *
+	 * @var bool
+	 */
+	protected bool $load_more = false;
+
+	/**
+	 * The option which holds the work list of a paginated import.
+	 *
+	 * @var string
+	 */
+	protected string $work_list_option = 'cfprop_objects_to_import';
+
+	/**
+	 * The option which holds the position of a paginated import.
+	 *
+	 * @var string
+	 */
+	protected string $offset_option = 'cfprop_objects_import_offset';
+
+	/**
 	 * Return the header to be used for any API request.
 	 *
 	 * @return array<string,mixed>
@@ -99,11 +120,16 @@ class Import_Base {
 	 * @return string
 	 */
 	private function get_error_messages(): string {
-		$messages = '';
+		// prepare the list of errors.
+		$messages = array();
+
+		// add them to the list.
 		foreach ( $this->get_errors() as $error ) {
-			$messages .= $error->get_error_message() . '<br>';
+			$messages[] = $error->get_error_message();
 		}
-		return $messages;
+
+		// return the list with linebreak and only unique entries (no doubles).
+		return implode( '<br>', array_unique( $messages ) );
 	}
 
 	/**
@@ -160,5 +186,104 @@ class Import_Base {
 	 */
 	public function set_process_id( string $process_id ): void {
 		$this->process_id = $process_id;
+	}
+
+	/**
+	 * Catch fatal errors that try/catch cannot handle and clean up the running-state.
+	 *
+	 * @return void
+	 */
+	public function handle_fatal_shutdown(): void {
+		$this->process_shutdown_error( error_get_last() );
+	}
+
+	/**
+	 * Testable core of the shutdown handling.
+	 *
+	 * @param array{type:int,message:string,file:string,line:int}|null $error The error.
+	 *
+	 * @return void
+	 */
+	public function process_shutdown_error( ?array $error ): void {
+		// bail if there was no fatal error.
+		if ( null === $error || ! in_array( $error['type'], array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR ), true ) ) {
+			return;
+		}
+
+		// bail if import already finished cleanly.
+		if ( 0 === absint( get_option( CFPROP_IMPORT_RUNNING, 0 ) ) ) {
+			return;
+		}
+
+		// log this event.
+		Log::get_instance()->add(
+			__( 'Import was aborted by a fatal PHP error:', 'connector-for-propstack' ) . '<br><code>' . esc_html( $error['message'] ) . '</code> ' . esc_html( $error['file'] ) . ':' . absint( $error['line'] ),
+			'error',
+			'import'
+		);
+
+		// reset the running-flag so the user is not stuck.
+		update_option( CFPROP_IMPORT_RUNNING, 0 );
+		$this->clear_work_list();
+	}
+
+	/**
+	 * Return whether this import needs another run to be completed.
+	 *
+	 * @return bool
+	 */
+	public function has_load_more(): bool {
+		return $this->load_more;
+	}
+
+	/**
+	 * Set whether this import needs another run to be completed.
+	 *
+	 * @param bool $load_more True if another run is needed.
+	 *
+	 * @return void
+	 */
+	public function set_load_more( bool $load_more ): void {
+		$this->load_more = $load_more;
+	}
+
+	/**
+	 * Remove the complete state of a paginated import.
+	 *
+	 * @return void
+	 */
+	protected function clear_work_list(): void {
+		// get the metadata to know how many blocks exist.
+		$import_data = get_option( $this->work_list_option, array() );
+
+		// delete every block.
+		if ( is_array( $import_data ) && isset( $import_data['blocks'] ) ) {
+			$count = absint( $import_data['blocks'] );
+			for ( $i = 0; $i < $count; $i++ ) {
+				delete_option( $this->work_list_option . '_block_' . $i );
+			}
+		}
+
+		// reset the metadata and the position.
+		update_option( $this->work_list_option, array() );
+		update_option( $this->offset_option, 0 );
+	}
+
+	/**
+	 * Return the name of the option which holds the work list of a paginated import.
+	 *
+	 * @return string
+	 */
+	public function get_work_list_option(): string {
+		return $this->work_list_option;
+	}
+
+	/**
+	 * Return the name of the option which holds the position of a paginated import.
+	 *
+	 * @return string
+	 */
+	public function get_offset_option(): string {
+		return $this->offset_option;
 	}
 }

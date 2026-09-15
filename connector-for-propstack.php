@@ -19,6 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Init;
 use ConnectorForPropstack\Plugin\Installer;
+use ConnectorForPropstack\Plugin\Log;
 
 // do nothing if the PHP version is not 8.2 or newer.
 if ( PHP_VERSION_ID < 80200 ) { // @phpstan-ignore smaller.alwaysFalse

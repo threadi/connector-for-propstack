@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easySettingsForWordPress\Fields\Button;
 use easySettingsForWordPress\Fields\Checkbox;
+use easySettingsForWordPress\Fields\MultiSelect;
 use easySettingsForWordPress\Fields\Number;
 use easySettingsForWordPress\Fields\Password;
 use easySettingsForWordPress\Fields\Radio;
@@ -71,7 +72,7 @@ class Settings {
 	public function init(): void {
 		// add the settings.
 		add_action( 'init', array( $this, 'add_main_settings' ) );
-		add_action( 'init', array( $this, 'add_plugin_settings' ), 20 );
+		add_action( 'init', array( $this, 'add_additional_settings' ), 20 );
 		add_action( 'init', array( $this, 'add_trademark_hint' ), 20 );
 
 		// use admin actions.
@@ -120,6 +121,9 @@ class Settings {
 		}
 		if ( method_exists( $settings_obj, 'set_update_version' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$settings_obj->set_update_version( CFPROP_VERSION );
+		}
+		if ( method_exists( $settings_obj, 'set_persist_section_collapse' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$settings_obj->set_persist_section_collapse( true );
 		}
 
 		// create help in case of error during loading of the settings.
@@ -237,7 +241,30 @@ class Settings {
 		$logs_tab = $settings_page->add_tab( 'propstack_connector_logs', 80 );
 		$logs_tab->set_title( __( 'Logs', 'connector-for-propstack' ) );
 		$logs_tab->set_hide_save( true );
+		$logs_tab->set_tab_class( 1 === absint( get_option( 'cfprop_enable_log_error_count' ) ) && absint( get_option( 'cfprop_log_error_count' ) ) > 0 ? 'errors' : '' );
 		$logs_tab->set_callback( array( $this, 'show_logs' ) );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_log_error_count' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+		$setting->prevent_export( true );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_objects_to_import' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'array' );
+		$setting->set_default( array() );
+		$setting->prevent_export( true );
+		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'object' ) ) ) );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_objects_import_offset' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+		$setting->prevent_export( true );
 
 		// initialize these settings.
 		$settings_obj->init();
@@ -270,11 +297,11 @@ class Settings {
 	}
 
 	/**
-	 * Add setting for plugin management.
+	 * Add additional settings.
 	 *
 	 * @return void
 	 */
-	public function add_plugin_settings(): void {
+	public function add_additional_settings(): void {
 		// get the settings page.
 		$settings_page = $this->get_settings_page();
 
@@ -283,12 +310,17 @@ class Settings {
 			return;
 		}
 
-		// add a tab on this page to demonstration import and export of settings.
+		// add a tab for additional settings.
 		$advanced_tab = $settings_page->add_tab( 'propstack_connector_advanced', 70 );
 		$advanced_tab->set_title( __( 'Advanced settings', 'connector-for-propstack' ) );
 
+		// add a tab for additional settings.
+		$additional_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_settings', 10 );
+		$additional_settings_tab->set_title( __( 'More settings', 'connector-for-propstack' ) );
+		$advanced_tab->set_default_tab( $additional_settings_tab );
+
 		// add a section.
-		$advanced_section = $advanced_tab->add_section( 'propstack_connector_advanced', 10 );
+		$advanced_section = $additional_settings_tab->add_section( 'propstack_connector_advanced', 10 );
 		$advanced_section->set_title( __( 'Advanced settings', 'connector-for-propstack' ) );
 
 		// add setting.
@@ -346,15 +378,6 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add setting.
-		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_debug' );
-		$setting->set_section( $advanced_section );
-		$setting->set_default( Helper::is_development_mode() ? 1 : 0 );
-		$field = new Checkbox( $this->get_settings_obj() );
-		$field->set_title( __( 'Enable debug mode', 'connector-for-propstack' ) );
-		$field->set_description( __( 'If enabled the plugin will log much more events. Do not use this in a production environment.', 'connector-for-propstack' ) );
-		$setting->set_field( $field );
-
-		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_timeout' );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 30 );
@@ -364,11 +387,50 @@ class Settings {
 		$field->set_description( __( 'This timeout will be used for any API connection.', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
+		// add setting.
+		$setting = $this->get_settings_obj()->add_setting( 'cfprop_enable_log_error_count' );
+		$setting->set_section( $advanced_section );
+		$setting->set_default( 1 );
+		$field = new Checkbox( $this->get_settings_obj() );
+		$field->set_title( __( 'Show error marker', 'connector-for-propstack' ) );
+		$field->set_description( __( 'When enabled, a marker appears in the backend menu as soon as any error is logged. Clicking the markers path takes you directly to the log, where you can review the error.', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
+
 		// add a section.
-		$import_export_section = $advanced_tab->add_section( 'propstack_connector_import_export_section', 20 );
+		$debug_section = $additional_settings_tab->add_section( 'propstack_connector_debug_section', 20 );
+		$debug_section->set_title( __( 'Debug', 'connector-for-propstack' ) );
+		if ( method_exists( $debug_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$debug_section->set_collapsible( true );
+			$debug_section->set_collapsed( 1 !== absint( get_option( 'propstack_connector_debug' ) ) );
+		}
+
+		// add setting.
+		$debug_setting = $this->get_settings_obj()->add_setting( 'propstack_connector_debug' );
+		$debug_setting->set_section( $debug_section );
+		$debug_setting->set_default( Helper::is_development_mode() ? 1 : 0 );
+		$field = new Checkbox( $this->get_settings_obj() );
+		$field->set_title( __( 'Enable debug mode', 'connector-for-propstack' ) );
+		$field->set_description( __( 'If enabled the plugin will log much more events. Do not use this in a production environment.', 'connector-for-propstack' ) );
+		$debug_setting->set_field( $field );
+
+		// add setting.
+		$setting = $this->get_settings_obj()->add_setting( 'cfprop_debug_categories' );
+		$setting->set_section( $debug_section );
+		$setting->set_type( 'array' );
+		$setting->set_default( array() );
+		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'string' ) ) ) );
+		$field = new MultiSelect( $this->get_settings_obj() );
+		$field->set_title( __( 'Categories to debug', 'personio-integration-light' ) );
+		$field->set_description( __( 'Select the topics for which you want to see debug output in the log. If nothing is selected, everything will be logged.', 'personio-integration-light' ) );
+		$field->set_options( Log::get_instance()->get_categories() );
+		$field->add_depend( $debug_setting, 1 );
+		$setting->set_field( $field );
+
+		// add a section.
+		$import_export_section = $additional_settings_tab->add_section( 'propstack_connector_import_export_section', 20 );
 		$import_export_section->set_title( __( 'Secure settings', 'connector-for-propstack' ) );
-		if ( method_exists( $import_export_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
-			$import_export_section->set_collapsed( true );
+		if ( method_exists( $import_export_section, 'set_collapsible' ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$import_export_section->set_collapsible( true );
 		}
 
 		// create import dialog.
@@ -441,7 +503,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$plugin_handling_section = $advanced_tab->add_section( 'propstack_connector_plugin_section', 30 );
+		$plugin_handling_section = $additional_settings_tab->add_section( 'propstack_connector_plugin_section', 30 );
 		$plugin_handling_section->set_title( __( 'Plugin handling', 'connector-for-propstack' ) );
 		if ( method_exists( $plugin_handling_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$plugin_handling_section->set_collapsed( true );
@@ -560,16 +622,26 @@ class Settings {
 	 * Return the settings URL for a specific tab.
 	 *
 	 * @param string $tab The slug of the tab (optional).
+	 * @param string $subtab The slug of the subtab (optional).
 	 *
 	 * @return string
 	 */
-	public function get_url( string $tab = '' ): string {
+	public function get_url( string $tab = '', string $subtab = '' ): string {
 		if ( empty( $tab ) ) {
 			return $this->get_settings_obj()->get_settings_link();
 		}
+		if ( empty( $subtab ) ) {
+			return add_query_arg(
+				array(
+					'tab' => $tab,
+				),
+				$this->get_settings_obj()->get_settings_link()
+			);
+		}
 		return add_query_arg(
 			array(
-				'tab' => $tab,
+				'tab'    => $tab,
+				'subtab' => $subtab,
 			),
 			$this->get_settings_obj()->get_settings_link()
 		);

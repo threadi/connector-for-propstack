@@ -440,7 +440,26 @@ class Setup {
 
 		// step 1: import the object from Propstack.
 		$this->set_process_label( __( 'Retrieve data for your properties from Propstack.', 'connector-for-propstack' ) );
-		ImmoObjects::get_instance()->import( '' );
+
+		// count the runs to prevent an endless loop on a broken state.
+		$runs = 0;
+
+		// no time budget during setup, the request is not behind a proxy which gives up.
+		add_filter( 'cfprop_object_import_time_budget', '__return_zero' );
+
+		// run the import until it is completed, every run processes one chunk.
+		do {
+			$import_obj = ImmoObjects::get_instance()->import( '' );
+
+			++$runs;
+
+			// bail if the import does not finish.
+			if ( $runs > 10000 ) {
+				Log::get_instance()->add( __( 'The import during setup did not finish and has been stopped.', 'connector-for-propstack' ), 'error', 'import' );
+
+				break;
+			}
+		} while ( $import_obj->has_load_more() );
 	}
 
 	/**

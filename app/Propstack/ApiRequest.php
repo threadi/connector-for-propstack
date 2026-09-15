@@ -180,25 +180,22 @@ class ApiRequest {
 		// secure the HTTP status from the response.
 		$this->set_http_status( absint( $response['http_response']->get_status() ) ); // @phpstan-ignore offsetAccess.nonOffsetAccessible
 
-		// log this request if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			// clean arguments from sensitive data.
-			$args['headers']['X-API-KEY'] = 'anonymized';
+		// clean arguments from sensitive data.
+		$args['headers']['X-API-KEY'] = 'anonymized';
 
-			$log_text  = __( 'URL:', 'connector-for-propstack' ) . ' <code>' . esc_url( $this->get_url() ) . '</code>';
-			$log_text .= '<br><br>' . __( 'Request:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $args ) . '</code>';
-			$log_text .= '<br><br>' . __( 'HTTP-Status:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $this->get_http_status() ) . '</code>';
+		$log_text  = __( 'URL:', 'connector-for-propstack' ) . ' <code>' . esc_url( $this->get_url() ) . '</code>';
+		$log_text .= '<br><br>' . __( 'Request:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $args ) . '</code>';
+		$log_text .= '<br><br>' . __( 'HTTP-Status:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $this->get_http_status() ) . '</code>';
 
-			// get the raw response and limit its length for the log entry.
-			$response   = $this->get_response();
-			$max_length = absint( apply_filters( 'cfprop_log_max_response_length', 100000 ) );
-			if ( strlen( $response ) > $max_length ) {
-				/* translators: %1$d will be replaced by the total length in bytes. */
-				$response = substr( $response, 0, $max_length ) . ' … ' . sprintf( __( '[truncated, %1$d bytes in total]', 'connector-for-propstack' ), strlen( $response ) );
-			}
-			$log_text .= '<br><br>' . __( 'Response:', 'connector-for-propstack' ) . ' <code>' . esc_html( $response ) . '</code>';
-			Log::get_instance()->add( $log_text, 'info', 'import', $this->get_md5() );
+		// get the raw response and limit its length for the log entry.
+		$response   = $this->get_response();
+		$max_length = absint( apply_filters( 'cfprop_log_max_response_length', 100000 ) );
+		if ( strlen( $response ) > $max_length ) {
+			/* translators: %1$d will be replaced by the total length in bytes. */
+			$response = substr( $response, 0, $max_length ) . ' … ' . sprintf( __( '[truncated, %1$d bytes in total]', 'connector-for-propstack' ), strlen( $response ) );
 		}
+		$log_text .= '<br><br>' . __( 'Response:', 'connector-for-propstack' ) . ' <code>' . esc_html( $response ) . '</code>';
+		Log::get_instance()->add( $log_text, 'info', 'import', $this->get_md5() );
 
 		// return true as the request itself was successful.
 		return true;

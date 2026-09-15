@@ -105,7 +105,7 @@ class ProcessHandler {
 		);
 
 		// remove this ID from the process' values if the process has been finished.
-		if ( 0 === $this->get( 'running' ) ) {
+		if ( 0 === absint( $this->get( 'running' ) ) ) {
 			$this->delete();
 		}
 
@@ -142,6 +142,9 @@ class ProcessHandler {
 
 		// add or update the given key with its value.
 		$values[ $this->get_id() ][ $key ] = $value;
+
+		// remember when this process was touched the last time.
+		$values[ $this->get_id() ]['updated'] = time();
 
 		// save it.
 		update_option( 'cfprop_process_values', $values );
@@ -315,29 +318,52 @@ class ProcessHandler {
 	}
 
 	/**
-	 * Delete the actual ID from the process values.
+	 * Remove outdated entries from the process values.
 	 *
-	 * Hint: not if we are in debug mode.
+	 * Hint:
+	 * The values are not removed when they have been read, as a very fast process could
+	 * be finished before the dialog asked for its result the first time. They expire
+	 * after a while instead.
 	 *
 	 * @return void
 	 */
 	private function delete(): void {
-		// bail if we are in debug mode.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			return;
-		}
-
 		// get the values.
 		$values = get_option( 'cfprop_process_values' );
 
-		// if this is not an array, create it.
+		// bail if this is not an array.
 		if ( ! is_array( $values ) ) {
-			$values = array();
+			return;
 		}
 
-		// delete the entry for the ID if it exists.
-		if ( isset( $values[ $this->get_id() ] ) ) {
-			unset( $values[ $this->get_id() ] );
+		$max_age = 15 * MINUTE_IN_SECONDS;
+
+		/**
+		 * Filter the max age of process values in seconds.
+		 *
+		 * @since 1.1.0 Available since 1.1.0.
+		 * @param int $max_age The max age in seconds.
+		 */
+		$max_age = absint( apply_filters( 'cfprop_process_values_max_age', $max_age ) );
+
+		// remove every entry which has not been touched for a while.
+		$changed = false;
+		foreach ( $values as $process_id => $process_values ) {
+			// bail if this entry is young enough.
+			if ( isset( $process_values['updated'] ) && ( time() - absint( $process_values['updated'] ) ) < $max_age ) {
+				continue;
+			}
+
+			// remove the entry.
+			unset( $values[ $process_id ] );
+
+			// set the change marker.
+			$changed = true;
+		}
+
+		// bail if nothing changed.
+		if ( ! $changed ) {
+			return;
 		}
 
 		// save it.

@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Languages;
+use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\Setup;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use WP_Error;
@@ -103,17 +104,6 @@ class Taxonomy {
 	}
 
 	/**
-	 * Return whether this cpt is assigned to a given plugin.
-	 *
-	 * @param string $plugin_path The plugin path (like __FILE__).
-	 *
-	 * @return bool
-	 */
-	public function is_from_plugin( string $plugin_path ): bool {
-		return CFPROP_PLUGIN === $plugin_path;
-	}
-
-	/**
 	 * Register this taxonomy.
 	 *
 	 * @return void
@@ -198,6 +188,11 @@ class Taxonomy {
 	 * @return int|false
 	 */
 	public function get_term_id_by_api_value( mixed $value, string $language_code ): int|false {
+		// bail if the value is not usable for a meta comparison.
+		if ( ! is_scalar( $value ) ) {
+			return false;
+		}
+
 		// check if the given value exists.
 		$query   = array(
 			'taxonomy'   => $this->get_name(),
@@ -392,9 +387,27 @@ class Taxonomy {
 			// add the term and get the result.
 			$term_data = wp_insert_term( $default_term['label'], $this->get_name(), array( 'slug' => $default_term['slug'] ) );
 
-			// if an error occurred, get the term ID from it.
+			// if an error occurred, check what kind of error it is.
 			if ( $term_data instanceof WP_Error ) {
-				$term_id = $term_data->get_error_data();
+				// the term already exists - the normal case on re-activation, use its ID.
+				if ( 'term_exists' === $term_data->get_error_code() ) {
+					$term_id = $term_data->get_error_data();
+				} else {
+					// log this event.
+					Log::get_instance()->add(
+						sprintf(
+						/* translators: %1$s will be replaced by the term name, %2$s by the taxonomy name. */
+							__( 'Error during creating the term %1$s for the taxonomy %2$s:', 'connector-for-propstack' ),
+							'<code>' . esc_html( $default_term['label'] ) . '</code>',
+							'<code>' . esc_html( $this->get_name() ) . '</code>'
+						) . ' <code>' . esc_html( $term_data->get_error_message() ) . '</code>',
+						'error',
+						'system'
+					);
+
+					// do nothing more with this term.
+					continue;
+				}
 			} else {
 				$term_id = $term_data['term_id'];
 			}

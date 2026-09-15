@@ -17,7 +17,7 @@ use ConnectorForPropstack\Propstack\FieldType_Base;
  */
 class StringField extends FieldType_Base {
 	/**
-	 * The internal name of the category.
+	 * The internal name of the type.
 	 *
 	 * @var string
 	 */
@@ -29,6 +29,12 @@ class StringField extends FieldType_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
-		return $this->value;
+		// return empty string for non-scalar values (e.g. arrays from the API).
+		if ( ! is_scalar( $this->value ) ) {
+			return '';
+		}
+
+		// return the value as string.
+		return (string) $this->value;
 	}
 }

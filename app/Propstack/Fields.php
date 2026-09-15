@@ -29,6 +29,13 @@ use ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base;
  */
 class Fields {
 	/**
+	 * List of fields already logged during the running import.
+	 *
+	 * @var array<string,bool>
+	 */
+	private array $logged_field_errors = array();
+
+	/**
 	 * Variable for the instance of this Singleton object.
 	 *
 	 * @var ?Fields
@@ -71,10 +78,11 @@ class Fields {
 		add_action( 'init', array( $this, 'add_settings' ), 20 );
 
 		// use our own hooks.
-		add_action( 'cfprop_import_object', array( $this, 'import_fields' ), 10, 2 );
+		add_action( 'cfprop_import_object', array( $this, 'import_fields' ), 10, 4 );
 		add_action( 'cfprop_import_object_field', array( $this, 'import_example' ), 10, 2 );
 		add_action( 'cfprop_import_object_field', array( $this, 'set_post_content' ), 10, 4 );
 		add_filter( 'cfprop_import_object_field_value', array( $this, 'clean_field_value_during_import' ), 10, 2 );
+		add_action( 'cfprop_import_object_before_start', array( $this, 'reset_logged_field_errors' ) );
 		add_filter( 'cfprop_rest_fields', array( $this, 'sort_rest_fields' ) );
 	}
 
@@ -650,11 +658,14 @@ class Fields {
 	 * Import the fields depending on the used object type during the import of a single immo object.
 	 *
 	 * @param array<string,mixed> $immo_object The object data from API.
-	 * @param int                 $post_id The post-ID.
+	 * @param int                 $post_id     The post-ID.
+	 * @param string              $language The language code.
+	 * @param bool                $is_new_object True if this is a new object.
 	 *
 	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function import_fields( array $immo_object, int $post_id ): void {
+	public function import_fields( array $immo_object, int $post_id, string $language, bool $is_new_object ): void {
 		// get the immo object title.
 		$title = '';
 		if ( is_array( $immo_object['title'] ) ) {
@@ -668,20 +679,21 @@ class Fields {
 
 		// bail if the object type is missing.
 		if ( ! $object_type_object instanceof Object_Type_Base ) {
-			// add a log entry if debug is enabled.
+			// add a log entry.
 			/* translators: %1$s will be replaced by the object title. */
-			Log::get_instance()->add( sprintf( __( 'Could not load object type for the object %1$s', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'error', 'import' );
+			Log::get_instance()->add( sprintf( __( 'Unknown object type used by the object %1$s. The object type may only be supported by <a href="%2$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), '<em>' . $title . '</em>', Helper::get_pro_url() ), 'error', 'import' );
 			return;
 		}
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			/* translators: %1$s will be replaced by the object title. */
-			Log::get_instance()->add( sprintf( __( 'Import the fields for the object %1$s', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'import' );
-		}
+		// add a log entry.
+		/* translators: %1$s will be replaced by the object title. */
+		Log::get_instance()->add( sprintf( __( 'Import the fields for the object %1$s.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'import' );
 
 		// get the list of fields.
 		$fields = $object_type_object->get_fields();
+
+		// collect the values first instead of writing each one on its own.
+		$values = array();
 
 		// update the object data in its fields.
 		foreach ( $fields as $field ) {
@@ -698,9 +710,26 @@ class Fields {
 			 */
 			$value = apply_filters( 'cfprop_import_object_field_value', $value, $field, $post_id );
 
-			// save the field value from API.
-			update_post_meta( $post_id, $field->get_name(), $value );
+			// update the field value from API.
+			if ( ! $is_new_object ) {
+				$written = update_post_meta( $post_id, $field->get_name(), $value );
 
+				if ( $written && Helper::is_development_mode() ) {
+					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $field->get_name(), get_debug_type( $value ) ), 'info', 'system' );
+				}
+			}
+
+			$values[ $field->get_name() ] = $value;
+		}
+
+		// write them in a single statement.
+		if ( $is_new_object ) {
+			$this->save_field_values( $post_id, $values );
+		}
+
+		// run the per field actions afterwards.
+		foreach ( $fields as $field ) {
+			$value = isset( $values[ $field->get_name() ] ) ? $values[ $field->get_name() ] : null;
 			/**
 			 * Run additional tasks for a single field on an object during the import of them.
 			 *
@@ -730,7 +759,7 @@ class Fields {
 
 				// save the value.
 				if ( is_array( $field ) ) {
-					update_post_meta( $post_id, $field_name, $field_name );
+					update_post_meta( $post_id, $field_name, $field['value'] );
 				}
 			}
 		}
@@ -955,6 +984,13 @@ class Fields {
 	 * @return void
 	 */
 	public function import_example( Field_Base $field, mixed $value ): void {
+		// bail if an example for this field has already been saved during this request.
+		static $saved = array();
+		if ( isset( $saved[ $field->get_name() ] ) ) {
+			return;
+		}
+		$saved[ $field->get_name() ] = true;
+
 		// bail if no value is given.
 		if ( empty( $value ) ) {
 			return;
@@ -1015,11 +1051,63 @@ class Fields {
 			return $value;
 		}
 
+		// log if Propstack delivered something this field type cannot handle.
+		$this->log_unexpected_field_value( $field, $value );
+
 		// set the value on the type.
 		$field_type->set_value( $value );
 
 		// return the cleaned value.
 		return $field_type->get_cleaned_value();
+	}
+
+	/**
+	 * Log if Propstack delivered a non-scalar value for a field which does not expect one.
+	 *
+	 * @param Field_Base $field The field object.
+	 * @param mixed      $value The value from the API.
+	 *
+	 * @return void
+	 */
+	private function log_unexpected_field_value( Field_Base $field, mixed $value ): void {
+		// bail if the value is scalar or not set - that is what we expect.
+		if ( is_scalar( $value ) || is_null( $value ) ) {
+			return;
+		}
+
+		// bail for field types which do expect structured values.
+		if ( in_array( $field->get_type(), array( 'array', 'code' ), true ) ) {
+			return;
+		}
+
+		// log each field only once per request.
+		if ( isset( $this->logged_field_errors[ $field->get_name() ] ) ) {
+			return;
+		}
+		$this->logged_field_errors[ $field->get_name() ] = true;
+
+		// log this error.
+		Log::get_instance()->add(
+			sprintf(
+			/* translators: %1$s is the field name, %2$s the configured type, %3$s the delivered type. */
+				__( 'Propstack delivered <code>%3$s</code> for field <code>%1$s</code>, which is configured as type <code>%2$s</code>. The value has been ignored. Please <a href="%4$s">contact our support</a> about this problem.', 'connector-for-propstack' ),
+				esc_html( $field->get_name() ),
+				esc_html( $field->get_type() ),
+				esc_html( get_debug_type( $value ) ),
+				esc_url( Helper::get_plugin_support_url() )
+			),
+			'error',
+			'import'
+		);
+	}
+
+	/**
+	 * Reset the list of logged field errors.
+	 *
+	 * @return void
+	 */
+	public function reset_logged_field_errors(): void {
+		$this->logged_field_errors = array();
 	}
 
 	/**
@@ -1064,5 +1152,105 @@ class Fields {
 
 		// return the resulting list.
 		return $fields; // @phpstan-ignore return.type
+	}
+
+	/**
+	 * Save multiple field values of a single object in one statement.
+	 *
+	 * Hint:
+	 * update_post_meta() drops the meta cache of the object after every write and reloads
+	 * all of its meta rows before the next one. With more than 200 fields per object that
+	 * results in a quadratic amount of queries during the first import of an object.
+	 * This method writes them in a single statement instead. It must only be used for
+	 * objects which do not have any of these meta keys yet, otherwise it would create
+	 * duplicate rows.
+	 *
+	 * @param int                 $post_id The post-ID of the object.
+	 * @param array<string,mixed> $values  The values to save, indexed by meta key.
+	 *
+	 * @return void
+	 */
+	private function save_field_values( int $post_id, array $values ): void {
+		// bail if no values are given.
+		if ( empty( $values ) ) {
+			return;
+		}
+
+		global $wpdb;
+
+		// prepare the rows to insert.
+		$rows = array();
+		foreach ( $values as $meta_key => $meta_value ) {
+			// run the same sanitizing the meta API would run.
+			$meta_value = sanitize_meta( (string) $meta_key, $meta_value, 'post' );
+
+			// collect the row.
+			$rows[] = array(
+				$post_id,
+				(string) $meta_key,
+				maybe_serialize( $meta_value ),
+			);
+		}
+
+		// insert them in batches to stay below max_allowed_packet.
+		$batch_size = 100;
+
+		/**
+		 * Filter the amount of meta rows written in a single statement.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param int $batch_size The batch size.
+		 */
+		$batch_size = max( 1, absint( apply_filters( 'cfprop_field_values_batch_size', $batch_size ) ) );
+
+		foreach ( array_chunk( $rows, $batch_size ) as $batch ) {
+			// build one placeholder group per row.
+			$placeholders = implode( ', ', array_fill( 0, count( $batch ), '(%d, %s, %s)' ) );
+
+			// flatten the rows into a single argument list.
+			$arguments = array();
+			foreach ( $batch as $row ) {
+				$arguments[] = $row[0];
+				$arguments[] = $row[1];
+				$arguments[] = $row[2];
+			}
+
+			// bail if the amount of arguments does not match the amount of placeholders.
+			if ( count( $arguments ) !== ( count( $batch ) * 3 ) ) {
+				continue;
+			}
+
+			// run the insert.
+			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWithoutPlaceholders -- Placeholders are generated above, values are passed as arguments.
+			$sql = $wpdb->prepare(
+				'INSERT INTO ' . $wpdb->postmeta . ' (post_id, meta_key, meta_value) VALUES ' . $placeholders,
+				$arguments
+			);
+			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWithoutPlaceholders
+
+			// bail if the statement could not be prepared.
+			if ( ! is_string( $sql ) ) {
+				continue;
+			}
+
+			$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Bulk insert of meta rows, see method description.
+
+			// log any error.
+			if ( $wpdb->last_error ) {
+				Log::get_instance()->add(
+					sprintf(
+					/* translators: %1$d will be replaced by the post-ID, %2$s by the error message. */
+						__( 'The field values of object %1$d could not be saved: %2$s', 'connector-for-propstack' ),
+						$post_id,
+						'<code>' . esc_html( $wpdb->last_error ) . '</code>'
+					),
+					'error',
+					'import'
+				);
+			}
+		}
+
+		// drop the meta cache of this object once, instead of once per field.
+		wp_cache_delete( $post_id, 'post_meta' );
 	}
 }

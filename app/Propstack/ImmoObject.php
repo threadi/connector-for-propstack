@@ -193,11 +193,9 @@ class ImmoObject {
 		// add the ID.
 		$list[] = $attachment_id;
 
-		// add a log entry if debug is enabled.
-		if ( 1 === absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
-			/* translators: %1$s will be replaced by the attachment ID. */
-			Log::get_instance()->add( sprintf( __( 'Assign image %1$s to object %2$s.', 'connector-for-propstack' ), '<em>' . $attachment_id . '</em>', '<em>' . $this->get_title() . '</em>' ), 'info', 'import' );
-		}
+		// add a log entry.
+		/* translators: %1$s will be replaced by the attachment ID. */
+		Log::get_instance()->add( sprintf( __( 'Assign image %1$s to object %2$s.', 'connector-for-propstack' ), '<em>' . $attachment_id . '</em>', '<em>' . $this->get_title() . '</em>' ), 'info', 'import' );
 
 		// save it.
 		update_post_meta( $this->get_id(), 'images', $list );

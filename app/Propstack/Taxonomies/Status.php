@@ -31,6 +31,13 @@ class Status extends Taxonomy {
 	protected string $api_field = 'property_status';
 
 	/**
+	 * The API field name to assign a term of this taxonomy to an object.
+	 *
+	 * @var string
+	 */
+	protected string $api_sub_field = 'id';
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Status

@@ -17,7 +17,7 @@ use ConnectorForPropstack\Propstack\FieldType_Base;
  */
 class IntegerField extends FieldType_Base {
 	/**
-	 * The internal name of the category.
+	 * The internal name of the type.
 	 *
 	 * @var string
 	 */
@@ -29,6 +29,10 @@ class IntegerField extends FieldType_Base {
 	 * @return mixed
 	 */
 	public function get_value(): mixed {
+		if ( ! is_scalar( $this->value ) ) {
+			return '';
+		}
+
 		// get the value as integer.
 		$output = absint( $this->value );
 

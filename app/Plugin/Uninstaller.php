@@ -95,7 +95,7 @@ class Uninstaller {
 
 		// run the init hooks to set all settings.
 		Settings::get_instance()->add_main_settings();
-		Settings::get_instance()->add_plugin_settings();
+		Settings::get_instance()->add_additional_settings();
 		ImmoObjects::get_instance()->add_settings();
 		Fields::get_instance()->add_settings();
 

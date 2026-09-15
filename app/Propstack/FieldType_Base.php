@@ -74,11 +74,32 @@ class FieldType_Base {
 	}
 
 	/**
-	 * Return the cleaned value.
+	 * Return the value cleaned for saving it as post meta.
+	 *
+	 * Hint:
+	 * Post meta is always stored as string. Returning anything else lets the strict
+	 * comparison in update_metadata() fail on every import, which rewrites the value
+	 * and drops the meta cache of the object for every single field.
 	 *
 	 * @return mixed
 	 */
 	public function get_cleaned_value(): mixed {
-		return $this->value;
+		// return an empty string for values which are not set, as that is how WordPress stores them.
+		if ( is_null( $this->value ) ) {
+			return '';
+		}
+
+		// keep non-scalar values as they are, they are serialized anyway.
+		if ( ! is_scalar( $this->value ) ) {
+			return $this->value;
+		}
+
+		// return booleans the way WordPress stores them.
+		if ( is_bool( $this->value ) ) {
+			return $this->value ? '1' : '';
+		}
+
+		// return everything else as string.
+		return (string) $this->value;
 	}
 }

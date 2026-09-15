@@ -7,6 +7,10 @@
 	--cfprop-pro-hint-font: #000;
 }
 
+.post-type-cfprop_object {
+	.column-cfprop-thumbnail { width: 160px }
+}
+
 .post-type-cfprop_object .postbox {
 	code {
 		display: block;
@@ -61,7 +65,7 @@ body.settings_page_connector-for-propstack {
 		tr:first-child, tr:nth-child(2n+3) { background-color: #c3c4c7; }
 	}
 	#options {
-		width: 160px;
+		width: 180px;
 	}
 	#state {
 		width: 60px;
@@ -238,4 +242,17 @@ body.post-type-cfprop_object, .etfw-transient, body.settings_page_connector-for-
 	bottom: 0;
 	z-index: 1;
 	text-align: center;
+}
+
+.nav-tab.errors { position: relative;z-index: 1 }
+
+.nav-tab.errors:after {
+	content: '!';
+	display: inline-block;
+	background-color: #d63638;
+	color: #fff;
+	border-radius: 16px;
+	margin-left: .4em;
+	padding: 0 8px;
+	font-size: .9em;
 }

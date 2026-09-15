@@ -17,7 +17,7 @@ use ConnectorForPropstack\Propstack\FieldType_Base;
  */
 class BooleanField extends FieldType_Base {
 	/**
-	 * The internal name of the category.
+	 * The internal name of the type.
 	 *
 	 * @var string
 	 */
@@ -36,7 +36,7 @@ class BooleanField extends FieldType_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
-		if ( 1 === absint( $this->value ) ) {
+		if ( is_scalar( $this->value ) && 1 === absint( $this->value ) ) {
 			return '<span class="dashicons dashicons-yes"></span>';
 		}
 		return '<span class="dashicons dashicons-no"></span>';
