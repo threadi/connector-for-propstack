@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed 2 wrong textdomains in Settings.php
+
 ## [1.1.0] - 14.09.2026
 
 ### Added

@@ -420,8 +420,8 @@ class Settings {
 		$setting->set_default( array() );
 		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'string' ) ) ) );
 		$field = new MultiSelect( $this->get_settings_obj() );
-		$field->set_title( __( 'Categories to debug', 'personio-integration-light' ) );
-		$field->set_description( __( 'Select the topics for which you want to see debug output in the log. If nothing is selected, everything will be logged.', 'personio-integration-light' ) );
+		$field->set_title( __( 'Categories to debug', 'connector-for-propstack' ) );
+		$field->set_description( __( 'Select the topics for which you want to see debug output in the log. If nothing is selected, everything will be logged.', 'connector-for-propstack' ) );
 		$field->set_options( Log::get_instance()->get_categories() );
 		$field->add_depend( $debug_setting, 1 );
 		$setting->set_field( $field );
