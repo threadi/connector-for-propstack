@@ -667,15 +667,24 @@ class Objects extends Import_Base {
 			if ( $this->has_errors() ) {
 				/**
 				 * Run additional tasks if any error occurred during import of objects.
-				 *
-				 * @since 1.0.0 Available since 1.0.0.
-				 *
-				 * @param Objects $instance The import object.
+				 * …
 				 */
 				do_action( 'cfprop_import_object_errors', $instance );
 
 				// report the errors.
 				$process_handler->set_message( $this->get_error_dialog_config() );
+			} elseif ( 0 === absint( $import_data['total'] ) ) {
+				/**
+				 * Run additional tasks if the import did not deliver any object.
+				 *
+				 * @since 1.1.0 Available since 1.1.0.
+				 *
+				 * @param Objects $instance The import object.
+				 */
+				do_action( 'cfprop_import_object_empty', $instance );
+
+				// report that nothing has been imported.
+				$process_handler->set_message( $this->get_empty_dialog_config() );
 			} else {
 				/**
 				 * Run additional tasks after successful import of objects.
@@ -958,5 +967,31 @@ class Objects extends Import_Base {
 				'import'
 			);
 		}
+	}
+
+	/**
+	 * Return a dialog configuration for an import which did not deliver any object.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function get_empty_dialog_config(): array {
+		return array(
+			'detail' => array(
+				'className' => 'cfprop-dialog',
+				'title'     => __( 'No objects have been imported', 'connector-for-propstack' ),
+				'texts'     => array(
+					'<p><strong>' . __( 'Your Propstack account did not deliver any object for the import.', 'connector-for-propstack' ) . '</strong></p>',
+					/* translators: %1$s will be replaced by a URL. */
+					'<p>' . sprintf( __( 'If you expected objects here, check <a href="%1$s">your import settings</a> - a restriction on marketing type or status can exclude all of them.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_import' ) ) ) . '</p>',
+				),
+				'buttons'   => array(
+					array(
+						'action'  => 'location.reload();',
+						'variant' => 'primary',
+						'text'    => __( 'OK', 'connector-for-propstack' ),
+					),
+				),
+			),
+		);
 	}
 }

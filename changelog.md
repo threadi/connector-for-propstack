@@ -26,6 +26,7 @@
 - Updated crypt lib and settings lib
 - Save the collapsible states of sections in the settings
 - Extended the function to get settings URL
+- Show hint if nothing has been imported
 
 ### Fixed
 
