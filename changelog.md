@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Optimized deletion of objects for more speed
 - Updates setup and settings lib
 
 ### Fixed
