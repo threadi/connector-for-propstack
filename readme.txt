@@ -154,30 +154,15 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Introducing paginated import for objects using API v1 and v2 in backend to prevent timeouts during manual imports
-- Added error marker in menu and settings for any events where an error was logged
-- Added option to debug only single topics, e.g., to get complete logs for import of objects but not for system-messages
-- Optimized import via API v1 and v2 if objects are prevented to be imported
-- Optimized used memory and amount of database queries during the import for higher speed and to prevent memory_limit errors
-- Optimized catch of fatal error during import via XML or API v2
-- Use an extended logging for any API error
-- Log if Propstack API is using an unexpected field type
-- More PHP Unit Tests to reduce possible errors with the Propstack API
-- Clearer hint for unsupported object types in log
-- Optimized AJAX-driven progress dialog to be less flickering
-- Optimized memory usage during import process
-- Optimized styling of the logging table
-- Optimized styling of the object table
-- Optimized the process handler to remove older process information
-- Prevent deletion of all objects if Propstack API does not response
-- Updated crypt lib and settings lib
-- Save the collapsible states of sections in the settings
-- Extended the function to get settings URL
-- Show hint if nothing has been imported
-- Fixed wrong handling of taxonomy term slug during import, which results in missing imported objects if slugs are used multiple times
-- Fixed missing dialog for the button to empty the log
-- Fixed missing subfield definition for status terms, which results in PHP-warnings during imports
-- Fixed missing value for custom fields (not the pretty value)
-- Fixed missing cache using for file import
+- Optimized deletion of objects for more speed
+- Optimizations on import for more speed too
+- Check for valid API key during first step in setup and show hints if there are any problems
+- Show info about empty feed from Propstack in setup
+- Better infos in import dialog about the start
+- Prevent crypt error after installation
+- Updates setup and settings lib
+- Fixed 2 wrong textdomains in Settings.php
+- Fixed missing usage of Lightbox for the gallery widget
+- Fixed old interval name for 2 settings
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)

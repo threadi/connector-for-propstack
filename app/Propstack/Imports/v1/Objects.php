@@ -528,7 +528,7 @@ class Objects extends Import_Base {
 							$is_new_object = false;
 						}
 
-						$object_start   = microtime( true );
+						$object_start = microtime( true );
 
 						/**
 						 * Run additional tasks for a single language-specific object import.

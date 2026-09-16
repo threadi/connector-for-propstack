@@ -421,7 +421,7 @@ class Admin {
 					)
 				)
 			),
-			(Setup::get_instance()->is_completed() ? 'error' : 'info'),
+			( Setup::get_instance()->is_completed() ? 'error' : 'info' ),
 			'system'
 		);
 	}

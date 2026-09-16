@@ -222,6 +222,11 @@ class Propstack {
 			);
 		}
 
+		// save the token right away, so it is available when the setup runs its process.
+		// the setup saves the fields through its own REST request which can arrive after
+		// the process has already started.
+		update_option( 'propstack_connector_api_key', $value );
+
 		// return an empty value if no error occurred.
 		return array();
 	}
