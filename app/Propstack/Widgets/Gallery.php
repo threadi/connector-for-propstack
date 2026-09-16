@@ -158,7 +158,7 @@ class Gallery extends Widget_Base {
 		wp_register_script(
 			'cfprop-lightbox3',
 			Helper::get_plugin_url() . 'js/generated/lightbox3.js',
-			array(),
+			array( 'jquery' ),
 			Helper::get_file_version( trailingslashit( Helper::get_plugin_path() ) . 'js/generated/lightbox3.js' ),
 			true
 		);
@@ -172,7 +172,7 @@ class Gallery extends Widget_Base {
 	 * @return string
 	 */
 	public function add_lightbox_marker_to_image_link( string $link ): string {
-		return str_replace( 'href', 'data-lightbox="gallery" href', $link );
+		return (string) preg_replace( '/<a\s/', '<a data-lightbox="gallery" ', $link, 1 );
 	}
 
 	/**

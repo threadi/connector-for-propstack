@@ -191,6 +191,42 @@ class Propstack {
 			);
 		}
 
+		// check the token against the API - the format is fine, so the request is worth it.
+		$request_object = new ApiRequest();
+		$request_object->set_url( 'https://api.propstack.de/v1/property_statuses' );
+		$request_object->set_post_data( '' );
+		$request_object->set_method( 'GET' );
+		$request_object->set_md5( md5( 'validate_' . $value ) );
+		$request_object->set_header(
+			array(
+				'X-API-KEY'    => $value,
+				'Content-Type' => 'application/json',
+			)
+		);
+		$request_object->send();
+
+		// bail if the API did not accept the token.
+		if ( 401 === $request_object->get_http_status() || 403 === $request_object->get_http_status() ) {
+			return array(
+				'error' => 'invalid',
+				'text'  => __( 'The specified API token was not accepted by Propstack. Please check the token and its permissions for objects, broker and statuses in your Propstack-account.', 'connector-for-propstack' ),
+			);
+		}
+
+		// bail if the API could not be reached at all.
+		if ( 200 !== $request_object->get_http_status() ) {
+			return array(
+				'error' => 'unreachable',
+				/* translators: %1$d will be replaced by the HTTP status. */
+				'text'  => sprintf( __( 'The Propstack API could not be reached (HTTP status %1$d). Please try again later.', 'connector-for-propstack' ), $request_object->get_http_status() ),
+			);
+		}
+
+		// save the token right away, so it is available when the setup runs its process.
+		// the setup saves the fields through its own REST request which can arrive after
+		// the process has already started.
+		update_option( 'propstack_connector_api_key', $value );
+
 		// return an empty value if no error occurred.
 		return array();
 	}

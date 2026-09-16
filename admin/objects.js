@@ -99,6 +99,11 @@ function propstack_connector_start_ajax_process( config ) {
   }
   propstack_connector_create_dialog( dialog_config );
 
+  // show a hint until the first status from the server arrives.
+  setTimeout( function() {
+    jQuery( '#progress_status' ).html( propstackConnectorImportJsVars.starting_text );
+  }, 20 );
+
   // mark in JS as running.
   import_running = true;
   propstack_connector_result_shown = false;
@@ -187,9 +192,16 @@ function propstack_connector_ajax_process( config ) {
       let status = data[3];
       let dialog_config = JSON.parse( data[4] );
 
-      // show progress.
-      jQuery( '#progress' ).attr( 'value', (count / max) * 100 );
-      jQuery( '#progress_status' ).html( status );
+      // show progress, but only if the maximum is already known.
+      if( max > 0 ) {
+        jQuery( '#progress' ).attr( 'value', (count / max) * 100 );
+      }
+      else {
+        jQuery( '#progress' ).removeAttr( 'value' );
+      }
+      if( status ) {
+        jQuery( '#progress_status' ).html( status );
+      }
 
       /**
        * If import is still running, get next info in 500ms.

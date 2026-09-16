@@ -53,6 +53,8 @@ class Objects extends Import_Base {
 	 * @return void
 	 */
 	public function run(): void {
+		global $wpdb;
+
 		// get the work list of a paginated import which is already in progress.
 		$import_data  = get_option( $this->work_list_option, array() );
 		$is_first_run = empty( $import_data );
@@ -332,7 +334,15 @@ class Objects extends Import_Base {
 					 * @param bool $force_delete True to bypass the trash.
 					 * @param int  $post_id      The post-ID of the object.
 					 */
-					wp_delete_post( $post_id, apply_filters( 'cfprop_force_delete_obsolete_object', true, $post_id ) );
+					$force_delete = apply_filters( 'cfprop_force_delete_obsolete_object', true, $post_id );
+
+					// delete the metadata in one statement if the object is removed permanently.
+					if ( $force_delete ) {
+						$wpdb->delete( $wpdb->postmeta, array( 'post_id' => $post_id ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Bulk delete, see delete_all().
+						wp_cache_delete( $post_id, 'post_meta' );
+					}
+
+					wp_delete_post( $post_id, $force_delete );
 
 					// update the counter for the progress bar.
 					$process_handler->set_count( $process_handler->get_count() + 1 );

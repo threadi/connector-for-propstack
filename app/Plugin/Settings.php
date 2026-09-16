@@ -168,7 +168,7 @@ class Settings {
 		$field = new Password( $settings_obj );
 		$field->set_title( __( 'API Key', 'connector-for-propstack' ) );
 		/* translators: %1$s will be replaced by a URL. */
-		$field->set_description( sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), 'https://crm.propstack.de/app/admin/api_keys' ) );
+		$field->set_description( sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() ) );
 		$field->set_placeholder( __( 'Enter your API key', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
@@ -420,8 +420,8 @@ class Settings {
 		$setting->set_default( array() );
 		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'string' ) ) ) );
 		$field = new MultiSelect( $this->get_settings_obj() );
-		$field->set_title( __( 'Categories to debug', 'personio-integration-light' ) );
-		$field->set_description( __( 'Select the topics for which you want to see debug output in the log. If nothing is selected, everything will be logged.', 'personio-integration-light' ) );
+		$field->set_title( __( 'Categories to debug', 'connector-for-propstack' ) );
+		$field->set_description( __( 'Select the topics for which you want to see debug output in the log. If nothing is selected, everything will be logged.', 'connector-for-propstack' ) );
 		$field->set_options( Log::get_instance()->get_categories() );
 		$field->add_depend( $debug_setting, 1 );
 		$setting->set_field( $field );

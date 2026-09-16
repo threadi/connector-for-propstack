@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.1] - 16.09.2026
+
+### Changed
+
+- Optimized deletion of objects for more speed
+- Optimizations on import for more speed too
+- Check for valid API key during first step in setup and show hints if there are any problems
+- Show info about empty feed from Propstack in setup
+- Better infos in import dialog about the start
+- Prevent crypt error after installation
+- Updates setup and settings lib
+
+### Fixed
+
+- Fixed 2 wrong textdomains in Settings.php
+- Fixed missing usage of Lightbox for the gallery widget
+- Fixed old interval name for 2 settings
+
 ## [1.1.0] - 14.09.2026
 
 ### Added

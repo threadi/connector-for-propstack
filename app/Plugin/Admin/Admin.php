@@ -15,6 +15,7 @@ use ConnectorForPropstack\Plugin\Crypt;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\Settings;
+use ConnectorForPropstack\Plugin\Setup;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use WP_Error;
@@ -420,7 +421,7 @@ class Admin {
 					)
 				)
 			),
-			'error',
+			( Setup::get_instance()->is_completed() ? 'error' : 'info' ),
 			'system'
 		);
 	}

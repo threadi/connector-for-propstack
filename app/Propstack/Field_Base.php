@@ -206,7 +206,7 @@ class Field_Base {
 			$title = $immo_object[ $this->get_api() ]['label'];
 
 			// save the title.
-			update_post_meta( $post_id, $this->get_name() . '_label', $title );
+			Fields::get_instance()->collect_field_meta( $this->get_name() . '_label', $title );
 
 			// get the value.
 			$value = $immo_object[ $this->get_api() ]['value'];

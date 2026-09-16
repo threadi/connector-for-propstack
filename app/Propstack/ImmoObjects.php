@@ -252,6 +252,8 @@ class ImmoObjects {
 	 * @return void
 	 */
 	public function delete_all( string $process_id ): void {
+		global $wpdb;
+
 		// bail if import or deletion are still running.
 		if ( Helper::is_process_running( CFPROP_IMPORT_RUNNING ) || Helper::is_process_running( CFPROP_DELETE_RUNNING ) ) {
 			return;
@@ -287,8 +289,14 @@ class ImmoObjects {
 		// show cli hint.
 		$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Deleting objects', $object_count ) : false;
 
+		// defer the term counting, it would run for every single object otherwise.
+		wp_defer_term_counting( true );
+
 		// loop through all objects and delete them.
 		foreach ( $objects as $object ) {
+			$object_start   = microtime( true );
+			$queries_before = get_num_queries();
+
 			// update marker.
 			/* translators: a title will replace %1$s. */
 			$process_handler->set_status( sprintf( __( 'Deleting object %1$s', 'connector-for-propstack' ), '<em>' . $object->get_title() . '</em>' ) );
@@ -306,6 +314,14 @@ class ImmoObjects {
 				}
 			}
 
+			// delete the metadata in one statement, wp_delete_post() would remove every
+			// single row on its own - with more than 200 fields per object that means
+			// hundreds of queries.
+			$wpdb->delete( $wpdb->postmeta, array( 'post_id' => $object->get_id() ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Bulk delete, see comment above.
+
+			// drop the meta cache of this object.
+			wp_cache_delete( $object->get_id(), 'post_meta' );
+
 			// delete the object.
 			wp_delete_post( $object->get_id(), true );
 
@@ -314,7 +330,18 @@ class ImmoObjects {
 
 			// show progress.
 			$progress ? $progress->tick() : '';
+
+			if ( Helper::is_development_mode() ) {
+				Log::get_instance()->add(
+					sprintf( 'Deleted %1$d: %2$.2fs, %3$d queries, %4$d images', $object->get_id(), microtime( true ) - $object_start, get_num_queries() - $queries_before, count( $object->get_images() ) ),
+					'info',
+					'system'
+				);
+			}
 		}
+
+		// run the deferred term counting once.
+		wp_defer_term_counting( false );
 
 		// finish progress.
 		$progress ? $progress->finish() : '';
@@ -873,6 +900,7 @@ class ImmoObjects {
 				'delete_files_title'           => __( 'Deletion of files is running', 'connector-for-propstack' ),
 				'files_title'                  => __( 'Import of files is running', 'connector-for-propstack' ),
 				'queue_title'                  => __( 'Processing the queue to import images', 'connector-for-propstack' ),
+				'starting_text'                => __( 'Starting, please wait…', 'connector-for-propstack' ),
 			)
 		);
 

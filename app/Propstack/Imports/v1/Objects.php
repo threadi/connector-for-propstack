@@ -52,6 +52,8 @@ class Objects extends Import_Base {
 	 * @return void
 	 */
 	public function run(): void {
+		global $wpdb;
+
 		// get the work list of a paginated import which is already in progress.
 		$import_data  = get_option( $this->work_list_option, array() );
 		$is_first_run = empty( $import_data );
@@ -112,6 +114,13 @@ class Objects extends Import_Base {
 
 		// run the preparations only on the first run of a paginated import.
 		if ( $is_first_run ) {
+			// set these values on every run.
+			$process_handler->set_status( __( 'Import of objects starting', 'connector-for-propstack' ) );
+			$process_handler->set_running( time() );
+			$process_handler->set_count( 0 );
+			$process_handler->set_max_count( 0 );
+			update_option( CFPROP_IMPORT_RUNNING, time() );
+
 			/**
 			 * Run additional tasks before starting the import of objects.
 			 *
@@ -133,17 +142,8 @@ class Objects extends Import_Base {
 				return;
 			}
 
-			// set these values on every run.
-			$process_handler->set_status( __( 'Import of objects starting', 'connector-for-propstack' ) );
-			$process_handler->set_running( time() );
-
 			// add a log entry.
 			Log::get_instance()->add( __( 'Import of objects has started.', 'connector-for-propstack' ), 'success', 'import' );
-
-			// set initial value.
-			$process_handler->set_count( 0 );
-			$process_handler->set_max_count( 0 );
-			update_option( CFPROP_IMPORT_RUNNING, time() );
 		}
 
 		// add a log entry.
@@ -189,13 +189,15 @@ class Objects extends Import_Base {
 				// count across all languages, the blocks are numbered globally.
 				$block_index   = 0;
 				$total_objects = 0;
-				$total_blocks  = 0;
 				$buffer        = array();
 
 				// loop through each enabled language and collect its objects.
 				foreach ( $languages as $language_code => $language_enabled ) {
 					$page_hashes      = array();
 					$language_objects = 0;
+
+					// update the status, the API can take a while for large accounts.
+					$this->set_new_status( $process_handler, __( 'Retrieving your objects from Propstack', 'connector-for-propstack' ) );
 
 					foreach ( $this->get_object_pages( $language_code ) as $page_hash => $page_objects ) {
 						// remember the hash of this page for the overall hash.
@@ -242,6 +244,16 @@ class Objects extends Import_Base {
 								$buffer = array();
 							}
 						}
+
+						// update the status with the amount collected so far.
+						$this->set_new_status(
+							$process_handler,
+							sprintf(
+							/* translators: %1$d will be replaced by the amount of objects retrieved so far. */
+								_n( 'Retrieved %1$d object from Propstack', 'Retrieved %1$d objects from Propstack', $total_objects, 'connector-for-propstack' ),
+								$total_objects
+							)
+						);
 
 						// free this page.
 						unset( $page_objects );
@@ -342,7 +354,15 @@ class Objects extends Import_Base {
 					 * @param bool $force_delete True to bypass the trash.
 					 * @param int  $post_id      The post-ID of the object.
 					 */
-					wp_delete_post( $post_id, apply_filters( 'cfprop_force_delete_obsolete_object', true, $post_id ) );
+					$force_delete = apply_filters( 'cfprop_force_delete_obsolete_object', true, $post_id );
+
+					// delete the metadata in one statement if the object is removed permanently.
+					if ( $force_delete ) {
+						$wpdb->delete( $wpdb->postmeta, array( 'post_id' => $post_id ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Bulk delete, see delete_all().
+						wp_cache_delete( $post_id, 'post_meta' );
+					}
+
+					wp_delete_post( $post_id, $force_delete );
 
 					// update the counter for the progress bar.
 					$process_handler->set_count( $process_handler->get_count() + 1 );

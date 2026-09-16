@@ -18,11 +18,26 @@ use ConnectorForPropstack\Dependencies\easyTransientsForWordPress\Transient;
 use ConnectorForPropstack\Dependencies\easyTransientsForWordPress\Transients;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
+use WP_Error;
 
 /**
  * Initialize the setup object.
  */
 class Setup {
+	/**
+	 * Collect the errors.
+	 *
+	 * @var array<int,WP_Error>
+	 */
+	private array $import_errors = array();
+
+	/**
+	 * The amount of objects imported during setup.
+	 *
+	 * @var int
+	 */
+	private int $imported_count = 0;
+
 	/**
 	 * Instance of this object.
 	 *
@@ -460,6 +475,10 @@ class Setup {
 				break;
 			}
 		} while ( $import_obj->has_load_more() );
+
+		// remember the result for the completion text.
+		$this->import_errors  = $import_obj->get_errors();
+		$this->imported_count = count( ImmoObjects::get_instance()->get_objects() );
 	}
 
 	/**
@@ -479,7 +498,19 @@ class Setup {
 		update_option( 'esfw_step', absint( get_option( 'esfw_max_steps' ) ) );
 
 		// prepare the completed text.
-		$completed_text = '<strong>' . __( 'Setup has been run.', 'connector-for-propstack' ) . '</strong> ' . __( 'Your objects from Propstack has been imported. Click on "Completed" to view them.', 'connector-for-propstack' );
+		if ( ! empty( $this->import_errors ) ) {
+			$completed_text = '<strong>' . __( 'Setup has been run, but the import reported problems.', 'connector-for-propstack' ) . '</strong>';
+
+			foreach ( $this->import_errors as $error ) {
+				$completed_text .= '<br>' . $error->get_error_message();
+			}
+		} elseif ( 0 === $this->imported_count ) {
+			$completed_text = '<strong>' . __( 'Setup has been run, but no objects have been imported.', 'connector-for-propstack' ) . '</strong> ';
+			/* translators: %1$s will be replaced by a URL. */
+			$completed_text .= sprintf( __( 'Your Propstack account did not deliver any object. If you expected objects here, check <a href="%1$s">your import settings</a> - a restriction on marketing type or status can exclude all of them.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_import' ) ) );
+		} else {
+			$completed_text = '<strong>' . __( 'Setup has been run.', 'connector-for-propstack' ) . '</strong> ' . __( 'Your objects from Propstack has been imported. Click on "Completed" to view them.', 'connector-for-propstack' );
+		}
 
 		/**
 		 * Filter the text for display if the setup has been run.
