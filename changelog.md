@@ -8,6 +8,7 @@
 - Optimizations on import for more speed too
 - Check for valid API key during first step in setup and show hints if there are any problems
 - Better infos in import dialog about the start
+- Prevent crypt error after installation
 - Updates setup and settings lib
 
 ### Fixed
