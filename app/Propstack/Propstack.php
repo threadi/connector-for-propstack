@@ -209,7 +209,7 @@ class Propstack {
 		if ( 401 === $request_object->get_http_status() || 403 === $request_object->get_http_status() ) {
 			return array(
 				'error' => 'invalid',
-				'text'  => sprintf( __( 'The specified API token was not accepted by Propstack. Please check the token and its permissions for objects, broker and statuses <a href="%1$s" target="_blank">in your Propstack-account</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() ),
+				'text'  => __( 'The specified API token was not accepted by Propstack. Please check the token and its permissions for objects, broker and statuses in your Propstack-account.', 'connector-for-propstack' ),
 			);
 		}
 

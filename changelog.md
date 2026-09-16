@@ -7,6 +7,7 @@
 - Optimized deletion of objects for more speed
 - Optimizations on import for more speed too
 - Check for valid API key during first step in setup and show hints if there are any problems
+- Show info about empty feed from Propstack in setup
 - Better infos in import dialog about the start
 - Prevent crypt error after installation
 - Updates setup and settings lib
