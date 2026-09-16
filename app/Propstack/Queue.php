@@ -133,7 +133,7 @@ class Queue {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'propstackConnectorQueueScheduleInterval' );
 		$setting->set_type( 'string' );
-		$setting->set_default( 'propstack_connector_15minutely' );
+		$setting->set_default( 'cfprop_15minutely' );
 		$setting->set_section( $queue_settings_section );
 		$setting->set_save_callback( array( $this, 'save_interval' ) );
 		$field = new Select( $settings_obj );

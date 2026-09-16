@@ -15,6 +15,7 @@
 
 - Fixed 2 wrong textdomains in Settings.php
 - Fixed missing usage of Lightbox for the gallery widget
+- Fixed old interval name for 2 settings
 
 ## [1.1.0] - 14.09.2026
 

@@ -37,7 +37,7 @@ class Objects extends Schedules_Base {
 	 *
 	 * @var string
 	 */
-	protected string $default_interval = 'propstack_connector_15minutely';
+	protected string $default_interval = 'cfprop_15minutely';
 
 	/**
 	 * Initialize this schedule.
