@@ -13,6 +13,7 @@
 ### Fixed
 
 - Fixed 2 wrong textdomains in Settings.php
+- Fixed missing usage of Lightbox for the gallery widget
 
 ## [1.1.0] - 14.09.2026
 
