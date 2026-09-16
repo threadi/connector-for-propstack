@@ -6,6 +6,7 @@
 
 - Optimized deletion of objects for more speed
 - Optimizations on import for more speed too
+- Check for valid API key during first step in setup and show hints if there are any problems
 - Better infos in import dialog about the start
 - Updates setup and settings lib
 

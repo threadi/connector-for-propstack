@@ -256,3 +256,7 @@ body.post-type-cfprop_object, .etfw-transient, body.settings_page_connector-for-
 	padding: 0 8px;
 	font-size: .9em;
 }
+
+.easy-setup-for-wordpress-main .components-panel__body > div:not(:first-child) {
+	margin-top: .6em;
+}

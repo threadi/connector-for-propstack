@@ -168,7 +168,7 @@ class Settings {
 		$field = new Password( $settings_obj );
 		$field->set_title( __( 'API Key', 'connector-for-propstack' ) );
 		/* translators: %1$s will be replaced by a URL. */
-		$field->set_description( sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), 'https://crm.propstack.de/app/admin/api_keys' ) );
+		$field->set_description( sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() ) );
 		$field->set_placeholder( __( 'Enter your API key', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 

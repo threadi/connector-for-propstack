@@ -694,4 +694,13 @@ class Helper {
 		// return the resulting list of errors.
 		return implode( '<hr>', $texts );
 	}
+
+	/**
+	 * Return the URL for the page in Propstack to manage API Keys and their permissions.
+	 *
+	 * @return string
+	 */
+	public static function get_propstack_api_page_url(): string {
+		return 'https://crm.propstack.de/app/admin/api_keys';
+	}
 }
