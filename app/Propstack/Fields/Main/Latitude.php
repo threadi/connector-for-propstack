@@ -36,7 +36,7 @@ class Latitude extends Field_Base {
 	 *
 	 * @var string
 	 */
-	protected string $type = 'number';
+	protected string $type = 'geo';
 
 	/**
 	 * Return the field label.
