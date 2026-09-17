@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added new field type for geo coordinates to output them with 4 digits
+
 ### Fixed
 
 - Fixed check for Elementor Pro and PRO Elements

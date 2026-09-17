@@ -56,6 +56,7 @@ class FieldTypes {
 			'\ConnectorForPropstack\Propstack\FieldTypes\CodeField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\EditorField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\FloatField',
+			'\ConnectorForPropstack\Propstack\FieldTypes\GeoField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\HtmlField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\IntegerField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\NumberField',
