@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed check for Elementor Pro and PRO Elements
+
 ## [1.1.1] - 16.09.2026
 
 ### Changed
