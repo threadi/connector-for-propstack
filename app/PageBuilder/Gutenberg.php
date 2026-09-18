@@ -21,6 +21,13 @@ use ConnectorForPropstack\Propstack\Taxonomies;
  */
 class Gutenberg extends PageBuilder_Base {
 	/**
+	 * The pagebuilder name.
+	 *
+	 * @var string
+	 */
+	protected string $name = 'Gutenberg';
+
+	/**
 	 * Variable for an instance of this Singleton object.
 	 *
 	 * @var ?Gutenberg

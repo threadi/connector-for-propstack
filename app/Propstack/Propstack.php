@@ -99,6 +99,9 @@ class Propstack {
 		// initialize the knowledge center.
 		KnowledgeCenter::get_instance()->init();
 
+		// initialize the ability-support.
+		Abilities::get_instance()->init();
+
 		// use hooks.
 		add_action( 'init', array( $this, 'add_settings' ), 20 );
 		add_filter( 'cfprop_log_categories', array( $this, 'add_categories' ) );
