@@ -6,6 +6,7 @@
 
 - Added new field type for geo coordinates to output them with 4 digits
 - Added internal names for each page builder support
+- Added 9 abilities to get object data or start imports via AI
 
 ### Changed
 
