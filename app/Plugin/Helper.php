@@ -677,19 +677,21 @@ class Helper {
 		$texts = array();
 		$depth = 0;
 
-		do {
+		// walk through the chain of exceptions.
+		$throwable = $e;
+		while ( $throwable instanceof Throwable && $depth < 5 ) {
 			$texts[] = sprintf(
 				'<strong>%1$s</strong>: %2$s<br><code>%3$s:%4$d</code><pre>%5$s</pre>',
-				esc_html( get_class( $e ) ),
-				esc_html( $e->getMessage() ),
-				esc_html( $e->getFile() ),
-				absint( $e->getLine() ),
-				esc_html( $e->getTraceAsString() )
+				esc_html( $throwable::class ),
+				esc_html( $throwable->getMessage() ),
+				esc_html( $throwable->getFile() ),
+				absint( $throwable->getLine() ),
+				esc_html( $throwable->getTraceAsString() )
 			);
 
 			++$depth;
-			$e = $e->getPrevious();
-		} while ( $e instanceof Throwable && $depth < 5 );
+			$throwable = $throwable->getPrevious();
+		}
 
 		// return the resulting list of errors.
 		return implode( '<hr>', $texts );
@@ -702,5 +704,22 @@ class Helper {
 	 */
 	public static function get_propstack_api_page_url(): string {
 		return 'https://crm.propstack.de/app/admin/api_keys';
+	}
+
+	/**
+	 * Update the list of used page builder.
+	 *
+	 * @param string $page_builder_name The name of the page builder to add to the list.
+	 * @return void
+	 */
+	public static function update_page_builder_list( string $page_builder_name ): void {
+		$page_builder_list = get_option( 'propstack_connector_pro_page_builder' );
+		if ( ! is_array( $page_builder_list ) ) {
+			$page_builder_list = array();
+		}
+		if ( ! in_array( $page_builder_name, $page_builder_list, true ) ) {
+			$page_builder_list[] = $page_builder_name;
+			update_option( 'propstack_connector_pro_page_builder', $page_builder_list );
+		}
 	}
 }

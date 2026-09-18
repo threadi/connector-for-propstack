@@ -5,6 +5,11 @@
 ### Added
 
 - Added new field type for geo coordinates to output them with 4 digits
+- Added internal names for each page builder support
+
+### Changed
+
+- Use $throwable::class instead of get_class() for the modern way of PHP
 
 ### Fixed
 

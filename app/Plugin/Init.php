@@ -12,9 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\PageBuilder\Page_Builders;
 use ConnectorForPropstack\Plugin\Admin\Admin;
-use ConnectorForPropstack\Propstack\Fields;
 use ConnectorForPropstack\Propstack\Propstack;
-use ConnectorForPropstack\Propstack\Taxonomies;
 
 /**
  * Initialize this plugin.

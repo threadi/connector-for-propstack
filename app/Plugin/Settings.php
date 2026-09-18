@@ -697,6 +697,12 @@ class Settings {
 		// check nonce.
 		check_admin_referer( 'cfprop-reset', 'nonce' );
 
+		// bail if capability is not granted.
+		if ( ! current_user_can( $this->get_settings_obj()->get_capability() ) ) {
+			wp_safe_redirect( (string) wp_get_referer() );
+			exit;
+		}
+
 		// uninstall all.
 		Uninstaller::get_instance()->run();
 
@@ -784,6 +790,12 @@ class Settings {
 	public function use_classic_view(): void {
 		// check nonce.
 		check_admin_referer( 'propstack-connector-use-classic-view', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( $this->get_settings_obj()->get_capability() ) ) {
+			wp_safe_redirect( (string) wp_get_referer() );
+			exit;
+		}
 
 		// change the setting.
 		update_option( 'propstack_connector_setting_view', 'classic' );

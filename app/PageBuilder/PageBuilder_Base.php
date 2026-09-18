@@ -8,12 +8,21 @@
 namespace ConnectorForPropstack\PageBuilder;
 
 // prevent direct access.
+use ConnectorForPropstack\Plugin\Helper;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Object as the base for each page builder.
  */
 class PageBuilder_Base {
+	/**
+	 * The pagebuilder name.
+	 *
+	 * @var string
+	 */
+	protected string $name = '';
+
 	/**
 	 * True if Page Builder has templates.
 	 *
@@ -33,7 +42,19 @@ class PageBuilder_Base {
 	 *
 	 * @return void
 	 */
-	public function init(): void {}
+	public function init(): void {
+		// add page builder to the list of used page builder in this project.
+		Helper::update_page_builder_list( $this->get_name() );
+	}
+
+	/**
+	 * Return the name of the page builder.
+	 *
+	 * @return string
+	 */
+	private function get_name(): string {
+		return $this->name;
+	}
 
 	/**
 	 * Return widgets this page builder supports.
