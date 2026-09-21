@@ -187,6 +187,7 @@
             <zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/lib/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/lib/" />
             <zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/build/" />
             <zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/assets/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/assets/" />
+            <zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/build/" />
 			<zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/src/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/src/" />
             <zipfileset dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-dialog-for-wordpress/build/" />
 			<zipfileset dir="${src.dir}" includes="composer.json" fullpath="${plugin.slug}/composer.json" />

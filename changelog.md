@@ -5,7 +5,7 @@
 ### Added
 
 - Added new field type for geo coordinates to output them with 4 digits
-- Added internal names for each page builder support
+- Added internal names for each supported page builder
 - Added 9 abilities to get object data or start imports via AI
 
 ### Changed
@@ -15,6 +15,7 @@
 ### Fixed
 
 - Fixed check for Elementor Pro and PRO Elements
+- Fixed missing DataView scripts in release build
 
 ## [1.1.1] - 16.09.2026
 

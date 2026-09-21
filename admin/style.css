@@ -76,6 +76,9 @@ body.settings_page_connector-for-propstack {
 	#category {
 		width: 180px;
 	}
+	.state .dashicons-no {
+		color: red;
+	}
 }
 
 .propstack_connector_fields_all table { width: 100% }
