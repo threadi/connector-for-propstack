@@ -7,6 +7,7 @@
 - Added new field type for geo coordinates to output them with 4 digits
 - Added internal names for each supported page builder
 - Added 9 abilities to get object data or start imports via AI
+- Added the Propstack logo as icon in the new WordPress Icon API
 
 ### Changed
 
