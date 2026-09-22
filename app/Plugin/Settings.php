@@ -314,10 +314,30 @@ class Settings {
 		$advanced_tab = $settings_page->add_tab( 'propstack_connector_advanced', 70 );
 		$advanced_tab->set_title( __( 'Advanced settings', 'connector-for-propstack' ) );
 
+		// add a tab for additional settings for objects.
+		$additional_object_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_objects', 10 );
+		$additional_object_settings_tab->set_title( __( 'For objects', 'connector-for-propstack' ) );
+		$advanced_tab->set_default_tab( $additional_object_settings_tab );
+
+		// add section.
+		$additional_object_settings_section = $additional_object_settings_tab->add_section( 'propstack_connector_advanced_objects', 10 );
+		$additional_object_settings_section->set_title( __( 'For objects', 'now-pages' ) );
+
+		// add a tab for additional settings for objects.
+		$additional_images_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_images', 20 );
+		$additional_images_settings_tab->set_title( __( 'For images', 'connector-for-propstack' ) );
+
+		// add section.
+		$additional_image_settings_section = $additional_images_settings_tab->add_section( 'propstack_connector_advanced_images', 10 );
+		$additional_image_settings_section->set_title( __( 'For images', 'now-pages' ) );
+
+		// add a tab for additional plugin settings.
+		$additional_plugin_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_plugin_settings', 30 );
+		$additional_plugin_settings_tab->set_title( __( 'Plugin', 'connector-for-propstack' ) );
+
 		// add a tab for additional settings.
-		$additional_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_settings', 10 );
-		$additional_settings_tab->set_title( __( 'More settings', 'connector-for-propstack' ) );
-		$advanced_tab->set_default_tab( $additional_settings_tab );
+		$additional_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_settings', 40 );
+		$additional_settings_tab->set_title( __( 'Miscellaneous', 'connector-for-propstack' ) );
 
 		// add a section.
 		$advanced_section = $additional_settings_tab->add_section( 'propstack_connector_advanced', 10 );
@@ -326,7 +346,7 @@ class Settings {
 		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_disable_archive_slug' );
 		$setting->set_default( 0 );
-		$setting->set_section( $advanced_section );
+		$setting->set_section( $additional_object_settings_section );
 		$setting->set_save_callback( array( $this, 'update_slugs' ) );
 		$field = new Checkbox( $this->get_settings_obj() );
 		$field->set_title( __( 'Disable archive view', 'connector-for-propstack' ) );
@@ -335,7 +355,7 @@ class Settings {
 		// add setting.
 		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_disable_single_slug' );
 		$setting->set_default( 0 );
-		$setting->set_section( $advanced_section );
+		$setting->set_section( $additional_object_settings_section );
 		$setting->set_save_callback( array( $this, 'update_slugs' ) );
 		$field = new Checkbox( $this->get_settings_obj() );
 		$field->set_title( __( 'Disable single view', 'connector-for-propstack' ) );
@@ -397,7 +417,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$debug_section = $additional_settings_tab->add_section( 'propstack_connector_debug_section', 20 );
+		$debug_section = $additional_plugin_settings_tab->add_section( 'propstack_connector_debug_section', 20 );
 		$debug_section->set_title( __( 'Debug', 'connector-for-propstack' ) );
 		if ( method_exists( $debug_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$debug_section->set_collapsible( true );
@@ -427,7 +447,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$import_export_section = $additional_settings_tab->add_section( 'propstack_connector_import_export_section', 20 );
+		$import_export_section = $additional_plugin_settings_tab->add_section( 'propstack_connector_import_export_section', 20 );
 		$import_export_section->set_title( __( 'Secure settings', 'connector-for-propstack' ) );
 		if ( method_exists( $import_export_section, 'set_collapsible' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$import_export_section->set_collapsible( true );
@@ -503,7 +523,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$plugin_handling_section = $additional_settings_tab->add_section( 'propstack_connector_plugin_section', 30 );
+		$plugin_handling_section = $additional_plugin_settings_tab->add_section( 'propstack_connector_plugin_section', 10 );
 		$plugin_handling_section->set_title( __( 'Plugin handling', 'connector-for-propstack' ) );
 		if ( method_exists( $plugin_handling_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$plugin_handling_section->set_collapsed( true );

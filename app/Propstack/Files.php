@@ -126,7 +126,7 @@ class Files {
 
 		// add a tab for file imports.
 		$files_tab = $import_tab->add_tab( 'propstack_connector_files_import', 20 );
-		$files_tab->set_title( __( 'Files', 'connector-for-propstack' ) );
+		$files_tab->set_title( __( 'Images', 'connector-for-propstack' ) );
 
 		// add a section.
 		$files_import_section = $files_tab->add_section( 'propstack_connector_files_import', 20 );
@@ -247,16 +247,6 @@ class Files {
 		$import_options_section->set_title( __( 'Options', 'connector-for-propstack' ) );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_ajax_limit' );
-		$setting->set_type( 'integer' );
-		$setting->set_default( 25 );
-		$setting->set_section( $import_options_section );
-		$field = new Number( $settings_obj );
-		$field->set_title( __( 'Limit for import of files', 'connector-for-propstack' ) );
-		$field->set_description( __( 'The higher this number is, the greater the likelihood of a timeout when importing files.', 'connector-for-propstack' ) );
-		$setting->set_field( $field );
-
-		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_image_size' );
 		$setting->set_type( 'string' );
 		$setting->set_default( 'big_url' );
@@ -315,6 +305,34 @@ class Files {
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$setting->prevent_export( true );
+
+		// get the advanced settings tab.
+		$advanced_tab = $settings_page->get_tab( 'propstack_connector_advanced' );
+		if( ! $advanced_tab instanceof Tab ) {
+			return;
+		}
+
+		// get the advanced object settings tab.
+		$advanced_object_settings_tab = $advanced_tab->get_tab( 'propstack_connector_advanced_images' );
+		if( ! $advanced_object_settings_tab instanceof Tab ) {
+			return;
+		}
+
+		// get the section.
+		$section = $advanced_object_settings_tab->get_section( 'propstack_connector_advanced_images' );
+		if( ! $section instanceof Section ) {
+			return;
+		}
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'propstack_connector_ajax_limit' );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 25 );
+		$setting->set_section( $section );
+		$field = new Number( $settings_obj );
+		$field->set_title( __( 'Limit for import of files', 'connector-for-propstack' ) );
+		$field->set_description( __( 'This limits the amount of images during one import run. If the limit is reached, a new import run is startet automatically. There is not hard limit to import images. The higher this number is, the greater the likelihood of a timeout when importing images.', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
 	}
 
 	/**

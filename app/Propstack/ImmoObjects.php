@@ -30,6 +30,7 @@ use ConnectorForPropstack\Plugin\Settings;
 use ConnectorForPropstack\Plugin\Users;
 use ConnectorForPropstack\Propstack\Fields\Main\ApiResponse;
 use ConnectorForPropstack\Propstack\Taxonomies\ObjectType;
+use easySettingsForWordPress\Tab;
 use WP_Post;
 use WP_Query;
 use WP_Screen;
@@ -504,25 +505,6 @@ class ImmoObjects {
 		$field->set_value( __( 'Daily', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
-		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_ajax_object_limit' );
-		$setting->set_type( 'integer' );
-		$setting->set_default( 20 );
-		$setting->set_section( $import_options_section );
-		$field = new Number( $settings_obj );
-		$field->set_title( __( 'Limit for objects', 'connector-for-propstack' ) );
-		$field->set_description( __( 'This limits the amount of objects during one import run. If the limit is reached, a new import run is startet automatically. There is not hard limit to import objects. The higher this number is, the greater the likelihood of a timeout when importing objects.', 'connector-for-propstack' ) );
-		$setting->set_field( $field );
-
-		// add setting.
-		$setting = $settings_obj->add_setting( 'propstack_connector_preserve_files' );
-		$setting->set_default( 0 );
-		$setting->set_section( $import_options_section );
-		$field = new Checkbox( $settings_obj );
-		$field->set_title( __( 'Preserve files', 'connector-for-propstack' ) );
-		$field->set_description( __( 'If objects are deleted, do not delete their files. They will stay in your media library, and you have to clean them manually.', 'connector-for-propstack' ) );
-		$setting->set_field( $field );
-
 		// add hidden setting for each language.
 		foreach ( Languages::get_instance()->get_languages() as $language_code => $name ) {
 			$setting = $settings_obj->add_setting( 'cfprop_md5_' . $language_code );
@@ -532,7 +514,7 @@ class ImmoObjects {
 		}
 
 		// add a tab on this page.
-		$objects_tab = $settings_page->add_tab( 'propstack_connector_objects', 45 );
+		$objects_tab = $settings_page->add_tab( 'propstack_connector_objects', 30 );
 		$objects_tab->set_title( __( 'Objects', 'connector-for-propstack' ) );
 
 		// add a sub tab for restrictions.
@@ -691,6 +673,43 @@ class ImmoObjects {
 		$field->set_title( __( 'Property types to import', 'connector-for-propstack' ) );
 		$field->set_description( __( 'Only objects with the property types will be imported. All other will be ignored. Selecting none will import objects for each property type.', 'connector-for-propstack' ) );
 		$field->set_options( $property_types );
+		$setting->set_field( $field );
+
+		// get the advanced settings tab.
+		$advanced_tab = $settings_page->get_tab( 'propstack_connector_advanced' );
+		if( ! $advanced_tab instanceof Tab ) {
+			return;
+		}
+
+		// get the advanced object settings tab.
+		$advanced_object_settings_tab = $advanced_tab->get_tab( 'propstack_connector_advanced_objects' );
+		if( ! $advanced_object_settings_tab instanceof Tab ) {
+			return;
+		}
+
+		// get the section.
+		$section = $advanced_object_settings_tab->get_section( 'propstack_connector_advanced_objects' );
+		if( ! $section instanceof Section ) {
+			return;
+		}
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'propstack_connector_ajax_object_limit' );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 20 );
+		$setting->set_section( $section );
+		$field = new Number( $settings_obj );
+		$field->set_title( __( 'Limit for objects', 'connector-for-propstack' ) );
+		$field->set_description( __( 'This limits the amount of objects during one import run. If the limit is reached, a new import run is startet automatically. There is not hard limit to import objects. The higher this number is, the greater the likelihood of a timeout when importing objects.', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'propstack_connector_preserve_files' );
+		$setting->set_default( 0 );
+		$setting->set_section( $section );
+		$field = new Checkbox( $settings_obj );
+		$field->set_title( __( 'Preserve files', 'connector-for-propstack' ) );
+		$field->set_description( __( 'If objects are deleted, do not delete their files. They will stay in your media library, and you have to clean them manually.', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
 		// get the hidden section to add some hidden settings we could clean up during uninstallation.
