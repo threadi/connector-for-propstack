@@ -11,6 +11,7 @@
 ### Changed
 
 - Use $throwable::class instead of get_class() for the modern way of PHP
+- Do not show error marker if setup has not been completed
 
 ### Fixed
 
