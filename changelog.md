@@ -8,6 +8,7 @@
 - Added internal names for each supported page builder
 - Added 9 abilities to get object data or start imports via AI
 - Added the Propstack logo as icon in the new WordPress Icon API
+- Added compatibility check for Divi 5
 
 ### Changed
 

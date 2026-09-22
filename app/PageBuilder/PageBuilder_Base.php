@@ -8,9 +8,9 @@
 namespace ConnectorForPropstack\PageBuilder;
 
 // prevent direct access.
-use ConnectorForPropstack\Plugin\Helper;
-
 defined( 'ABSPATH' ) || exit;
+
+use ConnectorForPropstack\Plugin\Helper;
 
 /**
  * Object as the base for each page builder.

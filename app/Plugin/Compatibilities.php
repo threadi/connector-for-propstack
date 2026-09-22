@@ -131,6 +131,7 @@ class Compatibilities {
 			'ConnectorForPropstack\Plugin\Compatibilities\Brizy',
 			'ConnectorForPropstack\Plugin\Compatibilities\Contact_Form_7',
 			'ConnectorForPropstack\Plugin\Compatibilities\Divi4',
+			'ConnectorForPropstack\Plugin\Compatibilities\Divi5',
 			'ConnectorForPropstack\Plugin\Compatibilities\Elementor',
 			'ConnectorForPropstack\Plugin\Compatibilities\Salient_WpBakery',
 			'ConnectorForPropstack\Plugin\Compatibilities\WpBakery',
