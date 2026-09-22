@@ -11,6 +11,7 @@
 ### Changed
 
 - Use $throwable::class instead of get_class() for the modern way of PHP
+- Use configured language during the installation of default terms for our taxonomies
 - Do not show error marker if setup has not been completed
 
 ### Fixed
