@@ -624,7 +624,7 @@ class ImmoObjects {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_import_object_type' );
 		$setting->set_type( 'array' );
-		$setting->set_default( array( 'APARTMENT' ) );
+		$setting->set_default( array() );
 		$setting->set_section( $import_restrictions_section );
 		$setting->set_show_in_rest(
 			array(

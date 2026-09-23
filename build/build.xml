@@ -180,6 +180,7 @@
             <zipfileset dir="${src.dir}/css" prefix="${plugin.slug}/css" />
             <zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
             <zipfileset dir="${src.dir}/js" prefix="${plugin.slug}/js" />
+            <zipfileset dir="${src.dir}/node_modules/intro.js/minified/" prefix="${plugin.slug}/node_modules/intro.js/minified/" /><<
 			<zipfileset dir="${src.dir}/templates" prefix="${plugin.slug}/templates" />
 			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
 			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />

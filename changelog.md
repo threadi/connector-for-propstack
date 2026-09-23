@@ -8,17 +8,20 @@
 - Added new field type for energy efficiency classes with check against a whitelist for value A+ to H
 - Added new field type for geo coordinates to output them with 4 digits
 - Added internal names for each supported page builder
-- Added 9 abilities to get object data or start imports via AI
+- Added 9 abilities to get object data or start imports via AI or your MCP plugin
 - Added the Propstack logo as icon in the new WordPress Icon API
 - Added compatibility check for Divi 5
+- Added intro after the setup to introduce the main functions of this plugin
 
 ### Changed
 
+- Optimized the setup to onboarding the plugin
 - Use $throwable::class instead of get_class() for the modern way of PHP
 - Use configured language during the installation of default terms for our taxonomies
 - Do not show error marker if setup has not been completed
 - Resort some settings
 - Updated settings lib
+- Updated lightbox3 library
 
 ### Fixed
 
