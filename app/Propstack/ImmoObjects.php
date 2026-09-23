@@ -677,19 +677,19 @@ class ImmoObjects {
 
 		// get the advanced settings tab.
 		$advanced_tab = $settings_page->get_tab( 'propstack_connector_advanced' );
-		if( ! $advanced_tab instanceof Tab ) {
+		if ( ! $advanced_tab instanceof Tab ) {
 			return;
 		}
 
 		// get the advanced object settings tab.
 		$advanced_object_settings_tab = $advanced_tab->get_tab( 'propstack_connector_advanced_objects' );
-		if( ! $advanced_object_settings_tab instanceof Tab ) {
+		if ( ! $advanced_object_settings_tab instanceof Tab ) {
 			return;
 		}
 
 		// get the section.
 		$section = $advanced_object_settings_tab->get_section( 'propstack_connector_advanced_objects' );
-		if( ! $section instanceof Section ) {
+		if ( ! $section instanceof Section ) {
 			return;
 		}
 

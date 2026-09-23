@@ -1,0 +1,48 @@
+.cfprop-energy-scale {
+	display: flex;
+	span {
+		flex: 1;
+		text-align: center;
+		padding: 8px 4px;
+		font-size: 13px;
+		font-weight: 700;
+		color: #fff;
+		opacity: 0.5;
+		transition: opacity 0.2s;
+	}
+	.cfprop-energy-scale-color-a-plus {
+		background-color: #1f9e52;
+	}
+	.cfprop-energy-scale-color-a {
+		background-color: #4cb050;
+	}
+	.cfprop-energy-scale-color-b {
+		background-color: #8bc34a;
+	}
+	.cfprop-energy-scale-color-c {
+		background-color: #d4d43c;
+	}
+	.cfprop-energy-scale-color-d {
+		background-color: #f2c029;
+	}
+	.cfprop-energy-scale-color-e {
+		background-color: #f09220;
+	}
+	.cfprop-energy-scale-color-f {
+		background-color: #e66418;
+	}
+	.cfprop-energy-scale-color-g {
+		background-color: #d8341c;
+	}
+	.cfprop-energy-scale-color-h {
+		background-color: #b31414;
+	}
+	.cfprop-energy-scale-active {
+		opacity: 1;
+		transform: scaleY(1.15);
+		box-shadow: 0 0 0 2px #000;
+		border-radius: 4px;
+		position: relative;
+		z-index: 1;
+	}
+}

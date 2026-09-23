@@ -436,7 +436,7 @@ class Admin {
 		global $menu, $submenu;
 
 		// bail if setup is not completed.
-		if( ! Setup::get_instance()->is_completed() ) {
+		if ( ! Setup::get_instance()->is_completed() ) {
 			return;
 		}
 

@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added new widget for show the energy scale of a single object, usable as Block and via shortcode
+- Added new field type for energy efficiency classes with check against a whitelist for value A+ to H
 - Added new field type for geo coordinates to output them with 4 digits
 - Added internal names for each supported page builder
 - Added 9 abilities to get object data or start imports via AI

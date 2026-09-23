@@ -55,6 +55,7 @@ class FieldTypes {
 			'\ConnectorForPropstack\Propstack\FieldTypes\BooleanField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\CodeField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\EditorField',
+			'\ConnectorForPropstack\Propstack\FieldTypes\EnergyEfficiencyClass',
 			'\ConnectorForPropstack\Propstack\FieldTypes\FloatField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\GeoField',
 			'\ConnectorForPropstack\Propstack\FieldTypes\HtmlField',
