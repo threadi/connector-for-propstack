@@ -76,6 +76,7 @@ class Widgets {
 			'\ConnectorForPropstack\Propstack\Widgets\Archive',
 			'\ConnectorForPropstack\Propstack\Widgets\Broker_Field',
 			'\ConnectorForPropstack\Propstack\Widgets\Description',
+			'\ConnectorForPropstack\Propstack\Widgets\Energy_Scale',
 			'\ConnectorForPropstack\Propstack\Widgets\Field',
 			'\ConnectorForPropstack\Propstack\Widgets\Filter',
 			'\ConnectorForPropstack\Propstack\Widgets\Gallery',

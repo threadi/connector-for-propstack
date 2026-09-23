@@ -31,7 +31,12 @@ class EnergyEfficiencyClass extends Field_Base {
 	 */
 	protected string $name = 'energy_efficiency_class';
 
-
+	/**
+	 * The WordPress-compatible type for the field (e.g., 'boolean', 'string', 'number', 'array').
+	 *
+	 * @var string
+	 */
+	protected string $type = 'energy_efficiency_class';
 
 	/**
 	 * Return the field label.

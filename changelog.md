@@ -4,17 +4,26 @@
 
 ### Added
 
+- Added new widget for show the energy scale of a single object, usable as Block and via shortcode
+- Added new field type for energy efficiency classes with check against a whitelist for value A+ to H
 - Added new field type for geo coordinates to output them with 4 digits
-- Added internal names for each page builder support
+- Added internal names for each supported page builder
 - Added 9 abilities to get object data or start imports via AI
+- Added the Propstack logo as icon in the new WordPress Icon API
+- Added compatibility check for Divi 5
 
 ### Changed
 
 - Use $throwable::class instead of get_class() for the modern way of PHP
+- Use configured language during the installation of default terms for our taxonomies
+- Do not show error marker if setup has not been completed
+- Resort some settings
+- Updated settings lib
 
 ### Fixed
 
 - Fixed check for Elementor Pro and PRO Elements
+- Fixed missing DataView scripts in release build
 
 ## [1.1.1] - 16.09.2026
 

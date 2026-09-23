@@ -19,6 +19,7 @@ use ConnectorForPropstack\Plugin\Setup;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use WP_Error;
+use function Sodium\randombytes_random16;
 
 /**
  * Object for admin tasks for this plugin.
@@ -433,6 +434,11 @@ class Admin {
 	 */
 	public function mark_errors_in_menu(): void {
 		global $menu, $submenu;
+
+		// bail if setup is not completed.
+		if ( ! Setup::get_instance()->is_completed() ) {
+			return;
+		}
 
 		// bail if user has no capability to change settings.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {

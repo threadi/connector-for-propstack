@@ -104,6 +104,7 @@ class Propstack {
 
 		// use hooks.
 		add_action( 'init', array( $this, 'add_settings' ), 20 );
+		add_action( 'init', array( $this, 'register_icon' ) );
 		add_filter( 'cfprop_log_categories', array( $this, 'add_categories' ) );
 		add_filter( 'cfprop_schedules', array( $this, 'add_schedules' ) );
 
@@ -375,5 +376,40 @@ class Propstack {
 
 		// return the resulting list.
 		return $schedules;
+	}
+
+	/**
+	 * Register the Propstack logo as icon in WordPress >= 7.1.
+	 *
+	 * @return void
+	 */
+	public function register_icon(): void {
+		// bail if the required functions does not exist.
+		if ( ! function_exists( 'wp_register_icon_collection' ) || ! function_exists( 'wp_register_icon' ) ) {
+			return;
+		}
+
+		// bail if our collection is already registered.
+		if ( \WP_Icon_Collections_Registry::get_instance()->is_registered( 'connector-for-propstack' ) ) {
+			return;
+		}
+
+		// register the collection.
+		wp_register_icon_collection(
+			'cfprop',
+			array(
+				'label'       => __( 'Propstack', 'connector-for-propstack' ),
+				'description' => __( 'Icons from Propstack.', 'connector-for-propstack' ),
+			)
+		);
+
+		// register the icon in this collection.
+		wp_register_icon(
+			'cfprop/logo',
+			array(
+				'label'   => __( 'Logo', 'connector-for-propstack' ),
+				'content' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M3 4.03 2.67 4.09 2.44 4.22 2.23 4.49 2.13 4.81 2.12 12.50 2.16 12.74 2.22 12.90 2.36 13.10 2.48 13.21 9.56 18.35 9.72 18.43 9.97 18.47 10.23 18.44 10.47 18.34 17.04 13.19 17.22 13 17.34 12.76 17.38 12.50 17.38 4.90 17.36 4.73 17.27 4.49 17.12 4.28 16.99 4.17 16.75 4.06 16.50 4.03ZM3.88 11.34 3.88 5.78 9.12 5.78 9.12 9.84ZM10 11.41 14.74 12.77 9.98 16.50 4.96 12.85ZM10.88 9.84 10.88 5.78 15.62 5.78 15.62 11.20Z"/></svg>',
+			)
+		);
 	}
 }

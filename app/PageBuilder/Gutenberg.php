@@ -124,6 +124,7 @@ class Gutenberg extends PageBuilder_Base {
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Archive',
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Broker_Field',
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Description',
+			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Energy_Scale',
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Field',
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Filter',
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Gallery',
