@@ -11,6 +11,7 @@ namespace ConnectorForPropstack\Propstack;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Log;
+use ConnectorForPropstack\Plugin\ProcessHandler;
 use WP_Error;
 
 /**
@@ -285,5 +286,38 @@ class Import_Base {
 	 */
 	public function get_offset_option(): string {
 		return $this->offset_option;
+	}
+
+	/**
+	 * End a paginated import before all objects have been processed.
+	 *
+	 * The objects imported so far are kept. There is no cleanup phase, so no object is removed,
+	 * and no md5 hash is saved, so the next import processes all objects again.
+	 *
+	 * @return void
+	 */
+	public function end_early(): void {
+		// remove the work list and the position.
+		$this->clear_work_list();
+		$this->set_load_more( false );
+
+		$instance = $this;
+		/**
+		 * Run additional tasks after any import of objects.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 *
+		 * @param Import_Base $instance The import object.
+		 */
+		do_action( 'cfprop_import_object_after', $instance );
+
+		// add a log entry.
+		Log::get_instance()->add( __( 'Import of objects has been ended early. The other objects will follow with the next import.', 'connector-for-propstack' ), 'info', 'import' );
+
+		// update the running marker.
+		$process_handler = ProcessHandler::get_instance();
+		$process_handler->set_id( $this->get_process_id() );
+		$process_handler->set_running( 0 );
+		update_option( CFPROP_IMPORT_RUNNING, 0 );
 	}
 }

@@ -39,6 +39,16 @@ class Setup {
 	private int $imported_count = 0;
 
 	/**
+	 * The amount of objects Propstack delivered for the import during setup.
+	 *
+	 * @var int
+	 */
+	private int $object_count = 0;
+
+	/**
+	 * Instance of this object.
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Setup
@@ -125,8 +135,8 @@ class Setup {
 			add_action( 'admin_menu', array( $this, 'add_setup_menu' ) );
 
 			// use own hooks.
-			add_action( 'cfprop_import_object_set_max_count', array( $this, 'update_max_step' ) );
-			add_action( 'cfprop_import_object_set_count', array( $this, 'update_process_step' ) );
+			add_action( 'cfprop_import_object_set_max_count', array( $this, 'set_object_count' ) );
+			add_action( 'cfprop_import_object_set_count', array( $this, 'set_import_progress' ) );
 			add_action( 'cfprop_import_object_set_status', array( $this, 'set_process_label' ) );
 			add_action( 'cfprop_queue_before_processing', array( $this, 'update_max_step' ) );
 			add_action( 'cfprop_queue_processing', array( $this, 'update_process_step' ) );
@@ -351,42 +361,10 @@ class Setup {
 			return;
 		}
 
-		// get the main language setting.
-		$language_setting = $settings->get_setting( 'propstack_connector_languages' );
-
-		// bail if language setting could not be loaded.
-		if ( ! $language_setting instanceof Setting ) {
-			return;
-		}
-
-		// get the field for URL settings.
-		$language_field = $language_setting->get_field();
-
-		// bail if field is not available.
-		if ( ! $language_field instanceof Radio ) {
-			return;
-		}
-
-		// get the settings for the object types.
-		$object_types_setting = $settings->get_setting( 'propstack_connector_import_object_type' );
-
-		// bail if setting could not be loaded.
-		if ( ! $object_types_setting instanceof Setting ) {
-			return;
-		}
-
-		// get the field for URL settings.
-		$object_types_field = $object_types_setting->get_field();
-
-		// bail if field is not available.
-		if ( ! $object_types_field instanceof MultiSelect ) {
-			return;
-		}
-
 		// define setup.
 		$this->setup = array(
 			1 => array(
-				$api_token->get_name()            => array(
+				$api_token->get_name() => array(
 					'type'                => 'TextControl',
 					'label'               => $api_token_field->get_title(),
 					'help'                => $api_token_field->get_description(),
@@ -394,19 +372,7 @@ class Setup {
 					'required'            => true,
 					'validation_callback' => 'ConnectorForPropstack\Propstack\Propstack::rest_validate_key',
 				),
-				$object_types_setting->get_name() => array(
-					'type'    => 'SelectControl',
-					'label'   => $object_types_field->get_title(),
-					'help'    => __( 'Only objects with the selected object type will be imported. All other will be ignored. You can change this setting after the setup any time.', 'connector-for-propstack' ),
-					'options' => $this->convert_options_for_react( $object_types_field->get_options() ),
-				),
-				$language_setting->get_name()     => array(
-					'type'    => 'RadioControl',
-					'label'   => $language_field->get_title(),
-					'help'    => $language_field->get_description(),
-					'options' => $this->convert_options_for_react( $language_field->get_options() ), // @phpstan-ignore argument.type
-				),
-				'help'                            => array(
+				'help'                 => array(
 					'type' => 'Text',
 					/* translators: %1$s will be replaced by our support-forum-URL. */
 					'text' => '<p><span class="dashicons dashicons-editor-help"></span> ' . sprintf( __( '<strong>Need help?</strong> Ask in <a href="%1$s" target="_blank">our forum (opens new window)</a>.', 'connector-for-propstack' ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
@@ -433,7 +399,13 @@ class Setup {
 	}
 
 	/**
-	 * Run the process to import objects
+	 * Run the process to import objects.
+	 *
+	 * The processing order:
+	 * 1. Get the list of all objects without importing them.
+	 * 2a. If objects could be loaded, import the first 10 of them.
+	 * 2b. If no objects could be loaded, forward to last step.
+	 * 3. Forward to last step in setup and show result with hint to intro after setup.
 	 *
 	 * @param string $config_name The name of the setup-configuration.
 	 *
@@ -450,35 +422,57 @@ class Setup {
 			return;
 		}
 
-		// update the max steps for this process.
-		$this->update_max_step( 2 );
+		// get the amount of objects to import during setup.
+		$limit = $this->get_import_limit();
 
-		// step 1: import the object from Propstack.
-		$this->set_process_label( __( 'Retrieve data for your properties from Propstack.', 'connector-for-propstack' ) );
-
-		// count the runs to prevent an endless loop on a broken state.
-		$runs = 0;
+		// step 1: get the list of all objects.
+		$this->update_max_step( 1 );
+		$this->set_process_label( __( 'Retrieve the list of your objects from Propstack.', 'connector-for-propstack' ) );
 
 		// no time budget during setup, the request is not behind a proxy which gives up.
 		add_filter( 'cfprop_object_import_time_budget', '__return_zero' );
 
-		// run the import until it is completed, every run processes one chunk.
-		do {
+		// store the list in blocks of $limit objects, the first block holds the objects to import during setup.
+		$block_size = static fn(): int => $limit;
+		add_filter( 'cfprop_object_import_block_size', $block_size );
+
+		// count the runs to prevent an endless loop on a broken state.
+		$runs = 0;
+
+		// step 2: the first run loads the list and imports the first block (2a) or ends if the list is empty (2b).
+		while ( true ) {
 			$import_obj = ImmoObjects::get_instance()->import( '' );
+
+			// collect the errors of every run.
+			$this->import_errors = array_merge( $this->import_errors, $import_obj->get_errors() );
 
 			++$runs;
 
-			// bail if the import does not finish.
-			if ( $runs > 10000 ) {
-				Log::get_instance()->add( __( 'The import during setup did not finish and has been stopped.', 'connector-for-propstack' ), 'error', 'import' );
-
+			// the import is completed.
+			if ( ! $import_obj->has_load_more() ) {
 				break;
 			}
-		} while ( $import_obj->has_load_more() );
 
-		// remember the result for the completion text.
-		$this->import_errors  = $import_obj->get_errors();
-		$this->imported_count = count( ImmoObjects::get_instance()->get_objects() );
+			// end the import if the first block has been imported and objects are left.
+			$import_data = get_option( $import_obj->get_work_list_option(), array() );
+			$total       = is_array( $import_data ) && isset( $import_data['total'] ) ? absint( $import_data['total'] ) : 0;
+			if ( absint( get_option( $import_obj->get_offset_option(), 0 ) ) < $total ) {
+				$import_obj->end_early();
+				break;
+			}
+
+			// bail if the import does not finish.
+			if ( $runs > 100 ) {
+				Log::get_instance()->add( __( 'The import during setup did not finish and has been forcibly stopped.', 'connector-for-propstack' ), 'error', 'import' );
+				break;
+			}
+		}
+
+		// remove our block size again.
+		remove_filter( 'cfprop_object_import_block_size', $block_size );
+
+		// step 3: remember the result for the completion text in the last step.
+		$this->imported_count = absint( ImmoObjects::get_instance()->get_objects_query( array( 'posts_per_page' => 1 ) )->found_posts );
 	}
 
 	/**
@@ -497,19 +491,38 @@ class Setup {
 		// set the progress to 100%.
 		update_option( 'esfw_step', absint( get_option( 'esfw_max_steps' ) ) );
 
+		// the hint to the intro, shown after the setup is completed.
+		$intro_hint = __( 'Click on "Completed" and we will show you in a short introduction how to present your objects on your website.', 'connector-for-propstack' );
+
 		// prepare the completed text.
 		if ( ! empty( $this->import_errors ) ) {
 			$completed_text = '<strong>' . __( 'Setup has been run, but the import reported problems.', 'connector-for-propstack' ) . '</strong>';
 
+			// show every message only once, the import runs several times.
+			$messages = array();
 			foreach ( $this->import_errors as $error ) {
-				$completed_text .= '<br>' . $error->get_error_message();
+				$messages[] = $error->get_error_message();
 			}
-		} elseif ( 0 === $this->imported_count ) {
+			foreach ( array_unique( $messages ) as $message ) {
+				$completed_text .= '<br>' . $message;
+			}
+		} elseif ( 0 === $this->object_count ) {
 			$completed_text = '<strong>' . __( 'Setup has been run, but no objects have been imported.', 'connector-for-propstack' ) . '</strong> ';
 			/* translators: %1$s will be replaced by a URL. */
 			$completed_text .= sprintf( __( 'Your Propstack account did not deliver any object. If you expected objects here, check <a href="%1$s">your import settings</a> - a restriction on marketing type or status can exclude all of them.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_import' ) ) );
+		} elseif ( $this->imported_count < $this->object_count ) {
+			$completed_text  = '<strong>' . __( 'Setup has been run.', 'connector-for-propstack' ) . '</strong> ';
+			$completed_text .= sprintf(
+								/* translators: %1$d will be replaced by the amount of imported objects, %2$d by the amount of all objects. */
+				_n( 'The first %1$d of your %2$d object from Propstack has been imported.', 'The first %1$d of your %2$d objects from Propstack have been imported.', $this->object_count, 'connector-for-propstack' ),
+				$this->imported_count,
+				$this->object_count
+			) . ' ';
+			$completed_text .= __( 'The others will follow with the next automatic import, or you follow the intro after completing this setup.', 'connector-for-propstack' );
+			$completed_text .= '<br><br>' . $intro_hint;
 		} else {
-			$completed_text = '<strong>' . __( 'Setup has been run.', 'connector-for-propstack' ) . '</strong> ' . __( 'Your objects from Propstack has been imported. Click on "Completed" to view them.', 'connector-for-propstack' );
+			$completed_text  = '<strong>' . __( 'Setup has been run.', 'connector-for-propstack' ) . '</strong> ' . __( 'Your objects from Propstack have been imported.', 'connector-for-propstack' );
+			$completed_text .= '<br><br>' . $intro_hint;
 		}
 
 		/**
@@ -625,5 +638,54 @@ class Setup {
 
 		// return the resulting list of links.
 		return $links;
+	}
+
+	/**
+	 * Save the amount of objects in the list and set the progress for the following import.
+	 *
+	 * This is the end of step 1: the list of all objects has been loaded.
+	 *
+	 * @param int $count The amount of objects in the list.
+	 *
+	 * @return void
+	 */
+	public function set_object_count( int $count ): void {
+		$this->object_count = $count;
+
+		// step 1 is done, add the steps for the import of the first objects.
+		update_option( 'esfw_step', 1 );
+		$this->update_max_step( min( $count, $this->get_import_limit() ) );
+	}
+
+	/**
+	 * Set the progress during the import of objects.
+	 *
+	 * The import reports the amount of processed objects, not the difference to the last call.
+	 *
+	 * @param int $count The amount of processed objects.
+	 *
+	 * @return void
+	 */
+	public function set_import_progress( int $count ): void {
+		update_option( 'esfw_step', 1 + min( absint( $count ), $this->get_import_limit() ) );
+	}
+
+	/**
+	 * Return the amount of objects to import during setup.
+	 *
+	 * @return int
+	 */
+	private function get_import_limit(): int {
+		$limit = 10;
+
+		/**
+		 * Filter the amount of objects to import during setup.
+		 *
+		 * The other objects will follow with the next import.
+		 *
+		 * @since 1.1.0 Available since 1.1.0.
+		 * @param int $limit The amount of objects.
+		 */
+		return max( 1, absint( apply_filters( 'cfprop_setup_import_limit', $limit ) ) );
 	}
 }

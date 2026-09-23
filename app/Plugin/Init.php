@@ -87,6 +87,9 @@ class Init {
 		// initialize the compatibility checks.
 		Compatibilities::get_instance()->init();
 
+		// initialize the intro.
+		Intro::get_instance()->init();
+
 		// register cli.
 		add_action( 'cli_init', array( $this, 'cli' ) );
 

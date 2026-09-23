@@ -417,7 +417,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$debug_section = $additional_plugin_settings_tab->add_section( 'propstack_connector_debug_section', 20 );
+		$debug_section = $additional_plugin_settings_tab->add_section( 'propstack_connector_debug_section', 10 );
 		$debug_section->set_title( __( 'Debug', 'connector-for-propstack' ) );
 		if ( method_exists( $debug_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$debug_section->set_collapsible( true );
@@ -523,7 +523,7 @@ class Settings {
 		$setting->set_field( $field );
 
 		// add a section.
-		$plugin_handling_section = $additional_plugin_settings_tab->add_section( 'propstack_connector_plugin_section', 10 );
+		$plugin_handling_section = $additional_plugin_settings_tab->add_section( 'propstack_connector_plugin_section', 30 );
 		$plugin_handling_section->set_title( __( 'Plugin handling', 'connector-for-propstack' ) );
 		if ( method_exists( $plugin_handling_section, 'set_collapsed' ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$plugin_handling_section->set_collapsed( true );
