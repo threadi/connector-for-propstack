@@ -28,6 +28,7 @@
 
 - Fixed check for Elementor Pro and PRO Elements
 - Fixed missing DataView scripts in release build
+- Fixed faulty check for the singular template to display the thumbnail
 
 ### Removed
 
