@@ -66,7 +66,7 @@ class Energy_Efficiency_Classes {
 		/**
 		 * Filter the allowed energy efficiency classes.
 		 *
-		 * @since 1.5.0 Available since 1.5.0.
+		 * @since 2.0.0 Available since 2.0.0.
 		 * @param array<int,string> $allowed_classes List of allowed classes.
 		 */
 		return apply_filters( 'cfprop_energy_efficiency_clases', $allowed_classes );

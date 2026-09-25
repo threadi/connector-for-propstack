@@ -21,7 +21,7 @@ class Energy_Scale extends Blocks_Basis {
 	 *
 	 * @var string
 	 */
-	protected string $name = 'energy_scale';
+	protected string $name = 'energy-scale';
 
 	/**
 	 * Path to the directory where block.json resides.

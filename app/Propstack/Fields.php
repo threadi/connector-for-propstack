@@ -688,7 +688,7 @@ class Fields {
 		if ( ! $object_type_object instanceof Object_Type_Base ) {
 			// add a log entry.
 			/* translators: %1$s will be replaced by the object title. */
-			Log::get_instance()->add( sprintf( __( 'Unknown object type used by the object %1$s. The object type may only be supported by <a href="%2$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), '<em>' . $title . '</em>', Helper::get_pro_url() ), 'error', 'import' );
+			Log::get_instance()->add( sprintf( __( 'Unknown object type used by the object %1$s. The object type may only be supported by <a href="%2$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), '<em>' . $title . '</em>', Helper::get_pro_url() ), 'info', 'import' );
 			return;
 		}
 
@@ -728,17 +728,17 @@ class Fields {
 
 		// get the custom fields.
 		$custom_fields_list = array();
-		if ( is_array( $immo_object['custom_fields'] ) ) {
+		if ( isset( $immo_object['custom_fields'] ) && is_array( $immo_object['custom_fields'] ) ) {
 			foreach ( $immo_object['custom_fields'] as $field_name => $field ) {
 				// add the field to the list.
 				$custom_fields_list[] = $field_name;
 
 				// collect the pretty value.
-				$values[ $field_name . '_pretty_value' ] = is_array( $field ) ? $field['pretty_value'] : $field;
+				$values[ $field_name . '_pretty_value' ] = is_array( $field ) ? ( $field['pretty_value'] ?? '' ) : $field;
 
 				// collect the value.
 				if ( is_array( $field ) ) {
-					$values[ $field_name ] = $field['value'];
+					$values[ $field_name ] = $field['value'] ?? '';
 				}
 			}
 		}

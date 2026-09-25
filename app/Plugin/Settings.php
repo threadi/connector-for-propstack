@@ -321,7 +321,7 @@ class Settings {
 
 		// add section.
 		$additional_object_settings_section = $additional_object_settings_tab->add_section( 'propstack_connector_advanced_objects', 10 );
-		$additional_object_settings_section->set_title( __( 'For objects', 'now-pages' ) );
+		$additional_object_settings_section->set_title( __( 'For objects', 'connector-for-propstack' ) );
 
 		// add a tab for additional settings for objects.
 		$additional_images_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_images', 20 );
@@ -329,7 +329,7 @@ class Settings {
 
 		// add section.
 		$additional_image_settings_section = $additional_images_settings_tab->add_section( 'propstack_connector_advanced_images', 10 );
-		$additional_image_settings_section->set_title( __( 'For images', 'now-pages' ) );
+		$additional_image_settings_section->set_title( __( 'For images', 'connector-for-propstack' ) );
 
 		// add a tab for additional plugin settings.
 		$additional_plugin_settings_tab = $advanced_tab->add_tab( 'propstack_connector_advanced_plugin_settings', 30 );

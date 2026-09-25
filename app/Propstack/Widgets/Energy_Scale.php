@@ -109,7 +109,7 @@ class Energy_Scale extends Widget_Base {
 		/**
 		 * Run custom actions before the output of the archive listing.
 		 *
-		 * @since 1.5.0 Available since 1.5.0.
+		 * @since 2.0.0 Available since 2.0.0.
 		 * @param array $attributes List of attributes.
 		 */
 		do_action( 'cfprop_get_template_before', $attributes );

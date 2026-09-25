@@ -1248,8 +1248,8 @@ class ImmoObjects {
 			return true;
 		}
 
-		// check if the given object type name does exist.
-		$term = ObjectType::get_instance()->get_term_id_by_api_value( $object_type_name, Languages::get_instance()->get_current_lang() );
+		// check if the given object type name does exist in the language of the import (not of the backend).
+		$term = ObjectType::get_instance()->get_term_id_by_api_value( $object_type_name, Languages::get_instance()->get_import_language() );
 
 		// prevent import if the term does not exist.
 		if ( ! $term ) {

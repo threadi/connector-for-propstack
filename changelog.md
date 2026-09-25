@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.0] - 28.09.2026
 
 ### Added
 
@@ -12,6 +12,7 @@
 - Added the Propstack logo as icon in the new WordPress Icon API
 - Added compatibility check for Avia, Beaver Builder, Divi 5 and SiteOrigin
 - Added intro after the setup to introduce the main functions of this plugin
+- Added some new hooks
 
 ### Changed
 

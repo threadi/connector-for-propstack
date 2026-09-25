@@ -424,7 +424,7 @@ class Taxonomy {
 			update_term_meta( $term->term_id, 'api', $default_term['api'] );
 
 			// add the language as a meta-field.
-			update_term_meta( $term->term_id, 'language_code', get_option( 'propstack_connector_languages', Languages::get_instance()->get_current_lang() ) );
+			update_term_meta( $term->term_id, 'language_code', Languages::get_instance()->get_import_language() );
 		}
 	}
 

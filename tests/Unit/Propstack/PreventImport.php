@@ -265,4 +265,65 @@ class PreventImport extends ConnectorForPropstackTestCase {
 
 		$this->assertFalse( $this->immo_objects->prevent_import_by_broker( false, $this->get_object() ) );
 	}
+
+	/**
+	 * Create a state term as the import of states via API v2 does.
+	 *
+	 * @param int    $state_id The Propstack-ID of the state.
+	 * @param string $name     The name of the state.
+	 *
+	 * @return void
+	 */
+	private function create_state_term( int $state_id, string $name ): void {
+		// the states are only used with API v2.
+		update_option( 'propstack_connector_api_version', 'v2' );
+
+		$term = wp_insert_term( $name, \ConnectorForPropstack\Propstack\Taxonomies\Status::get_instance()->get_name() );
+		$this->assertIsArray( $term );
+		update_term_meta( $term['term_id'], 'id', $state_id );
+		update_term_meta( $term['term_id'], 'language_code', \ConnectorForPropstack\Plugin\Languages::get_instance()->get_import_language() );
+	}
+
+	/**
+	 * Test that without configured states only objects in state "Vermarktung" are imported (API v2).
+	 *
+	 * Hint: the API v2 delivers the ID of the state, its name comes from the imported state terms.
+	 *
+	 * @return void
+	 */
+	public function test_state_v2_allows_only_active_marketing_by_default(): void {
+		$this->create_state_term( 222051, 'Vermarktung' );
+		$this->create_state_term( 222052, 'Archiviert' );
+
+		$states = \ConnectorForPropstack\Propstack\States::get_instance();
+
+		// the state "Vermarktung" is allowed.
+		$this->assertFalse( $states->prevent_import_by_state( false, $this->get_object( array( 'property_status_id' => 222051 ) ) ) );
+
+		// any other state is skipped.
+		$this->assertTrue( $states->prevent_import_by_state( false, $this->get_object( array( 'property_status_id' => 222052 ) ) ) );
+
+		// an unknown state is skipped.
+		$this->assertTrue( $states->prevent_import_by_state( false, $this->get_object( array( 'property_status_id' => 999999 ) ) ) );
+
+		// an object without a state is skipped.
+		$this->assertTrue( $states->prevent_import_by_state( false, $this->get_object() ) );
+	}
+
+	/**
+	 * Test that configured states replace the default state (API v2).
+	 *
+	 * @return void
+	 */
+	public function test_state_v2_uses_configured_states(): void {
+		$this->create_state_term( 222051, 'Vermarktung' );
+		$this->create_state_term( 222052, 'Archiviert' );
+
+		update_option( 'propstack_connector_import_states', array( '222052' ) );
+
+		$states = \ConnectorForPropstack\Propstack\States::get_instance();
+
+		$this->assertTrue( $states->prevent_import_by_state( false, $this->get_object( array( 'property_status_id' => 222051 ) ) ) );
+		$this->assertFalse( $states->prevent_import_by_state( false, $this->get_object( array( 'property_status_id' => 222052 ) ) ) );
+	}
 }
