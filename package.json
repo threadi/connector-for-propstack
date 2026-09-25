@@ -1,13 +1,13 @@
 {
   "name": "@connector-for-propstack/connector-for-propstack",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "Provides Blocks for Connector for Propstack.",
   "author": "laOlaWeb GmbH",
   "license": "GPL-2.0-or-later",
   "scripts": {
-    "build": "concurrently --kill-others-on-fail \"npm run build:archive\" \"npm run build:single\" \"npm run build:description\" \"npm run build:field\" \"npm run build:broker-field\" \"npm run build:filter\" \"npm run build:lightbox\" \"npm run build:gallery\" \"npm run build:energy_scale\"",
+    "build": "concurrently --kill-others-on-fail \"npm run build:archive\" \"npm run build:single\" \"npm run build:description\" \"npm run build:field\" \"npm run build:broker-field\" \"npm run build:filter\" \"npm run build:lightbox\" \"npm run build:gallery\" \"npm run build:energy_scale\" \"npm run copy:driver\"",
     "format": "wp-scripts format",
-    "start": "concurrently --kill-others-on-fail \"npm run start:archive\" \"npm run start:single\" \"npm run start:description\" \"npm run start:field\" \"npm run start:broker-field\" \"npm run start:filter\" \"npm run start:lightbox\" \"npm run start:gallery\" \"npm run start:energy_scale\"",
+    "start": "concurrently --kill-others-on-fail \"npm run start:archive\" \"npm run start:single\" \"npm run start:description\" \"npm run start:field\" \"npm run start:broker-field\" \"npm run start:filter\" \"npm run start:lightbox\" \"npm run start:gallery\" \"npm run start:energy_scale\" \"npm run copy:driver\"",
     "packages-update": "wp-scripts packages-update",
     "start:description": "wp-scripts start blocks/description/src/index.js --output-path=blocks/description/build/",
     "build:description": "wp-scripts build blocks/description/src/index.js --output-path=blocks/description/build/",
@@ -29,7 +29,8 @@
     "build:energy_scale": "wp-scripts build blocks/energy-scale/src/index.js --output-path=blocks/energy-scale/build/",
     "make-pot": "wp i18n make-pot . languages/connector-for-propstack.pot --exclude=blocks/single/src/,blocks/description/src/,blocks/field/src/,blocks/archive/src/,svn/",
     "make-json": "wp i18n make-json languages",
-    "global-styles": "cat blocks/*/build/style-index.css > css/blocks.css"
+    "global-styles": "cat blocks/*/build/style-index.css > css/blocks.css",
+    "copy:driver": "mkdir -p admin/driver && cp node_modules/driver.js/dist/driver.js.iife.js node_modules/driver.js/dist/driver.css admin/driver/ && cp node_modules/driver.js/license admin/driver/"
   },
   "devDependencies": {
     "@wordpress/scripts": "~34.2.0",
@@ -41,6 +42,6 @@
     "@wordpress/i18n": "^6.2.0",
     "concurrently": "^9.2.1",
     "lightbox3": "^1.4.0",
-    "intro.js": "^8.6.0"
+    "driver.js": "^1.8.0"
   }
 }

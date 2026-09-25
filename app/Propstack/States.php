@@ -10,8 +10,10 @@ namespace ConnectorForPropstack\Propstack;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use ConnectorForPropstack\Plugin\Languages;
 use ConnectorForPropstack\Propstack\Taxonomies\Status;
 use WP_Error;
+use WP_Term;
 use WP_Term_Query;
 
 /**
@@ -158,12 +160,61 @@ class States {
 	 * @return bool
 	 */
 	public function prevent_import_by_state( bool $prevent_import, array $immo_object ): bool {
-		// bail if "property_status_id" (API v2) is set.
-		if ( ! empty( $immo_object['property_status_id'] ) ) {
-			return ImmoObjects::get_instance()->prevent_import_by_taxonomy( 'propstack_connector_import_states', (string) $immo_object['property_status_id'], $prevent_import );
+		// prevent the import if no state is set.
+		if ( empty( $immo_object['property_status_id'] ) ) {
+			return true;
 		}
 
-		// prevent the import if no state is set.
-		return true;
+		// get the state of this object.
+		$property_status_id = (string) $immo_object['property_status_id'];
+
+		// use the configured states, if any are configured.
+		$import_states = get_option( 'propstack_connector_import_states' );
+		if ( is_array( $import_states ) && ! empty( $import_states ) && ! ( isset( $import_states[0] ) && empty( $import_states[0] ) ) ) {
+			return ImmoObjects::get_instance()->prevent_import_by_taxonomy( 'propstack_connector_import_states', $property_status_id, $prevent_import );
+		}
+
+		// without configured states, only objects in state "Vermarktung" are imported (same as with API v1).
+		if ( 'Vermarktung' !== $this->get_state_name( $property_status_id ) ) {
+			return true;
+		}
+
+		// return the value.
+		return $prevent_import;
+	}
+
+	/**
+	 * Return the name of the given state.
+	 *
+	 * The API v2 delivers the ID of the state. Its name is taken from the imported state terms.
+	 *
+	 * @param string $property_status_id The state as delivered by the API.
+	 *
+	 * @return string
+	 */
+	private function get_state_name( string $property_status_id ): string {
+		// return the value as it is, if it is not an ID.
+		if ( ! is_numeric( $property_status_id ) ) {
+			return $property_status_id;
+		}
+
+		// get the term of this state.
+		$term_id = $this->get_term_id_by_id( absint( $property_status_id ), Languages::get_instance()->get_import_language() );
+
+		// bail if the state is unknown.
+		if ( ! is_int( $term_id ) ) {
+			return '';
+		}
+
+		// get the term object.
+		$term = get_term( $term_id, Status::get_instance()->get_name() );
+
+		// bail if this is not a term.
+		if ( ! $term instanceof WP_Term ) {
+			return '';
+		}
+
+		// return the name of the state.
+		return $term->name;
 	}
 }

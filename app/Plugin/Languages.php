@@ -193,6 +193,28 @@ class Languages {
 	}
 
 	/**
+	 * Return the language used for imports from Propstack.
+	 *
+	 * This is the configured import language. If none is configured, the fallback language is used.
+	 * Everything which is stored or looked up during an import (objects, default terms, states)
+	 * must use this language, independent of the language of the WordPress backend.
+	 *
+	 * @return string
+	 */
+	public function get_import_language(): string {
+		// get the configured language.
+		$language_code = (string) get_option( 'propstack_connector_languages', '' );
+
+		// use the fallback language if no language is configured.
+		if ( empty( $language_code ) ) {
+			$language_code = $this->get_fallback_language_name();
+		}
+
+		// return the language.
+		return $language_code;
+	}
+
+	/**
 	 * Return whether the given language is supported or not.
 	 *
 	 * @param string $language_name The requested language name (e.g., "en").

@@ -126,6 +126,8 @@ class Compatibilities {
 	public function get_compatibility_checks(): array {
 		$list = array(
 			'ConnectorForPropstack\Plugin\Compatibilities\Avada',
+			'ConnectorForPropstack\Plugin\Compatibilities\Avia',
+			'ConnectorForPropstack\Plugin\Compatibilities\Beaver',
 			'ConnectorForPropstack\Plugin\Compatibilities\Breakdance',
 			'ConnectorForPropstack\Plugin\Compatibilities\Bricks',
 			'ConnectorForPropstack\Plugin\Compatibilities\Brizy',
@@ -134,6 +136,7 @@ class Compatibilities {
 			'ConnectorForPropstack\Plugin\Compatibilities\Divi5',
 			'ConnectorForPropstack\Plugin\Compatibilities\Elementor',
 			'ConnectorForPropstack\Plugin\Compatibilities\Salient_WpBakery',
+			'ConnectorForPropstack\Plugin\Compatibilities\SiteOrigin',
 			'ConnectorForPropstack\Plugin\Compatibilities\WpBakery',
 			'ConnectorForPropstack\Plugin\Compatibilities\Wpforms',
 			'ConnectorForPropstack\Plugin\Compatibilities\WpformsLite',

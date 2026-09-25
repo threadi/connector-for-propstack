@@ -50,7 +50,7 @@ The Pro version removes the limits of the free version and adds everything you n
 
 ➕ Import and display of all property types Propstack offers, such as "Plot", "Office" or "Store"
 ➕ Considerably more data fields for your Propstack properties
-➕ Eight widgets and ready-made templates for page builders such as Avada, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Elementor, GeneratePress Elements, Salient and WPBakery
+➕ Ten widgets and ready-made templates for page builders such as Avada, Avia (Enfold), Beaver Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Elementor, GeneratePress Elements, Live Composer, Oxygen, Salient, SiteOrigin, Themify, WPBakery and Zion Builder
 ➕ Send contact enquiries straight into Propstack using Avada Forms, Elementor Forms, Contact Form 7 or WPForms
 ➕ Additional blocks for the block editor, for example object status
 ➕ Personal support by the developers
@@ -154,15 +154,27 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Optimized deletion of objects for more speed
-- Optimizations on import for more speed too
-- Check for valid API key during first step in setup and show hints if there are any problems
-- Show info about empty feed from Propstack in setup
-- Better infos in import dialog about the start
-- Prevent crypt error after installation
-- Updates setup and settings lib
-- Fixed 2 wrong textdomains in Settings.php
-- Fixed missing usage of Lightbox for the gallery widget
-- Fixed old interval name for 2 settings
+- Added new widget for show the energy scale of a single object, usable as Block and via shortcode
+- Added new field type for energy efficiency classes with check against a whitelist for value A+ to H
+- Added new field type for geo coordinates to output them with 4 digits
+- Added internal names for each supported page builder
+- Added 9 abilities to get object data or start imports via AI or your MCP plugin
+- Added the Propstack logo as icon in the new WordPress Icon API
+- Added compatibility check for Avia, Beaver Builder, Divi 5 and SiteOrigin
+- Added intro after the setup to introduce the main functions of this plugin
+- Added some new hooks
+- Optimized the setup to onboarding the plugin
+- Use $throwable::class instead of get_class() for the modern way of PHP
+- Use configured language during the installation of default terms for our taxonomies
+- Do not show error marker if setup has not been completed
+- Resort some settings
+- Updated settings lib
+- Updated lightbox3 library
+- Fixed check for Elementor Pro and PRO Elements
+- Fixed missing DataView scripts in release build
+
+### Removed
+
+- Removed language files from repository
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)

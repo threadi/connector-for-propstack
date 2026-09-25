@@ -78,6 +78,9 @@ class Update {
 			if ( version_compare( $db_plugin_version, '1.0.5', '<' ) ) {
 				$this->version105();
 			}
+			if ( version_compare( $db_plugin_version, '2.0.0', '<' ) ) {
+				$this->version200();
+			}
 
 			// log that this update has been run.
 			/* translators: %1$s and %2$s are replaced by the old and new version. */
@@ -117,5 +120,15 @@ class Update {
 		if ( 'propstack_connector_15minutely' === $queue_interval ) {
 			update_option( 'propstackConnectorQueueScheduleInterval', 'cfprop_15minutely' );
 		}
+	}
+
+	/**
+	 * Run on update to 2.0.0.
+	 *
+	 * @return void
+	 */
+	private function version200(): void {
+		// set the intro to closed for old users during the update.
+		Intro::get_instance()->set_closed();
 	}
 }

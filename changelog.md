@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.0] - 28.09.2026
 
 ### Added
 
@@ -10,8 +10,9 @@
 - Added internal names for each supported page builder
 - Added 9 abilities to get object data or start imports via AI or your MCP plugin
 - Added the Propstack logo as icon in the new WordPress Icon API
-- Added compatibility check for Divi 5
+- Added compatibility check for Avia, Beaver Builder, Divi 5 and SiteOrigin
 - Added intro after the setup to introduce the main functions of this plugin
+- Added some new hooks
 
 ### Changed
 
@@ -27,6 +28,10 @@
 
 - Fixed check for Elementor Pro and PRO Elements
 - Fixed missing DataView scripts in release build
+
+### Removed
+
+- Removed language files from repository
 
 ## [1.1.1] - 16.09.2026
 

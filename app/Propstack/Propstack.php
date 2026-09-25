@@ -389,19 +389,21 @@ class Propstack {
 			return;
 		}
 
-		// bail if our collection is already registered.
-		if ( \WP_Icon_Collections_Registry::get_instance()->is_registered( 'connector-for-propstack' ) ) {
-			return;
+		// register the collection, if it is not already registered.
+		if ( ! \WP_Icon_Collections_Registry::get_instance()->is_registered( 'cfprop' ) ) {
+			wp_register_icon_collection(
+				'cfprop',
+				array(
+					'label'       => __( 'Propstack', 'connector-for-propstack' ),
+					'description' => __( 'Icons from Propstack.', 'connector-for-propstack' ),
+				)
+			);
 		}
 
-		// register the collection.
-		wp_register_icon_collection(
-			'cfprop',
-			array(
-				'label'       => __( 'Propstack', 'connector-for-propstack' ),
-				'description' => __( 'Icons from Propstack.', 'connector-for-propstack' ),
-			)
-		);
+		// bail if our icon is already registered.
+		if ( class_exists( '\WP_Icons_Registry' ) && \WP_Icons_Registry::get_instance()->is_registered( 'cfprop/logo' ) ) {
+			return;
+		}
 
 		// register the icon in this collection.
 		wp_register_icon(

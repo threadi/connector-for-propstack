@@ -154,13 +154,21 @@ class States extends Import_Base {
 						// add the term.
 						$term_data = wp_insert_term( $state['name'], Status::get_instance()->get_name() );
 
+						// use the existing term if a term with this name already exists.
+						if ( is_wp_error( $term_data ) && 'term_exists' === $term_data->get_error_code() ) {
+							$term_data = array( 'term_id' => absint( $term_data->get_error_data() ) );
+						}
+
 						// bail on error.
-						if ( is_wp_error( $term_data ) ) {
+						if ( is_wp_error( $term_data ) || empty( $term_data['term_id'] ) ) {
 							continue;
 						}
 
-						// set the term ID as metadata.
-						$term_id = $term_data['term_id'];
+						// get the term ID.
+						$term_id = absint( $term_data['term_id'] );
+
+						// set the Propstack-ID of the state as metadata.
+						update_term_meta( $term_id, 'id', absint( $state['id'] ) );
 					}
 
 					// set the language code.

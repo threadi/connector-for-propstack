@@ -145,8 +145,8 @@ class Intro {
 		}
 
 		// embed the necessary scripts for the dialog.
-		$path = Helper::get_plugin_path() . 'node_modules/intro.js/minified/';
-		$url  = Helper::get_plugin_url() . 'node_modules/intro.js/minified/';
+		$path = Helper::get_plugin_path() . 'admin/driver/';
+		$url  = Helper::get_plugin_url() . 'admin/driver/';
 
 		// bail if a path does not exist.
 		if ( ! file_exists( $path ) ) {
@@ -155,36 +155,36 @@ class Intro {
 
 		// embed the JS script from "intro.js".
 		wp_enqueue_script(
-			'cfprop-intro',
-			$url . 'intro.min.js',
+			'cfprop-driver',
+			$url . 'driver.js.iife.js',
 			array(),
-			Helper::get_file_version( trailingslashit( $path ) . 'intro.min.js' ),
+			Helper::get_file_version( trailingslashit( $path ) . 'driver.js.iife.js' ),
 			true
 		);
 
 		// embed our own JS script.
 		wp_enqueue_script(
 			'cfprop-intro-custom',
-			Helper::get_plugin_url() . 'admin/intro.js',
-			array( 'cfprop-intro' ),
-			Helper::get_file_version( Helper::get_plugin_path() . '/admin/intro.js' ),
+			Helper::get_plugin_url() . 'admin/driver.js',
+			array( 'cfprop-driver', 'jquery' ),
+			Helper::get_file_version( Helper::get_plugin_path() . '/admin/driver.js' ),
 			true
 		);
 
 		// embed the CSS file.
 		wp_enqueue_style(
-			'cfprop-intro',
-			$url . 'introjs.min.css',
+			'cfprop-driver',
+			$url . 'driver.css',
 			array(),
-			Helper::get_file_version( trailingslashit( $path ) . 'introjs.min.css' ),
+			Helper::get_file_version( trailingslashit( $path ) . 'driver.css' ),
 		);
 
 		// embed the CSS file.
 		wp_enqueue_style(
 			'cfprop-intro-custom',
-			Helper::get_plugin_url() . 'admin/intro.css',
+			Helper::get_plugin_url() . 'admin/driver.css',
 			array(),
-			Helper::get_file_version( Helper::get_plugin_path() . '/admin/intro.css' ),
+			Helper::get_file_version( Helper::get_plugin_path() . '/admin/driver.css' ),
 		);
 
 		// add php-vars to our js-script.
@@ -204,7 +204,7 @@ class Intro {
 				'step_3_title'       => __( 'The images', 'connector-for-propstack' ),
 				'step_3_intro'       => __( 'The images of your objects will be automatically requested from Propstack. If you want to speed things up, you can also click this button. Alternatively, you will find a button in the settings under Import > Images that lets you download all images at once.', 'connector-for-propstack' ),
 				'step_4_title'       => __( 'Change the view', 'connector-for-propstack' ),
-				'step_4_intro'       => __( 'Choose the columns you need in your list. Which columns are filled depends on the data in your Propstack account.', 'connector-for-propstack' ),
+				'step_4_intro'       => __( 'Choose the columns you need in your list in the backend. Which columns are filled depends on the data in your Propstack account. These settings are saved on your WordPress user.', 'connector-for-propstack' ),
 				'step_5_title'       => __( 'Run the import', 'connector-for-propstack' ),
 				'step_5_intro'       => __( 'On this button you could run the import of objects from Propstack any time. They can be displayed immediately afterwards in the frontend to your visitors.', 'connector-for-propstack' ),
 				'step_6_title'       => __( 'Frontend view', 'connector-for-propstack' ),
