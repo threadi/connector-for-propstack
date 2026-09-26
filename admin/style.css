@@ -149,7 +149,7 @@ body.settings_page_connector-for-propstack {
 	}
 }
 
-body.post-type-cfprop_object a:not(.review-hint-button)[target="_blank"]:after {
+body.post-type-cfprop_object a:not(.review-hint-button)[target="_blank"]:after, .cfprop-media-object a[target="_blank"]:after {
 	content: "\f504";
 	display: inline-block;
 	font-family: "dashicons", sans-serif;
