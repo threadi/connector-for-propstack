@@ -70,7 +70,6 @@ class Templates extends ConnectorForPropstackTestCase {
 	 */
 	public function test_is_valid_template_name(): void {
 		$method = new \ReflectionMethod( \ConnectorForPropstack\Plugin\Templates::class, 'is_valid_template_name' );
-		$method->setAccessible( true );
 		$templates_obj = \ConnectorForPropstack\Plugin\Templates::get_instance();
 
 		$this->assertTrue( $method->invoke( $templates_obj, 'parts/archive.php' ) );

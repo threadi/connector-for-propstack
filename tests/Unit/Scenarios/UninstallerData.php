@@ -58,7 +58,6 @@ class UninstallerData extends ConnectorForPropstackTestCase {
 	 */
 	private function restore_plugin(): void {
 		$method = new \ReflectionMethod( \ConnectorForPropstack\Plugin\Installer::class, 'activation_tasks' );
-		$method->setAccessible( true );
 		$method->invoke( \ConnectorForPropstack\Plugin\Installer::get_instance() );
 	}
 
