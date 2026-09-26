@@ -27,7 +27,8 @@ if ( ! empty( $attributes['listing_template'] ) && is_string( $attributes['listi
 			<?php
 		endif;
 	else :
-		?><article class="site-main entry inside-article container site-content site-container content-bg content-area ht-container"><div class="entry-content"><p><?php echo esc_html__( 'There are currently no objects available.', 'connector-for-propstack' ); ?></p></div></article>
+		?>
+		<article class="site-main entry inside-article container site-content site-container content-bg content-area ht-container"><div class="entry-content"><p><?php echo esc_html__( 'There are currently no objects available.', 'connector-for-propstack' ); ?></p></div></article>
 		<?php
 	endif;
 }

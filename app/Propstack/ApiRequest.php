@@ -106,7 +106,7 @@ class ApiRequest {
 	 * Set post-data for the request.
 	 *
 	 * @param string|array<string,mixed> $post_data The post-data as JSON- or boundary-string OR as an array.
-		 * @return void
+	 * @return void
 	 */
 	public function set_post_data( string|array $post_data ): void {
 		$this->post_data = $post_data;
