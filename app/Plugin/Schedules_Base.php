@@ -78,8 +78,19 @@ class Schedules_Base {
 	 * @return string
 	 */
 	public function get_interval(): string {
-		$interval = $this->interval;
+		$interval = $this->interval ?? '';
 		$instance = $this;
+
+		// migrate interval names from before the prefix "cfprop_" was introduced.
+		if ( str_starts_with( $interval, 'propstack_connector_' ) ) {
+			$interval = 'cfprop_' . substr( $interval, strlen( 'propstack_connector_' ) );
+		}
+
+		// use the default interval if the configured one is empty or not registered in WordPress.
+		$schedules = wp_get_schedules();
+		if ( ( empty( $interval ) || ! isset( $schedules[ $interval ] ) ) && ! empty( $this->get_default_interval() ) ) {
+			$interval = $this->get_default_interval();
+		}
 		/**
 		 * Filter the interval to a single schedule.
 		 *
@@ -119,8 +130,28 @@ class Schedules_Base {
 			return;
 		}
 
+		// start the first run after one interval, not immediately (e.g., directly after activation or during the setup).
+		$interval  = $this->get_interval();
+		$schedules = wp_get_schedules();
+		$first_run = time() + ( isset( $schedules[ $interval ]['interval'] ) ? absint( $schedules[ $interval ]['interval'] ) : 0 );
+
 		// create the schedule.
-		wp_schedule_event( time(), $this->get_interval(), $this->get_name(), $this->get_args(), true );
+		$result = wp_schedule_event( $first_run, $interval, $this->get_name(), $this->get_args(), true );
+
+		// log if the schedule could not be created, e.g., because of an unknown interval.
+		if ( is_wp_error( $result ) ) {
+			Log::get_instance()->add(
+				sprintf(
+				/* translators: %1$s will be replaced by the schedule name, %2$s by the interval, %3$s by the error message. */
+					__( 'Schedule %1$s could not be created with interval %2$s: %3$s', 'connector-for-propstack' ),
+					'<code>' . esc_html( $this->get_name() ) . '</code>',
+					'<code>' . esc_html( $this->get_interval() ) . '</code>',
+					esc_html( $result->get_error_message() )
+				),
+				'error',
+				$this->log_category
+			);
+		}
 	}
 
 	/**
@@ -236,7 +267,7 @@ class Schedules_Base {
 	 * @return string
 	 */
 	public function get_default_interval(): string {
-		return $this->default_interval;
+		return $this->default_interval ?? '';
 	}
 
 	/**

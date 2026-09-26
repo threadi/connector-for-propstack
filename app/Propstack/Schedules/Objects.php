@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\Schedules_Base;
+use ConnectorForPropstack\Plugin\Setup;
 
 /**
  * Object for this schedule.
@@ -37,7 +38,7 @@ class Objects extends Schedules_Base {
 	 *
 	 * @var string
 	 */
-	protected string $default_interval = 'cfprop_15minutely';
+	protected string $default_interval = 'cfprop_daily';
 
 	/**
 	 * Initialize this schedule.
@@ -56,6 +57,16 @@ class Objects extends Schedules_Base {
 		// bail if import is not enabled.
 		if ( ! $this->is_enabled() ) {
 			// do nothing more.
+			return;
+		}
+
+		// bail if the setup is not completed, the setup runs the first import itself.
+		if ( ! Setup::get_instance()->is_completed() ) {
+			return;
+		}
+
+		// bail if no API key is configured, a request would only end in an authentication error.
+		if ( empty( get_option( 'propstack_connector_api_key' ) ) ) {
 			return;
 		}
 

@@ -49,9 +49,34 @@ class Objects extends Import_Base {
 	 * request. The work list is built once and stored in an option, the position of the
 	 * running import is kept in a second option.
 	 *
+	 * Every run (the first one and each continuation) takes a lock for its chunk, so the same
+	 * chunk is never processed by two requests (e.g. cron and AJAX) at the same time.
+	 *
 	 * @return void
 	 */
 	public function run(): void {
+		// bail if another process is working on this import right now.
+		if ( ! $this->acquire_chunk_lock() ) {
+			$this->handle_locked_chunk();
+
+			// do nothing more.
+			return;
+		}
+
+		// run this chunk and release the lock in any case.
+		try {
+			$this->run_chunk();
+		} finally {
+			$this->release_chunk_lock();
+		}
+	}
+
+	/**
+	 * Process a single chunk of the import of objects.
+	 *
+	 * @return void
+	 */
+	private function run_chunk(): void {
 		global $wpdb;
 
 		// get the work list of a paginated import which is already in progress.
@@ -145,6 +170,9 @@ class Objects extends Import_Base {
 			// add a log entry.
 			Log::get_instance()->add( __( 'Import of objects has started.', 'connector-for-propstack' ), 'success', 'import' );
 		}
+
+		// refresh the running marker on every chunk, so it only gets stale if the import does not progress.
+		update_option( CFPROP_IMPORT_RUNNING, time() );
 
 		// add a log entry.
 		Log::get_instance()->add( __( 'Import of objects has running.', 'connector-for-propstack' ), 'info', 'import' );
@@ -299,6 +327,9 @@ class Objects extends Import_Base {
 				$import_data['block_size'] = $block_size;
 				$import_data['objects']    = array();
 
+				// remember any error during loading the objects, the import is incomplete then.
+				$import_data = $this->persist_errors( $import_data );
+
 				// save the metadata and reset the position.
 				update_option( $this->work_list_option, $import_data );
 				update_option( $this->offset_option, 0 );
@@ -342,6 +373,9 @@ class Objects extends Import_Base {
 
 				// delete them.
 				foreach ( $post_ids as $post_id ) {
+					// keep the lock of this chunk alive.
+					$this->refresh_chunk_lock();
+
 					// bail if this is not an ID.
 					if ( ! is_int( $post_id ) ) {
 						continue;
@@ -373,7 +407,7 @@ class Objects extends Import_Base {
 					$this->set_load_more( true );
 
 					// save the state and stop here.
-					update_option( $this->work_list_option, $import_data );
+					update_option( $this->work_list_option, $this->persist_errors( $import_data ) );
 
 					// do nothing more.
 					return;
@@ -404,6 +438,9 @@ class Objects extends Import_Base {
 					$this->set_load_more( false );
 
 					$this->clear_work_list();
+
+					// do nothing more.
+					return;
 				}
 
 				// count the objects processed in this run.
@@ -433,6 +470,9 @@ class Objects extends Import_Base {
 					if ( ( $block_index * $block_size + $index_in_block ) < $offset ) {
 						continue;
 					}
+
+					// keep the lock of this chunk alive.
+					$this->refresh_chunk_lock();
 
 					// stop this run if the time budget is used up, the request will be restarted.
 					if ( $time_budget > 0 && $counter > 0 && ! Helper::is_cli() && ! wp_doing_cron() && ( microtime( true ) - $chunk_start ) > $time_budget ) {
@@ -638,17 +678,18 @@ class Objects extends Import_Base {
 
 				// stop here if another run is needed to complete this import.
 				if ( $this->has_load_more() ) {
-					// save the current state of the meta data.
-					update_option( $this->work_list_option, $import_data );
+					// save the current state of the meta data, including the errors of this chunk.
+					update_option( $this->work_list_option, $this->persist_errors( $import_data ) );
 
 					// do nothing more.
 					return;
 				}
 
-				// switch to the cleanup phase if this import delivered objects and ran without errors.
-				if ( absint( $import_data['total'] ) > 0 && ! $this->has_errors() ) {
-					$import_data['phase'] = 'cleanup';
+				// get the errors of previous chunks, any of them marks this import as incomplete.
+				$this->restore_errors( $import_data );
 
+				// switch to the cleanup phase if this import delivered objects and ran without errors in any chunk.
+				if ( absint( $import_data['total'] ) > 0 && ! $this->has_errors() ) {
 					// count the objects which have to be removed, to show a progress for this phase.
 					$obsolete = new WP_Query(
 						array(
@@ -671,19 +712,64 @@ class Objects extends Import_Base {
 						)
 					);
 
-					// use the amount as the new maximum for the progress bar.
-					$process_handler->set_max_count( absint( $obsolete->found_posts ) );
-					$process_handler->set_count( 0 );
+					// count all existing objects.
+					$existing = new WP_Query(
+						array(
+							'post_type'      => ImmoObject::get_instance()->get_name(),
+							'post_status'    => 'any',
+							'posts_per_page' => 1,
+							'fields'         => 'ids',
+						)
+					);
 
-					$this->set_load_more( true );
+					$obsolete_count = absint( $obsolete->found_posts );
+					$existing_count = absint( $existing->found_posts );
 
-					// save the state and stop here.
-					update_option( $this->work_list_option, $import_data );
+					$max_ratio = 0.5;
+					/**
+					 * Filter the max. ratio of existing objects which could be removed by the cleanup after an import.
+					 *
+					 * If more objects would be removed, the cleanup is skipped as a safeguard against incomplete
+					 * data from the API. Use 1 to allow the removal of all objects.
+					 *
+					 * @since 2.0.0 Available since 2.0.0.
+					 * @param float $max_ratio      The ratio between 0 and 1.
+					 * @param int   $obsolete_count The amount of objects which would be removed.
+					 * @param int   $existing_count The amount of existing objects.
+					 */
+					$max_ratio = (float) apply_filters( 'cfprop_import_max_cleanup_ratio', $max_ratio, $obsolete_count, $existing_count );
 
-					// do nothing more.
-					return;
+					// skip the cleanup if it would remove too many objects.
+					if ( $existing_count > 5 && $obsolete_count > ( $existing_count * $max_ratio ) ) {
+						$this->add_error(
+							'propstack_object_import_cleanup_skipped',
+							sprintf(
+							/* translators: %1$d will be replaced by the amount of objects to remove, %2$d by the amount of existing objects. */
+								__( '%1$d of %2$d existing objects are no longer delivered by Propstack and would be deleted. As these are too many at once, no object has been deleted as a precaution. Check your import settings or delete the objects manually if this is intended.', 'connector-for-propstack' ),
+								$obsolete_count,
+								$existing_count
+							)
+						);
+					} else {
+						$import_data['phase'] = 'cleanup';
+
+						// use the amount as the new maximum for the progress bar.
+						$process_handler->set_max_count( $obsolete_count );
+						$process_handler->set_count( 0 );
+
+						$this->set_load_more( true );
+
+						// save the state and stop here.
+						update_option( $this->work_list_option, $import_data );
+
+						// do nothing more.
+						return;
+					}
 				}
 			}
+
+			// get the errors of previous chunks to report them.
+			$this->restore_errors( $import_data );
 
 			// the import is completed - run the tasks for each imported language now.
 			foreach ( array_keys( $import_data['md5'] ) as $language_code ) {
@@ -696,8 +782,8 @@ class Objects extends Import_Base {
 				 */
 				do_action( 'cfprop_import_language', (string) $language_code );
 
-				// save the md5 hash only if all objects of this language could be imported.
-				if ( 0 === $import_data['skipped'][ $language_code ] ) {
+				// save the md5 hash only if all objects of this language could be imported and the import is complete.
+				if ( 0 === $import_data['skipped'][ $language_code ] && ! $this->has_errors() ) {
 					update_option( 'cfprop_md5_' . $language_code, $import_data['md5'][ $language_code ] );
 				}
 			}
@@ -759,6 +845,9 @@ class Objects extends Import_Base {
 			// make sure the import is not marked as continuable.
 			$this->set_load_more( false );
 		} finally {
+			// log the errors of this chunk, the next chunk is a new request and would lose them.
+			$this->save_errors_in_log();
+
 			// keep the markers as they are if another run is needed to complete this import.
 			if ( ! $this->has_load_more() ) {
 				/**
@@ -770,7 +859,7 @@ class Objects extends Import_Base {
 				 */
 				do_action( 'cfprop_import_object_after', $instance );
 
-				// log the errors.
+				// log the errors which have been added by the tasks above.
 				$this->save_errors_in_log();
 
 				// add a log entry.
@@ -936,6 +1025,9 @@ class Objects extends Import_Base {
 		$previous_page_hash = '';
 
 		do {
+			// keep the lock of this chunk alive.
+			$this->refresh_chunk_lock();
+
 			// request one page.
 			$request_object = new ApiRequest();
 			$request_object->set_url( $this->get_url( $language_code, $page, $per ) );
@@ -978,7 +1070,10 @@ class Objects extends Import_Base {
 			// decode.
 			$data = json_decode( $request_object->get_response(), true );
 			if ( ! is_array( $data ) || ! isset( $data['data'] ) || ! is_array( $data['data'] ) ) {
-				Log::get_instance()->add( __( 'Error during decoding the API response.', 'connector-for-propstack' ), 'error', 'import' );
+				// save the error, the import is incomplete.
+				$this->add_error( 'propstack_object_import_decoding', __( 'Error during decoding the API response.', 'connector-for-propstack' ) );
+
+				// do nothing more in this language.
 				return;
 			}
 
@@ -1017,17 +1112,16 @@ class Objects extends Import_Base {
 			)
 		);
 
-		// safety check: warn if we ended up with fewer than reported.
-		if ( null !== $total && $collected < $total && $page <= $max_pages ) {
-			Log::get_instance()->add(
+		// safety check: mark the import as incomplete if we ended up with fewer than reported.
+		if ( null !== $total && $collected < $total ) {
+			$this->add_error(
+				'propstack_object_import_incomplete',
 				sprintf(
 				/* translators: %1$d received, %2$d total. */
 					__( 'Only %1$d of %2$d objects were imported. The rest could not be loaded.', 'connector-for-propstack' ),
 					$collected,
 					$total
-				),
-				'error',
-				'import'
+				)
 			);
 		}
 	}

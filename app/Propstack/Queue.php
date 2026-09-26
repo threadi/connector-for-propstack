@@ -182,8 +182,16 @@ class Queue {
 		/* translators: %1$s: the given title. */
 		Log::get_instance()->add( sprintf( __( 'Adding files for %1$s during import.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'queue' );
 
+		// bail if no images are given.
+		if ( empty( $immo_object['images'] ) || ! is_array( $immo_object['images'] ) ) {
+			return;
+		}
+
 		// get the map of file IDs already in the queue.
 		$list_of_existing_files_in_queue = $this->get_queue_map();
+
+		// get the image size setting.
+		$image_size = get_option( 'propstack_connector_image_size', 'big_url' );
 
 		// add the images of this object to the queue.
 		foreach ( $immo_object['images'] as $file ) {
@@ -193,6 +201,18 @@ class Queue {
 			if ( isset( $list_of_existing_files_in_queue[ $file['id'] ] ) ) {
 				$queue_post_id = $list_of_existing_files_in_queue[ $file['id'] ];
 				$state         = 1;
+			}
+
+			// do not add files to the queue, which would not be imported anyway (e.g. private files).
+			if ( $this->is_file_import_prevented( $file, (string) ( $file[ $image_size ] ?? '' ) ) ) {
+				// remove the queue entry.
+				if ( $queue_post_id > 0 ) {
+					wp_delete_post( $queue_post_id, true );
+					unset( $this->queue_map[ (string) $file['id'] ] );
+				}
+
+				// do nothing more with this file.
+				continue;
 			}
 
 			// bail if the given URL is already in the media library.
@@ -240,6 +260,7 @@ class Queue {
 				'post_author'  => Helper::get_author_during_object_creation(),
 				'post_parent'  => $post_id,
 				'post_content' => '',
+				'menu_order'   => 0,
 				'meta_input'   => $meta,
 			);
 			$queue_post_id = wp_insert_post( $query, true );
@@ -261,6 +282,10 @@ class Queue {
 
 			// mark the object as changed.
 			update_post_meta( $queue_post_id, 'changed', time() );
+
+			// reset any previous failures, as the entry has been (re-)added to the queue.
+			delete_post_meta( $queue_post_id, 'failed' );
+			delete_post_meta( $queue_post_id, 'failed_attempts' );
 
 			// add a log entry.
 			if ( 0 === $state ) {
@@ -287,16 +312,28 @@ class Queue {
 			$limit = 10;
 		}
 
-		// get entries to process.
+		// get entries to process: fresh entries first, failed entries (with fewer than max attempts) after them.
+		// the "menu_order" contains the count of failed attempts for each entry.
 		$query = array(
 			'post_type'      => PostTypes\Queue::get_instance()->get_name(),
 			'post_status'    => 'publish',
 			'posts_per_page' => $limit,
 			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
+				'relation' => 'OR',
 				array(
-					'key'     => 'failed',
+					'key'     => 'failed_attempts',
 					'compare' => 'NOT EXISTS',
 				),
+				array(
+					'key'     => 'failed_attempts',
+					'value'   => $this->get_max_attempts(),
+					'compare' => '<',
+					'type'    => 'NUMERIC',
+				),
+			),
+			'orderby'        => array(
+				'menu_order' => 'ASC',
+				'date'       => 'ASC',
 			),
 		);
 
@@ -389,6 +426,18 @@ class Queue {
 			// get the immo object.
 			$immo_object = $immo_objects->get_object( $post->post_parent );
 
+			// remove entries from the queue, which would not be imported anyway (e.g. private files added by older versions).
+			if ( $this->is_file_import_prevented( (array) get_post_meta( $post->ID, 'api_response', true ), (string) $url ) ) {
+				wp_delete_post( $post->ID, true );
+
+				// show progress.
+				$process_handler->set_count( $process_handler->get_count() + 1 );
+				$progress ? $progress->tick() : '';
+
+				// continue with the next entry.
+				continue;
+			}
+
 			// show status.
 			/* translators: %1$s: the file name. */
 			$process_handler->set_status( sprintf( __( 'Processing file %1$s for %2$s', 'connector-for-propstack' ), '<em>' . $name . '</em>', '<em>' . $immo_object->get_title() . '</em>' ) );
@@ -417,8 +466,22 @@ class Queue {
 				// delete it from the queue.
 				wp_delete_post( $post->ID, true );
 			} else {
-				// mark as failure.
-				update_post_meta( $post->ID, 'failed', time() );
+				// mark as failure and count the attempts, so it will be retried in later runs until the max attempts are reached.
+				$failed_attempts = absint( get_post_meta( $post->ID, 'failed_attempts', true ) ) + 1;
+				wp_update_post(
+					array(
+						'ID'         => $post->ID,
+						'menu_order' => $failed_attempts,
+						'meta_input' => array(
+							'failed'          => time(),
+							'failed_attempts' => $failed_attempts,
+						),
+					)
+				);
+
+				// add a log entry.
+				/* translators: %1$s: the file ID, %2$d: the count of failed attempts, %3$d: the max attempts. */
+				Log::get_instance()->add( sprintf( __( 'Import of file ID %1$s from the queue failed (attempt %2$d of %3$d).', 'connector-for-propstack' ), '<em>' . esc_html( $post->post_title ) . '</em>', $failed_attempts, $this->get_max_attempts() ), 'error', 'queue' );
 			}
 
 			/**
@@ -659,6 +722,11 @@ class Queue {
 	 * @return void
 	 */
 	public function remove_file( int $attachment_id, int $propstack_id ): void {
+		// bail if this is a broker avatar, as its ID is the broker ID and not a file ID.
+		if ( absint( get_post_meta( $attachment_id, 'cfprop_broker_avatar', true ) ) > 0 ) {
+			return;
+		}
+
 		// get the file in the queue.
 		$query  = array(
 			'post_type'      => PostTypes\Queue::get_instance()->get_name(),
@@ -676,6 +744,50 @@ class Queue {
 		if ( $result->found_posts > 0 && is_int( $result->posts[0] ) ) {
 			wp_delete_post( absint( $result->posts[0] ), true );
 		}
+	}
+
+	/**
+	 * Return the max count of attempts to import a single queue entry.
+	 *
+	 * @return int
+	 */
+	public function get_max_attempts(): int {
+		$max_attempts = 3;
+		/**
+		 * Filter the max count of attempts to import a single queue entry before it is skipped.
+		 * Failed entries are reset if they are added to the queue again during an object import.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 * @param int $max_attempts The max count of attempts.
+		 */
+		return max( 1, absint( apply_filters( 'cfprop_queue_max_attempts', $max_attempts ) ) );
+	}
+
+	/**
+	 * Return whether the import of the given file would be prevented.
+	 *
+	 * Uses the same filter as the file import itself (e.g. for private files).
+	 *
+	 * @param array<string,mixed> $file The file data from Propstack API.
+	 * @param string              $url  The URL to use for import.
+	 *
+	 * @return bool
+	 */
+	private function is_file_import_prevented( array $file, string $url ): bool {
+		$false = false;
+		/**
+		 * Filter whether a given file should not be imported.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param bool $false Return true to prevent the import.
+		 * @param array<string,mixed> $file_data The file data from Propstack.
+		 * @param int  $id    The file ID.
+		 * @param string  $url   The URL to use for import.
+		 * @param string  $filename The file name.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		return (bool) apply_filters( 'cfprop_prevent_file_import', $false, $file, absint( $file['id'] ?? 0 ), $url, ! empty( $file['name'] ) ? (string) $file['name'] : basename( $url ) );
 	}
 
 	/**

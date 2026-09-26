@@ -15,7 +15,6 @@ namespace ConnectorForPropstack\Propstack\Widgets;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
-use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use ConnectorForPropstack\Propstack\Widget_Base;
 
 /**
@@ -80,28 +79,22 @@ class Gallery extends Widget_Base {
 	 * @return string
 	 */
 	public function render( array $attributes ): string {
-		// get the object for this request, if no object is given as attribute.
-		if ( ! isset( $attributes['object'] ) ) {
-			$immo_object = $this->get_object_by_request();
+		// get the object to use (given as attribute or by request).
+		$immo_object = $this->get_immo_object( $attributes );
 
-			// bail if no object could be found.
-			if ( ! $immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
-				return '';
-			}
-
-			// bail if requested post-type is not ours.
-			if ( get_post_type( $immo_object->get_id() ) !== ImmoObject::get_instance()->get_name() ) {
-				return '';
-			}
-		} else {
-			$immo_object = $attributes['object'];
+		// bail if no object could be found.
+		if ( ! $immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
+			return '';
 		}
 
 		// check the columns.
 		$attributes['columns'] = ! empty( $attributes['columns'] ) ? absint( $attributes['columns'] ) : 3;
 
 		// check the size.
-		$attributes['size'] = ! empty( $attributes['size'] ) ? sanitize_text_field( $attributes['size'] ) : 'thumbnail';
+		$attributes['size'] = ! empty( $attributes['size'] ) && is_string( $attributes['size'] ) ? sanitize_key( $attributes['size'] ) : 'thumbnail';
+		if ( ! in_array( $attributes['size'], array_merge( get_intermediate_image_sizes(), array( 'full' ) ), true ) ) {
+			$attributes['size'] = 'thumbnail';
+		}
 
 		// get the assigned images.
 		$images = get_attached_media( array( 'image/jpeg', 'image/gif', 'image/png' ), $immo_object->get_id() ); // @phpstan-ignore argument.type
@@ -112,7 +105,7 @@ class Gallery extends Widget_Base {
 		}
 
 		// get the attachment IDs.
-		$ids = implode( ',', wp_list_pluck( $images, 'ID' ) );
+		$ids = implode( ',', array_filter( array_map( 'absint', wp_list_pluck( $images, 'ID' ) ) ) );
 
 		// enable the styles.
 		wp_enqueue_style( 'cfprop-gallery' );

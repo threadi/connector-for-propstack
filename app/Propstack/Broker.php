@@ -120,19 +120,29 @@ class Broker {
 			return;
 		}
 
-		// bail if the term already has a thumbnail, the avatar does not have to be imported again.
-		if ( absint( get_term_meta( $broker_terms[0]->term_id, 'thumbnail_id', true ) ) > 0 ) {
+		// get the ID of the broker.
+		$broker_id = absint( ! empty( $immo_object['broker']['id'] ) ? $immo_object['broker']['id'] : 0 );
+
+		// bail if no broker ID is given.
+		if ( 0 === $broker_id ) {
 			return;
 		}
 
-		// get the ID of the broker.
-		$broker_id = absint( $immo_object['broker']['id'] );
+		// bail if the term already has an existing thumbnail, the avatar does not have to be imported again.
+		$thumbnail_id = absint( get_term_meta( $broker_terms[0]->term_id, 'thumbnail_id', true ) );
+		if ( $thumbnail_id > 0 && 'attachment' === get_post_type( $thumbnail_id ) ) {
+			// mark avatars imported by older versions as broker avatar to protect them from the cleanup of object files.
+			if ( ! metadata_exists( 'post', $thumbnail_id, 'cfprop_broker_avatar' ) && absint( get_post_meta( $thumbnail_id, 'propstack_file_id', true ) ) === $broker_id ) {
+				update_post_meta( $thumbnail_id, 'cfprop_broker_avatar', $broker_id );
+			}
+			return;
+		}
 
 		// import the avatar only once per broker and run.
 		if ( isset( $this->broker_avatars[ $broker_id ] ) ) {
 			$attachment_id = $this->broker_avatars[ $broker_id ];
 		} else {
-			$attachment_id                      = Files::get_instance()->import_file( 0, $broker_id, $immo_object['broker']['avatar_url'], basename( $immo_object['broker']['avatar_url'] ), array() );
+			$attachment_id                      = Files::get_instance()->import_file( 0, $broker_id, $immo_object['broker']['avatar_url'], basename( $immo_object['broker']['avatar_url'] ), array(), $broker_id );
 			$this->broker_avatars[ $broker_id ] = $attachment_id;
 		}
 

@@ -78,7 +78,7 @@ class Broker_Field extends Blocks_Basis {
 		// set ID as class.
 		$classes = '';
 		if ( ! empty( $attributes['blockId'] ) ) {
-			$classes = 'cfprop-block-' . $attributes['blockId'];
+			$classes = 'cfprop-block-' . sanitize_html_class( (string) $attributes['blockId'] );
 		}
 
 		// get block-classes.

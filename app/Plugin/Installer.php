@@ -108,6 +108,9 @@ class Installer {
 		// run tasks for Propstack activation.
 		Propstack::get_instance()->activation();
 
+		// install our schedules, e.g., the automatic import.
+		Schedules::get_instance()->create_schedules();
+
 		// refresh permalinks.
 		update_option( 'cfprop_update_slugs', 1 );
 

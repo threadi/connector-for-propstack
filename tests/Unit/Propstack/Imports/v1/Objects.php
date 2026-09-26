@@ -150,7 +150,11 @@ class Objects extends ConnectorForPropstackTestCase {
 
 		// test the results.
 		$this->assertIsArray( $this->import_obj->get_errors() );
-		$this->assertEmpty( $this->import_obj->get_errors() );
+		$this->assertNotEmpty( $this->import_obj->get_errors() );
+		$codes = array_map( fn( $error ) => $error->get_error_code(), $this->import_obj->get_errors() );
+		$this->assertContains( 'propstack_object_import_decoding', $codes, 'Codes: ' . implode( ', ', $codes ) );
+
+		$this->import_obj->reset_errors();
 
 		// remove the filter.
 		remove_filter( 'cfprop_request_header', array( $this, 'set_to_use_faulty_api_response' ) );

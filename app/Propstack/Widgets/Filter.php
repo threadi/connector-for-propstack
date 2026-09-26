@@ -78,6 +78,9 @@ class Filter extends Widget_Base {
 	 * @return string
 	 */
 	public function render( array $attributes ): string {
+		// convert the list of filters to an array (e.g., if it is given as comma-separated string via shortcode).
+		$attributes['filters'] = $this->get_list_attribute( $attributes['filters'] ?? array() );
+
 		// prepare the listing of filters to use.
 		$attributes['filter_objects'] = array();
 
@@ -107,7 +110,7 @@ class Filter extends Widget_Base {
 		if ( empty( $attributes['filter_alignment'] ) ) {
 			$attributes['filter_alignment'] = 'column';
 		}
-		$attributes['classes'] .= ' cfprop-filter-' . $attributes['filter_alignment'];
+		$attributes['classes'] .= ' cfprop-filter-' . sanitize_html_class( (string) $attributes['filter_alignment'] );
 
 		/**
 		 * Filter the attributes for the select filter widget.

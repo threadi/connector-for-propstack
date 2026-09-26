@@ -80,7 +80,6 @@ class Files {
 		add_action( 'init', array( $this, 'add_settings' ), 20 );
 
 		// use our own hooks.
-		add_action( 'cfprop_queue_before_processing', array( $this, 'mark_files_as_not_updated' ), 10, 0 );
 		add_action( 'cfprop_files_before_import', array( $this, 'mark_files_as_not_updated' ), 10, 0 );
 		add_action( 'cfprop_file_is_assigned', array( $this, 'mark_file_as_updated' ) );
 		add_action( 'cfprop_files_for_object_imported', array( $this, 'delete_not_updated_files' ), 10, 0 );
@@ -145,14 +144,14 @@ class Files {
 		$setting = $settings_obj->add_setting( 'propstack_connector_files_import' );
 		$setting->set_section( $files_import_section );
 		$setting->prevent_export( true );
-		if ( defined( 'CFPROP_FILES_IMPORT_RUNNING' ) && absint( get_option( CFPROP_FILES_IMPORT_RUNNING ) ) > 0 ) {
+		if ( defined( 'CFPROP_FILES_IMPORT_RUNNING' ) && Helper::is_process_running( CFPROP_FILES_IMPORT_RUNNING ) ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import images', 'connector-for-propstack' ) );
-			$field->set_description( __( 'Import of files for objects is still running. Please wait.', 'connector-for-propstack' ) );
+			$field->set_description( __( 'Import of images for objects is still running. Please wait.', 'connector-for-propstack' ) );
 		} elseif ( ! ImmoObjects::get_instance()->has_objects() ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import images', 'connector-for-propstack' ) );
-			$field->set_description( __( 'No objects imported. Please import them first to import their files.', 'connector-for-propstack' ) );
+			$field->set_description( __( 'No objects imported. Please import them first to import their images.', 'connector-for-propstack' ) );
 		} else {
 			$field = new Button( $settings_obj );
 			$field->set_button_title( __( 'Import now', 'connector-for-propstack' ) );
@@ -207,7 +206,7 @@ class Files {
 		} elseif ( ! $this->has_files() ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Delete files', 'connector-for-propstack' ) );
-			$field->set_description( __( 'No files for objects imported.', 'connector-for-propstack' ) );
+			$field->set_description( __( 'No images for objects imported.', 'connector-for-propstack' ) );
 		} else {
 			$field = new Button( $settings_obj );
 			$field->set_button_title( __( 'Delete now', 'connector-for-propstack' ) );
@@ -218,9 +217,9 @@ class Files {
 				(string) wp_json_encode(
 					array(
 						'className' => 'cfprop-dialog',
-						'title'     => __( 'Delete all files of your objects', 'connector-for-propstack' ),
+						'title'     => __( 'Delete all images of your objects', 'connector-for-propstack' ),
 						'texts'     => array(
-							'<p><strong>' . __( 'Click on the button below to delete all files of your objects in your WordPress website.', 'connector-for-propstack' ) . '</strong></p>',
+							'<p><strong>' . __( 'Click on the button below to delete all images of your objects in your WordPress website.', 'connector-for-propstack' ) . '</strong></p>',
 							'<p>' . __( 'You will lose any images for your objects. They will be re-imported during the next object import.', 'connector-for-propstack' ) . '</p>',
 						),
 						'buttons'   => array(
@@ -272,8 +271,8 @@ class Files {
 		$setting->set_type( 'integer' );
 		$setting->set_default( Users::get_instance()->get_first_administrator_user() );
 		$field = new Select( $settings_obj );
-		$field->set_title( __( 'Assign new files to this user', 'connector-for-propstack' ) );
-		$field->set_description( __( 'This is only a fallback if the actual user is not available (e.g., via WP CLI import or synchronisation). New files are normally assigned to the user who adds them.', 'connector-for-propstack' ) );
+		$field->set_title( __( 'Assign new images to this user', 'connector-for-propstack' ) );
+		$field->set_description( __( 'This is only a fallback if the actual user is not available (e.g., via WP CLI import or synchronisation). New images are normally assigned to the user who adds them.', 'connector-for-propstack' ) );
 		$field->set_options( Users::get_instance()->get_users_for_settings() );
 		$setting->set_field( $field );
 
@@ -330,7 +329,7 @@ class Files {
 		$setting->set_default( 25 );
 		$setting->set_section( $section );
 		$field = new Number( $settings_obj );
-		$field->set_title( __( 'Limit for import of files', 'connector-for-propstack' ) );
+		$field->set_title( __( 'Limit for import of images', 'connector-for-propstack' ) );
 		$field->set_description( __( 'This limits the amount of images during one import run. If the limit is reached, a new import run is startet automatically. There is not hard limit to import images. The higher this number is, the greater the likelihood of a timeout when importing images.', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 	}
@@ -344,7 +343,7 @@ class Files {
 	 */
 	public function is_file_in_media_library( int $id ): int {
 		// run the check.
-		$query   = array(
+		$query = array(
 			'post_type'      => 'attachment',
 			'post_status'    => 'any',
 			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
@@ -353,6 +352,11 @@ class Files {
 					'value'   => $id,
 					'compare' => '=',
 					'type'    => 'NUMERIC',
+				),
+				// ignore broker avatars, as they use the broker ID as file ID.
+				array(
+					'key'     => 'cfprop_broker_avatar',
+					'compare' => 'NOT EXISTS',
 				),
 			),
 			'posts_per_page' => 1,
@@ -383,12 +387,14 @@ class Files {
 	 * @param string              $url      The URL to use for import.
 	 * @param string              $filename The file name.
 	 * @param array<string,mixed> $file_data The file data from Propstack.
+	 * @param int                 $broker_id The broker ID, if this file is a broker avatar (optional).
 	 *
 	 * @return int
 	 */
-	public function import_file( int $post_id, int $id, string $url, string $filename, array $file_data ): int {
+	public function import_file( int $post_id, int $id, string $url, string $filename, array $file_data, int $broker_id = 0 ): int {
 		// bail if the given URL is already in the media library.
-		$attachment_id = $this->is_file_in_media_library( $id );
+		// broker avatars are looked up by their broker, as their ID could collide with real file IDs.
+		$attachment_id = $broker_id > 0 ? $this->get_broker_avatar( $broker_id ) : $this->is_file_in_media_library( $id );
 		if ( $attachment_id > 0 ) {
 			// add a log entry.
 			/* translators: %1$s: the given URL. */
@@ -423,25 +429,13 @@ class Files {
 		// get the content-type of this file.
 		$mime_type = wp_check_filetype( $filename );
 
-		// get "WP_Filesystem" object.
-		$wp_filesystem = Helper::get_wp_filesystem();
+		// download the file in a temporary file.
+		$tmp_file = $this->download_file( $url, $filename );
 
-		// get tmp file name.
-		$tmp_file_name = wp_tempnam();
-
-		// set the file as tmp-file for import.
-		$tmp_file = str_replace( '.tmp', '', $tmp_file_name . '.' . $mime_type['ext'] );
-
-		// get the file from the given URL.
-		$file_content = $wp_filesystem->get_contents( $url );
-
-		// bail if the content is not a string.
-		if ( ! is_string( $file_content ) ) {
+		// bail if the file could not be downloaded.
+		if ( empty( $tmp_file ) ) {
 			return 0;
 		}
-
-		// save the file.
-		$wp_filesystem->put_contents( $tmp_file, $file_content );
 
 		// create the query to add the file.
 		$array = array(
@@ -449,7 +443,7 @@ class Files {
 			'type'     => (string) $mime_type['type'],
 			'tmp_name' => $tmp_file,
 			'error'    => '0',
-			'size'     => (string) $wp_filesystem->size( $tmp_file ),
+			'size'     => (string) filesize( $tmp_file ),
 		);
 		/**
 		 * Filter the query to upload a file in the media library.
@@ -474,6 +468,11 @@ class Files {
 		// save the image in the media library.
 		$attachment_id = media_handle_sideload( $array, $post_id, null, $post_array );
 
+		// remove the temporary file if it still exists (e.g. if the sideload failed).
+		if ( file_exists( $tmp_file ) ) {
+			wp_delete_file( $tmp_file );
+		}
+
 		// bail on error.
 		if ( ! is_int( $attachment_id ) ) {
 			// add a log entry.
@@ -486,6 +485,11 @@ class Files {
 
 		// add the used Propstack ID for the file to the file.
 		update_post_meta( $attachment_id, 'propstack_file_id', $id );
+
+		// mark broker avatars as such.
+		if ( $broker_id > 0 ) {
+			update_post_meta( $attachment_id, 'cfprop_broker_avatar', $broker_id );
+		}
 
 		// add the position from Propstack to the file, if given.
 		if ( ! empty( $file_data['position'] ) ) {
@@ -510,6 +514,198 @@ class Files {
 	}
 
 	/**
+	 * Download a file from the given URL in a temporary file.
+	 *
+	 * Only HTTPS-URLs are allowed. The download is limited in time and size.
+	 * The caller is responsible for deleting the returned temporary file.
+	 *
+	 * @param string $url      The URL to download.
+	 * @param string $filename The file name (used for the name of the temporary file).
+	 *
+	 * @return string The path to the temporary file or an empty string on any error.
+	 */
+	private function download_file( string $url, string $filename ): string {
+		// bail if the URL is not allowed.
+		if ( ! $this->is_allowed_file_url( $url ) ) {
+			// add a log entry.
+			/* translators: %1$s: the given URL. */
+			Log::get_instance()->add( sprintf( __( 'Given URL %1$s is not allowed for the download of files.', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ), 'error', 'import' );
+
+			// return empty string as we could not download the file.
+			return '';
+		}
+
+		$timeout = 60;
+		/**
+		 * Filter the timeout in seconds for the download of a single file.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 * @param int    $timeout The timeout in seconds.
+		 * @param string $url     The URL to download.
+		 */
+		$timeout = absint( apply_filters( 'cfprop_file_download_timeout', $timeout, $url ) );
+
+		$max_size = 50 * MB_IN_BYTES;
+		/**
+		 * Filter the max size in bytes for a single file to download. Use 0 to disable the limit.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 * @param int    $max_size The max size in bytes.
+		 * @param string $url      The URL to download.
+		 */
+		$max_size = absint( apply_filters( 'cfprop_max_file_size', $max_size, $url ) );
+
+		// get a temporary file.
+		$tmp_file = wp_tempnam( $filename );
+
+		// bail if no temporary file could be created.
+		if ( empty( $tmp_file ) ) {
+			return '';
+		}
+
+		// collect the arguments for the request.
+		$args = array(
+			'timeout'  => $timeout > 0 ? $timeout : 60,
+			'stream'   => true,
+			'filename' => $tmp_file,
+		);
+
+		// limit the response size (one byte more than allowed to detect too large files).
+		if ( $max_size > 0 ) {
+			$args['limit_response_size'] = $max_size + 1;
+		}
+
+		// download the file (which rejects unsafe URLs, e.g. local addresses).
+		$response = wp_safe_remote_get( $url, $args );
+
+		// bail on any error.
+		if ( is_wp_error( $response ) || 200 !== absint( wp_remote_retrieve_response_code( $response ) ) ) {
+			// add a log entry.
+			/* translators: %1$s: the given URL. */
+			Log::get_instance()->add( sprintf( __( 'Download of file %1$s failed:', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ) . ' <code>' . ( is_wp_error( $response ) ? esc_html( $response->get_error_message() ) : absint( wp_remote_retrieve_response_code( $response ) ) ) . '</code>', 'error', 'import' );
+
+			// remove the temporary file.
+			if ( file_exists( $tmp_file ) ) {
+				wp_delete_file( $tmp_file );
+			}
+
+			// return empty string as we could not download the file.
+			return '';
+		}
+
+		// get the size of the downloaded file.
+		clearstatcache( true, $tmp_file );
+		$size = file_exists( $tmp_file ) ? absint( filesize( $tmp_file ) ) : 0;
+
+		// bail if the file is empty or too large.
+		if ( 0 === $size || ( $max_size > 0 && $size > $max_size ) ) {
+			// add a log entry.
+			/* translators: %1$s: the given URL. */
+			Log::get_instance()->add( sprintf( __( 'Downloaded file %1$s is empty or larger than the allowed size.', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ), 'error', 'import' );
+
+			// remove the temporary file.
+			if ( file_exists( $tmp_file ) ) {
+				wp_delete_file( $tmp_file );
+			}
+
+			// return empty string as we could not use the file.
+			return '';
+		}
+
+		// return the path to the temporary file.
+		return $tmp_file;
+	}
+
+	/**
+	 * Return whether the given URL is allowed for the download of files.
+	 *
+	 * Only valid HTTPS-URLs are allowed. Per default any public host is allowed, as unsafe
+	 * URLs (e.g. local addresses) are rejected by wp_safe_remote_get(). Use the filter
+	 * "cfprop_allowed_file_hosts" to restrict the hosts.
+	 *
+	 * @param string $url The URL to check.
+	 *
+	 * @return bool
+	 */
+	private function is_allowed_file_url( string $url ): bool {
+		// bail if the URL is not valid.
+		if ( false === wp_http_validate_url( $url ) ) {
+			return false;
+		}
+
+		// bail if the URL does not use HTTPS.
+		if ( 'https' !== strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) ) ) {
+			return false;
+		}
+
+		// get the host of the URL.
+		$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+
+		$allowed_hosts = array();
+		/**
+		 * Filter the list of hosts from which files may be downloaded.
+		 *
+		 * An empty list allows any public host. Subdomains of listed hosts are allowed, too.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 * @param array<int,string> $allowed_hosts The list of allowed hosts.
+		 * @param string            $url           The URL to check.
+		 */
+		$allowed_hosts = (array) apply_filters( 'cfprop_allowed_file_hosts', $allowed_hosts, $url );
+
+		// allow any public host if no list is given.
+		if ( empty( $allowed_hosts ) ) {
+			return true;
+		}
+
+		// check the host against the list.
+		foreach ( $allowed_hosts as $allowed_host ) {
+			$allowed_host = strtolower( (string) $allowed_host );
+			if ( $host === $allowed_host || str_ends_with( $host, '.' . $allowed_host ) ) {
+				return true;
+			}
+		}
+
+		// return false as the host is not allowed.
+		return false;
+	}
+
+	/**
+	 * Return the attachment ID of the avatar of the given broker.
+	 *
+	 * @param int $broker_id The broker ID from Propstack.
+	 *
+	 * @return int
+	 */
+	public function get_broker_avatar( int $broker_id ): int {
+		// run the check.
+		$query   = array(
+			'post_type'      => 'attachment',
+			'post_status'    => 'any',
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
+				array(
+					'key'     => 'cfprop_broker_avatar',
+					'value'   => $broker_id,
+					'compare' => '=',
+					'type'    => 'NUMERIC',
+				),
+			),
+			'posts_per_page' => 1,
+			'no_found_rows'  => true,
+			'fields'         => 'ids',
+		);
+		$results = new WP_Query( $query );
+
+		// bail if nothing was found.
+		if ( empty( $results->posts ) || ! is_int( $results->posts[0] ) ) {
+			return 0;
+		}
+
+		// return the resulting attachment ID.
+		return absint( $results->posts[0] );
+	}
+
+	/**
 	 * Delete all files we imported from Propstack.
 	 *
 	 * @param string $process_id The process ID.
@@ -517,8 +713,8 @@ class Files {
 	 * @return void
 	 */
 	public function delete_all( string $process_id ): void {
-		// bail if file import is running.
-		if ( absint( get_option( CFPROP_FILES_IMPORT_RUNNING, 0 ) ) > 0 ) {
+		// bail if file import is running (a stale marker is released after a timeout).
+		if ( Helper::is_process_running( CFPROP_FILES_IMPORT_RUNNING ) ) {
 			return;
 		}
 
@@ -529,7 +725,7 @@ class Files {
 		// set initial value.
 		$process_handler->set_count( 0 );
 		$process_handler->set_max_count( 0 );
-		$process_handler->set_status( __( 'Deletion of files starting', 'connector-for-propstack' ) );
+		$process_handler->set_status( __( 'Deletion of images starting', 'connector-for-propstack' ) );
 		$process_handler->set_running( time() );
 		update_option( CFPROP_FILES_DELETE_RUNNING, time() );
 
@@ -597,7 +793,7 @@ class Files {
 				'className' => 'cfprop-dialog',
 				'title'     => __( 'Files has been deleted', 'connector-for-propstack' ),
 				'texts'     => array(
-					'<p><strong>' . __( 'The files for your objects from Propstack has been deleted.', 'connector-for-propstack' ) . '</strong></p>',
+					'<p><strong>' . __( 'The images for your objects from Propstack has been deleted.', 'connector-for-propstack' ) . '</strong></p>',
 					'<p>' . __( 'They are still in your Propstack account. They will be imported during the next object import.', 'connector-for-propstack' ) . '</p>',
 				),
 				'buttons'   => array(
@@ -626,15 +822,31 @@ class Files {
 	/**
 	 * Mark files as not updated.
 	 *
+	 * This is used at the start of a file import. Files without an update marker are handled
+	 * as not updated. If the import runs for a single object, only the files of this object
+	 * are marked, otherwise the marker is removed from all files in one query
+	 *
 	 * @return void
 	 */
 	public function mark_files_as_not_updated(): void {
+		// get the post-ID of the object from the request.
+		$post_id = $this->get_post_id_from_request();
+
+		// remove the marker from all files if the import runs for all objects.
+		if ( 0 === $post_id ) {
+			delete_metadata( 'post', 0, 'propstack_file_updated', '', true );
+			return;
+		}
+
+		// remove the marker only from the files of this object.
+		add_filter( 'cfprop_files_query', array( $this, 'set_post_id_filter' ) );
 		foreach ( $this->get_files()->get_posts() as $file ) {
 			if ( ! $file instanceof WP_Post ) {
 				continue;
 			}
-			update_post_meta( $file->ID, 'propstack_file_updated', 0 );
+			delete_post_meta( $file->ID, 'propstack_file_updated' );
 		}
+		remove_filter( 'cfprop_files_query', array( $this, 'set_post_id_filter' ) );
 	}
 
 	/**
@@ -692,7 +904,22 @@ class Files {
 			if ( ! $file instanceof WP_Post ) {
 				continue;
 			}
+
+			// ignore broker avatars, as they are not part of any object.
+			if ( absint( get_post_meta( $file->ID, 'cfprop_broker_avatar', true ) ) > 0 ) {
+				continue;
+			}
+
 			if ( 0 === absint( get_post_meta( $file->ID, 'propstack_file_updated', true ) ) ) {
+				// remove the file from the list of images of its object.
+				if ( $file->post_parent > 0 ) {
+					$images = get_post_meta( $file->post_parent, 'images', true );
+					if ( is_array( $images ) && in_array( $file->ID, $images, true ) ) {
+						update_post_meta( $file->post_parent, 'images', array_values( array_diff( $images, array( $file->ID ) ) ) );
+					}
+				}
+
+				// delete the file.
 				wp_delete_attachment( $file->ID, true );
 			}
 		}
@@ -805,8 +1032,8 @@ class Files {
 	 * @return void
 	 */
 	public function import( int $post_id = 0, string $process_id = '' ): void {
-		// bail if deletion is running.
-		if ( absint( get_option( CFPROP_FILES_DELETE_RUNNING, 0 ) ) > 0 ) {
+		// bail if deletion is running (a stale marker is released after a timeout).
+		if ( Helper::is_process_running( CFPROP_FILES_DELETE_RUNNING ) ) {
 			return;
 		}
 
@@ -824,13 +1051,20 @@ class Files {
 		// set global marker.
 		update_option( CFPROP_FILES_IMPORT_RUNNING, time() );
 
-		// get the cached list of files to import.
-		$files_to_import = get_transient( 'propstack_object_files_to_import' );
-
 		// get post-ID from the request.
 		$post_id_from_request = absint( filter_input( INPUT_POST, 'post', FILTER_SANITIZE_NUMBER_INT ) );
 		if ( $post_id_from_request > 0 ) {
 			$post_id = $post_id_from_request;
+		}
+
+		// get the cached list of files to import.
+		$files_to_import = get_transient( 'propstack_object_files_to_import' );
+
+		// use the cached list only if it belongs to this import process (same process and same object).
+		// otherwise, a list left over from an aborted import (e.g. for another object) would be used.
+		$list_owner = $process_id . '|' . $post_id;
+		if ( ! empty( $files_to_import ) && get_transient( 'propstack_object_files_to_import_owner' ) !== $list_owner ) {
+			$files_to_import = array();
 		}
 
 		// add a log entry.
@@ -887,8 +1121,9 @@ class Files {
 			 */
 			do_action( 'cfprop_files_before_import', $files_to_import );
 
-			// save the list in the cache.
-			set_transient( 'propstack_object_files_to_import', $files_to_import );
+			// save the list in the cache (with expiration, so it is not autoloaded and does not remain forever).
+			set_transient( 'propstack_object_files_to_import', $files_to_import, DAY_IN_SECONDS );
+			set_transient( 'propstack_object_files_to_import_owner', $list_owner, DAY_IN_SECONDS );
 
 			// add a log entry.
 			Log::get_instance()->add( __( 'Cache stored during import:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $files_to_import ) . '</code>', 'info', 'import' );
@@ -927,6 +1162,7 @@ class Files {
 		foreach ( $files_to_import as $file_index => $file ) {
 			// bail if the limit has been reached: send a simple AJAX response to start a new request and break the loop.
 			if ( $limit > 0 && $counter >= $limit ) {
+				// keep the marker set: the next request refreshes it, a stale marker expires via Helper::is_process_running().
 				wp_send_json( array( 'load_more' => 1 ) );
 			}
 
@@ -981,7 +1217,7 @@ class Files {
 
 			// remove this file from the list and update it.
 			unset( $files_to_import[ $file_index ] );
-			set_transient( 'propstack_object_files_to_import', $files_to_import );
+			set_transient( 'propstack_object_files_to_import', $files_to_import, DAY_IN_SECONDS );
 
 			/**
 			 * Run additional tasks after a file has been assigned to an object.
@@ -1036,6 +1272,7 @@ class Files {
 
 		// clear the cache of files to import as we are completed the import.
 		delete_transient( 'propstack_object_files_to_import' );
+		delete_transient( 'propstack_object_files_to_import_owner' );
 
 		// add a log entry.
 		Log::get_instance()->add( __( 'Import of files has been run', 'connector-for-propstack' ), 'info', 'import' );
@@ -1119,18 +1356,27 @@ class Files {
 	 */
 	public function set_post_id_filter( array $query ): array {
 		// get the post-ID from the request.
-		$post_id = absint( filter_input( INPUT_POST, 'post', FILTER_SANITIZE_NUMBER_INT ) );
+		$post_id = $this->get_post_id_from_request();
 
 		// bail if no post-ID is given.
 		if ( 0 === $post_id ) {
 			return $query;
 		}
 
-		// restrict to the ID.
-		$query['p'] = $post_id;
+		// restrict to the files which are assigned to this object (the files are attachments of the object).
+		$query['post_parent'] = $post_id;
 
 		// return the resulting query.
 		return $query;
+	}
+
+	/**
+	+    * Return the post-ID of the object from the request, if the import runs for a single object.
+	+    *
+	+    * @return int
+	+    */
+	private function get_post_id_from_request(): int {
+		return absint( filter_input( INPUT_POST, 'post', FILTER_SANITIZE_NUMBER_INT ) );
 	}
 
 	/**
@@ -1167,6 +1413,11 @@ class Files {
 	 * @return void
 	 */
 	public function delete_unused_files( array $object_data, int $post_id ): void {
+		// bail if the API response does not contain a list of images (this is not the same as "no images").
+		if ( ! isset( $object_data['images'] ) || ! is_array( $object_data['images'] ) ) {
+			return;
+		}
+
 		// get the immo object.
 		$immo_object = ImmoObjects::get_instance()->get_object( $post_id );
 

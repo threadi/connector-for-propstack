@@ -179,6 +179,14 @@ class Propstack {
 			return array();
 		}
 
+		// bail if the user is not allowed to save the API token.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return array(
+				'error' => 'no_permission',
+				'text'  => __( 'You are not allowed to save the API token.', 'connector-for-propstack' ),
+			);
+		}
+
 		// bail if the given value has not exact 40 characters.
 		if ( strlen( $value ) !== 40 ) {
 			return array(
