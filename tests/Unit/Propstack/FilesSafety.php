@@ -234,7 +234,6 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 	 */
 	private function get_private_method( string $name ): ReflectionMethod {
 		$method = new ReflectionMethod( \ConnectorForPropstack\Propstack\Files::class, $name );
-		$method->setAccessible( true );
 		return $method;
 	}
 

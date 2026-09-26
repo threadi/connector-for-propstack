@@ -231,7 +231,6 @@ class Schedules extends ConnectorForPropstackTestCase {
 
 		// run the activation tasks.
 		$method = new \ReflectionMethod( \ConnectorForPropstack\Plugin\Installer::class, 'activation_tasks' );
-		$method->setAccessible( true );
 		$method->invoke( \ConnectorForPropstack\Plugin\Installer::get_instance() );
 
 		// the event must exist and must not run immediately.
