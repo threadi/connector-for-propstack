@@ -115,7 +115,6 @@ class QueueSafety extends ConnectorForPropstackTestCase {
 	 */
 	private function reset_queue_map(): void {
 		$property = new ReflectionProperty( \ConnectorForPropstack\Propstack\Queue::class, 'queue_map' );
-		$property->setAccessible( true );
 		$property->setValue( \ConnectorForPropstack\Propstack\Queue::get_instance(), null );
 	}
 
