@@ -20,12 +20,6 @@ if ( ! empty( $attributes['listing_template'] ) && is_string( $attributes['listi
 	// loop through the list by using set the listing template.
 	if ( $attributes['query']->have_posts() ) :
 		include Templates::get_instance()->get_template( 'parts/archive/' . $cfprop_listing_template . '.php' );
-
-		// show the pagination, if set.
-		if ( ! empty( $attributes['pagination'] ) && is_string( $attributes['pagination'] ) ) :
-			?><nav class="navigation pagination cfprop-pagination" aria-label="<?php echo esc_attr__( 'Objects pagination', 'connector-for-propstack' ); ?>"><div class="nav-links"><?php echo wp_kses_post( $attributes['pagination'] ); ?></div></nav>
-			<?php
-		endif;
 	else :
 		?>
 		<article class="site-main entry inside-article container site-content site-container content-bg content-area ht-container"><div class="entry-content"><p><?php echo esc_html__( 'There are currently no objects available.', 'connector-for-propstack' ); ?></p></div></article>

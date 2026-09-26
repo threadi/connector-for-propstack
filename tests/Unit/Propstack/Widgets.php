@@ -375,4 +375,40 @@ class Widgets extends ConnectorForPropstackTestCase {
 		$this->assertStringNotContainsString( 'xids1', $output );
 		$this->assertStringNotContainsString( 'ids="1"', $output );
 	}
+
+	/**
+	 * Test that the archive shows max. 10 objects and no pagination.
+	 *
+	 * The pagination is only available with the Pro plugin or a custom template.
+	 *
+	 * @return void
+	 */
+	public function test_archive_shows_max_ten_objects_without_pagination(): void {
+		// create more objects than shown in the archive.
+		$post_type = \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name();
+		$post_ids  = self::factory()->post->create_many(
+			12,
+			array(
+				'post_type'   => $post_type,
+				'post_status' => 'publish',
+			)
+		);
+
+		// request the second page, which must be ignored.
+		set_query_var( 'paged', 2 );
+		$output = do_shortcode( '[cfprop_widget_archive]' );
+		set_query_var( 'paged', 0 );
+
+		// max. 10 objects are shown.
+		$this->assertSame( 10, substr_count( $output, 'type-' . $post_type ) );
+
+		// no pagination is shown.
+		$this->assertStringNotContainsString( 'page-numbers', $output );
+		$this->assertStringNotContainsString( 'cfprop-pagination', $output );
+
+		// clean up.
+		foreach ( $post_ids as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
+	}
 }

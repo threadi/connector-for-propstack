@@ -176,12 +176,6 @@ class ImmoObjects {
 			'fields'         => 'ids',
 		);
 		$query         = wp_parse_args( $query_params, $default_query );
-
-		// secure the requested page for the pagination.
-		if ( isset( $query['paged'] ) ) {
-			$query['paged'] = max( 1, absint( $query['paged'] ) );
-		}
-
 		return new WP_Query( $query );
 	}
 

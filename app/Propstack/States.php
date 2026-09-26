@@ -57,18 +57,18 @@ class States {
 	 * @return void
 	 */
 	public function init(): void {
-		// bail if not the v2 API is used.
-		if ( 'v2' !== get_option( 'propstack_connector_api_version' ) ) {
-			return;
-		}
-
-		// define constants.
+		// define constants (always, as the API version could be changed during this request).
 		if ( ! defined( 'CFPROP_STATES_IMPORT_RUNNING' ) ) {
 			define( 'CFPROP_STATES_IMPORT_RUNNING', 'propstack_connector_states_import_running' );
 		}
 
 		if ( ! defined( 'CFPROP_STATES_DELETE_RUNNING' ) ) {
 			define( 'CFPROP_STATES_DELETE_RUNNING', 'propstack_connector_states_delete_running' );
+		}
+
+		// bail if not the v2 API is used.
+		if ( 'v2' !== get_option( 'propstack_connector_api_version' ) ) {
+			return;
 		}
 
 		// use hooks.

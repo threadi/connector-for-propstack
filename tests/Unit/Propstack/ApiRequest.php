@@ -132,7 +132,7 @@ class ApiRequest extends ConnectorForPropstackTestCase {
 	private function get_error_texts( \ConnectorForPropstack\Propstack\ApiRequest $request_object ): string {
 		$texts = array();
 		foreach ( $request_object->get_errors() as $error ) {
-			$texts[] = (string) $error->get_error_data();
+			$texts[] = $error->get_error_message();
 		}
 
 		return implode( "\n", $texts );
@@ -279,5 +279,27 @@ class ApiRequest extends ConnectorForPropstackTestCase {
 		$this->assertSame( -1, $request_object->get_http_status() );
 		$this->assertCount( 1, $request_object->get_errors() );
 		$this->assertStringContainsString( 'timeout', $this->get_error_texts( $request_object ) );
+	}
+
+	/**
+	 * Test that the errors of a request are complete WP_Error objects with code and message.
+	 *
+	 * @return void
+	 */
+	public function test_errors_have_code_and_message(): void {
+		$this->responses = array(
+			array(
+				'status'  => 301,
+				'headers' => array( 'location' => 'https://example.com/' ),
+			),
+		);
+
+		$request_object = $this->send_request();
+
+		$errors = $request_object->get_errors();
+		$this->assertCount( 1, $errors );
+		$this->assertTrue( $errors[0]->has_errors() );
+		$this->assertSame( 'propstack_api_request_error', $errors[0]->get_error_code() );
+		$this->assertNotEmpty( $errors[0]->get_error_message() );
 	}
 }
