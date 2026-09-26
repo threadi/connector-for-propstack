@@ -149,7 +149,7 @@ body.settings_page_connector-for-propstack {
 	}
 }
 
-body.post-type-cfprop_object a:not(.review-hint-button)[target="_blank"]:after {
+body.post-type-cfprop_object a:not(.review-hint-button)[target="_blank"]:after, .cfprop-media-object a[target="_blank"]:after {
 	content: "\f504";
 	display: inline-block;
 	font-family: "dashicons", sans-serif;
@@ -263,3 +263,5 @@ body.post-type-cfprop_object, .etfw-transient, body.settings_page_connector-for-
 .easy-setup-for-wordpress-main .components-panel__body > div:not(:first-child) {
 	margin-top: .6em;
 }
+
+.esfw-field--propstack_connector_abilities_guide ol, .propstack_connector_abilities_guide ol { margin-left: 14px; }

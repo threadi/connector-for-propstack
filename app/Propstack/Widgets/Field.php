@@ -12,7 +12,6 @@ namespace ConnectorForPropstack\Propstack\Widgets;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Templates;
 use ConnectorForPropstack\Propstack\Field_Base;
 use ConnectorForPropstack\Propstack\FieldFormat_Base;
@@ -152,7 +151,7 @@ class Field extends Widget_Base {
 		$field_value = Fields::get_instance()->get_field_value( $immo_object->get_id(), $field, false );
 
 		// if we got no text and are in an editor, show a placeholder.
-		if ( empty( $field_value ) && Helper::is_rest_request() ) {
+		if ( empty( $field_value ) && $this->show_placeholders() ) {
 			$field_value = '<em>' . __( 'Empty field.', 'connector-for-propstack' ) . '</em>';
 		}
 

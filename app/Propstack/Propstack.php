@@ -81,6 +81,9 @@ class Propstack {
 		// initialize the file support.
 		Files::get_instance()->init();
 
+		// initialize the extensions for the media library.
+		MediaLibrary::get_instance()->init();
+
 		// initialize the queue.
 		Queue::get_instance()->init();
 

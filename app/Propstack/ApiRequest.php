@@ -313,9 +313,7 @@ class ApiRequest {
 	 * @return void
 	 */
 	private function add_error( string $text ): void {
-		$error = new WP_Error();
-		$error->add_data( $text );
-		$this->errors[] = $error;
+		$this->errors[] = new WP_Error( 'propstack_api_request_error', $text );
 	}
 
 	/**

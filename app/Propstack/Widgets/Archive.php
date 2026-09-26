@@ -66,17 +66,7 @@ class Archive extends Widget_Base {
 	 * @return string
 	 */
 	public function render( array $attributes ): string {
-		// get the current page for the pagination.
-		$paged = absint( get_query_var( 'paged' ) );
-		if ( 0 === $paged ) {
-			$paged = absint( get_query_var( 'page' ) );
-		}
-		$paged = max( 1, $paged );
-
-		// set the query params.
-		$query_params = array(
-			'paged' => $paged,
-		);
+		$query_params = array();
 		/**
 		 * Filter the archive query params, e.g., to filter the list.
 		 *
@@ -102,7 +92,7 @@ class Archive extends Widget_Base {
 		$query                    = array(
 			'base'    => str_replace( (string) PHP_INT_MAX, '%#%', esc_url( get_pagenum_link( PHP_INT_MAX ) ) ),
 			'format'  => '?paged=%#%',
-			'current' => $paged,
+			'current' => max( 1, get_query_var( 'paged' ) ),
 			'total'   => $attributes['query']->max_num_pages,
 		);
 		$attributes['pagination'] = paginate_links( $query );

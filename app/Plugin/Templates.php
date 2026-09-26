@@ -139,7 +139,7 @@ class Templates {
 	 * @return bool
 	 */
 	private function is_valid_template_name( string $template ): bool {
-		return '' !== $template && 0 === validate_file( $template ) && ! str_starts_with( $template, '/' ) && ! str_contains( $template, "\0" );
+		return '' !== $template && 0 === validate_file( $template ) && ! str_starts_with( $template, '/' ) && ! str_starts_with( $template, './' ) && ! str_contains( $template, '/./' ) && ! str_contains( $template, "\0" );
 	}
 
 	/**

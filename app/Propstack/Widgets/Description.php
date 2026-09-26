@@ -10,7 +10,6 @@ namespace ConnectorForPropstack\Propstack\Widgets;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Templates;
 use ConnectorForPropstack\Propstack\Field_Base;
 use ConnectorForPropstack\Propstack\Fields;
@@ -97,7 +96,7 @@ class Description extends Widget_Base {
 		$description_text = Fields::get_instance()->get_field_value( $immo_object->get_id(), $field, false );
 
 		// if we got no text and are in an editor, show placeholder.
-		if ( empty( $description_text ) && Helper::is_rest_request() ) {
+		if ( empty( $description_text ) && $this->show_placeholders() ) {
 			$description_text = '<em>' . __( 'No description set.', 'connector-for-propstack' ) . '</em>';
 		}
 

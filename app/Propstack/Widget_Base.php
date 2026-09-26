@@ -184,6 +184,21 @@ class Widget_Base {
 	}
 
 	/**
+	 * Return whether placeholders for empty values should be shown (e.g., in the preview of the block editor).
+	 *
+	 * @return bool
+	 */
+	protected function show_placeholders(): bool {
+		/**
+		 * Filter whether placeholders for empty values are shown in widgets.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param bool $show True to show placeholders (default during REST requests).
+		 */
+		return (bool) apply_filters( 'cfprop_show_empty_placeholders', Helper::is_rest_request() );
+	}
+
+	/**
 	 * Return the object as a PHP object by request.
 	 *
 	 * Hints:
@@ -204,8 +219,9 @@ class Widget_Base {
 			$immo_object = $immo_objects->get_object( $post_id );
 		}
 
-		// Fallback: get the newest immo object, only during the REST request of editors (e.g., preview in Gutenberg).
-		if ( Helper::is_rest_request() && current_user_can( 'edit_posts' ) ) {
+		// Fallback: get the newest immo object, only during the REST request of editors (e.g., preview in Gutenberg)
+		// and only if the actual post is not an object (e.g., the preview of a template for a specific object).
+		if ( Helper::is_rest_request() && current_user_can( 'edit_posts' ) && \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() !== ( $post_id > 0 ? get_post_type( $post_id ) : false ) ) {
 			$immo_objects_array = $immo_objects->get_objects( array( 'posts_per_page' => 1 ) );
 			if ( ! empty( $immo_objects_array ) ) {
 				$immo_object = $immo_objects_array[0];
