@@ -8,6 +8,7 @@ parameters:
     - "#_IN_SECONDS#"
     - "#WP_CLI#"
     - "#WP_Icon_Collections_Registry#"
+    - "#MB_IN_BYTES#"
   paths:
     - app
     - connector-for-propstack.php
