@@ -723,8 +723,8 @@ class Settings {
 			exit;
 		}
 
-		// uninstall all.
-		Uninstaller::get_instance()->run();
+		// uninstall all data of the current site only (not network-wide).
+		Uninstaller::get_instance()->run( false );
 
 		// run installer tasks.
 		Installer::get_instance()->activation();

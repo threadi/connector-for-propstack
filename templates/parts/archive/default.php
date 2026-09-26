@@ -5,7 +5,7 @@
  * @param array<string,mixed> $attributes List of settings.
  *
  * @package connector-for-propstack
- * @version: 1.0.0
+ * @version: 2.0.0
  */
 
 // prevent direct access.
@@ -33,9 +33,10 @@ use ConnectorForPropstack\Propstack\ImmoObject;
 				 *
 				 * @since 1.0.0 Available since 1.0.0.
 				 * @param ImmoObject    $cfprop_immo_object      The immo object as an object.
+				 * @param string       $cfprop_template         The template name.
 				 * @param array<string,mixed>  $attributes   List of attributes.
 				 */
-				do_action( 'cfprop_template_' . $cfprop_template, $cfprop_immo_object, $attributes );
+				do_action( 'cfprop_template_' . $cfprop_template, $cfprop_immo_object, $cfprop_template, $attributes );
 			}
 			?>
 		</article>

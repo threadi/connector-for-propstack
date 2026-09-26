@@ -14,7 +14,6 @@ use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Templates;
 use ConnectorForPropstack\Propstack\Field_Base;
 use ConnectorForPropstack\Propstack\Fields;
-use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use ConnectorForPropstack\Propstack\Widget_Base;
 
 /**
@@ -73,21 +72,12 @@ class Description extends Widget_Base {
 			return '';
 		}
 
-		// get the object for this request, if no object is given as attribute.
-		if ( ! isset( $attributes['object'] ) ) {
-			$immo_object = $this->get_object_by_request();
+		// get the object to use (given as attribute or by request).
+		$immo_object = $this->get_immo_object( $attributes );
 
-			// bail if no object could be found.
-			if ( ! $immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
-				return '';
-			}
-
-			// bail if requested post-type is not ours.
-			if ( get_post_type( $immo_object->get_id() ) !== ImmoObject::get_instance()->get_name() ) {
-				return '';
-			}
-		} else {
-			$immo_object = $attributes['object'];
+		// bail if no object could be found.
+		if ( ! $immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
+			return '';
 		}
 
 		// get the field object.
@@ -95,6 +85,11 @@ class Description extends Widget_Base {
 
 		// bail if field could not be found.
 		if ( ! $field instanceof Field_Base ) {
+			return '';
+		}
+
+		// bail if the field is hidden in frontend.
+		if ( $field->hide() || $field->hide_in_frontend() ) {
 			return '';
 		}
 

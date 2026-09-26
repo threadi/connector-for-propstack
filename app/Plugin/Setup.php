@@ -453,6 +453,11 @@ class Setup {
 				break;
 			}
 
+			// bail if another process works on an import, its state must not be ended here - it imports the objects.
+			if ( $import_obj->is_locked() ) {
+				break;
+			}
+
 			// end the import if the first block has been imported and objects are left.
 			$import_data = get_option( $import_obj->get_work_list_option(), array() );
 			$total       = is_array( $import_data ) && isset( $import_data['total'] ) ? absint( $import_data['total'] ) : 0;
@@ -492,7 +497,7 @@ class Setup {
 		update_option( 'esfw_step', absint( get_option( 'esfw_max_steps' ) ) );
 
 		// the hint to the intro, shown after the setup is completed.
-		$intro_hint = __( 'Click on "Completed" and we will show you in a short introduction how to present your objects on your website.', 'connector-for-propstack' );
+		$intro_hint = __( '<strong>Click "Completed"</strong> for a quick tour of how to showcase your objects on your website.', 'connector-for-propstack' );
 
 		// prepare the completed text.
 		if ( ! empty( $this->import_errors ) ) {
@@ -519,6 +524,7 @@ class Setup {
 				$this->object_count
 			) . ' ';
 			$completed_text .= __( 'The others will follow with the next automatic import, or you follow the intro after completing this setup.', 'connector-for-propstack' );
+			$completed_text .= '<br><br><strong>' . __( 'Images of your objects will be imported automatically in background.', 'connector-for-propstack' ) . '</strong> ' . __( 'Depending on the amount of images, this may take a moment.', 'connector-for-propstack' );
 			$completed_text .= '<br><br>' . $intro_hint;
 		} else {
 			$completed_text  = '<strong>' . __( 'Setup has been run.', 'connector-for-propstack' ) . '</strong> ' . __( 'Your objects from Propstack have been imported.', 'connector-for-propstack' );

@@ -85,7 +85,7 @@ class Queue extends Post_Type {
 			'description'         => '',
 			'labels'              => $labels,
 			'supports'            => array(),
-			'public'              => true,
+			'public'              => false,
 			'hierarchical'        => false,
 			'show_ui'             => false,
 			'show_in_menu'        => false,
@@ -93,10 +93,12 @@ class Queue extends Post_Type {
 			'show_in_admin_bar'   => false,
 			'has_archive'         => false,
 			'can_export'          => false,
-			'exclude_from_search' => false,
+			'exclude_from_search' => true,
 			'taxonomies'          => array(),
-			'publicly_queryable'  => true,
-			'show_in_rest'        => true,
+			'publicly_queryable'  => false,
+			'show_in_rest'        => false,
+			'rewrite'             => false,
+			'query_var'           => false,
 			'capability_type'     => 'post',
 			'capabilities'        => array(
 				'create_posts'       => 'do_not_allow',
@@ -112,7 +114,7 @@ class Queue extends Post_Type {
 		);
 		register_post_type( $this->get_name(), $args ); // @phpstan-ignore argument.type
 
-		// register our fields in REST API.
+		// register our fields (not in REST API, as the queue is internal).
 		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
 			register_post_meta(
 				$this->get_name(),
@@ -120,7 +122,7 @@ class Queue extends Post_Type {
 				array(
 					'type'         => $field->get_type(),
 					'single'       => true,
-					'show_in_rest' => true,
+					'show_in_rest' => false,
 				)
 			);
 		}

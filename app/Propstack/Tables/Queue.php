@@ -51,6 +51,8 @@ class Queue extends WP_List_Table {
 			'cfprop_queue_query',
 			static function ( array $query ) {
 				$query['posts_per_page'] = -1;
+				// show also entries which reached the max attempts.
+				unset( $query['meta_query'] );
 				return $query;
 			}
 		);
@@ -218,7 +220,7 @@ class Queue extends WP_List_Table {
 	 * Message to be displayed when no items are available.
 	 */
 	public function no_items(): void {
-		echo esc_html__( 'The queue to import files from Propstack is empty.', 'connector-for-propstack' );
+		echo esc_html__( 'The queue to import images from Propstack is empty.', 'connector-for-propstack' );
 	}
 
 	/**
@@ -284,8 +286,16 @@ class Queue extends WP_List_Table {
 			}
 		}
 
+		// get the failed attempts.
+		$failed_attempts = absint( get_post_meta( $item->ID, 'failed_attempts', true ) );
+		$failed_hint     = '';
+		if ( $failed_attempts > 0 ) {
+			/* translators: %1$d: the count of failed attempts, %2$d: the max attempts. */
+			$failed_hint = '<br><em>' . esc_html( sprintf( __( 'Import failed %1$d times (max. %2$d attempts).', 'connector-for-propstack' ), $failed_attempts, \ConnectorForPropstack\Propstack\Queue::get_instance()->get_max_attempts() ) ) . '</em>';
+		}
+
 		// get the document URL.
-		return '<a href="' . esc_url( $url ) . '" target="_blank">' . esc_url( $url ) . '</a>';
+		return '<a href="' . esc_url( $url ) . '" target="_blank">' . esc_url( $url ) . '</a>' . $failed_hint;
 	}
 
 	/**

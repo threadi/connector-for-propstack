@@ -224,7 +224,6 @@ class Roles {
 			// remove the capabilities.
 			$role_obj->remove_cap( 'manage_' . $cpt_name );
 			$role_obj->remove_cap( 'read_' . $cpt_name );
-			$role_obj->remove_cap( 'manage_categories' );
 		}
 
 		// add the cap to the configured roles.
@@ -244,7 +243,6 @@ class Roles {
 			// add the capabilities.
 			$role_obj->add_cap( 'manage_' . $cpt_name );
 			$role_obj->add_cap( 'read_' . $cpt_name );
-			$role_obj->add_cap( 'manage_categories' );
 		}
 
 		// return the value.

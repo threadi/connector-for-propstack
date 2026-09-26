@@ -130,5 +130,16 @@ class Update {
 	private function version200(): void {
 		// set the intro to closed for old users during the update.
 		Intro::get_instance()->set_closed();
+
+		// migrate interval names without the prefix "cfprop_", they are not registered in WordPress.
+		foreach ( array( 'propstackConnectorObjectsScheduleInterval', 'propstackConnectorQueueScheduleInterval' ) as $option_name ) {
+			$interval = (string) get_option( $option_name, '' );
+			if ( str_starts_with( $interval, 'propstack_connector_' ) ) {
+				update_option( $option_name, 'cfprop_' . substr( $interval, strlen( 'propstack_connector_' ) ) );
+			}
+		}
+
+		// install the schedules which could not be created with the invalid interval names.
+		Schedules::get_instance()->create_schedules();
 	}
 }

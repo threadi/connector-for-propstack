@@ -144,12 +144,22 @@ class Cities extends Filter_Base {
 		$filters = array();
 
 		// check our objects for some values.
-		$cities = Cache::get( 'cities' );
-		if ( empty( $cities ) ) {
+		// The cache also contains an empty list (with expiration) to prevent loading all objects on every request.
+		$cache = Cache::get( 'filter_cities' );
+		if ( is_array( $cache ) && isset( $cache['list'] ) && is_array( $cache['list'] ) && ( empty( $cache['expires'] ) || absint( $cache['expires'] ) > time() ) ) {
+			$cities = $cache['list'];
+		} else {
 			$cities = array();
-			foreach ( ImmoObjects::get_instance()->get_objects( array( 'posts_per_page' => - 1 ) ) as $object ) {
+			$query  = ImmoObjects::get_instance()->get_objects_query(
+				array(
+					'posts_per_page' => -1,
+					'fields'         => 'ids',
+					'no_found_rows'  => true,
+				)
+			);
+			foreach ( $query->posts as $post_id ) {
 				// get the city.
-				$city = Fields::get_instance()->get_field_value( $object->get_id(), $this->get_field() );
+				$city = Fields::get_instance()->get_field_value( is_int( $post_id ) ? $post_id : $post_id->ID, $this->get_field() );
 
 				// bail if no city is given.
 				if ( empty( $city ) ) {
@@ -176,8 +186,14 @@ class Cities extends Filter_Base {
 				$cities[ $city ] = $city;
 			}
 
-			// save the list in the cache.
-			Cache::set( 'cities', $cities );
+			// save the list in the cache (an empty list expires after an hour, e.g., if the import is still running).
+			Cache::set(
+				'filter_cities',
+				array(
+					'list'    => $cities,
+					'expires' => empty( $cities ) ? time() + HOUR_IN_SECONDS : 0,
+				)
+			);
 		}
 
 		// add a filter for cities, if more than 0.
@@ -217,7 +233,7 @@ class Cities extends Filter_Base {
 		}
 
 		// get the filters.
-		$filters = isset( $_GET['filter'] ) ? array_map( 'sanitize_text_field', wp_unslash( (array) $_GET['filter'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only public endpoint, no nonce required.
+		$filters = Filters::get_instance()->get_requested_filters();
 
 		// get the param from the request.
 		$city = isset( $filters[ $this->get_field()->get_name() ] ) ? sanitize_text_field( $filters[ $this->get_field()->get_name() ] ) : '';

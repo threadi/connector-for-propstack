@@ -56,30 +56,39 @@ class Uninstaller {
 	 * Remove all plugin-data.
 	 *
 	 * Either via uninstall or via cli.
-
+	 *
+	 * @param bool $network_wide True to clean all sites of a multisite network, false for the current site only.
+	 *
 	 * @return void
 	 */
-	public function run(): void {
+	public function run( bool $network_wide = true ): void {
 		// set deactivation runner to enable.
-		define( 'CFPROP_DEACTIVATION_RUNNING', 1 );
+		if ( ! defined( 'CFPROP_DEACTIVATION_RUNNING' ) ) {
+			define( 'CFPROP_DEACTIVATION_RUNNING', 1 );
+		}
 
-		if ( is_multisite() ) {
-			// get original blog ID.
-			$original_blog_id = get_current_blog_id();
-
+		if ( $network_wide && is_multisite() ) {
 			// loop through the blogs.
 			foreach ( Helper::get_blogs() as $blog ) {
+				// get the blog ID (the rows are returned as associative arrays).
+				$blog_id = absint( is_array( $blog ) ? ( $blog['blog_id'] ?? 0 ) : ( $blog->blog_id ?? 0 ) );
+
+				// bail if no valid ID is given.
+				if ( 0 === $blog_id ) {
+					continue;
+				}
+
 				// switch to the blog.
-				switch_to_blog( $blog->blog_id );
+				switch_to_blog( $blog_id );
 
 				// run tasks for deactivation in this single blog.
 				$this->deinstallation_tasks();
-			}
 
-			// switch back to the original blog.
-			switch_to_blog( $original_blog_id );
+				// switch back to the previous blog.
+				restore_current_blog();
+			}
 		} else {
-			// simply run the tasks on single-site-install.
+			// simply run the tasks on the current site.
 			$this->deinstallation_tasks();
 		}
 	}
@@ -137,10 +146,50 @@ class Uninstaller {
 			$transient_obj->delete_dismiss();
 		}
 
+		// remove the import states and work lists.
+		$this->delete_import_data();
+
 		// reset the setup marker.
 		Setup::get_instance()->uninstall();
 
 		// clear the cache.
 		Cache::get_instance()->clear_cache();
+	}
+
+	/**
+	 * Delete the options and transients used during imports.
+	 *
+	 * @return void
+	 */
+	private function delete_import_data(): void {
+		global $wpdb;
+
+		// delete the running-markers and locks.
+		foreach ( array( 'CFPROP_IMPORT_RUNNING', 'CFPROP_FILES_IMPORT_RUNNING', 'CFPROP_DELETE_RUNNING', 'CFPROP_FILES_DELETE_RUNNING' ) as $constant ) {
+			if ( defined( $constant ) ) {
+				delete_option( (string) constant( $constant ) );
+			}
+		}
+		delete_option( 'propstack_connector_import_running' );
+		delete_option( 'propstack_connector_files_import_running' );
+		delete_option( 'cfprop_import_chunk_lock' );
+
+		// delete the transient with the list of files to import.
+		delete_transient( 'propstack_object_files_to_import' );
+		delete_transient( 'propstack_object_files_to_import_owner' );
+
+		// delete the work list and all its blocks.
+		$work_list_option = 'cfprop_objects_to_import';
+		delete_option( $work_list_option );
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->prepare(
+				'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+				$wpdb->esc_like( $work_list_option . '_block_' ) . '%'
+			)
+		);
+
+		// clear the options cache as we deleted options directly in the database.
+		wp_cache_delete( 'alloptions', 'options' );
+		wp_cache_delete( 'notoptions', 'options' );
 	}
 }

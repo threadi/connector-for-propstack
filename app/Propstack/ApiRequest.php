@@ -106,7 +106,7 @@ class ApiRequest {
 	 * Set post-data for the request.
 	 *
 	 * @param string|array<string,mixed> $post_data The post-data as JSON- or boundary-string OR as an array.
-	 * @return void
+		 * @return void
 	 */
 	public function set_post_data( string|array $post_data ): void {
 		$this->post_data = $post_data;
@@ -139,21 +139,18 @@ class ApiRequest {
 			'headers'     => $headers,
 			'httpversion' => '1.1',
 			'timeout'     => get_option( 'propstack_connector_timeout', 30 ),
-			'redirection' => 10,
+			'redirection' => 0, // do not follow redirects, as they would forward the API key to the target.
 			'body'        => $this->get_post_data(),
 		);
 
-		// set response initiale to false.
-		$response = false;
+		// send the request.
+		$response = $this->send_request( $args );
 
-		// send the request and get the result-object.
-		switch ( $this->get_method() ) {
-			case 'GET':
-				$response = wp_remote_get( $this->get_url(), $args );
-				break;
-			case 'POST':
-				$response = wp_remote_post( $this->get_url(), $args );
-				break;
+		// send it a second time if the API asks for a short break ("too many requests").
+		$retry_after = $this->get_retry_after( $response );
+		if ( $retry_after >= 0 ) {
+			sleep( $retry_after );
+			$response = $this->send_request( $args );
 		}
 
 		// bail if the response is false.
@@ -178,7 +175,12 @@ class ApiRequest {
 		$this->set_response( wp_remote_retrieve_body( $response ) );
 
 		// secure the HTTP status from the response.
-		$this->set_http_status( absint( $response['http_response']->get_status() ) ); // @phpstan-ignore offsetAccess.nonOffsetAccessible
+		$this->set_http_status( $this->get_status_code( $response ) );
+
+		// note a redirect, it is not followed and must be handled as error by the caller.
+		if ( $this->get_http_status() >= 300 && $this->get_http_status() < 400 ) {
+			$this->add_error( __( 'The Propstack API answered with a redirect, which is not followed for security reasons.', 'connector-for-propstack' ) );
+		}
 
 		// clean arguments from sensitive data.
 		$args['headers']['X-API-KEY'] = 'anonymized';
@@ -323,5 +325,72 @@ class ApiRequest {
 	 */
 	public function get_errors(): array {
 		return $this->errors;
+	}
+
+	/**
+	 * Send the request with the given arguments.
+	 *
+	 * @param array<string,mixed> $args The arguments for the request.
+	 *
+	 * @return array<string,mixed>|WP_Error|false
+	 */
+	private function send_request( array $args ): array|WP_Error|false {
+		switch ( $this->get_method() ) {
+			case 'GET':
+				return wp_remote_get( $this->get_url(), $args );
+			case 'POST':
+				return wp_remote_post( $this->get_url(), $args );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Return the seconds to wait before the request could be retried.
+	 *
+	 * Returns -1 if the request should not be retried: if it is not a "too many requests" answer
+	 * or if the API does not tell us a short time to wait (max. 10 seconds).
+	 *
+	 * @param array<string,mixed>|WP_Error|false $response The response.
+	 *
+	 * @return int
+	 */
+	private function get_retry_after( array|WP_Error|false $response ): int {
+		// bail if this is not a valid response.
+		if ( ! is_array( $response ) ) {
+			return -1;
+		}
+
+		// bail if this is not a "too many requests" answer.
+		if ( 429 !== $this->get_status_code( $response ) ) {
+			return -1;
+		}
+
+		// bail if the API does not tell us a short time to wait (in seconds).
+		$retry_after = wp_remote_retrieve_header( $response, 'retry-after' );
+		if ( ! is_numeric( $retry_after ) || absint( $retry_after ) > 10 ) {
+			return -1;
+		}
+
+		// return the seconds to wait.
+		return absint( $retry_after );
+	}
+
+	/**
+	 * Return the HTTP status code of the given response.
+	 *
+	 * @param array<string,mixed> $response The response.
+	 *
+	 * @return int
+	 */
+	private function get_status_code( array $response ): int {
+		// use the response object, if given.
+		$http_response = $response['http_response'] ?? null;
+		if ( $http_response instanceof \WP_HTTP_Requests_Response ) {
+			return absint( $http_response->get_status() );
+		}
+
+		// otherwise, use the code from the response array.
+		return absint( wp_remote_retrieve_response_code( $response ) );
 	}
 }

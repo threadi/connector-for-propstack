@@ -11,6 +11,7 @@ namespace ConnectorForPropstack\Propstack;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
+use ConnectorForPropstack\Plugin\Languages;
 
 /**
  * Object, which handles the base functions for widget extensions.
@@ -93,12 +94,84 @@ class Widget_Base {
 	/**
 	 * Return the shortcode for the widget content.
 	 *
-	 * @param array<string,mixed> $attributes List of attributes.
+	 * WordPress passes an empty string if the shortcode is used without any attributes.
+	 *
+	 * @param array<string,mixed>|string $attributes List of attributes.
 	 *
 	 * @return string
 	 */
-	public function get_shortcode( array $attributes ): string {
+	public function get_shortcode( array|string $attributes ): string {
+		// WordPress uses an empty string for shortcodes without attributes.
+		$attributes = is_array( $attributes ) ? $attributes : array();
+
+		// remove attributes which are only allowed internally (e.g., via blocks) and not via shortcodes.
+		unset( $attributes['styles'], $attributes['object'] );
+
 		return wp_kses_post( $this->render( $attributes ) );
+	}
+
+	/**
+	 * Return the immo object to use for rendering.
+	 *
+	 * Uses the given 'object' attribute if it is an ImmoObject, the 'object_id' attribute if it is set
+	 * (and $use_object_id is true) or the object of the actual request.
+	 *
+	 * @param array<string,mixed> $attributes    The attributes.
+	 * @param bool                $use_object_id Whether to use the 'object_id' attribute.
+	 *
+	 * @return ImmoObject|false
+	 */
+	protected function get_immo_object( array $attributes, bool $use_object_id = false ): ImmoObject|false {
+		// use the given object, if it is valid.
+		if ( isset( $attributes['object'] ) && $attributes['object'] instanceof ImmoObject ) {
+			return $attributes['object'];
+		}
+
+		// if 'object_id' is given, get the object for it.
+		if ( $use_object_id && ! empty( $attributes['object_id'] ) && is_scalar( $attributes['object_id'] ) ) {
+			$immo_object = ImmoObjects::get_instance()->get_object_by_object_id( (string) $attributes['object_id'], Languages::get_instance()->get_current_lang() );
+			return $immo_object instanceof ImmoObject ? $immo_object : false;
+		}
+
+		// get the object for this request.
+		$immo_object = $this->get_object_by_request();
+
+		// bail if no object could be found.
+		if ( ! $immo_object instanceof ImmoObject ) {
+			return false;
+		}
+
+		// bail if requested post-type is not ours.
+		if ( get_post_type( $immo_object->get_id() ) !== \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() ) {
+			return false;
+		}
+
+		// return the object.
+		return $immo_object;
+	}
+
+	/**
+	 * Return a list attribute as array.
+	 *
+	 * Shortcodes provide lists as comma-separated strings, blocks as arrays.
+	 *
+	 * @param mixed $value The value.
+	 *
+	 * @return array<int,string>
+	 */
+	protected function get_list_attribute( mixed $value ): array {
+		// convert a comma-separated string to an array.
+		if ( is_string( $value ) ) {
+			$value = explode( ',', $value );
+		}
+
+		// bail if value is not an array.
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+
+		// return the cleaned list.
+		return array_values( array_filter( array_map( 'trim', array_map( 'strval', array_filter( $value, 'is_scalar' ) ) ) ) );
 	}
 
 	/**
@@ -131,8 +204,8 @@ class Widget_Base {
 			$immo_object = $immo_objects->get_object( $post_id );
 		}
 
-		// Fallback: get a random immo object, only during the AJAX request (e.g., in Gutenberg).
-		if ( Helper::is_rest_request() ) {
+		// Fallback: get the newest immo object, only during the REST request of editors (e.g., preview in Gutenberg).
+		if ( Helper::is_rest_request() && current_user_can( 'edit_posts' ) ) {
 			$immo_objects_array = $immo_objects->get_objects( array( 'posts_per_page' => 1 ) );
 			if ( ! empty( $immo_objects_array ) ) {
 				$immo_object = $immo_objects_array[0];
@@ -150,7 +223,7 @@ class Widget_Base {
 	 */
 	public function get_shortcode_description(): string {
 		// concat the returning text.
-		$text = '<code data-copied-label="' . esc_attr__( 'copied', 'connector-for-propstack' ) . '" title="' . esc_attr__( 'Click to copy this code in your clipboard', 'connector-for-propstack' ) . '">[propstack_connector_' . $this->get_name() . ']</code><br>';
+		$text = '<code data-copied-label="' . esc_attr__( 'copied', 'connector-for-propstack' ) . '" title="' . esc_attr__( 'Click to copy this code in your clipboard', 'connector-for-propstack' ) . '">[cfprop_' . $this->get_name() . ']</code><br>';
 
 		// get the params.
 		$params = $this->get_params();
@@ -197,7 +270,7 @@ class Widget_Base {
 		}
 
 		// return the resulting example.
-		return '<code data-copied-label="' . esc_attr__( 'copied', 'connector-for-propstack' ) . '" title="' . esc_attr__( 'Click to copy this code in your clipboard', 'connector-for-propstack' ) . '">[propstack_connector_' . $this->get_name() . $params . ']</code>';
+		return '<code data-copied-label="' . esc_attr__( 'copied', 'connector-for-propstack' ) . '" title="' . esc_attr__( 'Click to copy this code in your clipboard', 'connector-for-propstack' ) . '">[cfprop_' . $this->get_name() . $params . ']</code>';
 	}
 
 	/**

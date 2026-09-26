@@ -176,6 +176,12 @@ class ImmoObjects {
 			'fields'         => 'ids',
 		);
 		$query         = wp_parse_args( $query_params, $default_query );
+
+		// secure the requested page for the pagination.
+		if ( isset( $query['paged'] ) ) {
+			$query['paged'] = max( 1, absint( $query['paged'] ) );
+		}
+
 		return new WP_Query( $query );
 	}
 
@@ -498,7 +504,7 @@ class ImmoObjects {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'propstackConnectorObjectsScheduleInterval' );
 		$setting->set_type( 'string' );
-		$setting->set_default( 'propstack_connector_daily' );
+		$setting->set_default( 'cfprop_daily' );
 		$setting->set_section( $import_options_section );
 		$field = new Value( $settings_obj );
 		$field->set_title( __( 'Interval for automatic import', 'connector-for-propstack' ) );

@@ -332,6 +332,23 @@ class Filters {
 	}
 
 	/**
+	 * Return the requested filter values, read from the configured request method (GET or POST).
+	 *
+	 * @return array<string,string>
+	 */
+	public function get_requested_filters(): array {
+		// get the request data depending on the configured method.
+		if ( INPUT_POST === $this->get_method_for_filter_input() ) {
+			$filters = isset( $_POST['filter'] ) ? wp_unslash( (array) $_POST['filter'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only public filter, no nonce required; sanitized below.
+		} else {
+			$filters = isset( $_GET['filter'] ) ? wp_unslash( (array) $_GET['filter'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only public filter, no nonce required; sanitized below.
+		}
+
+		// return the sanitized list.
+		return array_map( 'sanitize_text_field', $filters );
+	}
+
+	/**
 	 * Extend the form if the project is using simple permalinks.
 	 *
 	 * @return void

@@ -55,6 +55,7 @@ class Cache {
 	public function init(): void {
 		// use our own hooks.
 		add_action( 'cfprop_import_object_before_start', array( $this, 'clear_cache' ) );
+		add_action( 'cfprop_import_object_after', array( $this, 'clear_cache' ), 10, 0 );
 
 		// clear the cache also on any user change, as we have a cache, which saves the first admin user as fallback for authors of object posts.
 		add_action( 'wp_update_user', array( $this, 'clear_cache' ), 10, 0 );
@@ -81,7 +82,7 @@ class Cache {
 	 * @return void
 	 */
 	public static function set( string $key, mixed $cache ): void {
-		update_option( 'cfprop_cache_' . $key . '_' . Languages::get_instance()->get_current_lang(), $cache );
+		update_option( 'cfprop_cache_' . $key . '_' . Languages::get_instance()->get_current_lang(), $cache, false );
 	}
 
 	/**

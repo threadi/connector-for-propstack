@@ -97,14 +97,17 @@ class Templates {
 	 * @return string
 	 */
 	public function get_template( string $template ): string {
-		if ( is_embed() ) {
-			return $template;
+		// bail with an empty template if the given template contains a path traversal or is an absolute path.
+		if ( ! $this->is_valid_template_name( $template ) ) {
+			return plugin_dir_path( CFPROP_PLUGIN ) . 'templates/parts/empty.php';
 		}
 
-		// check if the requested template exists in the theme.
-		$theme_template = locate_template( trailingslashit( basename( dirname( CFPROP_PLUGIN ) ) ) . $template );
-		if ( $theme_template ) {
-			return $theme_template;
+		// check if the requested template exists in the theme (not for embeds).
+		if ( ! is_embed() ) {
+			$theme_template = locate_template( trailingslashit( basename( dirname( CFPROP_PLUGIN ) ) ) . $template );
+			if ( $theme_template ) {
+				return $theme_template;
+			}
 		}
 
 		// set the directory for the template to use.
@@ -129,12 +132,28 @@ class Templates {
 	}
 
 	/**
+	 * Return whether the given template name is a valid relative path without path traversal.
+	 *
+	 * @param string $template The template with a relative path.
+	 *
+	 * @return bool
+	 */
+	private function is_valid_template_name( string $template ): bool {
+		return '' !== $template && 0 === validate_file( $template ) && ! str_starts_with( $template, '/' ) && ! str_contains( $template, "\0" );
+	}
+
+	/**
 	 * Check if the given template exists.
 	 *
 	 * @param string $template The searched template with a relative path.
 	 * @return bool
 	 */
 	public function has_template( string $template ): bool {
+		// bail if the given template contains a path traversal or is an absolute path.
+		if ( ! $this->is_valid_template_name( $template ) ) {
+			return false;
+		}
+
 		// check if the requested template exists in the theme.
 		$theme_template = locate_template( trailingslashit( basename( dirname( CFPROP_PLUGIN ) ) ) . $template );
 		if ( $theme_template ) {

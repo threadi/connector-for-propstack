@@ -11,12 +11,13 @@
 - Added 9 abilities to get object data or start imports via AI or your MCP plugin
 - Added the Propstack logo as icon in the new WordPress Icon API
 - Added compatibility check for Avia, Beaver Builder, Divi 5 and SiteOrigin
-- Added intro after the setup to introduce the main functions of this plugin
+- Added an intro after the setup to introduce the main functions of this plugin
 - Added some new hooks
 
 ### Changed
 
 - Optimized the setup to onboarding the plugin
+- Multiple optimizations for stability of the plugin
 - Use $throwable::class instead of get_class() for the modern way of PHP
 - Use configured language during the installation of default terms for our taxonomies
 - Do not show error marker if setup has not been completed
@@ -29,6 +30,7 @@
 - Fixed check for Elementor Pro and PRO Elements
 - Fixed missing DataView scripts in release build
 - Fixed faulty check for the singular template to display the thumbnail
+- Fixed faulty default value for daily import schedule
 
 ### Removed
 

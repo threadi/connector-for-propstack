@@ -36,7 +36,7 @@ class Queue extends Schedules_Base {
 	 *
 	 * @var string
 	 */
-	protected string $default_interval = 'propstack_connector_hourly';
+	protected string $default_interval = 'cfprop_15minutely';
 
 	/**
 	 * Initialize this schedule.

@@ -73,7 +73,7 @@ class Single extends Widget_Base {
 		}
 
 		// get the object for the selected object ID.
-		$attributes['object'] = ImmoObjects::get_instance()->get_object_by_object_id( $attributes['object_id'], Languages::get_instance()->get_current_lang() );
+		$attributes['object'] = ImmoObjects::get_instance()->get_object_by_object_id( (string) $attributes['object_id'], Languages::get_instance()->get_current_lang() );
 
 		// bail if no object could be found.
 		if ( ! $attributes['object'] instanceof ImmoObject ) {
@@ -82,8 +82,8 @@ class Single extends Widget_Base {
 
 		// set some attributes to configure the rendering.
 		$attributes['classes']   = 'cfprop-object default-max-width';
-		$attributes['template']  = ! empty( $attributes['template'] ) ? $attributes['template'] : 'default';
-		$attributes['templates'] = ! empty( $attributes['templates'] ) ? $attributes['templates'] : array(
+		$attributes['template']  = ! empty( $attributes['template'] ) && is_string( $attributes['template'] ) ? sanitize_key( $attributes['template'] ) : 'default';
+		$attributes['templates'] = ! empty( $attributes['templates'] ) ? $this->get_list_attribute( $attributes['templates'] ) : array(
 			'thumbnail',
 			'marketing_type',
 			'key_facts',
@@ -99,6 +99,12 @@ class Single extends Widget_Base {
 		 * @param array<string,mixed> $attributes The attributes for the single widget.
 		 */
 		$attributes = apply_filters( 'cfprop_widget_single_attributes', $attributes );
+
+		// use only existing single templates (prevents path traversal).
+		$attributes['template'] = sanitize_key( (string) $attributes['template'] );
+		if ( empty( $attributes['template'] ) || ! Templates::get_instance()->has_template( 'parts/single/' . $attributes['template'] . '.php' ) ) {
+			$attributes['template'] = 'default';
+		}
 
 		// secure the post-ID for the template.
 		$post_id = $attributes['object']->get_id();
