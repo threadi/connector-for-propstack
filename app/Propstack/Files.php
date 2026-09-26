@@ -764,8 +764,8 @@ class Files {
 					$images = array();
 				}
 
-				// find the entry.
-				$key = array_search( $object_post_id, $images, true );
+				// find the entry of this attachment.
+				$key = array_search( $post->ID, $images, true );
 
 				// remove it from the list.
 				if ( false !== $key ) {
@@ -1052,7 +1052,7 @@ class Files {
 		update_option( CFPROP_FILES_IMPORT_RUNNING, time() );
 
 		// get post-ID from the request.
-		$post_id_from_request = absint( filter_input( INPUT_POST, 'post', FILTER_SANITIZE_NUMBER_INT ) );
+		$post_id_from_request = $this->get_post_id_from_request();
 		if ( $post_id_from_request > 0 ) {
 			$post_id = $post_id_from_request;
 		}
@@ -1376,7 +1376,8 @@ class Files {
 	+    * @return int
 	+    */
 	private function get_post_id_from_request(): int {
-		return absint( filter_input( INPUT_POST, 'post', FILTER_SANITIZE_NUMBER_INT ) );
+		// the nonce is checked by the calling AJAX handler.
+		return isset( $_POST['post'] ) ? absint( wp_unslash( $_POST['post'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	}
 
 	/**

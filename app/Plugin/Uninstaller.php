@@ -108,6 +108,10 @@ class Uninstaller {
 		ImmoObjects::get_instance()->add_settings();
 		Fields::get_instance()->add_settings();
 
+		// remove the running-markers first, otherwise the deletion of objects and files would be skipped
+		// if an import has been running within the last hour.
+		$this->delete_running_markers();
+
 		// delete all objects from Propstack.
 		ImmoObjects::get_instance()->delete_all( '' );
 
@@ -164,15 +168,8 @@ class Uninstaller {
 	private function delete_import_data(): void {
 		global $wpdb;
 
-		// delete the running-markers and locks.
-		foreach ( array( 'CFPROP_IMPORT_RUNNING', 'CFPROP_FILES_IMPORT_RUNNING', 'CFPROP_DELETE_RUNNING', 'CFPROP_FILES_DELETE_RUNNING' ) as $constant ) {
-			if ( defined( $constant ) ) {
-				delete_option( (string) constant( $constant ) );
-			}
-		}
-		delete_option( 'propstack_connector_import_running' );
-		delete_option( 'propstack_connector_files_import_running' );
-		delete_option( 'cfprop_import_chunk_lock' );
+		// delete the running-markers and locks (again, they could be set during the uninstallation).
+		$this->delete_running_markers();
 
 		// delete the transient with the list of files to import.
 		delete_transient( 'propstack_object_files_to_import' );
@@ -181,15 +178,32 @@ class Uninstaller {
 		// delete the work list and all its blocks.
 		$work_list_option = 'cfprop_objects_to_import';
 		delete_option( $work_list_option );
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$block_options = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
-				'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
 				$wpdb->esc_like( $work_list_option . '_block_' ) . '%'
 			)
 		);
 
-		// clear the options cache as we deleted options directly in the database.
-		wp_cache_delete( 'alloptions', 'options' );
-		wp_cache_delete( 'notoptions', 'options' );
+		// delete them via WordPress, so the object cache is cleaned, too.
+		foreach ( $block_options as $block_option ) {
+			delete_option( (string) $block_option );
+		}
+	}
+
+	/**
+	 * Delete the running-markers and locks of imports and deletions.
+	 *
+	 * @return void
+	 */
+	private function delete_running_markers(): void {
+		foreach ( array( 'CFPROP_IMPORT_RUNNING', 'CFPROP_FILES_IMPORT_RUNNING', 'CFPROP_DELETE_RUNNING', 'CFPROP_FILES_DELETE_RUNNING' ) as $constant ) {
+			if ( defined( $constant ) ) {
+				delete_option( (string) constant( $constant ) );
+			}
+		}
+		delete_option( 'propstack_connector_import_running' );
+		delete_option( 'propstack_connector_files_import_running' );
+		delete_option( 'cfprop_import_chunk_lock' );
 	}
 }
