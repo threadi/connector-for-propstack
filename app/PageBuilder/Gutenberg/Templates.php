@@ -78,7 +78,12 @@ class Templates {
 	public function add_block_templates( array $template_list, array $query, string $template_type ): array {
 		// bail if the theme is not a block theme.
 		if ( ! Helper::theme_is_fse_theme() ) {
-			return array();
+			return $template_list;
+		}
+
+		// bail if no templates are requested (e.g. template parts), as we only provide templates.
+		if ( 'wp_template' !== $template_type ) {
+			return $template_list;
 		}
 
 		// get the post-type from the query.

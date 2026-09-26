@@ -63,12 +63,23 @@ class Abilities {
 	 * @return void
 	 */
 	public function init(): void {
+		// show the abilities in the settings.
+		Abilities_Settings::get_instance()->init();
+
+		// use our own hooks: an import, which was already scheduled by an ability, still runs.
+		add_action( 'cfprop_run_import_by_ability', array( $this, 'run_scheduled_import' ) );
+
+		// bail if the abilities are disabled.
+		if ( ! Abilities_Settings::get_instance()->is_enabled() ) {
+			return;
+		}
+
 		// use hooks.
 		add_action( 'wp_abilities_api_init', array( $this, 'add_abilities' ) );
 		add_action( 'wp_abilities_api_categories_init', array( $this, 'add_ability_category' ) );
 
-		// use our own hooks.
-		add_action( 'cfprop_run_import_by_ability', array( $this, 'run_scheduled_import' ) );
+		// initialize the abilities for templates of page builders.
+		Template_Abilities::get_instance()->init();
 	}
 
 	/**
@@ -108,7 +119,7 @@ class Abilities {
 			self::ABILITY_CATEGORY . '/get-objects',
 			array(
 				'label'               => __( 'Get list of objects', 'connector-for-propstack' ),
-				'description'         => __( 'Returns the list of objects from Propstack in WordPress. Use the returned post_id to request the details of a single object.', 'connector-for-propstack' ),
+				'description'         => __( 'Returns the list of objects from Propstack in WordPress. Use the returned post_id to request the details of a single object. To design how objects are shown on the website (templates, detail view, list), use get-builders and get-template-catalog instead of building it from these field values.', 'connector-for-propstack' ),
 				'category'            => self::ABILITY_CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -180,6 +191,7 @@ class Abilities {
 				'permission_callback' => array( $this, 'has_read_permission' ),
 				'meta'                => array(
 					'show_in_rest' => true,
+					'mcp'          => array( 'public' => true ), // expose via the MCP Adapter of WordPress.
 					'annotations'  => array(
 						'readonly'    => true,
 						'destructive' => false,
@@ -194,7 +206,7 @@ class Abilities {
 			self::ABILITY_CATEGORY . '/get-object',
 			array(
 				'label'               => __( 'Get a single object', 'connector-for-propstack' ),
-				'description'         => __( 'Returns a single object from Propstack in WordPress with all of its fields.', 'connector-for-propstack' ),
+				'description'         => __( 'Returns a single object from Propstack in WordPress with all of its fields. To design how objects are shown on the website (templates, detail view, list), use get-builders and get-template-catalog instead of building it from these field values.', 'connector-for-propstack' ),
 				'category'            => self::ABILITY_CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -245,6 +257,7 @@ class Abilities {
 				'permission_callback' => array( $this, 'has_read_permission' ),
 				'meta'                => array(
 					'show_in_rest' => true,
+					'mcp'          => array( 'public' => true ), // expose via the MCP Adapter of WordPress.
 					'annotations'  => array(
 						'readonly'    => true,
 						'destructive' => false,
@@ -259,7 +272,7 @@ class Abilities {
 			self::ABILITY_CATEGORY . '/get-fields',
 			array(
 				'label'               => __( 'Get list of object fields', 'connector-for-propstack' ),
-				'description'         => __( 'Returns the fields which objects from Propstack can have, with their internal name, label and category. Use the internal names to request single fields via get-objects.', 'connector-for-propstack' ),
+				'description'         => __( 'Returns the fields, which objects from Propstack can have, with their internal name, label and category. Use the internal names to request single fields via get-objects. To design how objects are shown on the website (templates, detail view, list), use get-builders and get-template-catalog instead of building it from these field values.', 'connector-for-propstack' ),
 				'category'            => self::ABILITY_CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -303,6 +316,7 @@ class Abilities {
 				'permission_callback' => array( $this, 'has_read_permission' ),
 				'meta'                => array(
 					'show_in_rest' => true,
+					'mcp'          => array( 'public' => true ), // expose via the MCP Adapter of WordPress.
 					'annotations'  => array(
 						'readonly'    => true,
 						'destructive' => false,
@@ -373,6 +387,7 @@ class Abilities {
 				'permission_callback' => array( $this, 'has_read_permission' ),
 				'meta'                => array(
 					'show_in_rest' => true,
+					'mcp'          => array( 'public' => true ), // expose via the MCP Adapter of WordPress.
 					'annotations'  => array(
 						'readonly'    => true,
 						'destructive' => false,
@@ -389,7 +404,10 @@ class Abilities {
 				'label'               => __( 'Get the state of the object import', 'connector-for-propstack' ),
 				'description'         => __( 'Returns whether an import is running right now and how many objects exist. Use this to find out why objects are missing.', 'connector-for-propstack' ),
 				'category'            => self::ABILITY_CATEGORY,
-				'input_schema'        => array(),
+				'input_schema'        => array(
+					'type'    => 'object',
+					'default' => array(),
+				),
 				'output_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -427,6 +445,7 @@ class Abilities {
 				'permission_callback' => array( $this, 'has_permission' ),
 				'meta'                => array(
 					'show_in_rest' => true,
+					'mcp'          => array( 'public' => true ), // expose via the MCP Adapter of WordPress.
 					'annotations'  => array(
 						'readonly'    => true,
 						'destructive' => false,
@@ -443,7 +462,10 @@ class Abilities {
 				'label'               => __( 'Start the import of objects', 'connector-for-propstack' ),
 				'description'         => __( 'Starts the import of objects from Propstack. The import runs in several steps, so this only starts it - use get-import-status to follow its progress.', 'connector-for-propstack' ),
 				'category'            => self::ABILITY_CATEGORY,
-				'input_schema'        => array(),
+				'input_schema'        => array(
+					'type'    => 'object',
+					'default' => array(),
+				),
 				'output_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -461,6 +483,7 @@ class Abilities {
 				'permission_callback' => array( $this, 'has_permission' ),
 				'meta'                => array(
 					'show_in_rest' => true,
+					'mcp'          => array( 'public' => true ), // expose via the MCP Adapter of WordPress.
 					'annotations'  => array(
 						'readonly'    => false,
 						'destructive' => false,

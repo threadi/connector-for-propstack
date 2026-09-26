@@ -1371,10 +1371,10 @@ class Files {
 	}
 
 	/**
-	+    * Return the post-ID of the object from the request, if the import runs for a single object.
-	+    *
-	+    * @return int
-	+    */
+	 * Return the post-ID of the object from the request, if the import runs for a single object.
+	 *
+	 * @return int
+	 */
 	private function get_post_id_from_request(): int {
 		// the nonce is checked by the calling AJAX handler.
 		return isset( $_POST['post'] ) ? absint( wp_unslash( $_POST['post'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized

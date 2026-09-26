@@ -153,6 +153,12 @@ class Uninstaller {
 		// remove the import states and work lists.
 		$this->delete_import_data();
 
+		// remove the CSS for the templates of objects (the templates themselves belong to the theme and are kept).
+		delete_option( \ConnectorForPropstack\PageBuilder\Gutenberg\Template_Styles::OPTION );
+
+		// remove the marker for the hint about the abilities.
+		delete_option( \ConnectorForPropstack\Propstack\Abilities_Settings::HINT_OPTION );
+
 		// reset the setup marker.
 		Setup::get_instance()->uninstall();
 

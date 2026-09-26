@@ -8,12 +8,12 @@
 - Added new field type for energy efficiency classes with check against a whitelist for value A+ to H
 - Added new field type for geo coordinates to output them with 4 digits
 - Added internal names for each supported page builder
-- Added 9 abilities to get object data or start imports via AI or your MCP plugin
+- Added multiple abilities to get object data, start imports or create templates for and with objects via AI or your preferred MCP plugin
 - Added the Propstack logo as icon in the new WordPress Icon API
 - Added compatibility check for Avia, Beaver Builder, Divi 5 and SiteOrigin
 - Added an intro after the setup to introduce the main functions of this plugin
 - Added a filter in both media library views to show only images for objects
-- Added a info box on every image from Propstack in media library
+- Added an info box on every image from Propstack in media library
 - Added some new hooks
 
 ### Changed
@@ -33,6 +33,7 @@
 - Fixed missing DataView scripts in release build
 - Fixed faulty check for the singular template to display the thumbnail
 - Fixed faulty default value for daily import schedule
+- Fixed wrong handling of block templates from third parties
 
 ### Removed
 

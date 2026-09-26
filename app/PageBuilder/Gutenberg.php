@@ -60,6 +60,15 @@ class Gutenberg extends PageBuilder_Base {
 		// add our custom block category.
 		add_filter( 'block_categories_all', array( $this, 'add_block_category' ) );
 
+		// make the block templates accessible for abilities.
+		add_filter( 'cfprop_template_ability_adapters', array( $this, 'add_template_adapter' ) );
+
+		// hide groups whose blocks of this plugin show nothing (via the classes "cfprop-hide-if-empty" and "cfprop-hide-if-no").
+		Gutenberg\Hide_Empty_Groups::get_instance()->init();
+
+		// output the CSS for the templates of objects.
+		Gutenberg\Template_Styles::get_instance()->init();
+
 		// bail if the theme is not a FSE theme with block support.
 		if ( ! $this->theme_support_block_templates() ) {
 			return;
@@ -279,5 +288,17 @@ class Gutenberg extends PageBuilder_Base {
 
 		// return the fallback image without a link.
 		return '<figure class="cfprop-thumbnail wp-block-post-featured-image">' . wp_kses_post( $image ) . '</figure>';
+	}
+
+	/**
+	 * Add the adapter, which makes the block templates accessible for abilities.
+	 *
+	 * @param array<int,\ConnectorForPropstack\Propstack\Template_Adapter_Base> $adapters List of adapters.
+	 *
+	 * @return array<int,\ConnectorForPropstack\Propstack\Template_Adapter_Base>
+	 */
+	public function add_template_adapter( array $adapters ): array {
+		$adapters[] = new Gutenberg\Template_Adapter();
+		return $adapters;
 	}
 }
