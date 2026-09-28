@@ -408,6 +408,8 @@ class ImmoObjects {
 			$field = new Button( $settings_obj );
 			$field->set_button_title( __( 'Import now', 'connector-for-propstack' ) );
 			$field->set_title( __( 'Import objects', 'connector-for-propstack' ) );
+			/* translators: %1$s  will ber replaced by a URL. */
+			$field->set_description( sprintf( __( 'Configure <a href="%1$s">here</a> which objects you would like to display on your website.', 'connector-for-propstack' ), Settings::get_instance()->get_url( 'propstack_connector_objects' ) ) );
 			$field->set_button_url( $this->get_import_url() );
 			$field->add_data( 'dialog', (string) wp_json_encode( $this->get_import_dialog() ) );
 			$field->add_class( 'easy-dialog-for-wordpress' );
@@ -439,6 +441,7 @@ class ImmoObjects {
 			$field = new Button( $settings_obj );
 			$field->set_button_title( __( 'Delete now', 'connector-for-propstack' ) );
 			$field->set_title( __( 'Delete objects', 'connector-for-propstack' ) );
+			$field->set_description( __( 'Delete all objects on your website. You will be asked to confirm before proceeding.', 'connector-for-propstack' ) );
 			$field->set_button_url( $delete_url );
 			$field->add_data(
 				'dialog',

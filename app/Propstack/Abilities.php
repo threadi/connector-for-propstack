@@ -2,6 +2,9 @@
 /**
  * File for handling the abilities we provide.
  *
+ * Hints:
+ * Use custom settings with this hook: https://developer.wordpress.org/reference/hooks/wp_register_ability_args/
+ *
  * @package connector-for-propstack
  */
 

@@ -156,6 +156,7 @@ class Files {
 			$field = new Button( $settings_obj );
 			$field->set_button_title( __( 'Import now', 'connector-for-propstack' ) );
 			$field->set_title( __( 'Import images', 'connector-for-propstack' ) );
+			$field->set_description( __( 'Import all images for all objects in one go. Existing images will not be changed.', 'connector-for-propstack' ) );
 			$field->set_button_url( $import_url );
 			$field->add_data(
 				'dialog',
@@ -211,6 +212,7 @@ class Files {
 			$field = new Button( $settings_obj );
 			$field->set_button_title( __( 'Delete now', 'connector-for-propstack' ) );
 			$field->set_title( __( 'Delete files', 'connector-for-propstack' ) );
+			$field->set_description( __( 'Delete all images of your objects in WordPress. You will be asked to confirm before the process begins. Afterward, you can import them again from Propstack at any time.', 'connector-for-propstack' ) );
 			$field->set_button_url( $delete_url );
 			$field->add_data(
 				'dialog',

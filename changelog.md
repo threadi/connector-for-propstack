@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.0] - 30.09.2026
 
 ### Added
 
@@ -34,6 +34,7 @@
 - Fixed faulty check for the singular template to display the thumbnail
 - Fixed faulty default value for daily import schedule
 - Fixed wrong handling of block templates from third parties
+- Fixed missing run of check for tasks to update after plugin update
 
 ### Removed
 
