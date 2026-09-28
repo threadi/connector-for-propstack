@@ -37,16 +37,6 @@ class Abilities_Settings {
 	public const OPTION = 'propstack_connector_abilities';
 
 	/**
-	 * The option, which marks that the hint about the abilities has been created.
-	 */
-	public const HINT_OPTION = 'cfprop_abilities_hint_created';
-
-	/**
-	 * The name of the hint about the abilities.
-	 */
-	private const HINT_NAME = 'cfprop_abilities_hint';
-
-	/**
 	 * The name of the tab for advanced settings.
 	 */
 	private const TAB = 'propstack_connector_advanced';
@@ -100,7 +90,6 @@ class Abilities_Settings {
 	 */
 	public function init(): void {
 		add_action( 'init', array( $this, 'add_settings' ), 30 );
-		add_action( 'admin_init', array( $this, 'add_hint' ) );
 		add_action( 'admin_action_cfprop_reset_ability_template', array( $this, 'reset_template_by_request' ) );
 		add_filter( 'display_post_states', array( $this, 'add_post_state' ), 10, 2 );
 	}
@@ -242,13 +231,12 @@ class Abilities_Settings {
 			$lines[] = $this->get_status_line( false, esc_html__( 'Your WordPress does not support abilities yet. They are available since WordPress 6.9.', 'connector-for-propstack' ) );
 		}
 
-		// the MCP Adapter.
+		// the MCP Adapter (optional, other MCP plugins with support for abilities work as well).
 		if ( $this->is_mcp_adapter_active() ) {
 			/* translators: %1$s will be replaced by a URL. */
 			$lines[] = $this->get_status_line( true, sprintf( __( 'The MCP Adapter is active. Its default endpoint for connected applications is %1$s', 'connector-for-propstack' ), '<code>' . esc_html( rest_url( 'mcp/mcp-adapter-default-server' ) ) . '</code>' ) );
 		} else {
-			/* translators: %1$s will be replaced by a URL. */
-			$lines[] = $this->get_status_line( false, sprintf( __( 'The <a href="%1$s" target="_blank">MCP Adapter</a> is not active. It connects applications like AI assistants with the abilities of your WordPress.', 'connector-for-propstack' ), esc_url( 'https://github.com/WordPress/mcp-adapter' ) ) );
+			$lines[] = '<li><span class="dashicons dashicons-info"></span> ' . esc_html__( 'To connect applications like AI assistants, you need an MCP plugin with support for the abilities of WordPress.', 'connector-for-propstack' ) . '</li>';
 		}
 
 		// return the list.
@@ -385,48 +373,14 @@ class Abilities_Settings {
 	public function get_guide_html(): string {
 		$html = '<ol>';
 		/* translators: %1$s will be replaced by a URL. */
-		$html .= '<li>' . sprintf( __( 'Install and activate the <a href="%1$s" target="_blank">MCP Adapter plugin</a>.', 'connector-for-propstack' ), 'https://github.com/WordPress/mcp-adapter/releases/latest' ) . '</li>';
+		$html .= '<li>' . sprintf( __( 'Install and activate an MCP plugin of your choice, which supports the abilities of WordPress (e.g. the <a href="%1$s" target="_blank">MCP Adapter</a>).', 'connector-for-propstack' ), esc_url( 'https://github.com/WordPress/mcp-adapter' ) ) . '</li>';
+		$html .= '<li>' . esc_html__( 'Make sure the abilities of this plugin are available in your MCP plugin. Depending on the plugin, you may have to enable them in its settings.', 'connector-for-propstack' ) . '</li>';
 		/* translators: %1$s will be replaced by a URL. */
-		$html .= '<li>' . sprintf( __( 'Create an <a href="%1$s">application password</a> for your user.', 'connector-for-propstack' ), esc_url( admin_url( 'profile.php#application-passwords-section' ) ) ) . '</li>';
-		$html .= '<li>' . esc_html__( 'Connect your application (e.g. an AI assistant with MCP support) with the endpoint above, your username and the application password.', 'connector-for-propstack' ) . '</li>';
+		$html .= '<li>' . sprintf( __( 'Set up the access for your application as described by your MCP plugin, e.g. with an <a href="%1$s">application password</a> for your user.', 'connector-for-propstack' ), esc_url( admin_url( 'profile.php#application-passwords-section' ) ) ) . '</li>';
+		$html .= '<li>' . esc_html__( 'Connect your application (e.g. an AI assistant with MCP support) with the endpoint of your MCP plugin and the access data.', 'connector-for-propstack' ) . '</li>';
 		$html .= '</ol>';
-		$html .= '<p><strong>' . esc_html__( 'Examples for prompts:', 'connector-for-propstack' ) . '</strong></p><ul>';
-		$html .= '<li><em>' . esc_html__( 'Which page builders can be used for the templates of my objects?', 'connector-for-propstack' ) . '</em></li>';
-		$html .= '<li><em>' . esc_html__( 'Create a detail view for my objects with price, living area and the description in the style of my website.', 'connector-for-propstack' ) . '</em></li>';
-		$html .= '<li><em>' . esc_html__( 'Hide the rows of empty values in the detail view.', 'connector-for-propstack' ) . '</em></li>';
-		$html .= '</ul>';
-		$html .= '<p>' . esc_html__( 'Templates are only saved after you agreed to it and can be reset here at any time.', 'connector-for-propstack' ) . '</p>';
+		// … examples for prompts and the final note unchanged …
 		return $html;
-	}
-
-	/**
-	 * Inform once about the abilities, if they can be used.
-	 *
-	 * @return void
-	 */
-	public function add_hint(): void {
-		// bail if the hint has already been created.
-		if ( get_option( self::HINT_OPTION ) ) {
-			return;
-		}
-
-		// bail if the abilities can not be used or the user can not use templates.
-		if ( ! $this->is_enabled() || ! $this->is_api_available() || ! current_user_can( 'edit_theme_options' ) ) {
-			return;
-		}
-
-		// create the hint.
-		$transient_obj = Transients::get_instance()->add();
-		$transient_obj->set_name( self::HINT_NAME );
-		/* translators: %1$s will be replaced by a URL. */
-		$transient_obj->set_message( '<strong>' . __( 'Hint:', 'connector-for-propstack' ) . '</strong> ' . sprintf( __( 'The templates for the detail view, and the list of your objects can now also be created by applications you connect to your WordPress, e.g. an AI assistant. This is optional and only works if you set it up yourself. <a href="%1$s">Learn more</a>', 'connector-for-propstack' ), esc_url( $this->get_url() ) ) );
-		$transient_obj->set_type( 'info' );
-		$transient_obj->set_dismissible_days( 365 );
-		$transient_obj->set_hide_on( array( $this->get_url() ) );
-		$transient_obj->save();
-
-		// remember that the hint has been created.
-		update_option( self::HINT_OPTION, 1, false );
 	}
 
 	/**

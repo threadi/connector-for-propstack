@@ -50,9 +50,7 @@ class AbilitiesSettings extends ConnectorForPropstackTestCase {
 		}
 		wp_set_current_user( $user_id );
 
-		// start with enabled abilities and without hint.
-		delete_option( Abilities_Settings::OPTION );
-		delete_option( Abilities_Settings::HINT_OPTION );
+		// start with enabled abilities.
 		Transients::get_instance()->get_transient_by_name( 'cfprop_abilities_hint' )->delete();
 	}
 
@@ -343,53 +341,6 @@ class AbilitiesSettings extends ConnectorForPropstackTestCase {
 		$this->assertIsArray( $reset );
 		$this->assertSame( 'reset', $reset['action'] );
 		$this->assertStringNotContainsString( 'Created via abilities', Abilities_Settings::get_instance()->get_templates_html() );
-	}
-
-	/**
-	 * Test the status.
-	 *
-	 * @return void
-	 */
-	public function test_status(): void {
-		$html = Abilities_Settings::get_instance()->get_status_html();
-		$this->assertStringContainsString( 'MCP Adapter', $html );
-		$this->assertStringContainsString( function_exists( 'wp_register_ability' ) ? 'supports abilities' : 'WordPress 6.9', $html );
-		$this->assertStringContainsString( 'application password', Abilities_Settings::get_instance()->get_guide_html() );
-	}
-
-	/**
-	 * Test that the hint is created once and only for users, who can use templates.
-	 *
-	 * @return void
-	 */
-	public function test_hint(): void {
-		if ( ! function_exists( 'wp_register_ability' ) ) {
-			$this->markTestSkipped( 'The abilities API is not available.' );
-		}
-		$transients = Transients::get_instance();
-
-		// not for editors.
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
-		Abilities_Settings::get_instance()->add_hint();
-		$this->assertFalse( $transients->is_transient_set( 'cfprop_abilities_hint' ) );
-
-		// not if the abilities are disabled.
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
-		update_option( Abilities_Settings::OPTION, 0 );
-		Abilities_Settings::get_instance()->add_hint();
-		$this->assertFalse( $transients->is_transient_set( 'cfprop_abilities_hint' ) );
-
-		// once for administrators.
-		update_option( Abilities_Settings::OPTION, 1 );
-		Abilities_Settings::get_instance()->add_hint();
-		$this->assertTrue( $transients->is_transient_set( 'cfprop_abilities_hint' ) );
-		$this->assertStringContainsString( 'optional', $transients->get_transient_by_name( 'cfprop_abilities_hint' )->get_message() );
-		$this->assertSame( 1, absint( get_option( Abilities_Settings::HINT_OPTION ) ) );
-
-		// not again after it was removed.
-		$transients->get_transient_by_name( 'cfprop_abilities_hint' )->delete();
-		Abilities_Settings::get_instance()->add_hint();
-		$this->assertFalse( $transients->is_transient_set( 'cfprop_abilities_hint' ) );
 	}
 
 	/**

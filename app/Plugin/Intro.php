@@ -337,7 +337,7 @@ class Intro {
 		$setting->set_section( $hidden_section );
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'integer' );
-		$setting->set_default( 0 );
+		$setting->set_default( defined( 'CFPROP_UPDATE_RUNNING' ) ? 1 : 0 );
 	}
 
 	/**
