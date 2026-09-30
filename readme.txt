@@ -181,6 +181,5 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 - Fixed wrong handling of block templates from third parties
 - Fixed missing run of check for tasks to update after plugin update
 - Removed language files from repository
-- Removed language files from repository
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)
