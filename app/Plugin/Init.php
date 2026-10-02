@@ -151,7 +151,10 @@ class Init {
 	 *
 	 * @return void
 	 */
-	public function deactivation(): void {}
+	public function deactivation(): void {
+		// remove our schedules.
+		Schedules::get_instance()->delete_all();
+	}
 
 	/**
 	 * Delete database tables of registered objects.

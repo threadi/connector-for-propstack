@@ -6,6 +6,10 @@
 
 - Updated dependencies
 
+### Fixed
+
+- Remove our schedules on plugin deactivation
+
 ## [2.0.0] - 30.09.2026
 
 ### Added
