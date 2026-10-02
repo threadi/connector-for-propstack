@@ -275,7 +275,7 @@ class Queue extends WP_List_Table {
 
 		// if no URL is set, get the image URL.
 		if ( empty( $url ) ) {
-			$url = (string) get_post_meta( $item->ID, get_option( 'propstack_connector_image_size', 'big_url' ), true );
+			$url = \ConnectorForPropstack\Propstack\Queue::get_instance()->get_file_url_of_entry( $item->ID );
 		}
 
 		// if still no URL is set, get the doc URL.

@@ -190,9 +190,6 @@ class Queue {
 		// get the map of file IDs already in the queue.
 		$list_of_existing_files_in_queue = $this->get_queue_map();
 
-		// get the image size setting.
-		$image_size = get_option( 'propstack_connector_image_size', 'big_url' );
-
 		// add the images of this object to the queue.
 		foreach ( $immo_object['images'] as $file ) {
 			// get its post-ID in the queue.
@@ -204,7 +201,7 @@ class Queue {
 			}
 
 			// do not add files to the queue, which would not be imported anyway (e.g. private files).
-			if ( $this->is_file_import_prevented( $file, (string) ( $file[ $image_size ] ?? '' ) ) ) {
+			if ( $this->is_file_import_prevented( $file, Files::get_instance()->get_file_url( $file ) ) ) {
 				// remove the queue entry.
 				if ( $queue_post_id > 0 ) {
 					wp_delete_post( $queue_post_id, true );
@@ -414,8 +411,8 @@ class Queue {
 
 		// import the given files.
 		foreach ( $queue as $post ) {
-			// get the type by checking if "big_url" is given.
-			$url = get_post_meta( $post->ID, get_option( 'propstack_connector_image_size', 'big_url' ), true );
+			// get the URL in the chosen image size.
+			$url = $this->get_file_url_of_entry( $post->ID );
 
 			// get the file name.
 			$name = get_post_meta( $post->ID, 'name', true );
@@ -761,6 +758,35 @@ class Queue {
 		 * @param int $max_attempts The max count of attempts.
 		 */
 		return max( 1, absint( apply_filters( 'cfprop_queue_max_attempts', $max_attempts ) ) );
+	}
+
+	/**
+	 * Return the URL to import for the given entry of the queue.
+	 *
+	 * API v1 delivers the chosen image size as its own field, which is saved on the entry.
+	 * API v2 delivers the sizes as a list, so we get the URL from the saved API response.
+	 *
+	 * @param int $queue_post_id The post-ID of the entry in the queue.
+	 *
+	 * @return string
+	 */
+	public function get_file_url_of_entry( int $queue_post_id ): string {
+		// get the URL from the field of the chosen image size.
+		$url = get_post_meta( $queue_post_id, (string) get_option( 'propstack_connector_image_size', 'big_url' ), true );
+		if ( ! empty( $url ) && is_string( $url ) ) {
+			return $url;
+		}
+
+		// get the URL from the saved API response of this file.
+		$file = get_post_meta( $queue_post_id, 'api_response', true );
+
+		// bail if no API response is saved.
+		if ( ! is_array( $file ) ) {
+			return '';
+		}
+
+		// return the URL in the chosen image size.
+		return Files::get_instance()->get_file_url( $file );
 	}
 
 	/**

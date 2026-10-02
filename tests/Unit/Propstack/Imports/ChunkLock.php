@@ -38,7 +38,7 @@ class ChunkLock extends ConnectorForPropstackTestCase {
 	 *
 	 * @var string
 	 */
-	private static string $properties_url = 'https://api.propstack.de/v2/properties';
+	private static string $properties_url = 'https://api.propstack.de/v2/properties?';
 
 	/**
 	 * The option which holds the lock of a single chunk.
@@ -357,11 +357,17 @@ class ChunkLock extends ConnectorForPropstackTestCase {
 			);
 		}
 
+		// the API v1 delivers the total count as "meta.total_count", the API v2 as "total".
 		$body = wp_json_encode(
-			array(
-				'data' => $slice,
-				'meta' => array( 'total_count' => $this->total_objects ),
-			)
+			$is_v1
+				? array(
+					'data' => $slice,
+					'meta' => array( 'total_count' => $this->total_objects ),
+				)
+				: array(
+					'data'  => $slice,
+					'total' => $this->total_objects,
+				)
 		);
 
 		return $this->build_response( 200, (string) $body );

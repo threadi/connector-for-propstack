@@ -37,6 +37,20 @@ class Objects extends Import_Base {
 	private string $url = 'https://api.propstack.de/v2/properties';
 
 	/**
+	 * The object to get the texts for the codes of selection fields.
+	 *
+	 * @var Options|null
+	 */
+	private ?Options $options = null;
+
+	/**
+	 * The object to get the brokers.
+	 *
+	 * @var Brokers|null
+	 */
+	private ?Brokers $brokers = null;
+
+	/**
 	 * Initialize this object.
 	 */
 	public function __construct() {}
@@ -188,12 +202,17 @@ class Objects extends Import_Base {
 			// build the work list on the first run of a paginated import.
 			if ( $is_first_run ) {
 				$import_data = array(
-					'objects' => array(),
-					'md5'     => array(),
-					'skipped' => array(),
-					'phase'   => 'import',
-					'run_id'  => time(),
+					'objects'   => array(),
+					'md5'       => array(),
+					'skipped'   => array(),
+					'imported'  => 0,
+					'prevented' => 0,
+					'phase'     => 'import',
+					'run_id'    => time(),
 				);
+
+				// remove blocks which are left behind by an import which has been aborted while its list was built.
+				$this->remove_blocks();
 
 				// the block size is a storage decision and must not depend on the request limit.
 				$block_size = $limit > 0 ? $limit : 100;
@@ -232,8 +251,16 @@ class Objects extends Import_Base {
 						$page_objects = apply_filters( 'cfprop_object_import_response', $page_objects );
 
 						foreach ( $page_objects as $object ) {
+							// bring the object into the structure the API v1 delivers, which the import expects.
+							if ( is_array( $object ) ) {
+								$object = $this->prepare_object( $object, (string) $language_code );
+							}
+
 							// skip objects which would be prevented anyway.
 							if ( apply_filters( 'cfprop_prevent_import_of_object', false, $object ) ) {
+								// add a log entry with the reason and remember the object.
+								$this->handle_prevented_object( $object );
+
 								continue;
 							}
 
@@ -300,6 +327,10 @@ class Objects extends Import_Base {
 
 				// free the buffer.
 				unset( $buffer );
+
+				// save the objects which are not imported because of a restriction.
+				$import_data['prevented'] = $this->get_prevented_objects_count();
+				$this->save_prevented_objects( absint( $import_data['run_id'] ) );
 
 				// keep only the small metadata in the main option.
 				$import_data['total']      = $total_objects;
@@ -479,9 +510,10 @@ class Objects extends Import_Base {
 							// update the counter.
 							$this->set_count( $process_handler, $process_handler->get_count() + 1 );
 
-							// add a log entry.
-							/* translators: %1$s will be replaced by the object title. */
-							Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+							// add a log entry with the reason and add the object to the list of this import.
+							$this->handle_prevented_object( $object );
+							$this->save_prevented_objects( absint( $import_data['run_id'] ), true );
+							$import_data['prevented'] = absint( $import_data['prevented'] ?? 0 ) + 1;
 
 							// update tick.
 							if ( $progress ) {
@@ -564,6 +596,9 @@ class Objects extends Import_Base {
 
 						// mark the object as changed.
 						update_post_meta( $post_id, 'changed', absint( $import_data['run_id'] ) );
+
+						// count the object as imported.
+						$import_data['imported'] = absint( $import_data['imported'] ?? 0 ) + 1;
 
 						// update the counter.
 						$this->set_count( $process_handler, $process_handler->get_count() + 1 );
@@ -780,7 +815,7 @@ class Objects extends Import_Base {
 				do_action( 'cfprop_import_object_empty', $instance );
 
 				// report that nothing has been imported.
-				$process_handler->set_message( $this->get_empty_dialog_config() );
+				$process_handler->set_message( $this->get_empty_dialog_config( absint( $import_data['prevented'] ?? 0 ) ) );
 			} else {
 				/**
 				 * Run additional tasks after successful import of objects.
@@ -792,7 +827,7 @@ class Objects extends Import_Base {
 				do_action( 'cfprop_import_object_success', $instance );
 
 				// report the success.
-				$process_handler->set_message( $this->get_success_dialog_config() );
+				$process_handler->set_message( $this->get_success_dialog_config( absint( $import_data['imported'] ?? 0 ), absint( $import_data['prevented'] ?? 0 ) ) );
 			}
 		} catch ( Throwable $e ) {
 			// log this event.
@@ -841,6 +876,43 @@ class Objects extends Import_Base {
 	}
 
 	/**
+	 * Bring an object from the API v2 into the structure the API v1 delivers.
+	 *
+	 * The API v2 delivers the codes of selection fields and only the ID of the broker:
+	 * - the codes are replaced by their texts (e.g. "GAS_HEATING" by "Gas-Heizung").
+	 * - the complete broker is added to the object.
+	 *
+	 * @param array<string,mixed> $immo_object   The object data from API.
+	 * @param string              $language_code The used language.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function prepare_object( array $immo_object, string $language_code ): array {
+		// get the helper objects once per import, each of them requests the API only once.
+		if ( ! $this->options instanceof Options ) {
+			$this->options = new Options();
+		}
+		if ( ! $this->brokers instanceof Brokers ) {
+			$this->brokers = new Brokers();
+		}
+
+		// replace the codes of selection fields by their texts.
+		$immo_object = $this->options->translate_object( $immo_object, $language_code );
+
+		// add the complete broker.
+		$immo_object = $this->brokers->add_broker_to_object( $immo_object );
+
+		/**
+		 * Filter a single object from Propstack API v2 after it has been prepared for the import.
+		 *
+		 * @since 2.0.1 Available since 2.0.1.
+		 * @param array<string,mixed> $immo_object   The object data.
+		 * @param string              $language_code The used language.
+		 */
+		return apply_filters( 'cfprop_api_v2_prepared_object', $immo_object, $language_code );
+	}
+
+	/**
 	 * Return the API URL to import objects.
 	 *
 	 * @param string $language_code The language to use for the URL.
@@ -853,12 +925,12 @@ class Objects extends Import_Base {
 		// get the URL.
 		$url = add_query_arg(
 			array(
-				'locale'    => $language_code,
-				'expand'    => 1,
-				'archived'  => -1,
-				'with_meta' => 1,
-				'page'      => $page,
-				'per'       => $per,
+				'locale'     => $language_code,
+				'expand'     => 1,
+				'archived'   => -1,
+				'with_total' => 'true',
+				'page'       => $page,
+				'per'        => $per,
 			),
 			$this->url
 		);
@@ -875,17 +947,20 @@ class Objects extends Import_Base {
 	/**
 	 * Return a success dialog configuration.
 	 *
+	 * @param int $imported  The amount of imported objects.
+	 * @param int $prevented The amount of objects which have not been imported because of a restriction.
+	 *
 	 * @return array<string,mixed>
 	 */
-	private function get_success_dialog_config(): array {
+	private function get_success_dialog_config( int $imported, int $prevented ): array {
 		return array(
 			'detail' => array(
 				'className' => 'cfprop-dialog',
 				'title'     => __( 'Import of objects has been run', 'connector-for-propstack' ),
-				'texts'     => array(
-					'<p><strong>' . __( 'The import of objects from your Propstack account has been run.', 'connector-for-propstack' ) . '</strong></p>',
-					'<p>' . __( 'You will find them in the list in the backend and your frontend.', 'connector-for-propstack' ) . '</p>',
-					'<p>' . __( 'Please note that any files for the objects are imported later. However, you can also trigger their import directly from the object itself.', 'connector-for-propstack' ) . '</p>',
+				'texts'     => array_merge(
+					array( '<p><strong>' . __( 'The import of objects from your Propstack account has been run.', 'connector-for-propstack' ) . '</strong></p>' ),
+					$this->get_result_texts( $imported, $prevented ),
+					array( '<p>' . __( '<strong>Please note that any images for the objects are imported later.</strong> However, you can also trigger their import directly from the object itself.', 'connector-for-propstack' ) . '</p>' )
 				),
 				'buttons'   => array(
 					array(
@@ -1024,9 +1099,9 @@ class Objects extends Import_Base {
 				return;
 			}
 
-			// read the total count once (from the first page).
-			if ( null === $total && isset( $data['meta']['total_count'] ) ) {
-				$total = absint( $data['meta']['total_count'] );
+			// read the total count once (from the first page), the API v2 delivers it as "total".
+			if ( null === $total && isset( $data['total'] ) && is_numeric( $data['total'] ) ) {
+				$total = absint( $data['total'] );
 			}
 
 			// stop on an empty page.
@@ -1074,20 +1149,35 @@ class Objects extends Import_Base {
 	}
 
 	/**
-	 * Return a dialog configuration for an import which did not deliver any object.
+	 * Return a dialog configuration for an import which did not import any object.
+	 *
+	 * @param int $prevented The amount of objects which have not been imported because of a restriction.
 	 *
 	 * @return array<string,mixed>
 	 */
-	private function get_empty_dialog_config(): array {
+	private function get_empty_dialog_config( int $prevented ): array {
+		// the account did not deliver any object.
+		$texts = array(
+			'<p><strong>' . __( 'Your Propstack account did not deliver any object for the import.', 'connector-for-propstack' ) . '</strong></p>',
+			/* translators: %1$s will be replaced by a URL. */
+			'<p>' . sprintf( __( 'If you expected objects here, check <a href="%1$s">your import settings</a> - a restriction on marketing type or status can exclude all of them.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_import' ) ) ) . '</p>',
+		);
+
+		// the account delivered objects, but every one is excluded by a restriction.
+		if ( $prevented > 0 ) {
+			$texts = array_merge(
+				array( '<p><strong>' . __( 'None of the objects from your Propstack account has been imported.', 'connector-for-propstack' ) . '</strong></p>' ),
+				$this->get_result_texts( 0, $prevented ),
+				/* translators: %1$s will be replaced by a URL. */
+				array( '<p>' . sprintf( __( 'If you expected objects here, check <a href="%1$s">the restrictions for the import</a>.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_objects' ) ) ) . '</p>' )
+			);
+		}
+
 		return array(
 			'detail' => array(
 				'className' => 'cfprop-dialog',
 				'title'     => __( 'No objects have been imported', 'connector-for-propstack' ),
-				'texts'     => array(
-					'<p><strong>' . __( 'Your Propstack account did not deliver any object for the import.', 'connector-for-propstack' ) . '</strong></p>',
-					/* translators: %1$s will be replaced by a URL. */
-					'<p>' . sprintf( __( 'If you expected objects here, check <a href="%1$s">your import settings</a> - a restriction on marketing type or status can exclude all of them.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_import' ) ) ) . '</p>',
-				),
+				'texts'     => $texts,
 				'buttons'   => array(
 					array(
 						'action'  => 'location.reload();',

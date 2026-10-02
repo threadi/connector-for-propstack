@@ -43,6 +43,27 @@ class Fields {
 	private array $collected_field_meta = array();
 
 	/**
+	 * The class names of the fields of objects, used as keys.
+	 *
+	 * @var array<string,bool>|null
+	 */
+	private ?array $object_field_classes = null;
+
+	/**
+	 * The amount of callbacks on the hook for the list of fields, when the list of class names has been built.
+	 *
+	 * @var int
+	 */
+	private int $object_field_callbacks = 0;
+
+	/**
+	 * The names of the fields the API v2 delivers for objects, used as keys.
+	 *
+	 * @var array<string,bool>|null
+	 */
+	private ?array $api_v2_object_fields = null;
+
+	/**
 	 * Variable for the instance of this Singleton object.
 	 *
 	 * @var ?Fields
@@ -645,6 +666,258 @@ class Fields {
 	}
 
 	/**
+	 * Return the names of the fields the API v2 delivers for an object.
+	 *
+	 * The API v2 delivers fewer fields than the API v1. This list contains every field of an
+	 * object in the response of the API v2.
+	 *
+	 * @source https://api.propstack.de/docs/index.html
+	 *
+	 * @return array<int,string>
+	 */
+	public function get_api_v2_object_fields(): array {
+		$fields = array(
+			'id',
+			'name',
+			'title',
+			'unit_id',
+			'exposee_id',
+			'project_id',
+			'broker_id',
+			'archived',
+			'token',
+			'parent_id',
+			'children_count',
+			'street',
+			'house_number',
+			'zip_code',
+			'city',
+			'lat',
+			'lng',
+			'country',
+			'region',
+			'hide_address',
+			'location_name',
+			'property_space_value',
+			'for_bidding',
+			'group_ids',
+			'property_status_id',
+			'price_on_inquiry',
+			'marketing_type',
+			'object_type',
+			'rs_type',
+			'rs_category',
+			'custom_fields',
+			'sold_date',
+			'sold_price',
+			'total_commission',
+			'internal_commission',
+			'external_commission',
+			'internal_commission_percentage',
+			'external_commission_percentage',
+			'valuation_price',
+			'valuation_price_from',
+			'valuation_price_to',
+			'openimmo_firstname',
+			'openimmo_lastname',
+			'openimmo_email',
+			'openimmo_phone',
+			'short_address',
+			'number_of_rooms',
+			'price',
+			'base_rent',
+			'living_space',
+			'number_of_bed_rooms',
+			'number_of_bath_rooms',
+			'currency',
+			'free_from',
+			'rented',
+			'construction_year',
+			'energy_certificate_construction_year',
+			'energy_efficiency_class',
+			'energy_efficiency_value',
+			'thermal_characteristic',
+			'plot_area',
+			'additional_area',
+			'heating_costs',
+			'heating_type',
+			'address',
+			'apartment_number',
+			'building_energy_rating_type',
+			'condition',
+			'courtage',
+			'courtage_note',
+			'deposit',
+			'description_note',
+			'short_note',
+			'energy_certificate_availability',
+			'firing_types',
+			'furnishing_note',
+			'land_registry',
+			'local_court',
+			'location_note',
+			'long_description_note',
+			'long_furnishing_note',
+			'long_location_note',
+			'long_other_note',
+			'other_note',
+			'net_floor_space',
+			'parking_space_price',
+			'price_per_sqm',
+			'service_charge',
+			'total_rent',
+			'usable_floor_space',
+			'warning_notice',
+			'system_warning_notice',
+			'floor',
+			'number_of_floors',
+			'number_of_parking_spaces',
+			'number_of_ev_charging',
+			'cellar',
+			'balcony',
+			'garden',
+			'suitable_for_investment',
+			'window_shutter',
+			'bicycle_storage',
+			'laundry_room',
+			'smart_home',
+			'conflict_of_interest_type',
+			'dual_agency',
+			'guest_toilet',
+			'kitchen_complete',
+			'ramp',
+			'site_development_type',
+			'site_constructible_type',
+			'aut_building_certificates',
+			'primary_outdoor_orientation',
+			'barrier_free',
+			'built_in_kitchen',
+			'energy_certificate_creation_date',
+			'energy_certificate_end_date',
+			'energy_certificate_start_date',
+			'equipment_technology_construction_year',
+			'heating_costs_in_service_charge',
+			'interior_quality',
+			'last_refurbishment',
+			'lift',
+			'number_of_apartments',
+			'number_of_vacancies',
+			'pets_allowed',
+			'price_multiplier',
+			'price_multiplier_target',
+			'rental_income_actual',
+			'rental_income_target',
+			'storeroom',
+			'total_floor_space',
+			'yield_actual',
+			'yield_target',
+			'is24_id',
+			'is24_contact_id',
+			'translations',
+			'images',
+			'documents',
+			'links',
+			'rent_subsidy',
+			'maintenance_reserve',
+			'fork_ids',
+			'fork_id',
+			'location_id',
+			'public_expose_url',
+			'created_at',
+			'updated_at',
+		);
+
+		/**
+		 * Filter the names of the fields the API v2 delivers for an object.
+		 *
+		 * Fields of objects, which are not in this list, are hidden if the API v2 is used.
+		 *
+		 * @since 2.0.1 Available since 2.0.1.
+		 * @param array<int,string> $fields The names of the fields in the API.
+		 */
+		return apply_filters( 'cfprop_api_v2_object_fields', $fields );
+	}
+
+	/**
+	 * Return whether the API v2 delivers an object field with the given name.
+	 *
+	 * @param string $api_name The name of the field in the API.
+	 *
+	 * @return bool
+	 */
+	public function is_api_v2_object_field( string $api_name ): bool {
+		// build the list once per request.
+		if ( null === $this->api_v2_object_fields ) {
+			$this->api_v2_object_fields = array_fill_keys( $this->get_api_v2_object_fields(), true );
+		}
+
+		// return whether the field is in the list.
+		return isset( $this->api_v2_object_fields[ $api_name ] );
+	}
+
+	/**
+	 * Return whether the given field is a field of an object (and not a field of a term, e.g. of a broker).
+	 *
+	 * @param Field_Base $field The field object.
+	 *
+	 * @return bool
+	 */
+	private function is_object_field( Field_Base $field ): bool {
+		global $wp_filter;
+
+		// the list of fields can be extended via hook (e.g. by the Pro plugin), so we rebuild our list if the callbacks changed.
+		$callbacks = isset( $wp_filter['cfprop_fields'] ) ? count( $wp_filter['cfprop_fields']->callbacks, COUNT_RECURSIVE ) : 0;
+
+		// build the list of the class names of all object fields.
+		if ( null === $this->object_field_classes || $callbacks !== $this->object_field_callbacks ) {
+			$this->object_field_classes = array();
+			foreach ( $this->get_fields() as $field_class_name ) {
+				$this->object_field_classes[ ltrim( $field_class_name, '\\' ) ] = true;
+			}
+			$this->object_field_callbacks = $callbacks;
+		}
+
+		// return whether the field is in the list.
+		return isset( $this->object_field_classes[ $field::class ] );
+	}
+
+	/**
+	 * Return whether the used API version delivers the given field.
+	 *
+	 * The API v1 delivers every field we support. The API v2 delivers fewer fields for an object.
+	 * Fields which are not delivered are hidden, as they would always be empty.
+	 *
+	 * @param Field_Base $field The field object.
+	 *
+	 * @return bool
+	 */
+	public function is_field_available_in_api( Field_Base $field ): bool {
+		// the API v1 delivers every field.
+		if ( 'v2' !== get_option( 'propstack_connector_api_version' ) ) {
+			return true;
+		}
+
+		// only the fields of objects depend on the API version, the fields of terms (e.g. brokers) do not.
+		if ( ! $this->is_object_field( $field ) ) {
+			return true;
+		}
+
+		// ask the field whether the API v2 delivers it.
+		$available = $field->is_delivered_by_api_v2();
+
+		/**
+		 * Filter whether the used API version delivers a field of an object.
+		 *
+		 * This filter is only used if the API v2 is used. Fields which are not delivered are hidden.
+		 *
+		 * @since 2.0.1 Available since 2.0.1.
+		 * @param bool       $available True if the field is delivered.
+		 * @param Field_Base $field     The field object.
+		 */
+		return (bool) apply_filters( 'cfprop_field_available_in_api', $available, $field );
+	}
+
+	/**
 	 * Return the value of a single field on an immo object.
 	 *
 	 * This function also checks the datatype of the value.
@@ -754,7 +1027,7 @@ class Fields {
 				$written = update_post_meta( $post_id, $meta_key, $meta_value );
 
 				if ( $written && Helper::is_development_mode() ) {
-					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $meta_key, get_debug_type( $meta_value ) ), 'info', 'system' );
+					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $meta_key, get_debug_type( $meta_value ) ), 'info', 'import' );
 				}
 			}
 		}

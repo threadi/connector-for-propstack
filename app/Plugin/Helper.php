@@ -698,6 +698,17 @@ class Helper {
 	}
 
 	/**
+	 * Return the URL to edit the object with the given Propstack-ID in Propstack.
+	 *
+	 * @param int $object_id The Propstack-ID of the object.
+	 *
+	 * @return string
+	 */
+	public static function get_propstack_object_url( int $object_id ): string {
+		return 'https://crm.propstack.de/app/portfolio/properties/' . $object_id;
+	}
+
+	/**
 	 * Return the URL for the page in Propstack to manage API Keys and their permissions.
 	 *
 	 * @return string

@@ -2,9 +2,24 @@
 
 ## [Unreleased]
 
+### Added
+
+- Show the reason why an object has not been imported
+
 ### Changed
 
+- Changed the log category for changed field values from system to import
+- Now fully support Propstack API v2 as far as Propstack does deliver data atm
+  -> over 120 fields are missing
+  -> still only usable for developers
 - Updated dependencies
+- More PHP Unit Tests
+
+### Fixed
+
+- Fixed import of images via API v2
+- Fixed wrong JS-function to import settings for the plugin
+- Remove our schedules on plugin deactivation
 
 ## [2.0.0] - 30.09.2026
 

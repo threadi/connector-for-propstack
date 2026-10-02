@@ -74,4 +74,15 @@ class ApiResponse extends Field_Base {
 	public function get_value_from_api_response( int $post_id, array $immo_object ): mixed {
 		return $immo_object;
 	}
+
+	/**
+	 * Return whether the API v2 delivers this field.
+	 *
+	 * This field is not delivered by the API, it contains the complete response of every API version.
+	 *
+	 * @return bool
+	 */
+	public function is_delivered_by_api_v2(): bool {
+		return true;
+	}
 }

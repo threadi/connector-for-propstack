@@ -184,6 +184,40 @@ class States {
 	}
 
 	/**
+	 * Return the reason why the import of the given object is prevented by its state.
+	 *
+	 * @param array<string,mixed> $immo_object The object data.
+	 *
+	 * @return string
+	 */
+	public function get_prevent_import_reason( array $immo_object ): string {
+		// bail if no state is set.
+		if ( empty( $immo_object['property_status_id'] ) || ! is_scalar( $immo_object['property_status_id'] ) ) {
+			return __( 'The object has no state.', 'connector-for-propstack' );
+		}
+
+		// get the state of this object.
+		$property_status_id = (string) $immo_object['property_status_id'];
+
+		// use the name of the state, or its ID if the state is unknown.
+		$state_name = $this->get_state_name( $property_status_id );
+		if ( '' === $state_name ) {
+			$state_name = $property_status_id;
+		}
+
+		// states are configured.
+		$import_states = get_option( 'propstack_connector_import_states' );
+		if ( is_array( $import_states ) && ! empty( $import_states ) && ! ( isset( $import_states[0] ) && empty( $import_states[0] ) ) ) {
+			/* translators: %1$s will be replaced by the name of the state. */
+			return sprintf( __( 'The state "%1$s" of the object is not one of the states to import.', 'connector-for-propstack' ), $state_name );
+		}
+
+		// without configured states only the state "Vermarktung" is imported.
+		/* translators: %1$s will be replaced by the name of the state. */
+		return sprintf( __( 'The state "%1$s" of the object is not "Vermarktung".', 'connector-for-propstack' ), $state_name );
+	}
+
+	/**
 	 * Return the name of the given state.
 	 *
 	 * The API v2 delivers the ID of the state. Its name is taken from the imported state terms.

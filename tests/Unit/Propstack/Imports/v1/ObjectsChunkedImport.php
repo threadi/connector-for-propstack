@@ -157,6 +157,46 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	}
 
 	/**
+	 * Return the number of log entries which contain the given text.
+	 *
+	 * @param string $text The text to search for.
+	 *
+	 * @return int
+	 */
+	private function count_log_entries( string $text ): int {
+		global $wpdb;
+
+		return absint( $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'propstack_logs WHERE log LIKE %s', '%' . $wpdb->esc_like( $text ) . '%' ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+	}
+
+	/**
+	 * Run the complete import in chunks with a process ID and return the texts of the resulting dialog.
+	 *
+	 * @return string
+	 */
+	private function get_dialog_texts_of_complete_import(): string {
+		$runs = 0;
+
+		do {
+			$import_obj = new \ConnectorForPropstack\Propstack\Imports\v1\Objects();
+			$import_obj->set_process_id( 'cfprop-test-process' );
+			$import_obj->run();
+			++$runs;
+
+			// safeguard so a broken offset cannot hang the test suite.
+			$this->assertLessThan( 20, $runs, 'The chunked import did not finish.' );
+		} while ( $import_obj->has_load_more() );
+
+		// get the message of this process.
+		$values = get_option( 'cfprop_process_values' );
+		$this->assertIsArray( $values );
+		$this->assertArrayHasKey( 'cfprop-test-process', $values );
+		$this->assertIsArray( $values['cfprop-test-process']['message']['detail']['texts'] );
+
+		return implode( ' ', $values['cfprop-test-process']['message']['detail']['texts'] );
+	}
+
+	/**
 	 * Test that the first run stops after the limit and keeps its state.
 	 *
 	 * @return void
@@ -375,6 +415,280 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 		// the state is gone and the lock is released.
 		$this->assertEmpty( get_option( self::$work_list_option, array() ) );
 		$this->assertSame( 0, absint( get_option( CFPROP_IMPORT_RUNNING ) ) );
+	}
+
+	/**
+	 * Test that a prevented object is written to the log with the reason.
+	 *
+	 * Prevented objects never reach the work list, so the entry has to be written while the
+	 * list is built. Without it nobody could see why an object from Propstack is missing.
+	 *
+	 * @return void
+	 */
+	public function test_prevented_objects_are_logged_with_reason(): void {
+		// info entries are only logged in debug mode.
+		update_option( 'propstack_connector_debug', 1 );
+		delete_option( 'cfprop_debug_categories' );
+
+		// deliver the objects in a state which looks right, but is not "Vermarktung".
+		$change_state = function ( array $objects ): array {
+			foreach ( $objects as $index => $object ) {
+				$objects[ $index ]['property_status']['name'] = 'Aktive Vermarktung';
+			}
+			return $objects;
+		};
+		add_filter( 'cfprop_object_import_response', $change_state );
+
+		$this->run_complete_import();
+
+		remove_filter( 'cfprop_object_import_response', $change_state );
+		update_option( 'propstack_connector_debug', 0 );
+
+		// no object has been imported.
+		$this->assertEmpty( ImmoObjects::get_instance()->get_objects() );
+
+		// the log names the object and the reason.
+		$this->assertGreaterThan( 0, $this->count_log_entries( 'Import of object <em>Musterhaus</em> (Propstack-ID 42) prevented. The state &quot;Aktive Vermarktung&quot; of the object is not &quot;Vermarktung&quot;.' ) );
+	}
+
+	/**
+	 * Test that a general hint is logged if the import is prevented by an unknown check.
+	 *
+	 * @return void
+	 */
+	public function test_prevented_objects_are_logged_with_general_hint(): void {
+		update_option( 'propstack_connector_debug', 1 );
+		delete_option( 'cfprop_debug_categories' );
+
+		$prevent_all = fn() => true;
+		add_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		$this->run_chunk();
+
+		remove_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+		update_option( 'propstack_connector_debug', 0 );
+
+		$this->assertGreaterThan( 0, $this->count_log_entries( '(Propstack-ID 42) prevented. A custom restriction prevents the import.' ) );
+	}
+
+	/**
+	 * Test that blocks which are left behind by an aborted import do not break the next import.
+	 *
+	 * An import which is aborted while its list is built has no metadata yet, so its blocks
+	 * are not known. The next import builds the same blocks again - and an unchanged option is
+	 * not saved by WordPress, which has been reported as an error and aborted every import.
+	 *
+	 * @return void
+	 */
+	public function test_orphaned_blocks_do_not_break_the_next_import(): void {
+		// the first chunk builds the list and imports one object, the block of the second one is left.
+		$this->run_chunk();
+		$this->assertNotEmpty( $this->get_block_options() );
+
+		// simulate the abort: the metadata is gone, the block is still there.
+		delete_option( self::$work_list_option );
+		delete_option( self::$offset_option );
+		update_option( CFPROP_IMPORT_RUNNING, 0 );
+		update_option( self::$work_list_option . '_block_7', array( 'left behind' ), false );
+
+		// the next import has to run without any error.
+		$import_obj = $this->run_complete_import();
+
+		$codes = array_map(
+			fn( $error ) => $error->get_error_code(),
+			$import_obj->get_errors()
+		);
+		$this->assertNotContains( 'propstack_object_import_block_not_saved', $codes );
+		$this->assertSame( array(), $codes );
+
+		// every block is gone, also the one which did not belong to this import.
+		$this->assertEmpty( $this->get_block_options() );
+
+		// both objects have been imported.
+		$this->assertCount( 2, ImmoObjects::get_instance()->get_objects() );
+	}
+
+	/**
+	 * Remove all entries from the log.
+	 *
+	 * @return void
+	 */
+	private function empty_log(): void {
+		global $wpdb;
+
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'propstack_logs' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+	}
+
+	/**
+	 * Test that a prevented object is written to the log although the debug mode is disabled.
+	 *
+	 * Only this entry is logged in any case. The other info entries of the import must still
+	 * be skipped, otherwise the log would be flooded without the debug mode.
+	 *
+	 * @return void
+	 */
+	public function test_prevented_objects_are_logged_without_debug(): void {
+		update_option( 'propstack_connector_debug', 0 );
+		$this->empty_log();
+
+		$prevent_all = fn() => true;
+		add_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		$this->run_chunk();
+
+		remove_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		// the prevented object is logged.
+		$this->assertGreaterThan( 0, $this->count_log_entries( '(Propstack-ID 42) prevented.' ) );
+
+		// the info entries of the import which follow the prevented object are not logged.
+		$this->assertSame( 0, $this->count_log_entries( 'Import of objects is running' ) );
+	}
+
+	/**
+	 * Test that a prevented object is written to the log if the debug mode is limited to other categories.
+	 *
+	 * @return void
+	 */
+	public function test_prevented_objects_are_logged_with_other_debug_categories(): void {
+		update_option( 'propstack_connector_debug', 1 );
+		update_option( 'cfprop_debug_categories', array( 'queue' ) );
+		$this->empty_log();
+
+		$prevent_all = fn() => true;
+		add_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		$this->run_chunk();
+
+		remove_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		update_option( 'propstack_connector_debug', 0 );
+		delete_option( 'cfprop_debug_categories' );
+
+		// the prevented object is logged.
+		$this->assertGreaterThan( 0, $this->count_log_entries( '(Propstack-ID 42) prevented.' ) );
+
+		// the info entries of the import which follow the prevented object are not logged.
+		$this->assertSame( 0, $this->count_log_entries( 'Import of objects is running' ) );
+	}
+
+	/**
+	 * Test that the filters which force the log entry of a prevented object are removed afterwards.
+	 *
+	 * @return void
+	 */
+	public function test_log_filters_are_removed_after_a_prevented_object(): void {
+		$prevent_all = fn() => true;
+		add_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		$this->run_chunk();
+
+		remove_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		$this->assertFalse( has_filter( 'cfprop_log_without_debug' ) );
+		$this->assertFalse( has_filter( 'cfprop_log_with_debug' ) );
+	}
+
+	/**
+	 * Test that the prevented objects of an import are saved with their reasons.
+	 *
+	 * @return void
+	 */
+	public function test_prevented_objects_are_saved(): void {
+		// deliver the objects in a state which looks right, but is not "Vermarktung".
+		$change_state = function ( array $objects ): array {
+			foreach ( $objects as $index => $object ) {
+				$objects[ $index ]['property_status']['name'] = 'Aktive Vermarktung';
+			}
+			return $objects;
+		};
+		add_filter( 'cfprop_object_import_response', $change_state );
+
+		$this->run_complete_import();
+
+		remove_filter( 'cfprop_object_import_response', $change_state );
+
+		$prevented = ImmoObjects::get_instance()->get_prevented_objects();
+
+		// both objects of the fixture are in the list.
+		$this->assertGreaterThan( 0, $prevented['run_id'] );
+		$this->assertCount( 2, $prevented['objects'] );
+		$this->assertSame( 42, $prevented['objects'][0]['id'] );
+		$this->assertSame( 'Musterhaus', $prevented['objects'][0]['title'] );
+		$this->assertSame( array( 'The state "Aktive Vermarktung" of the object is not "Vermarktung".' ), $prevented['objects'][0]['reasons'] );
+
+		// the list belongs to the last import: an import without prevented objects empties it.
+		$this->run_complete_import();
+		$this->assertSame( array(), ImmoObjects::get_instance()->get_prevented_objects()['objects'] );
+	}
+
+	/**
+	 * Test that the dialog names the amount of imported objects.
+	 *
+	 * @return void
+	 */
+	public function test_dialog_names_the_imported_objects(): void {
+		$texts = $this->get_dialog_texts_of_complete_import();
+
+		$this->assertStringContainsString( '2 objects have been imported.', $texts );
+		$this->assertStringNotContainsString( 'not been imported', $texts );
+	}
+
+	/**
+	 * Test that the dialog names the amount of prevented objects and where to find the reasons.
+	 *
+	 * @return void
+	 */
+	public function test_dialog_names_the_prevented_objects(): void {
+		// prevent the import of one of the two objects.
+		$prevent_one = fn( bool $prevent, array $immo_object ) => 43 === absint( $immo_object['id'] );
+		add_filter( 'cfprop_prevent_import_of_object', $prevent_one, 10, 2 );
+
+		$texts = $this->get_dialog_texts_of_complete_import();
+
+		remove_filter( 'cfprop_prevent_import_of_object', $prevent_one );
+
+		$this->assertStringContainsString( '1 object has been imported.', $texts );
+		$this->assertStringContainsString( '1 object has not been imported because', $texts );
+		$this->assertStringContainsString( 'tab=propstack_connector_logs', $texts );
+	}
+
+	/**
+	 * Test that the dialog names the prevented objects if none has been imported at all.
+	 *
+	 * @return void
+	 */
+	public function test_dialog_names_the_prevented_objects_if_nothing_is_imported(): void {
+		$prevent_all = fn() => true;
+		add_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		$texts = $this->get_dialog_texts_of_complete_import();
+
+		remove_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		$this->assertStringContainsString( 'None of the objects from your Propstack account has been imported.', $texts );
+		$this->assertStringContainsString( '2 objects have not been imported because', $texts );
+		$this->assertStringNotContainsString( 'did not deliver any object', $texts );
+	}
+
+	/**
+	 * Test that the hint where to find the reasons can be changed via hook.
+	 *
+	 * @return void
+	 */
+	public function test_dialog_hint_can_be_changed(): void {
+		$prevent_all = fn() => true;
+		$change_hint = fn( string $hint, int $prevented ) => 'See the list of all ' . $prevented . ' objects.';
+		add_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+		add_filter( 'cfprop_import_prevented_hint', $change_hint, 10, 2 );
+
+		$texts = $this->get_dialog_texts_of_complete_import();
+
+		remove_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+		remove_filter( 'cfprop_import_prevented_hint', $change_hint );
+
+		$this->assertStringContainsString( 'See the list of all 2 objects.', $texts );
+		$this->assertStringNotContainsString( 'tab=propstack_connector_logs', $texts );
 	}
 
 	/**

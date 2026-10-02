@@ -206,6 +206,9 @@ class Settings {
 		$field = new Select( $settings_obj );
 		$field->set_title( __( 'API version', 'connector-for-propstack' ) );
 		$field->set_options( $api_versions );
+		if ( isset( $api_versions['v2'] ) ) {
+			$field->set_description( __( 'The support for the API v2 is still beta. Propstack delivers fewer fields for an object via the API v2 than via the API v1. Fields which are not delivered are hidden in this plugin as long as you use the API v2. If you miss data in the API v2, please contact the Propstack support. After changing the API version, you should run the import of objects again.', 'connector-for-propstack' ) );
+		}
 		$setting->set_field( $field );
 
 		// create a hidden page for hidden settings.
@@ -463,7 +466,7 @@ class Settings {
 			),
 			'buttons'   => array(
 				array(
-					'action'  => 'settings_import_file();',
+					'action'  => 'esefw_settings_import_file();',
 					'variant' => 'primary',
 					'text'    => __( 'Import now', 'connector-for-propstack' ),
 				),

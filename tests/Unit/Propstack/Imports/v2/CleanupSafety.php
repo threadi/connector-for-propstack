@@ -33,7 +33,7 @@ class CleanupSafety extends ConnectorForPropstackTestCase {
 	 *
 	 * @var string
 	 */
-	private static string $properties_url = 'https://api.propstack.de/v2/properties';
+	private static string $properties_url = 'https://api.propstack.de/v2/properties?';
 
 	/**
 	 * The option which holds the work list of a paginated import.
@@ -349,7 +349,7 @@ class CleanupSafety extends ConnectorForPropstackTestCase {
 				case 'invalid_json':
 					return $this->build_response( 200, '{"data": [ {"id": 1' );
 				case 'missing_data':
-					return $this->build_response( 200, (string) wp_json_encode( array( 'meta' => array( 'total_count' => count( $this->api_ids ) ) ) ) );
+					return $this->build_response( 200, (string) wp_json_encode( array( 'total' => count( $this->api_ids ) ) ) );
 			}
 		}
 
@@ -367,8 +367,8 @@ class CleanupSafety extends ConnectorForPropstackTestCase {
 		// build the paginated response with the total count.
 		$body = wp_json_encode(
 			array(
-				'data' => $slice,
-				'meta' => array( 'total_count' => null !== $this->reported_total ? $this->reported_total : count( $this->api_ids ) ),
+				'data'  => $slice,
+				'total' => null !== $this->reported_total ? $this->reported_total : count( $this->api_ids ),
 			)
 		);
 
@@ -465,7 +465,7 @@ class CleanupSafety extends ConnectorForPropstackTestCase {
 	}
 
 	/**
-	 * Test that fewer objects than reported by "total_count" do not remove any existing object.
+	 * Test that fewer objects than reported by "total" do not remove any existing object.
 	 *
 	 * @return void
 	 */

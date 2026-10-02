@@ -237,6 +237,14 @@ class Propstack {
 			);
 		}
 
+		// with the API v2 the token also needs the permission to read the options of object fields.
+		if ( 'v2' === get_option( 'propstack_connector_api_version' ) && ! ( new Imports\v2\Options() )->is_token_permitted( $value ) ) {
+			return array(
+				'error' => 'missing_options_permission',
+				'text'  => __( 'The specified API token is not allowed to read the options of object fields in Propstack. This permission is necessary to use the API v2. Please enable it for the token in your Propstack-account.', 'connector-for-propstack' ),
+			);
+		}
+
 		// save the token right away, so it is available when the setup runs its process.
 		// the setup saves the fields through its own REST request which can arrive after
 		// the process has already started.

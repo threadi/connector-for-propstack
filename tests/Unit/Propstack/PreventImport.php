@@ -326,4 +326,243 @@ class PreventImport extends ConnectorForPropstackTestCase {
 		$this->assertTrue( $states->prevent_import_by_state( false, $this->get_object( array( 'property_status_id' => 222051 ) ) ) );
 		$this->assertFalse( $states->prevent_import_by_state( false, $this->get_object( array( 'property_status_id' => 222052 ) ) ) );
 	}
+
+	/**
+	 * Return a complete object as API v1 delivers it, which passes every check.
+	 *
+	 * @param array<string,mixed> $overrides Values to overwrite in the returned object.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function get_importable_object( array $overrides = array() ): array {
+		return $this->get_object(
+			array_merge(
+				array(
+					'property_status' => array(
+						'id'   => 222051,
+						'name' => 'Vermarktung',
+					),
+					'broker'          => array(
+						'id'   => 64,
+						'name' => 'Erika Musterfrau',
+					),
+					'marketing_type'  => 'BUY',
+					'rs_type'         => 'HOUSE',
+					'rs_category'     => 'TWO_FAMILY_HOUSE',
+				),
+				$overrides
+			)
+		);
+	}
+
+	/**
+	 * Prepare the default terms in the language the import uses, as the object type check needs them.
+	 *
+	 * @return void
+	 */
+	private function prepare_default_terms(): void {
+		update_option( 'propstack_connector_languages', 'de' );
+		update_option( 'propstack_connector_api_version', 'v1' );
+		add_filter( 'cfprop_current_language', fn() => 'de' );
+		\ConnectorForPropstack\Propstack\Propstack::get_instance()->activation();
+	}
+
+	/**
+	 * Test that an object which passes every check does not deliver any reason.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_are_empty_for_importable_object(): void {
+		$this->prepare_default_terms();
+
+		$this->assertSame( array(), $this->immo_objects->get_prevent_import_reasons( $this->get_importable_object() ) );
+	}
+
+	/**
+	 * Test that the state is named as reason if it is not "Vermarktung" (API v1).
+	 *
+	 * Hint: this is the most common support case of the free version. A state like
+	 * "Aktive Vermarktung" looks right, but is not the state the import expects.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_name_the_state_v1(): void {
+		$this->prepare_default_terms();
+
+		$immo_object = $this->get_importable_object(
+			array(
+				'property_status' => array(
+					'id'   => 262839,
+					'name' => 'Aktive Vermarktung',
+				),
+			)
+		);
+
+		$reasons = $this->immo_objects->get_prevent_import_reasons( $immo_object );
+
+		$this->assertCount( 1, $reasons );
+		$this->assertStringContainsString( 'Aktive Vermarktung', $reasons[0] );
+	}
+
+	/**
+	 * Test that a missing state is named as reason (API v1).
+	 *
+	 * @return void
+	 */
+	public function test_reasons_name_the_missing_state_v1(): void {
+		$this->prepare_default_terms();
+
+		$immo_object = $this->get_importable_object();
+		unset( $immo_object['property_status'] );
+
+		$this->assertSame( array( 'The object has no state.' ), $this->immo_objects->get_prevent_import_reasons( $immo_object ) );
+	}
+
+	/**
+	 * Test that every restriction which prevents the import is named.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_name_every_restriction(): void {
+		$this->prepare_default_terms();
+
+		update_option( 'propstack_connector_import_broker', array( '65' ) );
+		update_option( 'propstack_connector_import_marketing_type', array( 'RENT' ) );
+		update_option( 'propstack_connector_import_object_type', array( 'APARTMENT' ) );
+		update_option( 'propstack_connector_import_property_type', array( 'MAISONETTE' ) );
+
+		$reasons = implode( ' ', $this->immo_objects->get_prevent_import_reasons( $this->get_importable_object() ) );
+
+		$this->assertStringContainsString( 'The broker "Erika Musterfrau"', $reasons );
+		$this->assertStringContainsString( 'The marketing type "BUY"', $reasons );
+		$this->assertStringContainsString( 'The object type "HOUSE" of the object is not one of the object types to import.', $reasons );
+		$this->assertStringContainsString( 'The property type "TWO_FAMILY_HOUSE"', $reasons );
+
+		// the state is fine, so it must not be named.
+		$this->assertStringNotContainsString( 'state', $reasons );
+	}
+
+	/**
+	 * Test that an object type this plugin does not know is named as not supported.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_name_unsupported_object_type(): void {
+		$this->prepare_default_terms();
+
+		$reasons = $this->immo_objects->get_prevent_import_reasons( $this->get_importable_object( array( 'rs_type' => 'OFFICE' ) ) );
+
+		$this->assertSame( array( 'The object type "OFFICE" of the object is not supported.' ), $reasons );
+	}
+
+	/**
+	 * Test that missing main fields are named as reason.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_name_missing_fields(): void {
+		$this->prepare_default_terms();
+
+		$immo_object = $this->get_importable_object();
+		unset( $immo_object['title'] );
+
+		$this->assertSame( array( 'The ID, the name or the title of the object is missing.' ), $this->immo_objects->get_prevent_import_reasons( $immo_object ) );
+	}
+
+	/**
+	 * Test that a check which is not used does not deliver a reason.
+	 *
+	 * Hint: another plugin can replace a check with its own one. The reason of the removed
+	 * check would be wrong then.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_ignore_removed_checks(): void {
+		$this->prepare_default_terms();
+
+		remove_filter( 'cfprop_prevent_import_of_object', array( $this->immo_objects, 'prevent_import_by_state' ) );
+
+		$immo_object = $this->get_importable_object(
+			array(
+				'property_status' => array(
+					'id'   => 262839,
+					'name' => 'Aktive Vermarktung',
+				),
+			)
+		);
+
+		$this->assertSame( array(), $this->immo_objects->get_prevent_import_reasons( $immo_object ) );
+	}
+
+	/**
+	 * Test that own reasons can be added via hook.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_can_be_extended(): void {
+		$this->prepare_default_terms();
+
+		add_filter(
+			'cfprop_prevent_import_of_object_reasons',
+			function ( array $reasons, array $immo_object ) {
+				$reasons[] = 'The object ' . $immo_object['id'] . ' is excluded.';
+				return $reasons;
+			},
+			10,
+			2
+		);
+
+		$this->assertSame( array( 'The object 42 is excluded.' ), $this->immo_objects->get_prevent_import_reasons( $this->get_importable_object() ) );
+	}
+
+	/**
+	 * Test the reason for the state with API v2.
+	 *
+	 * @return void
+	 */
+	public function test_state_v2_reason(): void {
+		$this->create_state_term( 222051, 'Vermarktung' );
+		$this->create_state_term( 222052, 'Archiviert' );
+
+		$states = \ConnectorForPropstack\Propstack\States::get_instance();
+
+		// without configured states the state must be "Vermarktung".
+		$this->assertSame( 'The state "Archiviert" of the object is not "Vermarktung".', $states->get_prevent_import_reason( $this->get_object( array( 'property_status_id' => 222052 ) ) ) );
+
+		// an unknown state is named by its ID.
+		$this->assertSame( 'The state "999999" of the object is not "Vermarktung".', $states->get_prevent_import_reason( $this->get_object( array( 'property_status_id' => 999999 ) ) ) );
+
+		// an object without a state.
+		$this->assertSame( 'The object has no state.', $states->get_prevent_import_reason( $this->get_object() ) );
+
+		// with configured states the state must be one of them.
+		update_option( 'propstack_connector_import_states', array( '222052' ) );
+		$this->assertSame( 'The state "Vermarktung" of the object is not one of the states to import.', $states->get_prevent_import_reason( $this->get_object( array( 'property_status_id' => 222051 ) ) ) );
+	}
+
+	/**
+	 * Test that the state check of API v2 delivers its reason via the list of reasons.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_name_the_state_v2(): void {
+		$this->prepare_default_terms();
+		$this->create_state_term( 222051, 'Vermarktung' );
+		$this->create_state_term( 222052, 'Archiviert' );
+
+		// use the state check of API v2, as States::init() does.
+		$states = \ConnectorForPropstack\Propstack\States::get_instance();
+		remove_filter( 'cfprop_prevent_import_of_object', array( $this->immo_objects, 'prevent_import_by_state' ) );
+		add_filter( 'cfprop_prevent_import_of_object', array( $states, 'prevent_import_by_state' ), 10, 2 );
+
+		$immo_object = $this->get_importable_object(
+			array(
+				'property_status_id' => 222052,
+				'broker_id'          => 64,
+			)
+		);
+		unset( $immo_object['property_status'], $immo_object['broker'] );
+
+		$this->assertSame( array( 'The state "Archiviert" of the object is not "Vermarktung".' ), $this->immo_objects->get_prevent_import_reasons( $immo_object ) );
+	}
 }

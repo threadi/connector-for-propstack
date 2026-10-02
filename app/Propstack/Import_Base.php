@@ -10,8 +10,11 @@ namespace ConnectorForPropstack\Propstack;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use ConnectorForPropstack\Plugin\Db;
+use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\ProcessHandler;
+use ConnectorForPropstack\Plugin\Settings;
 use WP_Error;
 
 /**
@@ -59,6 +62,20 @@ class Import_Base {
 	 * @var string
 	 */
 	protected string $chunk_lock_option = 'cfprop_import_chunk_lock';
+
+	/**
+	 * The option which holds the objects which have not been imported during the last import.
+	 *
+	 * @var string
+	 */
+	protected string $prevented_objects_option = 'cfprop_prevented_objects';
+
+	/**
+	 * The objects which have not been imported in this run, as they are not saved yet.
+	 *
+	 * @var array<int,array<string,mixed>>
+	 */
+	private array $prevented_objects = array();
 
 	/**
 	 * The token of the chunk lock this instance holds (empty if it holds none).
@@ -209,6 +226,196 @@ class Import_Base {
 
 			// mark this error as logged.
 			$this->logged_errors[ spl_object_id( $error ) ] = true;
+		}
+	}
+
+	/**
+	 * Handle an object which is not imported as a restriction prevents it.
+	 *
+	 * The object is written to the log with the reasons, so it is visible why it is missing.
+	 * It is also remembered for the list of objects which have not been imported.
+	 *
+	 * @param array<string,mixed> $immo_object The object data from API.
+	 *
+	 * @return void
+	 */
+	protected function handle_prevented_object( array $immo_object ): void {
+		// get the title, the API v1 delivers it as a field with label and value.
+		$title = $immo_object['title'] ?? '';
+		if ( is_array( $title ) ) {
+			$title = $title['value'] ?? '';
+		}
+
+		// use the name if no title is given.
+		if ( ! is_scalar( $title ) || '' === (string) $title ) {
+			$title = $immo_object['name'] ?? '';
+		}
+		if ( ! is_scalar( $title ) ) {
+			$title = '';
+		}
+
+		// get the Propstack-ID.
+		$object_id = isset( $immo_object['id'] ) && is_scalar( $immo_object['id'] ) ? absint( $immo_object['id'] ) : 0;
+
+		// get the reasons.
+		$reasons = ImmoObjects::get_instance()->get_prevent_import_reasons( $immo_object );
+
+		// use a general hint if the import is prevented by an unknown check.
+		if ( empty( $reasons ) ) {
+			$reasons = array( __( 'A custom restriction prevents the import.', 'connector-for-propstack' ) );
+		}
+
+		// remember the object for the list of objects which have not been imported.
+		$this->prevented_objects[] = array(
+			'id'      => $object_id,
+			'title'   => (string) $title,
+			'reasons' => $reasons,
+		);
+
+		// log this entry in any case, also if debug is disabled or limited to other categories.
+		$log_in_any_case = static fn(): bool => true;
+		add_filter( 'cfprop_log_without_debug', $log_in_any_case );
+		add_filter( 'cfprop_log_with_debug', $log_in_any_case );
+
+		// add the log entry.
+		Log::get_instance()->add(
+			sprintf(
+				/* translators: %1$s will be replaced by the object title, %2$d by its Propstack-ID. */
+				__( 'Import of object %1$s (Propstack-ID %2$d) prevented.', 'connector-for-propstack' ),
+				'<em>' . esc_html( (string) $title ) . '</em>',
+				$object_id
+			) . ' ' . esc_html( implode( ' ', $reasons ) ),
+			'info',
+			'import'
+		);
+
+		// the following entries are logged as configured again.
+		remove_filter( 'cfprop_log_without_debug', $log_in_any_case );
+		remove_filter( 'cfprop_log_with_debug', $log_in_any_case );
+	}
+
+	/**
+	 * Return the amount of objects which have not been imported in this run and are not saved yet.
+	 *
+	 * @return int
+	 */
+	protected function get_prevented_objects_count(): int {
+		return count( $this->prevented_objects );
+	}
+
+	/**
+	 * Save the objects which have not been imported in this run.
+	 *
+	 * The list belongs to a single import. It replaces the list of the import before, unless
+	 * it is extended by a later chunk of the same import.
+	 *
+	 * @param int  $run_id The ID of the import run.
+	 * @param bool $append True to add the objects to the list of this import run.
+	 *
+	 * @return void
+	 */
+	protected function save_prevented_objects( int $run_id, bool $append = false ): void {
+		// get the objects of this run.
+		$objects = $this->prevented_objects;
+
+		// add them to the objects which are already saved for this import run.
+		if ( $append ) {
+			$saved = get_option( $this->prevented_objects_option, array() );
+			if ( is_array( $saved ) && isset( $saved['run_id'], $saved['objects'] ) && absint( $saved['run_id'] ) === $run_id && is_array( $saved['objects'] ) ) {
+				$objects = array_merge( $saved['objects'], $objects );
+			}
+		}
+
+		// save the list, it is not needed on every request.
+		update_option(
+			$this->prevented_objects_option,
+			array(
+				'run_id'  => $run_id,
+				'objects' => $objects,
+			),
+			false
+		);
+
+		// the objects of this run are saved now.
+		$this->prevented_objects = array();
+	}
+
+	/**
+	 * Return the texts for the dialog which name the result of an import.
+	 *
+	 * @param int $imported  The amount of imported objects.
+	 * @param int $prevented The amount of objects which have not been imported because of a restriction.
+	 *
+	 * @return array<int,string>
+	 */
+	protected function get_result_texts( int $imported, int $prevented ): array {
+		// prepare the list.
+		$texts = array();
+
+		// add the imported objects.
+		if ( $imported > 0 ) {
+			/* translators: %1$d will be replaced by the amount of objects. */
+			$texts[] = '<p>' . sprintf( _n( '%1$d object has been imported.', '%1$d objects have been imported.', $imported, 'connector-for-propstack' ), $imported ) . ' ' . __( 'You will find them in the list in the backend and your frontend.', 'connector-for-propstack' ) . '</p>';
+		}
+
+		// bail if every object has been imported.
+		if ( $prevented <= 0 ) {
+			return $texts;
+		}
+
+		/* translators: %1$s will be replaced by a URL. */
+		$hint = '<br><span class="cfprop-pro-hint">' . sprintf( __( 'With <a href="%1$s">Connector for Propstack Pro</a>, you will receive a list of the relevant objects.', 'connector-for-propstack' ), esc_url( Helper::get_pro_url() ) ) . '</span> ' . sprintf( __( 'Alternatively, you can <a href="%1$s">enable debug mode for imports</a> and then check the log after the next import.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_advanced', 'propstack_connector_advanced_plugin_settings' ) ) );
+		if ( 1 === absint( get_option( 'propstack_connector_debug' ) ) ) {
+			/* translators: %1$s will be replaced by a URL. */
+			$hint = '<br>' . sprintf( __( 'You will find the reasons in <a href="%1$s">the log</a>.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_logs' ) ) );
+		}
+
+		/**
+		 * Filter the hint where the reasons for objects which have not been imported can be found.
+		 *
+		 * @since 2.0.1 Available since 2.0.1.
+		 *
+		 * @param string $hint      The hint, HTML is allowed.
+		 * @param int    $prevented The amount of objects which have not been imported.
+		 */
+		$hint = (string) apply_filters( 'cfprop_import_prevented_hint', $hint, $prevented );
+
+		// add the objects which have not been imported.
+		/* translators: %1$d will be replaced by the amount of objects, %2$s with an URL. */
+		$texts[] = '<p>' . sprintf( _n( '%1$d object has not been imported because of <a href="%2$s">your restrictions</a>.', '%1$d objects have not been imported because of <a href="%2$s">your restrictions</a>.', $prevented, 'connector-for-propstack' ), $prevented, Settings::get_instance()->get_url( 'propstack_connector_objects', 'propstack_connector_import_restrictions' ) ) . ' ' . $hint . '</p>';
+
+		// return the resulting list.
+		return $texts;
+	}
+
+	/**
+	 * Remove every block of the work list of a paginated import.
+	 *
+	 * The blocks are searched by their name and not by the amount in the metadata. An import
+	 * which is aborted while its list is built has no metadata yet, its blocks would be left
+	 * behind. Such a block lets the next import fail, as an unchanged block is not saved again.
+	 *
+	 * @return void
+	 */
+	protected function remove_blocks(): void {
+		global $wpdb;
+
+		// get the names of all blocks.
+		$options = Db::get_instance()->get_results(
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+				$wpdb->esc_like( $this->work_list_option . '_block_' ) . '%'
+			)
+		);
+
+		// delete them via WordPress, so the object cache is cleaned, too.
+		foreach ( $options as $option ) {
+			// bail if the name is missing.
+			if ( ! is_array( $option ) || ! isset( $option['option_name'] ) ) {
+				continue;
+			}
+
+			delete_option( (string) $option['option_name'] );
 		}
 	}
 
@@ -602,16 +809,8 @@ class Import_Base {
 	 * @return void
 	 */
 	protected function clear_work_list(): void {
-		// get the metadata to know how many blocks exist.
-		$import_data = get_option( $this->work_list_option, array() );
-
 		// delete every block.
-		if ( is_array( $import_data ) && isset( $import_data['blocks'] ) ) {
-			$count = absint( $import_data['blocks'] );
-			for ( $i = 0; $i < $count; $i++ ) {
-				delete_option( $this->work_list_option . '_block_' . $i );
-			}
-		}
+		$this->remove_blocks();
 
 		// reset the metadata and the position.
 		update_option( $this->work_list_option, array() );
