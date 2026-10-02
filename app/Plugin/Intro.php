@@ -213,7 +213,7 @@ class Intro {
 				'step_7_intro'       => __( 'The settings of this plugin help you to individualize the use of your Propstack objects on your website.', 'connector-for-propstack' ),
 				'step_8_title'       => __( 'Thank you for using Connector for Propstack', 'connector-for-propstack' ),
 				/* translators: %1$s, %2$s and %3$s will be replaced by URLs */
-				'step_8_intro'       => sprintf( __( 'If you have any questions, please do not hesitate to ask them <a href="%1$s" target="_blank">in our forum (opens a new window)</a>.<br>You are also welcome to <a href="%2$s" target="_blank">rate the plugin (opens a new window)</a>.<br>If you also want to collect applications on your website, take a look at our <a href="%3$s" target="_blank">Connector for Propstack Pro (opens a new window)</a>.', 'connector-for-propstack' ), esc_url( Helper::get_plugin_support_url() ), esc_url( Helper::get_review_url() ), esc_url( Helper::get_pro_url() ) ),
+				'step_8_intro'       => sprintf( __( 'If you have any questions, please do not hesitate to ask them <a href="%1$s" target="_blank">in our forum (opens a new window)</a>.<br>You are also welcome to <a href="%2$s" target="_blank">rate the plugin (opens a new window)</a>.<br>If you also want to collect contacts on your website, take a look at our <a href="%3$s" target="_blank">Connector for Propstack Pro (opens a new window)</a>.', 'connector-for-propstack' ), esc_url( Helper::get_plugin_support_url() ), esc_url( Helper::get_review_url() ), esc_url( Helper::get_pro_url() ) ),
 			)
 		);
 	}
