@@ -754,7 +754,7 @@ class Fields {
 				$written = update_post_meta( $post_id, $meta_key, $meta_value );
 
 				if ( $written && Helper::is_development_mode() ) {
-					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $meta_key, get_debug_type( $meta_value ) ), 'info', 'system' );
+					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $meta_key, get_debug_type( $meta_value ) ), 'info', 'import' );
 				}
 			}
 		}

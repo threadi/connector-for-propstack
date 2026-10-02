@@ -1320,6 +1320,146 @@ class ImmoObjects {
 	}
 
 	/**
+	 * Return the reasons why the import of the given object is prevented.
+	 *
+	 * Only the checks which are in use are asked. A check which has been removed
+	 * (e.g. the state check of API v1 if API v2 is used) does not deliver a reason.
+	 *
+	 * @param array<string,mixed> $immo_object The object data.
+	 *
+	 * @return array<int,string>
+	 */
+	public function get_prevent_import_reasons( array $immo_object ): array {
+		// prepare the list of reasons.
+		$reasons = array();
+
+		// check for missing main fields.
+		if ( $this->is_prevent_import_check_used( array( $this, 'prevent_import_by_missing_fields' ) ) && $this->prevent_import_by_missing_fields( false, $immo_object ) ) {
+			$reasons[] = __( 'The ID, the name or the title of the object is missing.', 'connector-for-propstack' );
+		}
+
+		// check the state (API v1).
+		if ( $this->is_prevent_import_check_used( array( $this, 'prevent_import_by_state' ) ) && $this->prevent_import_by_state( false, $immo_object ) ) {
+			// get the state.
+			$state = isset( $immo_object['property_status'] ) && is_array( $immo_object['property_status'] ) ? $immo_object['property_status'] : array();
+
+			if ( empty( $state['id'] ) ) {
+				$reasons[] = __( 'The object has no state.', 'connector-for-propstack' );
+			} else {
+				/* translators: %1$s will be replaced by the name of the state. */
+				$reasons[] = sprintf( __( 'The state "%1$s" of the object is not "Vermarktung".', 'connector-for-propstack' ), $this->get_api_value_as_string( $state['name'] ?? '' ) );
+			}
+		}
+
+		// check the state (API v2).
+		$states = States::get_instance();
+		if ( $this->is_prevent_import_check_used( array( $states, 'prevent_import_by_state' ) ) && $states->prevent_import_by_state( false, $immo_object ) ) {
+			$reasons[] = $states->get_prevent_import_reason( $immo_object );
+		}
+
+		// check the broker.
+		if ( $this->is_prevent_import_check_used( array( $this, 'prevent_import_by_broker' ) ) && $this->prevent_import_by_broker( false, $immo_object ) ) {
+			// use the name of the broker (API v1) or its ID (API v2).
+			$broker = '';
+			if ( isset( $immo_object['broker'] ) && is_array( $immo_object['broker'] ) ) {
+				$broker = $this->get_api_value_as_string( $immo_object['broker']['name'] ?? '' );
+				if ( '' === $broker ) {
+					$broker = $this->get_api_value_as_string( $immo_object['broker']['id'] ?? '' );
+				}
+			}
+			if ( '' === $broker ) {
+				$broker = $this->get_api_value_as_string( $immo_object['broker_id'] ?? '' );
+			}
+
+			/* translators: %1$s will be replaced by the name or the ID of the broker. */
+			$reasons[] = sprintf( __( 'The broker "%1$s" of the object is not one of the brokers to import.', 'connector-for-propstack' ), $broker );
+		}
+
+		// check the marketing type.
+		if ( $this->is_prevent_import_check_used( array( $this, 'prevent_import_by_marketing_type' ) ) && $this->prevent_import_by_marketing_type( false, $immo_object ) ) {
+			/* translators: %1$s will be replaced by the marketing type. */
+			$reasons[] = sprintf( __( 'The marketing type "%1$s" of the object is not one of the marketing types to import.', 'connector-for-propstack' ), $this->get_api_value_as_string( $immo_object['marketing_type'] ?? '' ) );
+		}
+
+		// check the object type.
+		if ( $this->is_prevent_import_check_used( array( $this, 'prevent_import_by_object_type' ) ) && $this->prevent_import_by_object_type( false, $immo_object ) ) {
+			// get the object type.
+			$object_type = $this->get_api_value_as_string( $immo_object['rs_type'] ?? '' );
+
+			if ( '' === $object_type ) {
+				$reasons[] = __( 'The object has no object type.', 'connector-for-propstack' );
+			} elseif ( ! ObjectType::get_instance()->get_term_id_by_api_value( $object_type, Languages::get_instance()->get_import_language() ) ) {
+				/* translators: %1$s will be replaced by the object type. */
+				$reasons[] = sprintf( __( 'The object type "%1$s" of the object is not supported.', 'connector-for-propstack' ), $object_type );
+			} else {
+				/* translators: %1$s will be replaced by the object type. */
+				$reasons[] = sprintf( __( 'The object type "%1$s" of the object is not one of the object types to import.', 'connector-for-propstack' ), $object_type );
+			}
+		}
+
+		// check the property type.
+		if ( $this->is_prevent_import_check_used( array( $this, 'prevent_import_by_property_type' ) ) && $this->prevent_import_by_property_type( false, $immo_object ) ) {
+			/* translators: %1$s will be replaced by the property type. */
+			$reasons[] = sprintf( __( 'The property type "%1$s" of the object is not one of the property types to import.', 'connector-for-propstack' ), $this->get_api_value_as_string( $immo_object['rs_category'] ?? '' ) );
+		}
+
+		/**
+		 * Filter the reasons why the import of an object is prevented.
+		 *
+		 * Use this to add the reason for an own check on the filter "cfprop_prevent_import_of_object".
+		 *
+		 * @since 2.0.1 Available since 2.0.1.
+		 *
+		 * @param array<int,string>   $reasons     The reasons, each as a complete sentence.
+		 * @param array<string,mixed> $immo_object The object data from API.
+		 */
+		$reasons = apply_filters( 'cfprop_prevent_import_of_object_reasons', $reasons, $immo_object );
+
+		// bail if the filter did not return a list.
+		if ( ! is_array( $reasons ) ) {
+			return array();
+		}
+
+		// return only usable reasons.
+		return array_values( array_filter( $reasons, static fn( $reason ) => is_string( $reason ) && '' !== $reason ) );
+	}
+
+	/**
+	 * Return whether the given check is used to prevent the import of objects.
+	 *
+	 * @param callable $callback The check.
+	 *
+	 * @return bool
+	 */
+	private function is_prevent_import_check_used( callable $callback ): bool {
+		return false !== has_filter( 'cfprop_prevent_import_of_object', $callback );
+	}
+
+	/**
+	 * Return a value of the API as string.
+	 *
+	 * The API delivers some values as plain value, some as list with the value in "id".
+	 *
+	 * @param mixed $value The value from the API.
+	 *
+	 * @return string
+	 */
+	private function get_api_value_as_string( mixed $value ): string {
+		// use the ID if a list is given.
+		if ( is_array( $value ) ) {
+			$value = $value['id'] ?? '';
+		}
+
+		// bail if the value is not usable.
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		// return the value.
+		return (string) $value;
+	}
+
+	/**
 	 * Assign the feature image to the objects if the queue has been run.
 	 *
 	 * @return void

@@ -2,9 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added logging the reason why an object has not been imported (only with enabled debug mode)
+
 ### Changed
 
+- Changed the log category for changed field values from system to import
 - Updated dependencies
+- More PHP Unit Tests
 
 ### Fixed
 

@@ -244,6 +244,9 @@ class Objects extends Import_Base {
 						foreach ( $page_objects as $object ) {
 							// skip objects which would be prevented anyway.
 							if ( apply_filters( 'cfprop_prevent_import_of_object', false, $object ) ) {
+								// add a log entry with the reason.
+								$this->log_prevented_object( $object );
+
 								continue;
 							}
 
@@ -500,9 +503,8 @@ class Objects extends Import_Base {
 							// update the counter.
 							$this->set_count( $process_handler, $process_handler->get_count() + 1 );
 
-							// add a log entry.
-							/* translators: %1$s will be replaced by the object title. */
-							Log::get_instance()->add( sprintf( __( 'Import of object %1$s prevented.', 'connector-for-propstack' ), '<em>' . $object['title']['value'] . '</em>' ), 'info', 'import' );
+							// add a log entry with the reason.
+							$this->log_prevented_object( $object );
 
 							// update tick.
 							if ( $progress ) {

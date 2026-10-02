@@ -213,6 +213,54 @@ class Import_Base {
 	}
 
 	/**
+	 * Add a log entry for an object which is not imported as a restriction prevents it.
+	 *
+	 * The entry names the reasons, so it is visible in the log why an object is missing.
+	 *
+	 * @param array<string,mixed> $immo_object The object data from API.
+	 *
+	 * @return void
+	 */
+	protected function log_prevented_object( array $immo_object ): void {
+		// get the title, the API v1 delivers it as a field with label and value.
+		$title = $immo_object['title'] ?? '';
+		if ( is_array( $title ) ) {
+			$title = $title['value'] ?? '';
+		}
+
+		// use the name if no title is given.
+		if ( ! is_scalar( $title ) || '' === (string) $title ) {
+			$title = $immo_object['name'] ?? '';
+		}
+		if ( ! is_scalar( $title ) ) {
+			$title = '';
+		}
+
+		// get the Propstack-ID.
+		$object_id = isset( $immo_object['id'] ) && is_scalar( $immo_object['id'] ) ? absint( $immo_object['id'] ) : 0;
+
+		// get the reasons.
+		$reasons = ImmoObjects::get_instance()->get_prevent_import_reasons( $immo_object );
+
+		// use a general hint if the import is prevented by an unknown check.
+		if ( empty( $reasons ) ) {
+			$reasons = array( __( 'A custom restriction prevents the import.', 'connector-for-propstack' ) );
+		}
+
+		// add the log entry.
+		Log::get_instance()->add(
+			sprintf(
+				/* translators: %1$s will be replaced by the object title, %2$d by its Propstack-ID. */
+				__( 'Import of object %1$s (Propstack-ID %2$d) prevented.', 'connector-for-propstack' ),
+				'<em>' . esc_html( (string) $title ) . '</em>',
+				$object_id
+			) . ' ' . esc_html( implode( ' ', $reasons ) ),
+			'info',
+			'import'
+		);
+	}
+
+	/**
 	 * Add the errors of this run to the state of a paginated import.
 	 *
 	 * Each chunk is a separate request with its own instance, so errors are kept in the

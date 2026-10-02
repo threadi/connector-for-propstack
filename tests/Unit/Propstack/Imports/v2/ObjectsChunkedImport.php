@@ -191,6 +191,19 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	}
 
 	/**
+	 * Return the number of log entries which contain the given text.
+	 *
+	 * @param string $text The text to search for.
+	 *
+	 * @return int
+	 */
+	private function count_log_entries( string $text ): int {
+		global $wpdb;
+
+		return absint( $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'propstack_logs WHERE log LIKE %s', '%' . $wpdb->esc_like( $text ) . '%' ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+	}
+
+	/**
 	 * Test that the first run stops after the limit and keeps its state.
 	 *
 	 * @return void
@@ -381,6 +394,52 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 		// the state is gone and the lock is released.
 		$this->assertEmpty( get_option( self::$work_list_option, array() ) );
 		$this->assertSame( 0, absint( get_option( CFPROP_IMPORT_RUNNING ) ) );
+	}
+
+	/**
+	 * Test that a prevented object is written to the log with the reason.
+	 *
+	 * Prevented objects never reach the work list, so the entry has to be written while the
+	 * list is built. Without it nobody could see why an object from Propstack is missing.
+	 *
+	 * Hint: the fixture delivers one object in the state "Archiviert".
+	 *
+	 * @return void
+	 */
+	public function test_prevented_objects_are_logged_with_reason(): void {
+		// info entries are only logged in debug mode.
+		update_option( 'propstack_connector_debug', 1 );
+		delete_option( 'cfprop_debug_categories' );
+
+		$this->run_chunk();
+
+		update_option( 'propstack_connector_debug', 0 );
+
+		// the log names the object and the reason.
+		$this->assertGreaterThan( 0, $this->count_log_entries( 'Import of object <em>Archiviertes Objekt</em> (Propstack-ID 44) prevented. The state &quot;Archiviert&quot; of the object is not &quot;Vermarktung&quot;.' ) );
+
+		// the objects which are imported are not reported as prevented.
+		$this->assertSame( 0, $this->count_log_entries( '(Propstack-ID 42) prevented.' ) );
+	}
+
+	/**
+	 * Test that a general hint is logged if the import is prevented by an unknown check.
+	 *
+	 * @return void
+	 */
+	public function test_prevented_objects_are_logged_with_general_hint(): void {
+		update_option( 'propstack_connector_debug', 1 );
+		delete_option( 'cfprop_debug_categories' );
+
+		$prevent_all = fn() => true;
+		add_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+
+		$this->run_chunk();
+
+		remove_filter( 'cfprop_prevent_import_of_object', $prevent_all );
+		update_option( 'propstack_connector_debug', 0 );
+
+		$this->assertGreaterThan( 0, $this->count_log_entries( '(Propstack-ID 42) prevented. A custom restriction prevents the import.' ) );
 	}
 
 	/**
