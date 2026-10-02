@@ -187,6 +187,8 @@ body.post-type-cfprop_object, body.settings_page_connector-for-propstack {
 	padding: 4px 8px;
 }
 
+.easy-dialog-for-wordpress-text p .cfprop-pro-hint { padding: 0 }
+
 body.post-type-cfprop_object, .etfw-transient, body.settings_page_connector-for-propstack {
 	.copied {
 		position: relative;

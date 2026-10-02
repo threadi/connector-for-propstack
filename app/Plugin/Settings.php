@@ -463,7 +463,7 @@ class Settings {
 			),
 			'buttons'   => array(
 				array(
-					'action'  => 'settings_import_file();',
+					'action'  => 'esefw_settings_import_file();',
 					'variant' => 'primary',
 					'text'    => __( 'Import now', 'connector-for-propstack' ),
 				),

@@ -745,6 +745,14 @@ class ImmoObjects {
 		$setting->set_default( array() );
 		$setting->prevent_export( true );
 		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'string' ) ) ) );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'cfprop_prevented_objects' );
+		$setting->set_section( $hidden_section );
+		$setting->set_type( 'array' );
+		$setting->set_default( array() );
+		$setting->prevent_export( true );
+		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'object' ) ) ) );
 	}
 
 	/**
@@ -1416,12 +1424,60 @@ class ImmoObjects {
 		$reasons = apply_filters( 'cfprop_prevent_import_of_object_reasons', $reasons, $immo_object );
 
 		// bail if the filter did not return a list.
-		if ( ! is_array( $reasons ) ) {
+		if ( ! is_array( $reasons ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			return array();
 		}
 
-		// return only usable reasons.
-		return array_values( array_filter( $reasons, static fn( $reason ) => is_string( $reason ) && '' !== $reason ) );
+		// return only usable reasons, each of them once.
+		return array_values( array_unique( array_filter( $reasons, static fn( $reason ) => is_string( $reason ) && '' !== $reason ) ) ); // @phpstan-ignore function.alreadyNarrowedType
+	}
+
+	/**
+	 * Return the objects which have not been imported during the last import because of a restriction.
+	 *
+	 * Format:
+	 * - run_id => the time the import has been started.
+	 * - objects => the list of objects, each with "id" (the Propstack-ID), "title" and "reasons".
+	 *
+	 * @return array{run_id:int,objects:array<int,array{id:int,title:string,reasons:array<int,string>}>}
+	 */
+	public function get_prevented_objects(): array {
+		// get the saved list.
+		$saved = get_option( 'cfprop_prevented_objects', array() );
+
+		// prepare the result.
+		$result = array(
+			'run_id'  => 0,
+			'objects' => array(),
+		);
+
+		// bail if no list is saved.
+		if ( ! is_array( $saved ) || ! isset( $saved['objects'] ) || ! is_array( $saved['objects'] ) ) {
+			return $result;
+		}
+
+		// get the time of the import.
+		$result['run_id'] = absint( $saved['run_id'] ?? 0 );
+
+		// add only complete entries.
+		foreach ( $saved['objects'] as $entry ) {
+			// bail if this is not an entry.
+			if ( ! is_array( $entry ) ) {
+				continue;
+			}
+
+			// get the reasons.
+			$reasons = isset( $entry['reasons'] ) && is_array( $entry['reasons'] ) ? $entry['reasons'] : array();
+
+			$result['objects'][] = array(
+				'id'      => absint( $entry['id'] ?? 0 ),
+				'title'   => isset( $entry['title'] ) && is_scalar( $entry['title'] ) ? (string) $entry['title'] : '',
+				'reasons' => array_values( array_filter( $reasons, 'is_string' ) ),
+			);
+		}
+
+		// return the resulting list.
+		return $result;
 	}
 
 	/**
@@ -1431,7 +1487,7 @@ class ImmoObjects {
 	 *
 	 * @return bool
 	 */
-	private function is_prevent_import_check_used( callable $callback ): bool {
+	public function is_prevent_import_check_used( callable $callback ): bool {
 		return false !== has_filter( 'cfprop_prevent_import_of_object', $callback );
 	}
 
