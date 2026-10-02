@@ -399,7 +399,8 @@ class ImmoObjects {
 		if ( empty( get_option( 'propstack_connector_api_key' ) ) ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import objects', 'connector-for-propstack' ) );
-			$field->set_description( __( 'Propstack API key is missing.', 'connector-for-propstack' ) );
+			/* translators: %1$s  will ber replaced by a URL. */
+			$field->set_description( sprintf( __( 'Propstack API key is missing. Add it <a href="%1$s">here</a>.', 'connector-for-propstack' ), Settings::get_instance()->get_url() ) );
 		} elseif ( defined( 'CFPROP_IMPORT_RUNNING' ) && absint( get_option( CFPROP_IMPORT_RUNNING ) ) > 0 ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import objects', 'connector-for-propstack' ) );

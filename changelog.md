@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Fixed import of images via API v2
 - Remove our schedules on plugin deactivation
 
 ## [2.0.0] - 30.09.2026

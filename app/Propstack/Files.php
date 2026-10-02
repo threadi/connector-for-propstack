@@ -144,14 +144,20 @@ class Files {
 		$setting = $settings_obj->add_setting( 'propstack_connector_files_import' );
 		$setting->set_section( $files_import_section );
 		$setting->prevent_export( true );
-		if ( defined( 'CFPROP_FILES_IMPORT_RUNNING' ) && Helper::is_process_running( CFPROP_FILES_IMPORT_RUNNING ) ) {
+		if ( empty( get_option( 'propstack_connector_api_key' ) ) ) {
+			$field = new TextInfo( $settings_obj );
+			$field->set_title( __( 'Import images', 'connector-for-propstack' ) );
+			/* translators: %1$s  will ber replaced by a URL. */
+			$field->set_description( sprintf( __( 'Propstack API key is missing. Add it <a href="%1$s">here</a>.', 'connector-for-propstack' ), Settings::get_instance()->get_url() ) );
+		} elseif ( defined( 'CFPROP_FILES_IMPORT_RUNNING' ) && Helper::is_process_running( CFPROP_FILES_IMPORT_RUNNING ) ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import images', 'connector-for-propstack' ) );
 			$field->set_description( __( 'Import of images for objects is still running. Please wait.', 'connector-for-propstack' ) );
 		} elseif ( ! ImmoObjects::get_instance()->has_objects() ) {
 			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Import images', 'connector-for-propstack' ) );
-			$field->set_description( __( 'No objects imported. Please import them first to import their images.', 'connector-for-propstack' ) );
+			/* translators: %1$s will be replaced by a URL. */
+			$field->set_description( sprintf( __( 'No objects imported. <a href="%1$s">Please import them first</a> to import their images.', 'connector-for-propstack' ), Settings::get_instance()->get_url( 'propstack_connector_import', 'propstack_connector_objects_import' ) ) );
 		} else {
 			$field = new Button( $settings_obj );
 			$field->set_button_title( __( 'Import now', 'connector-for-propstack' ) );
@@ -379,6 +385,55 @@ class Files {
 
 		// return the resulting attachment ID.
 		return absint( $results->posts[0] );
+	}
+
+	/**
+	 * Return the URL of a file from the Propstack API in the configured image size.
+	 *
+	 * API v1 delivers each image size as its own key (e.g. "big_url"). API v2 delivers them
+	 * in the list "urls" with other names (e.g. "large"). If the chosen size is not delivered
+	 * for a file, the original URL is used, so the file is imported anyway.
+	 *
+	 * @param array<string,mixed> $file The file data from Propstack API.
+	 *
+	 * @return string
+	 */
+	public function get_file_url( array $file ): string {
+		// get the image size setting.
+		$image_size = (string) get_option( 'propstack_connector_image_size', 'big_url' );
+
+		// use the chosen size if the API delivers it under this name (API v1).
+		if ( ! empty( $file[ $image_size ] ) && is_string( $file[ $image_size ] ) ) {
+			return $file[ $image_size ];
+		}
+
+		// get the list of sizes API v2 delivers.
+		$urls = ( isset( $file['urls'] ) && is_array( $file['urls'] ) ) ? $file['urls'] : array();
+
+		// the names of our image sizes in the list of API v2.
+		$mapping = array(
+			'url'             => 'original',
+			'big_url'         => 'large',
+			'medium_url'      => 'medium',
+			'thumb_url'       => 'thumb',
+			'small_thumb_url' => 'small',
+		);
+
+		// use the chosen size from the list of API v2.
+		if ( isset( $mapping[ $image_size ] ) && ! empty( $urls[ $mapping[ $image_size ] ] ) && is_string( $urls[ $mapping[ $image_size ] ] ) ) {
+			return $urls[ $mapping[ $image_size ] ];
+		}
+
+		// fallback: use the original file, if the chosen size is not available (e.g. the square size in API v2).
+		if ( ! empty( $file['url'] ) && is_string( $file['url'] ) ) {
+			return $file['url'];
+		}
+		if ( ! empty( $urls['original'] ) && is_string( $urls['original'] ) ) {
+			return $urls['original'];
+		}
+
+		// no URL could be found.
+		return '';
 	}
 
 	/**
@@ -1154,9 +1209,6 @@ class Files {
 		 */
 		$limit = apply_filters( 'cfprop_files_import_limit', $limit, $files_to_import );
 
-		// get the image size setting.
-		$image_size = get_option( 'propstack_connector_image_size', 'big_url' );
-
 		// show cli hint.
 		$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import files', count( $files_to_import ) ) : false;
 
@@ -1171,8 +1223,8 @@ class Files {
 			// get the immo object.
 			$immo_object_obj = $immo_objects_obj->get_object( $file['wp_post_id'] );
 
-			// get the type by checking if the chosen image size is given.
-			$url = isset( $file[ $image_size ] ) ? $file[ $image_size ] : '';
+			// get the URL in the chosen image size (API v1 and v2 deliver them in different structures).
+			$url = $this->get_file_url( $file );
 
 			// bail if no URL could be found.
 			if ( empty( $url ) ) {
