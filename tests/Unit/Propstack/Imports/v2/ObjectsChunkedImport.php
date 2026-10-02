@@ -32,7 +32,7 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 	 *
 	 * @var string
 	 */
-	private static string $properties_url = 'https://api.propstack.de/v2/properties';
+	private static string $properties_url = 'https://api.propstack.de/v2/properties?';
 
 	/**
 	 * The option which holds the work list of a paginated import.

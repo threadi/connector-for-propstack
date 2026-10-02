@@ -30,7 +30,7 @@ class Objects extends ConnectorForPropstackTestCase {
 	 *
 	 * @var string
 	 */
-	private static string $properties_url = 'https://api.propstack.de/v2/properties';
+	private static string $properties_url = 'https://api.propstack.de/v2/properties?';
 
 	/**
 	 * Prepare the test environment for each test.

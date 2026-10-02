@@ -9,6 +9,9 @@
 ### Changed
 
 - Changed the log category for changed field values from system to import
+- Now fully support Propstack API v2 as far as Propstack does deliver data atm
+  -> over 120 fields are missing
+  -> still only usable for developers
 - Updated dependencies
 - More PHP Unit Tests
 

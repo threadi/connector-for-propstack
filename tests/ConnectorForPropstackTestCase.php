@@ -30,6 +30,20 @@ abstract class ConnectorForPropstackTestCase extends WP_UnitTestCase {
 	private static string $status_url = 'https://api.propstack.de/v2/property_statuses';
 
 	/**
+	 * The API URL for brokers (API v2).
+	 *
+	 * @var string
+	 */
+	private static string $brokers_url = 'https://api.propstack.de/v2/brokers';
+
+	/**
+	 * The API URL for the options of object fields (API v2).
+	 *
+	 * @var string
+	 */
+	private static string $options_url = 'https://api.propstack.de/v2/properties/options';
+
+	/**
 	 * The test API key.
 	 *
 	 * @var string
@@ -141,6 +155,41 @@ abstract class ConnectorForPropstackTestCase extends WP_UnitTestCase {
 			return array(
 				'http_response' => new WP_HTTP_Requests_Response( $requests_response, $parsed_args['filename'] ),
 				'body'          => $xml
+			);
+		}
+
+		// create a local response for the GET requests for brokers and for the options of object fields (API v2).
+		foreach ( array( self::$brokers_url => 'brokers_full.json', self::$options_url => 'property_options_full.json' ) as $api_url => $file ) {
+			// bail if this is not the requested URL.
+			if ( 'GET' !== $parsed_args['method'] || ! str_starts_with( $url, $api_url ) ) {
+				continue;
+			}
+
+			// bail if a test already answered this request with its own response.
+			if ( false !== $false ) {
+				return $false;
+			}
+
+			// create the response object.
+			$requests_response = new \WpOrg\Requests\Response();
+
+			// if the API key is missing.
+			if ( empty( $parsed_args['headers']['X-API-KEY'] ) ) {
+				$requests_response->status_code = 401;
+
+				// create the header response.
+				return array(
+					'http_response' => new WP_HTTP_Requests_Response( $requests_response, $parsed_args['filename'] ),
+				);
+			}
+
+			// get our JSON file and return its content.
+			$requests_response->status_code = 200;
+
+			// create the header response.
+			return array(
+				'http_response' => new WP_HTTP_Requests_Response( $requests_response, $parsed_args['filename'] ),
+				'body'          => \ConnectorForPropstack\Plugin\Helper::get_wp_filesystem()->get_contents( UNIT_TESTS_DATA_PLUGIN_DIR . $file ),
 			);
 		}
 

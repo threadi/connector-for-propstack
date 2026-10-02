@@ -103,6 +103,9 @@ class UninstallerData extends ConnectorForPropstackTestCase {
 		update_option( self::$work_list_option . '_block_1', array( array( 'object' => array() ) ), false );
 		update_option( 'cfprop_import_chunk_lock', time(), false );
 
+		// set the texts for the values of selection fields from the API v2.
+		update_option( \ConnectorForPropstack\Propstack\Imports\v2\Options::OPTION_PREFIX . 'de', array( 'heating_type' => array( 'GAS_HEATING' => 'Gas-Heizung' ) ), false );
+
 		// set the transients with the files to import.
 		set_transient( 'propstack_object_files_to_import', array( 1, 2 ) );
 		set_transient( 'propstack_object_files_to_import_owner', 'test' );
@@ -123,6 +126,9 @@ class UninstallerData extends ConnectorForPropstackTestCase {
 		$this->assertFalse( get_option( self::$work_list_option ) );
 		$this->assertEmpty( $this->get_block_options() );
 		$this->assertFalse( get_option( 'cfprop_import_chunk_lock' ) );
+
+		// the texts from the API v2 are removed.
+		$this->assertFalse( get_option( \ConnectorForPropstack\Propstack\Imports\v2\Options::OPTION_PREFIX . 'de' ) );
 
 		// the transients are removed.
 		$this->assertFalse( get_transient( 'propstack_object_files_to_import' ) );

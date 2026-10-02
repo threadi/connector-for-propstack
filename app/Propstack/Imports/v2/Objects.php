@@ -37,6 +37,20 @@ class Objects extends Import_Base {
 	private string $url = 'https://api.propstack.de/v2/properties';
 
 	/**
+	 * The object to get the texts for the codes of selection fields.
+	 *
+	 * @var Options|null
+	 */
+	private ?Options $options = null;
+
+	/**
+	 * The object to get the brokers.
+	 *
+	 * @var Brokers|null
+	 */
+	private ?Brokers $brokers = null;
+
+	/**
 	 * Initialize this object.
 	 */
 	public function __construct() {}
@@ -237,6 +251,11 @@ class Objects extends Import_Base {
 						$page_objects = apply_filters( 'cfprop_object_import_response', $page_objects );
 
 						foreach ( $page_objects as $object ) {
+							// bring the object into the structure the API v1 delivers, which the import expects.
+							if ( is_array( $object ) ) {
+								$object = $this->prepare_object( $object, (string) $language_code );
+							}
+
 							// skip objects which would be prevented anyway.
 							if ( apply_filters( 'cfprop_prevent_import_of_object', false, $object ) ) {
 								// add a log entry with the reason and remember the object.
@@ -857,6 +876,43 @@ class Objects extends Import_Base {
 	}
 
 	/**
+	 * Bring an object from the API v2 into the structure the API v1 delivers.
+	 *
+	 * The API v2 delivers the codes of selection fields and only the ID of the broker:
+	 * - the codes are replaced by their texts (e.g. "GAS_HEATING" by "Gas-Heizung").
+	 * - the complete broker is added to the object.
+	 *
+	 * @param array<string,mixed> $immo_object   The object data from API.
+	 * @param string              $language_code The used language.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function prepare_object( array $immo_object, string $language_code ): array {
+		// get the helper objects once per import, each of them requests the API only once.
+		if ( ! $this->options instanceof Options ) {
+			$this->options = new Options();
+		}
+		if ( ! $this->brokers instanceof Brokers ) {
+			$this->brokers = new Brokers();
+		}
+
+		// replace the codes of selection fields by their texts.
+		$immo_object = $this->options->translate_object( $immo_object, $language_code );
+
+		// add the complete broker.
+		$immo_object = $this->brokers->add_broker_to_object( $immo_object );
+
+		/**
+		 * Filter a single object from Propstack API v2 after it has been prepared for the import.
+		 *
+		 * @since 2.0.1 Available since 2.0.1.
+		 * @param array<string,mixed> $immo_object   The object data.
+		 * @param string              $language_code The used language.
+		 */
+		return apply_filters( 'cfprop_api_v2_prepared_object', $immo_object, $language_code );
+	}
+
+	/**
 	 * Return the API URL to import objects.
 	 *
 	 * @param string $language_code The language to use for the URL.
@@ -869,12 +925,12 @@ class Objects extends Import_Base {
 		// get the URL.
 		$url = add_query_arg(
 			array(
-				'locale'    => $language_code,
-				'expand'    => 1,
-				'archived'  => -1,
-				'with_meta' => 1,
-				'page'      => $page,
-				'per'       => $per,
+				'locale'     => $language_code,
+				'expand'     => 1,
+				'archived'   => -1,
+				'with_total' => 'true',
+				'page'       => $page,
+				'per'        => $per,
 			),
 			$this->url
 		);
@@ -1043,9 +1099,9 @@ class Objects extends Import_Base {
 				return;
 			}
 
-			// read the total count once (from the first page).
-			if ( null === $total && isset( $data['meta']['total_count'] ) ) {
-				$total = absint( $data['meta']['total_count'] );
+			// read the total count once (from the first page), the API v2 delivers it as "total".
+			if ( null === $total && isset( $data['total'] ) && is_numeric( $data['total'] ) ) {
+				$total = absint( $data['total'] );
 			}
 
 			// stop on an empty page.

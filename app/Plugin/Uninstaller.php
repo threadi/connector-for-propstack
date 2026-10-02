@@ -192,6 +192,19 @@ class Uninstaller {
 		foreach ( $block_options as $block_option ) {
 			delete_option( (string) $block_option );
 		}
+
+		// delete the texts for the values of selection fields we got from the API v2.
+		$api_options = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+				$wpdb->esc_like( \ConnectorForPropstack\Propstack\Imports\v2\Options::OPTION_PREFIX ) . '%'
+			)
+		);
+
+		// delete them via WordPress, so the object cache is cleaned, too.
+		foreach ( $api_options as $api_option ) {
+			delete_option( (string) $api_option );
+		}
 	}
 
 	/**

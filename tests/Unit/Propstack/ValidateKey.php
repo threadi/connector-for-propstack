@@ -44,6 +44,20 @@ class ValidateKey extends ConnectorForPropstackTestCase {
 	private int $requests = 0;
 
 	/**
+	 * Number of requests for the options of object fields (API v2).
+	 *
+	 * @var int
+	 */
+	private int $option_requests = 0;
+
+	/**
+	 * The HTTP status the mocked API answers with for the options of object fields (API v2).
+	 *
+	 * @var int
+	 */
+	private int $options_status = 200;
+
+	/**
 	 * Prepare the test environment for each test.
 	 *
 	 * @return void
@@ -55,7 +69,9 @@ class ValidateKey extends ConnectorForPropstackTestCase {
 		update_option( 'propstack_connector_api_key', self::$saved_key );
 
 		// mock the API endpoint used for the validation before any other filter could answer it.
-		$this->requests = 0;
+		$this->requests        = 0;
+		$this->option_requests = 0;
+		$this->options_status  = 200;
 		add_filter( 'pre_http_request', array( $this, 'mock_validation_request' ), 1, 3 );
 	}
 
@@ -82,6 +98,21 @@ class ValidateKey extends ConnectorForPropstackTestCase {
 	 * @return false|array|WP_Error
 	 */
 	public function mock_validation_request( false|array|WP_Error $response, array $parsed_args, string $url ): false|array|WP_Error {
+		// answer the request for the options of object fields, which is used for the API v2.
+		if ( str_starts_with( $url, 'https://api.propstack.de/v2/properties/options' ) ) {
+			++$this->option_requests;
+
+			return array(
+				'headers'  => array(),
+				'body'     => 200 === $this->options_status ? '{"data":{"heating_type":{"GAS_HEATING":"Gas-Heizung"}}}' : '{"status":403,"message":"authorization_error"}',
+				'response' => array(
+					'code'    => $this->options_status,
+					'message' => 200 === $this->options_status ? 'OK' : 'Forbidden',
+				),
+				'cookies'  => array(),
+			);
+		}
+
 		// bail if this is not the validation request.
 		if ( ! str_starts_with( $url, 'https://api.propstack.de/v1/property_statuses' ) ) {
 			return $response;
@@ -181,6 +212,66 @@ class ValidateKey extends ConnectorForPropstackTestCase {
 		$this->assertSame( array(), Propstack::rest_validate_key( ' ' . self::$valid_key . ' ' ) );
 		$this->assertSame( self::$valid_key, get_option( 'propstack_connector_api_key' ) );
 		$this->assertSame( 1, $this->requests );
+	}
+
+	/**
+	 * Test that the permission for the options of object fields is not checked with the API v1.
+	 *
+	 * @return void
+	 */
+	public function test_options_are_not_checked_with_api_v1(): void {
+		$this->login_as( 'administrator' );
+		update_option( 'propstack_connector_api_version', 'v1' );
+		$this->options_status = 403;
+
+		$this->assertSame( array(), Propstack::rest_validate_key( self::$valid_key ) );
+		$this->assertSame( self::$valid_key, get_option( 'propstack_connector_api_key' ) );
+		$this->assertSame( 0, $this->option_requests );
+	}
+
+	/**
+	 * Test that a key with the permission for the options of object fields is saved with the API v2.
+	 *
+	 * @return void
+	 */
+	public function test_valid_key_with_api_v2(): void {
+		$this->login_as( 'administrator' );
+		update_option( 'propstack_connector_api_version', 'v2' );
+
+		$this->assertSame( array(), Propstack::rest_validate_key( self::$valid_key ) );
+		$this->assertSame( self::$valid_key, get_option( 'propstack_connector_api_key' ) );
+		$this->assertSame( 1, $this->option_requests );
+	}
+
+	/**
+	 * Test that a key without the permission for the options of object fields is not saved with the API v2.
+	 *
+	 * @return void
+	 */
+	public function test_key_without_permission_for_options_with_api_v2(): void {
+		$this->login_as( 'administrator' );
+		update_option( 'propstack_connector_api_version', 'v2' );
+		$this->options_status = 403;
+
+		$result = Propstack::rest_validate_key( self::$valid_key );
+
+		$this->assertSame( 'missing_options_permission', $result['error'] );
+		$this->assertSame( self::$saved_key, get_option( 'propstack_connector_api_key' ) );
+		$this->assertSame( 1, $this->option_requests );
+	}
+
+	/**
+	 * Test that a key is saved with the API v2 if the options are not reachable, as this is no missing permission.
+	 *
+	 * @return void
+	 */
+	public function test_key_is_saved_with_api_v2_if_options_are_not_reachable(): void {
+		$this->login_as( 'administrator' );
+		update_option( 'propstack_connector_api_version', 'v2' );
+		$this->options_status = 500;
+
+		$this->assertSame( array(), Propstack::rest_validate_key( self::$valid_key ) );
+		$this->assertSame( self::$valid_key, get_option( 'propstack_connector_api_key' ) );
 	}
 
 	/**

@@ -19,7 +19,7 @@ use WP_HTTP_Requests_Response;
  * The shared test case only mocks the API v1 URL. This class registers its own
  * page-aware mock for the v2 endpoint (https://api.propstack.de/v2/properties):
  * it reads "page" and "per" from the request URL, returns the matching slice and
- * always sends "meta.total_count", so the pagination loop can be exercised end to
+ * always sends "total", so the pagination loop can be exercised end to
  * end without a real request.
  *
  * Hint: since the import loads its pages through a generator and processes them in
@@ -32,7 +32,7 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 	 *
 	 * @var string
 	 */
-	private static string $properties_url = 'https://api.propstack.de/v2/properties';
+	private static string $properties_url = 'https://api.propstack.de/v2/properties?';
 
 	/**
 	 * The option which holds the work list of a paginated import.
@@ -221,8 +221,8 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 		// build the paginated response with the total count.
 		$body = wp_json_encode(
 			array(
-				'data' => $slice,
-				'meta' => array( 'total_count' => $this->total_objects ),
+				'data'  => $slice,
+				'total' => $this->total_objects,
 			)
 		);
 
@@ -330,10 +330,10 @@ class ObjectsPagination extends ConnectorForPropstackTestCase {
 	}
 
 	/**
-	 * Test that the import stops once total_count is reached (no extra request).
+	 * Test that the import stops once the total count is reached (no extra request).
 	 *
 	 * With 4 objects and 2 per page exactly two pages are needed; the loop must
-	 * not fetch a third, empty page because total_count already reports 4.
+	 * not fetch a third, empty page because "total" already reports 4.
 	 *
 	 * @return void
 	 */

@@ -163,7 +163,24 @@ class Field_Base {
 	 * @return bool
 	 */
 	public function hide(): bool {
+		// hide the field if the used API version does not deliver it, it would always be empty.
+		if ( ! Fields::get_instance()->is_field_available_in_api( $this ) ) {
+			return true;
+		}
+
 		return $this->hide;
+	}
+
+	/**
+	 * Return whether the API v2 delivers this field.
+	 *
+	 * The API v2 delivers fewer fields for an object than the API v1. A field which is not
+	 * delivered is hidden if the API v2 is used.
+	 *
+	 * @return bool
+	 */
+	public function is_delivered_by_api_v2(): bool {
+		return Fields::get_instance()->is_api_v2_object_field( $this->get_api() );
 	}
 
 	/**
