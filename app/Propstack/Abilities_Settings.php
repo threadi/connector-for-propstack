@@ -13,10 +13,10 @@ namespace ConnectorForPropstack\Propstack;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Dependencies\easyTransientsForWordPress\Transients;
-use ConnectorForPropstack\Plugin\Admin\Callback_TextInfo;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Settings;
 use easySettingsForWordPress\Fields\Checkbox;
+use easySettingsForWordPress\Fields\TextInfo;
 use easySettingsForWordPress\Page;
 use easySettingsForWordPress\Tab;
 use Throwable;
@@ -175,7 +175,7 @@ class Abilities_Settings {
 		$setting = $settings_obj->add_setting( 'propstack_connector_abilities_status' );
 		$setting->set_section( $section );
 		$setting->prevent_export( true );
-		$field = new Callback_TextInfo( $settings_obj );
+		$field = new TextInfo( $settings_obj );
 		$field->set_title( __( 'Status', 'connector-for-propstack' ) );
 		$field->set_callback( array( $this, 'get_status_html' ) );
 		$setting->set_field( $field );
@@ -184,7 +184,7 @@ class Abilities_Settings {
 		$setting = $settings_obj->add_setting( 'propstack_connector_abilities_templates' );
 		$setting->set_section( $section );
 		$setting->prevent_export( true );
-		$field = new Callback_TextInfo( $settings_obj );
+		$field = new TextInfo( $settings_obj );
 		$field->set_title( __( 'Templates for your page builders', 'connector-for-propstack' ) );
 		$field->set_callback( array( $this, 'get_templates_html' ) );
 		$setting->set_field( $field );
@@ -193,7 +193,7 @@ class Abilities_Settings {
 		$setting = $settings_obj->add_setting( 'propstack_connector_abilities_guide' );
 		$setting->set_section( $section );
 		$setting->prevent_export( true );
-		$field = new Callback_TextInfo( $settings_obj );
+		$field = new TextInfo( $settings_obj );
 		$field->set_title( __( 'Getting started', 'connector-for-propstack' ) );
 		$field->set_callback( array( $this, 'get_guide_html' ) );
 		$setting->set_field( $field );
@@ -373,7 +373,7 @@ class Abilities_Settings {
 	public function get_guide_html(): string {
 		$html = '<ol>';
 		/* translators: %1$s will be replaced by a URL. */
-		$html .= '<li>' . sprintf( __( 'Install and activate an MCP plugin of your choice, which supports the abilities of WordPress (e.g. the <a href="%1$s" target="_blank">MCP Adapter</a>).', 'connector-for-propstack' ), esc_url( 'https://github.com/WordPress/mcp-adapter' ) ) . '</li>';
+		$html .= '<li>' . sprintf( __( 'Install and activate an MCP plugin of your choice, which supports the abilities of WordPress (see the <a href="%1$s" target="_blank">WordPress Repository</a>).', 'connector-for-propstack' ), esc_url( 'https://wordpress.org/plugins/tags/mcp/' ) ) . '</li>';
 		$html .= '<li>' . esc_html__( 'Make sure the abilities of this plugin are available in your MCP plugin. Depending on the plugin, you may have to enable them in its settings.', 'connector-for-propstack' ) . '</li>';
 		/* translators: %1$s will be replaced by a URL. */
 		$html .= '<li>' . sprintf( __( 'Set up the access for your application as described by your MCP plugin, e.g. with an <a href="%1$s">application password</a> for your user.', 'connector-for-propstack' ), esc_url( admin_url( 'profile.php#application-passwords-section' ) ) ) . '</li>';

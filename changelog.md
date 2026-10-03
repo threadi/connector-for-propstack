@@ -15,6 +15,8 @@
 - Encrypted settings are now bound to the setting they belong to: copied into another field of
   the database, they can no longer be decrypted there. Existing values are converted
   automatically during the update
+- Replaced custom TextInfo object with the new one from settings lib
+- Updated hints how to use MCP with our abilities
 - Updated dependencies
 - More PHP Unit Tests
 

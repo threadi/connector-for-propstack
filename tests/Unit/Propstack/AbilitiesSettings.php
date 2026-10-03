@@ -8,13 +8,13 @@
 namespace ConnectorForPropstack\Tests\Unit\Propstack;
 
 use ConnectorForPropstack\Dependencies\easyTransientsForWordPress\Transients;
-use ConnectorForPropstack\Plugin\Admin\Callback_TextInfo;
 use ConnectorForPropstack\Plugin\Settings;
 use ConnectorForPropstack\Propstack\Abilities;
 use ConnectorForPropstack\Propstack\Abilities_Settings;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use ConnectorForPropstack\Propstack\Template_Adapter_Base;
 use ConnectorForPropstack\Tests\ConnectorForPropstackTestCase;
+use easySettingsForWordPress\Fields\TextInfo;
 use WP_Error;
 
 /**
@@ -220,7 +220,7 @@ class AbilitiesSettings extends ConnectorForPropstackTestCase {
 		$this->assertNotFalse( $settings_obj->get_setting( Abilities_Settings::OPTION ) );
 		$status = $settings_obj->get_setting( 'propstack_connector_abilities_status' );
 		$this->assertNotFalse( $status );
-		$this->assertInstanceOf( Callback_TextInfo::class, $status->get_field() );
+		$this->assertInstanceOf( TextInfo::class, $status->get_field() );
 		$this->assertTrue( Abilities_Settings::get_instance()->is_enabled() );
 		$this->assertStringContainsString( 'subtab=propstack_connector_abilities', Abilities_Settings::get_instance()->get_url() );
 	}
@@ -275,7 +275,7 @@ class AbilitiesSettings extends ConnectorForPropstackTestCase {
 		$setting = Settings::get_instance()->get_settings_obj()->get_setting( 'propstack_connector_abilities_templates' );
 		$this->assertNotFalse( $setting );
 		$field = $setting->get_field();
-		$this->assertInstanceOf( Callback_TextInfo::class, $field );
+		$this->assertInstanceOf( TextInfo::class, $field );
 		ob_start();
 		$field->display( array( 'setting' => $setting ) );
 		$output = (string) ob_get_clean();
