@@ -31,9 +31,6 @@
         <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install2.txt">
             <arg line="install concurrently"/>
         </exec>
-        <exec dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install3.txt">
-            <arg line="install"/>
-        </exec>
     </target>
 
     <!-- build the Blocks via npm -->
@@ -71,9 +68,6 @@
         </exec>
         <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build9.txt">
             <arg line="run build:lightbox"/>
-        </exec>
-        <exec dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build10.txt">
-            <arg line="run build"/>
         </exec>
     </target>
 

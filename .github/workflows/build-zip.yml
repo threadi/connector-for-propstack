@@ -22,10 +22,6 @@ jobs:
                   composer install
                   npm i
                   npm i concurrently
-                  cd vendor/threadi/easy-setup-for-wordpress/
-                  npm i
-                  npm run build
-                  cd ../../../
                   npm run build:archive
                   npm run build:broker-field
                   npm run build:description

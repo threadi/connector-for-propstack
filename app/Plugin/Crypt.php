@@ -83,21 +83,55 @@ class Crypt {
 	 * Encrypt a given string.
 	 *
 	 * @param string $plain_text The plain string.
+	 * @param string $context The context.
 	 *
 	 * @return string
 	 */
-	public function encrypt( string $plain_text ): string {
-		return $this->get_crypt_obj()->encrypt( $plain_text );
+	public function encrypt( string $plain_text, string $context = '' ): string {
+		return $this->get_crypt_obj()->encrypt( $plain_text, $context );
 	}
 
 	/**
 	 * Decrypt a given string.
 	 *
 	 * @param string $encrypted_string The encrypted string.
+	 * @param string $context The context.
 	 *
 	 * @return string
 	 */
-	public function decrypt( string $encrypted_string ): string {
-		return $this->get_crypt_obj()->decrypt( $encrypted_string );
+	public function decrypt( string $encrypted_string, string $context = '' ): string {
+		return $this->get_crypt_obj()->decrypt( $encrypted_string, $context );
+	}
+
+	/**
+	 * Return the callback to encrypt the value of a setting, bound to a context.
+	 *
+	 * @param string $context The context, e.g. the name of the setting.
+	 *
+	 * @return \Closure
+	 */
+	public function get_save_callback( string $context ): \Closure {
+		return fn( $value ) => $this->encrypt( (string) $value, $context );
+	}
+
+	/**
+	 * Return the callback to decrypt the value of a setting, bound to a context.
+	 *
+	 * @param string $context The context, e.g. the name of the setting.
+	 *
+	 * @return \Closure
+	 */
+	public function get_read_callback( string $context ): \Closure {
+		return function ( $value ) use ( $context ) {
+			$value = (string) $value;
+			if ( '' === $value ) {
+				return '';
+			}
+
+			$plain = $this->decrypt( $value, $context );
+
+			// transition: the value has been encrypted before the context existed.
+			return '' !== $plain ? $plain : $this->decrypt( $value );
+		};
 	}
 }

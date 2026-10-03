@@ -163,8 +163,8 @@ class Settings {
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_show_in_rest( current_user_can( $settings_obj->get_capability() ) );
-		$setting->set_read_callback( array( Crypt::get_instance(), 'decrypt' ) );
-		$setting->set_save_callback( array( Crypt::get_instance(), 'encrypt' ) );
+		$setting->set_read_callback( Crypt::get_instance()->get_read_callback( $setting->get_name() ) );
+		$setting->set_save_callback( Crypt::get_instance()->get_save_callback( $setting->get_name() ) );
 		$field = new Password( $settings_obj );
 		$field->set_title( __( 'API Key', 'connector-for-propstack' ) );
 		/* translators: %1$s will be replaced by a URL. */
