@@ -12,6 +12,9 @@
 - Now fully support Propstack API v2 as far as Propstack does deliver data atm
   -> over 120 fields are missing
   -> still only usable for developers
+- Encrypted settings are now bound to the setting they belong to: copied into another field of
+  the database, they can no longer be decrypted there. Existing values are converted
+  automatically during the update
 - Updated dependencies
 - More PHP Unit Tests
 
