@@ -26,6 +26,7 @@
 - Fixed import of images via API v2
 - Fixed wrong JS-function to import settings for the plugin
 - Remove our schedules on plugin deactivation
+- Fixed missing logging of errors if debug mode is enabled with restriction for one or more categories
 
 ## [2.0.0] - 30.09.2026
 
