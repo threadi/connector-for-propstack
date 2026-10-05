@@ -102,6 +102,9 @@ class Installer {
 		// install the settings.
 		Settings::get_instance()->get_settings_obj()->activation();
 
+		// set the version.
+		add_option( 'cfprop_version', CFPROP_VERSION );
+
 		// install the capabilities for the roles.
 		Roles::get_instance()->install();
 
