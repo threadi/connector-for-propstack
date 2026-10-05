@@ -1723,6 +1723,175 @@ class ImmoObjects {
 	}
 
 	/**
+	 * Return a new import object depending on the API version setting.
+	 *
+	 * @return Import_Base
+	 */
+	public function get_import_object(): Import_Base {
+		if ( 'v2' === get_option( 'propstack_connector_api_version' ) ) {
+			return new Imports\v2\Objects();
+		}
+
+		return new Imports\v1\Objects();
+	}
+
+	/**
+	 * Check whether the Propstack API delivers a specific object for the import.
+	 *
+	 * This uses the same request as the import, including every restriction which is sent to the API.
+	 * Nothing is imported or changed. If the object is delivered, the result also tells whether a
+	 * restriction would prevent its import and whether it already exists in WordPress. If it is not
+	 * delivered, Propstack is asked directly for the object to see whether it exists at all.
+	 *
+	 * Format of the result:
+	 * - delivered => true if the API delivers the object in at least one language.
+	 * - has_errors => true if a request failed, the result is not reliable then.
+	 * - languages => the result for each language the import requests:
+	 *   - url => the first requested URL.
+	 *   - full_scan => true if all pages have been checked, false if the API has been asked for this object only.
+	 *   - checked => the amount of objects the API delivered during the check.
+	 *   - errors => the errors of the requests as plain texts.
+	 *   - found => true if the API delivers the object.
+	 *   - object => the main values of the delivered object, see get_object_check_values().
+	 *   - prevented => true if a restriction would prevent the import of the object.
+	 *   - reasons => the reasons why the import is prevented, each as a complete sentence.
+	 *   - post_id => the post-ID of the object in WordPress, 0 if it is not imported.
+	 * - direct => the result of the direct request for the object, which is only run if it is not delivered:
+	 *   - http_status => the HTTP status of the answer, 0 if the request has not been run.
+	 *   - object => the main values of the object, see get_object_check_values().
+	 *
+	 * @since 2.0.1
+	 *
+	 * @param string $object_id The ID to search for.
+	 * @param string $field     The field of the API the ID belongs to ("id", "unit_id" or "exposee_id").
+	 * @param bool   $full_scan True to request all pages like the import does it, instead of asking the API for this single object.
+	 *
+	 * @return array{delivered:bool,has_errors:bool,languages:array<string,array{url:string,full_scan:bool,checked:int,errors:array<int,string>,found:bool,object:array<string,string>,prevented:bool,reasons:array<int,string>,post_id:int}>,direct:array{http_status:int,object:array<string,string>}}
+	 */
+	public function get_object_check( string $object_id, string $field = 'id', bool $full_scan = false ): array {
+		// prepare the result.
+		$check = array(
+			'delivered'  => false,
+			'has_errors' => false,
+			'languages'  => array(),
+			'direct'     => array(
+				'http_status' => 0,
+				'object'      => $this->get_object_check_values( array() ),
+			),
+		);
+
+		// check each language the import would request.
+		foreach ( array_keys( $this->get_import_object()->get_import_languages() ) as $language_code ) {
+			$language_code = (string) $language_code;
+
+			// search for the object with a new import object, so the errors belong to this language.
+			$import_obj = $this->get_import_object();
+			$result     = $import_obj->find_object( $object_id, $language_code, $field, $full_scan );
+
+			// prepare the result for this language.
+			$entry = array(
+				'url'       => $result['url'],
+				'full_scan' => $result['full_scan'],
+				'checked'   => $result['checked'],
+				'errors'    => array(),
+				'found'     => $result['found'],
+				'object'    => $this->get_object_check_values( $result['object'] ),
+				'prevented' => false,
+				'reasons'   => array(),
+				'post_id'   => 0,
+			);
+
+			// add the errors as plain texts.
+			foreach ( $import_obj->get_errors() as $error ) {
+				$check['has_errors'] = true;
+				$entry['errors'][]   = html_entity_decode( wp_strip_all_tags( $error->get_error_message() ), ENT_QUOTES | ENT_HTML5 );
+			}
+
+			// bail if the object is not delivered in this language.
+			if ( ! $result['found'] ) {
+				$check['languages'][ $language_code ] = $entry;
+				continue;
+			}
+
+			$check['delivered'] = true;
+
+			/** This filter is documented in app/Propstack/Imports/v1/Objects.php */
+			if ( apply_filters( 'cfprop_prevent_import_of_object', false, $result['object'] ) ) {
+				$entry['prevented'] = true;
+				$entry['reasons']   = $this->get_prevent_import_reasons( $result['object'] );
+
+				// use a general hint if the import is prevented by an unknown check.
+				if ( empty( $entry['reasons'] ) ) {
+					$entry['reasons'] = array( __( 'A custom restriction prevents the import.', 'connector-for-propstack' ) );
+				}
+			}
+
+			// check whether the object exists in WordPress.
+			if ( '' !== $entry['object']['id'] ) {
+				$existing_object = $this->get_object_by_object_id( $entry['object']['id'], $language_code );
+				if ( $existing_object instanceof ImmoObject ) {
+					$entry['post_id'] = $existing_object->get_id();
+				}
+			}
+
+			$check['languages'][ $language_code ] = $entry;
+		}
+
+		// bail if the object is delivered, if the check is not reliable or if Propstack cannot be asked for this ID.
+		if ( $check['delivered'] || $check['has_errors'] || 'id' !== $field || ! ctype_digit( $object_id ) ) {
+			return $check;
+		}
+
+		// ask Propstack directly for the object to see whether it exists at all.
+		$single                         = $this->get_import_object()->request_single_object( $object_id );
+		$check['direct']['http_status'] = $single['http_status'];
+		$check['direct']['object']      = $this->get_object_check_values( $single['object'] );
+
+		// return the result.
+		return $check;
+	}
+
+	/**
+	 * Return the main values of an object from the API as texts, used to show the result of a check.
+	 *
+	 * The API delivers some values as plain value, some as list with the text in "value" or "name".
+	 *
+	 * @param array<string,mixed> $immo_object The object data from API.
+	 *
+	 * @return array{title:string,id:string,unit_id:string,state:string,marketing_type:string,object_type:string,archived:string}
+	 */
+	private function get_object_check_values( array $immo_object ): array {
+		// get the values, the state is delivered as "property_status" (API v1) or "property_status_id" (API v2).
+		$values = array(
+			'title'          => $immo_object['title'] ?? '',
+			'id'             => $immo_object['id'] ?? '',
+			'unit_id'        => $immo_object['unit_id'] ?? '',
+			'state'          => $immo_object['property_status'] ?? ( $immo_object['property_status_id'] ?? '' ),
+			'marketing_type' => $immo_object['marketing_type'] ?? '',
+			'object_type'    => $immo_object['rs_type'] ?? '',
+			'archived'       => $immo_object['archived'] ?? '',
+		);
+
+		// convert each value to a text.
+		foreach ( $values as $name => $value ) {
+			// use the text if a list is given.
+			if ( is_array( $value ) ) {
+				$value = $value['value'] ?? ( $value['name'] ?? ( $value['id'] ?? '' ) );
+			}
+
+			// use words for booleans.
+			if ( is_bool( $value ) ) {
+				$value = $value ? 'yes' : 'no';
+			}
+
+			$values[ $name ] = is_scalar( $value ) ? (string) $value : '';
+		}
+
+		// return the values.
+		return $values;
+	}
+
+	/**
 	 * Run the import depending on the API version setting.
 	 *
 	 * @param string $process_id The process ID to use.
@@ -1730,10 +1899,8 @@ class ImmoObjects {
 	 * @return Import_Base
 	 */
 	public function import( string $process_id ): Import_Base {
-		$import_obj = new Imports\v1\Objects();
-		if ( 'v2' === get_option( 'propstack_connector_api_version' ) ) {
-			$import_obj = new Imports\v2\Objects();
-		}
+		// get the import object.
+		$import_obj = $this->get_import_object();
 
 		// run the import.
 		$import_obj->set_process_id( $process_id );

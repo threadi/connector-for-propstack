@@ -921,6 +921,17 @@ class Objects extends Import_Base {
 	}
 
 	/**
+	 * Return the API URL to request a single object by its Propstack-ID.
+	 *
+	 * @param string $object_id The Propstack-ID of the object.
+	 *
+	 * @return string
+	 */
+	protected function get_single_object_url( string $object_id ): string {
+		return add_query_arg( array( 'new' => 1 ), $this->url . '/' . rawurlencode( $object_id ) );
+	}
+
+	/**
 	 * Return a success dialog configuration.
 	 *
 	 * @param int $imported  The amount of imported objects.
@@ -1019,7 +1030,7 @@ class Objects extends Import_Base {
 	 *
 	 * @return \Generator<int,array<int,mixed>>
 	 */
-	private function get_object_pages( string $language_code ): \Generator {
+	protected function get_object_pages( string $language_code ): \Generator {
 		$max_per_value = 100;
 		/**
 		 * Filter the max. per page objects for every import from Propstack.

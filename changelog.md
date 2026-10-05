@@ -5,6 +5,7 @@
 ### Added
 
 - Show the reason why an object has not been imported
+- Added WP CLI command to check whether the Propstack API delivers a specific object
 
 ### Changed
 

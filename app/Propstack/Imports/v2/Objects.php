@@ -887,7 +887,7 @@ class Objects extends Import_Base {
 	 *
 	 * @return array<string,mixed>
 	 */
-	private function prepare_object( array $immo_object, string $language_code ): array {
+	protected function prepare_object( array $immo_object, string $language_code ): array {
 		// get the helper objects once per import, each of them requests the API only once.
 		if ( ! $this->options instanceof Options ) {
 			$this->options = new Options();
@@ -942,6 +942,17 @@ class Objects extends Import_Base {
 		 * @param string $url The URL.
 		 */
 		return apply_filters( 'cfprop_api_object_url', $url );
+	}
+
+	/**
+	 * Return the API URL to request a single object by its Propstack-ID.
+	 *
+	 * @param string $object_id The Propstack-ID of the object.
+	 *
+	 * @return string
+	 */
+	protected function get_single_object_url( string $object_id ): string {
+		return $this->url . '/' . rawurlencode( $object_id );
 	}
 
 	/**
@@ -1043,7 +1054,7 @@ class Objects extends Import_Base {
 	 *
 	 * @return \Generator<int,array<int,mixed>>
 	 */
-	private function get_object_pages( string $language_code ): \Generator {
+	protected function get_object_pages( string $language_code ): \Generator {
 		$max_per_value = 100;
 		/**
 		 * Filter the max. per page objects for every import from Propstack.

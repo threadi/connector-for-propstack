@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Db;
 use ConnectorForPropstack\Plugin\Helper;
+use ConnectorForPropstack\Plugin\Languages;
 use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\ProcessHandler;
 use ConnectorForPropstack\Plugin\Settings;
@@ -122,6 +123,249 @@ class Import_Base {
 	 * @return void
 	 */
 	public function run(): void {}
+
+	/**
+	 * Return the languages the import of objects requests from Propstack.
+	 *
+	 * @return array<string,int>
+	 */
+	public function get_import_languages(): array {
+		// get the configured language or the fallback language.
+		$languages = array( Languages::get_instance()->get_import_language() => 1 );
+
+		/** This filter is documented in app/Propstack/Imports/v1/Objects.php */
+		$languages = apply_filters( 'cfprop_import_object_languages', $languages );
+
+		// bail if the filter did not return a list.
+		if ( ! is_array( $languages ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			return array();
+		}
+
+		// return the languages.
+		return $languages;
+	}
+
+	/**
+	 * Load the objects of a language page by page.
+	 *
+	 * Must be overridden by each import which requests objects from the API.
+	 *
+	 * @param string $language_code The language to load.
+	 *
+	 * @return \Generator<int,array<int,mixed>>
+	 */
+	protected function get_object_pages( string $language_code ): \Generator { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Used by the imports which override this.
+		yield from array();
+	}
+
+	/**
+	 * Bring an object from the API into the structure the import expects.
+	 *
+	 * Could be overridden by an import whose API delivers another structure.
+	 *
+	 * @param array<string,mixed> $immo_object   The object data from API.
+	 * @param string              $language_code The used language.
+	 *
+	 * @return array<string,mixed>
+	 */
+	protected function prepare_object( array $immo_object, string $language_code ): array {
+		return $immo_object;
+	}
+
+	/**
+	 * Return the API URL to request a single object by its Propstack-ID.
+	 *
+	 * Must be overridden by each import which requests objects from the API.
+	 *
+	 * @param string $object_id The Propstack-ID of the object.
+	 *
+	 * @return string
+	 */
+	protected function get_single_object_url( string $object_id ): string {
+		return '';
+	}
+
+	/**
+	 * Check whether the API delivers a specific object for the import.
+	 *
+	 * This uses the same request as the import, including every restriction which is sent to the API.
+	 * Nothing is imported or changed. The check looks at the raw answer of the API, so objects which
+	 * are removed afterwards via hook are still found.
+	 *
+	 * If the object is searched by its Propstack-ID, the API is asked for this single object first, which
+	 * needs one request only. All pages are requested like the import does it if the API does not
+	 * support this, if another field is used or if a full scan is requested. Only a full scan
+	 * detects objects which get lost between two pages.
+	 *
+	 * Errors during the requests are added to this object, the result is not reliable then.
+	 *
+	 * @param string $value         The value to search for.
+	 * @param string $language_code The language to check.
+	 * @param string $field         The field of the API which must contain the value ("id", "unit_id" or "exposee_id").
+	 * @param bool   $full_scan     True to request all pages in any case.
+	 *
+	 * @return array{found:bool,object:array<string,mixed>,checked:int,full_scan:bool,url:string}
+	 */
+	public function find_object( string $value, string $language_code, string $field = 'id', bool $full_scan = false ): array {
+		// the API can be asked for a single object only by its Propstack-ID.
+		if ( ! $full_scan && 'id' === $field && ctype_digit( $value ) ) {
+			// remember the errors so far to be able to drop the ones of this attempt.
+			$errors = $this->errors;
+
+			// ask the API for this single object.
+			$result = $this->search_object_in_pages( $value, $language_code, $field, true );
+
+			// use the result if the object has been found, or if the API answered without any error and with nothing else.
+			if ( $result['found'] || ( ! $result['others'] && count( $this->errors ) === count( $errors ) ) ) {
+				unset( $result['others'] );
+				return $result;
+			}
+
+			// the API did not limit its answer to this object, so check all pages instead.
+			$this->errors = $errors;
+		}
+
+		// check all pages like the import does it.
+		$result = $this->search_object_in_pages( $value, $language_code, $field, false );
+		unset( $result['others'] );
+
+		// return the result.
+		return $result;
+	}
+
+	/**
+	 * Search for an object in the pages the API delivers for the import.
+	 *
+	 * @param string $value          The value to search for.
+	 * @param string $language_code  The language to check.
+	 * @param string $field          The field of the API which must contain the value.
+	 * @param bool   $with_id_filter True to ask the API only for the object with this Propstack-ID.
+	 *
+	 * @return array{found:bool,object:array<string,mixed>,checked:int,full_scan:bool,url:string,others:bool}
+	 */
+	private function search_object_in_pages( string $value, string $language_code, string $field, bool $with_id_filter ): array {
+		// prepare the result.
+		$result = array(
+			'found'     => false,
+			'object'    => array(),
+			'checked'   => 0,
+			'full_scan' => ! $with_id_filter,
+			'url'       => '',
+			'others'    => false,
+		);
+
+		// add the ID to each request if requested, and remember the first URL which is requested.
+		$first_url  = '';
+		$url_filter = static function ( string $url ) use ( $value, $with_id_filter, &$first_url ): string {
+			if ( $with_id_filter ) {
+				$url = add_query_arg( array( 'property_ids' => $value ), $url );
+			}
+
+			if ( '' === $first_url ) {
+				$first_url = $url;
+			}
+
+			return $url;
+		};
+		add_filter( 'cfprop_api_object_url', $url_filter, PHP_INT_MAX );
+
+		// search in each page, the requests stop as soon as the object has been found.
+		try {
+			foreach ( $this->get_object_pages( $language_code ) as $page_objects ) {
+				foreach ( $page_objects as $immo_object ) {
+					// bail if this is not an object.
+					if ( ! is_array( $immo_object ) ) {
+						continue;
+					}
+
+					++$result['checked'];
+
+					// get the value of the field, the API delivers some of them as a list with the value in "value".
+					$field_value = $immo_object[ $field ] ?? '';
+					if ( is_array( $field_value ) ) {
+						$field_value = $field_value['value'] ?? '';
+					}
+
+					// bail if this is another object.
+					if ( ! is_scalar( $field_value ) || (string) $field_value !== $value ) {
+						$result['others'] = true;
+						continue;
+					}
+
+					// we found the object.
+					$result['found']  = true;
+					$result['object'] = $this->prepare_object( $immo_object, $language_code );
+
+					break 2;
+				}
+
+				// stop if the API did not limit its answer to the requested object, all pages are checked afterwards.
+				if ( $with_id_filter && $result['others'] ) {
+					break;
+				}
+			}
+		} finally {
+			remove_filter( 'cfprop_api_object_url', $url_filter, PHP_INT_MAX );
+		}
+
+		// add the requested URL.
+		$result['url'] = $first_url;
+
+		// return the result.
+		return $result;
+	}
+
+	/**
+	 * Request a single object by its Propstack-ID directly from the API, without any restriction.
+	 *
+	 * This tells whether Propstack knows the object at all if it is not part of the objects for the import.
+	 *
+	 * @param string $object_id The Propstack-ID of the object.
+	 *
+	 * @return array{http_status:int,object:array<string,mixed>}
+	 */
+	public function request_single_object( string $object_id ): array {
+		// prepare the result.
+		$result = array(
+			'http_status' => 0,
+			'object'      => array(),
+		);
+
+		// bail if this import does not support the request of a single object.
+		$url = $this->get_single_object_url( $object_id );
+		if ( '' === $url ) {
+			return $result;
+		}
+
+		// request the object.
+		$request_object = new ApiRequest();
+		$request_object->set_url( $url );
+		$request_object->set_post_data( '' );
+		$request_object->set_method( 'GET' );
+		$request_object->set_md5( md5( $url ) );
+		$request_object->set_header( $this->get_header() );
+		$request_object->send();
+
+		// add the HTTP status.
+		$result['http_status'] = $request_object->get_http_status();
+
+		// bail if the API did not deliver the object.
+		if ( 200 !== $result['http_status'] ) {
+			return $result;
+		}
+
+		// decode.
+		$data = json_decode( $request_object->get_response(), true );
+		if ( ! is_array( $data ) ) {
+			return $result;
+		}
+
+		// add the object, with or without a surrounding "data".
+		$result['object'] = isset( $data['data'] ) && is_array( $data['data'] ) ? $data['data'] : $data;
+
+		// return the result.
+		return $result;
+	}
 
 	/**
 	 * Add an error to the list of errors during the import.
