@@ -18,12 +18,14 @@ use easySettingsForWordPress\Page;
 use easySettingsForWordPress\Section;
 use easySettingsForWordPress\Tab;
 use ConnectorForPropstack\Dependencies\easyTransientsForWordPress\Transients;
+use ConnectorForPropstack\Plugin\Db;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\ProcessHandler;
 use ConnectorForPropstack\Plugin\Settings;
 use ConnectorForPropstack\Plugin\Users;
 use ConnectorForPropstack\Propstack\Fields\Main\ObjectId;
+use Throwable;
 use WP_Post;
 use WP_Query;
 
@@ -38,6 +40,34 @@ class Files {
 	 * @var ?Files
 	 */
 	private static ?Files $instance = null;
+
+	/**
+	 * The option which holds the metadata of the list of files to import.
+	 *
+	 * @var string
+	 */
+	private string $files_work_list_option = 'cfprop_files_to_import';
+
+	/**
+	 * The option which holds the position in the list of files to import.
+	 *
+	 * @var string
+	 */
+	private string $files_offset_option = 'cfprop_files_to_import_offset';
+
+	/**
+	 * Marker whether the last run of the import of files needs another run to be completed.
+	 *
+	 * @var bool
+	 */
+	private bool $load_more = false;
+
+	/**
+	 * Marker whether the last call of import() could not run as another process imports files right now.
+	 *
+	 * @var bool
+	 */
+	private bool $locked_by_other_process = false;
 
 	/**
 	 * Constructor, not used as this a Singleton object.
@@ -455,7 +485,7 @@ class Files {
 		if ( $attachment_id > 0 ) {
 			// add a log entry.
 			/* translators: %1$s: the given URL. */
-			Log::get_instance()->add( sprintf( __( 'Given URL %1$s is already in the database.', 'connector-for-propstack' ), ' <em>' . $url . '</em>' ), 'info', 'import' );
+			Log::get_instance()->add( sprintf( __( 'Given URL %1$s is already in the database.', 'connector-for-propstack' ), ' <em>' . esc_html( $url ) . '</em>' ), 'info', 'import' );
 
 			// return the attachment ID.
 			return $attachment_id;
@@ -494,47 +524,50 @@ class Files {
 			return 0;
 		}
 
-		// create the query to add the file.
-		$array = array(
-			'name'     => $filename,
-			'type'     => (string) $mime_type['type'],
-			'tmp_name' => $tmp_file,
-			'error'    => '0',
-			'size'     => (string) filesize( $tmp_file ),
-		);
-		/**
-		 * Filter the query to upload a file in the media library.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 * @param array<string,mixed> $array The parameter to use.
-		 */
-		$array = apply_filters( 'cfprop_file_import_array', $array );
+		// import the file and remove the temporary file in any case.
+		try {
+			// create the query to add the file.
+			$array = array(
+				'name'     => $filename,
+				'type'     => (string) $mime_type['type'],
+				'tmp_name' => $tmp_file,
+				'error'    => '0',
+				'size'     => (string) filesize( $tmp_file ),
+			);
+			/**
+			 * Filter the query to upload a file in the media library.
+			 *
+			 * @since 1.0.0 Available since 1.0.0.
+			 * @param array<string,mixed> $array The parameter to use.
+			 */
+			$array = apply_filters( 'cfprop_file_import_array', $array );
 
-		$post_array = array(
-			'post_author' => Helper::get_author_during_object_creation(),
-			'post_name'   => $filename,
-		);
-		/**
-		 * Filter the post-query to upload a file in the media library.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 * @param array<string,mixed> $array The parameter to use.
-		 */
-		$post_array = apply_filters( 'cfprop_file_import_post_array', $post_array );
+			$post_array = array(
+				'post_author' => Helper::get_author_during_object_creation(),
+				'post_name'   => $filename,
+			);
+			/**
+			 * Filter the post-query to upload a file in the media library.
+			 *
+			 * @since 1.0.0 Available since 1.0.0.
+			 * @param array<string,mixed> $array The parameter to use.
+			 */
+			$post_array = apply_filters( 'cfprop_file_import_post_array', $post_array );
 
-		// save the image in the media library.
-		$attachment_id = media_handle_sideload( $array, $post_id, null, $post_array );
-
-		// remove the temporary file if it still exists (e.g. if the sideload failed).
-		if ( file_exists( $tmp_file ) ) {
-			wp_delete_file( $tmp_file );
+			// save the image in the media library.
+			$attachment_id = media_handle_sideload( $array, $post_id, null, $post_array );
+		} finally {
+			// remove the temporary file if it still exists (e.g. if the sideload failed).
+			if ( file_exists( $tmp_file ) ) {
+				wp_delete_file( $tmp_file );
+			}
 		}
 
 		// bail on error.
 		if ( ! is_int( $attachment_id ) ) {
 			// add a log entry.
 			/* translators: %1$s: the given URL. */
-			Log::get_instance()->add( sprintf( __( 'Import of file %1$s failed:', 'connector-for-propstack' ), '<em>' . $url . '</em>' ) . ' <code>' . Helper::get_json( $attachment_id ) . '</code>', 'error', 'import' );
+			Log::get_instance()->add( sprintf( __( 'Import of file %1$s failed:', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ) . ' <code>' . esc_html( Helper::get_json( $attachment_id ) ) . '</code>', 'error', 'import' );
 
 			// return 0 as we could not import the file.
 			return 0;
@@ -546,6 +579,20 @@ class Files {
 		// mark broker avatars as such.
 		if ( $broker_id > 0 ) {
 			update_post_meta( $attachment_id, 'cfprop_broker_avatar', $broker_id );
+		}
+
+		// use the older attachment if another process has imported the same file in the meantime.
+		$older_attachment_id = $this->get_older_duplicate( $attachment_id, $id, $broker_id );
+		if ( $older_attachment_id > 0 ) {
+			// remove the newer duplicate including its files.
+			wp_delete_attachment( $attachment_id, true );
+
+			// add a log entry.
+			/* translators: %1$s: the given URL. */
+			Log::get_instance()->add( sprintf( __( 'File %1$s has been imported by another process at the same time. The duplicate has been removed.', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ), 'info', 'import' );
+
+			// return the attachment ID of the older file.
+			return $older_attachment_id;
 		}
 
 		// add the position from Propstack to the file, if given.
@@ -568,6 +615,111 @@ class Files {
 
 		// return the resulting attachment ID.
 		return $attachment_id;
+	}
+
+	/**
+	 * Return the ID of an older attachment for the same Propstack file than the given attachment.
+	 *
+	 * Used to detect duplicates which result from two processes which import the same file at the same time.
+	 *
+	 * @param int $attachment_id The ID of the new attachment.
+	 * @param int $id            The Propstack file ID.
+	 * @param int $broker_id     The broker ID, if this file is a broker avatar.
+	 *
+	 * @return int The ID of the older attachment or 0 if there is none.
+	 */
+	private function get_older_duplicate( int $attachment_id, int $id, int $broker_id ): int {
+		// search broker avatars by their broker, any other file by its Propstack file ID.
+		$meta_query = array(
+			array(
+				'key'     => 'propstack_file_id',
+				'value'   => $id,
+				'compare' => '=',
+				'type'    => 'NUMERIC',
+			),
+			array(
+				'key'     => 'cfprop_broker_avatar',
+				'compare' => 'NOT EXISTS',
+			),
+		);
+		if ( $broker_id > 0 ) {
+			$meta_query = array(
+				array(
+					'key'     => 'cfprop_broker_avatar',
+					'value'   => $broker_id,
+					'compare' => '=',
+					'type'    => 'NUMERIC',
+				),
+			);
+		}
+
+		// get the oldest attachment for this file.
+		$results = new WP_Query(
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'any',
+				'meta_query'     => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; sync context.
+				'orderby'        => 'ID',
+				'order'          => 'ASC',
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+				'fields'         => 'ids',
+			)
+		);
+
+		// bail if nothing was found.
+		if ( empty( $results->posts ) || ! is_int( $results->posts[0] ) ) {
+			return 0;
+		}
+
+		// bail if the given attachment is the oldest one.
+		if ( $results->posts[0] >= $attachment_id ) {
+			return 0;
+		}
+
+		// return the older attachment.
+		return $results->posts[0];
+	}
+
+	/**
+	 * Return the file name of a URL, without its query string and fragment.
+	 *
+	 * @param string $url The URL.
+	 *
+	 * @return string
+	 */
+	public function get_file_name_from_url( string $url ): string {
+		// get the path of the URL.
+		$path = wp_parse_url( $url, PHP_URL_PATH );
+
+		// use the complete URL if it has no usable path.
+		if ( ! is_string( $path ) || '' === $path ) {
+			$path = $url;
+		}
+
+		// return the last part of the path.
+		return basename( $path );
+	}
+
+	/**
+	 * Return the lock which prevents the import of files by two processes at the same time.
+	 *
+	 * It is used for a single run of the queue and for a single request of the import of all files.
+	 *
+	 * @return Lock
+	 */
+	public function get_import_lock(): Lock {
+		$ttl = 10 * MINUTE_IN_SECONDS;
+		/**
+		 * Filter the time in seconds after which the lock for the import of files is treated as stale.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param int $ttl The time in seconds.
+		 */
+		$ttl = absint( apply_filters( 'cfprop_files_import_lock_ttl', $ttl ) );
+
+		// return the lock.
+		return new Lock( 'cfprop_files_import_lock', $ttl );
 	}
 
 	/**
@@ -1040,7 +1192,7 @@ class Files {
 		}
 
 		// run the deletion.
-		$this->delete_all( '' );
+		$this->delete_all( $process_id );
 
 		// send ok.
 		wp_send_json_success();
@@ -1081,7 +1233,12 @@ class Files {
 	 * Import the files for all objects.
 	 *
 	 * This process is running in loops with a limited amount of files per run.
-	 * It must be reloaded to continue.
+	 * It must be reloaded to continue. Via AJAX, this method answers with "load_more" itself.
+	 * Any other caller has to check has_load_more() and call it again.
+	 *
+	 * The list of files to import is stored in blocks in options, the position in a separate
+	 * option. Each run takes the lock for the import of files, so no file is imported by two
+	 * requests (e.g. the queue and this import) at the same time.
 	 *
 	 * @param int    $post_id The post-ID of the immo object these files should be assigned to.
 	 * @param string $process_id The process ID.
@@ -1089,17 +1246,109 @@ class Files {
 	 * @return void
 	 */
 	public function import( int $post_id = 0, string $process_id = '' ): void {
+		// this run does not need another run and is not locked until now.
+		$this->load_more               = false;
+		$this->locked_by_other_process = false;
+
 		// bail if deletion is running (a stale marker is released after a timeout).
 		if ( Helper::is_process_running( CFPROP_FILES_DELETE_RUNNING ) ) {
 			return;
 		}
 
+		// get post-ID from the request.
+		$post_id_from_request = $this->get_post_id_from_request();
+		if ( $post_id_from_request > 0 ) {
+			$post_id = $post_id_from_request;
+		}
+
+		// bail if another process imports files right now.
+		$lock = $this->get_import_lock();
+		if ( ! $lock->acquire() ) {
+			$this->handle_locked_import( $process_id );
+		} else {
+			// run this chunk and release the lock in any case.
+			try {
+				$this->import_chunk( $post_id, $process_id, $lock );
+			} catch ( Throwable $e ) {
+				// log this event.
+				Log::get_instance()->add( __( 'Following error occurred during the import of files:', 'connector-for-propstack' ) . '<br>' . Helper::get_throwable_as_log_text( $e ), 'error', 'import' );
+
+				// end this import, it cannot be continued.
+				$this->end_files_import_after_error();
+			} finally {
+				$lock->release();
+			}
+		}
+
+		// request another run via AJAX if the import is not completed yet.
+		if ( $this->load_more && wp_doing_ajax() ) {
+			// keep the marker set: the next request refreshes it, a stale marker expires via Helper::is_process_running().
+			wp_send_json( array( 'load_more' => 1 ) );
+		}
+	}
+
+	/**
+	 * Return whether the last call of import() needs another run to complete the import of files.
+	 *
+	 * @return bool
+	 */
+	public function has_load_more(): bool {
+		return $this->load_more;
+	}
+
+	/**
+	 * Return whether the last call of import() did not import anything as another process imports files right now.
+	 *
+	 * @return bool
+	 */
+	public function is_locked_by_other_process(): bool {
+		return $this->locked_by_other_process;
+	}
+
+	/**
+	 * Run a single chunk of the import of files while this request holds the lock for the import of files.
+	 *
+	 * @param int    $post_id    The post-ID of the immo object these files should be assigned to (0 for all objects).
+	 * @param string $process_id The process ID.
+	 * @param Lock   $lock       The lock for the import of files.
+	 *
+	 * @return void
+	 */
+	private function import_chunk( int $post_id, string $process_id, Lock $lock ): void {
 		// get the "immo objects" object.
 		$immo_objects_obj = ImmoObjects::get_instance();
 
 		// get the process handler and set the process ID.
 		$process_handler = ProcessHandler::get_instance();
 		$process_handler->set_id( $process_id );
+
+		// the owner of the list of files: the list must belong to this import process (same process and same object).
+		// otherwise, a list left over from an aborted import (e.g. for another object) would be used.
+		$list_owner = $process_id . '|' . $post_id;
+
+		// get the list of files to import of an import which is already in progress.
+		$work_list = $this->get_files_work_list();
+
+		// handle a list of another import.
+		if ( ! empty( $work_list ) && ( $work_list['owner'] ?? '' ) !== $list_owner ) {
+			// wait if the other import is still in progress.
+			if ( ( time() - absint( $work_list['updated'] ?? 0 ) ) < $this->get_files_import_takeover_time() ) {
+				$this->handle_locked_import( $process_id );
+
+				// do nothing more.
+				return;
+			}
+
+			// remove the list of the aborted import.
+			$this->clear_files_work_list();
+			$work_list = array();
+		}
+
+		// discard a list which is older than a day.
+		if ( ! empty( $work_list ) && ( time() - absint( $work_list['created'] ?? 0 ) ) > DAY_IN_SECONDS ) {
+			$this->clear_files_work_list();
+			$work_list = array();
+		}
 
 		// set initial value.
 		$process_handler->set_status( __( 'Import of files for your objects starting', 'connector-for-propstack' ) );
@@ -1108,86 +1357,24 @@ class Files {
 		// set global marker.
 		update_option( CFPROP_FILES_IMPORT_RUNNING, time() );
 
-		// get post-ID from the request.
-		$post_id_from_request = $this->get_post_id_from_request();
-		if ( $post_id_from_request > 0 ) {
-			$post_id = $post_id_from_request;
-		}
-
-		// get the cached list of files to import.
-		$files_to_import = get_transient( 'propstack_object_files_to_import' );
-
-		// use the cached list only if it belongs to this import process (same process and same object).
-		// otherwise, a list left over from an aborted import (e.g. for another object) would be used.
-		$list_owner = $process_id . '|' . $post_id;
-		if ( ! empty( $files_to_import ) && get_transient( 'propstack_object_files_to_import_owner' ) !== $list_owner ) {
-			$files_to_import = array();
-		}
-
 		// add a log entry.
 		Log::get_instance()->add( __( 'Prepare the import of files for your objects', 'connector-for-propstack' ), 'info', 'import' );
 
 		// if the list is empty, create it.
-		if ( empty( $files_to_import ) ) {
-			// create the empty list as an array.
-			$files_to_import = array();
+		if ( empty( $work_list ) ) {
+			$work_list = $this->build_files_work_list( $post_id, $list_owner, $process_handler );
 
-			// get the objects where we want to import the files.
-			if ( $post_id > 0 ) {
-				// update status.
-				$process_handler->set_status( __( 'Collecting all files for your object to import', 'connector-for-propstack' ) );
-
+			// bail if the list could not be saved.
+			if ( empty( $work_list ) ) {
 				// add a log entry.
-				Log::get_instance()->add( __( 'Collecting all files for your object to import', 'connector-for-propstack' ), 'info', 'import' );
+				Log::get_instance()->add( __( 'The list of files to import could not be saved. The import of files has been aborted.', 'connector-for-propstack' ), 'error', 'import' );
 
-				// a single object.
-				$immo_objects = array( $immo_objects_obj->get_object( $post_id ) );
-			} else {
-				// update status.
-				$process_handler->set_status( __( 'Collecting all files for your objects to import', 'connector-for-propstack' ) );
+				// end this import.
+				$this->end_files_import_after_error();
 
-				// add a log entry.
-				Log::get_instance()->add( __( 'Collecting all files for your objects to import', 'connector-for-propstack' ), 'info', 'import' );
-
-				// all objects.
-				$immo_objects = $immo_objects_obj->get_objects( array( 'posts_per_page' => -1 ) );
+				// do nothing more.
+				return;
 			}
-
-			// loop through the objects to create the list of files to import.
-			foreach ( $immo_objects as $object ) {
-				// get the API response for this object.
-				$api_response = $object->get_api_response();
-
-				if ( ! empty( $api_response['images'] ) ) {
-					foreach ( $api_response['images'] as $index => $document ) {
-						$api_response['images'][ $index ]['wp_post_id'] = $object->get_id();
-					}
-				}
-
-				// add their images to the list.
-				if ( ! empty( $api_response['images'] ) ) {
-					$files_to_import = array_merge( $files_to_import, $api_response['images'] );
-				}
-			}
-
-			/**
-			 * Run additional tasks before the files are imported during object import.
-			 *
-			 * @since 1.0.0 Available since 1.0.0.
-			 * @param array<string,mixed> $files_to_import The list of files.
-			 */
-			do_action( 'cfprop_files_before_import', $files_to_import );
-
-			// save the list in the cache (with expiration, so it is not autoloaded and does not remain forever).
-			set_transient( 'propstack_object_files_to_import', $files_to_import, DAY_IN_SECONDS );
-			set_transient( 'propstack_object_files_to_import_owner', $list_owner, DAY_IN_SECONDS );
-
-			// add a log entry.
-			Log::get_instance()->add( __( 'Cache stored during import:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $files_to_import ) . '</code>', 'info', 'import' );
-
-			// reset the counter if we start a new import.
-			$process_handler->set_count( 0 );
-			$process_handler->set_max_count( count( $files_to_import ) );
 		}
 
 		// update marker.
@@ -1196,99 +1383,97 @@ class Files {
 		// add a log entry.
 		Log::get_instance()->add( __( 'Import of files for your objects is starting', 'connector-for-propstack' ), 'info', 'import' );
 
+		// get the position and the structure of the list.
+		$offset     = absint( get_option( $this->files_offset_option, 0 ) );
+		$total      = absint( $work_list['total'] ?? 0 );
+		$block_size = max( 1, absint( $work_list['block_size'] ?? 1 ) );
+
 		// set the counter for this run and the limit.
 		$counter = 0;
 		$limit   = absint( get_option( 'propstack_connector_ajax_limit' ) );
 
+		// load the block with the next file.
+		$block_index = intdiv( $offset, $block_size );
+		$block       = get_option( $this->files_work_list_option . '_block_' . $block_index, array() );
+
 		/**
 		 * Filter the limit of files to import during object import.
 		 *
+		 * Hint: since 2.1.0 the list contains the files of the actual block of the list only.
+		 *
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param int $limit The limit.
-		 * @param array<string,mixed> $files_to_import The list of files.
+		 * @param array<int|string,mixed> $files_to_import The list of files.
 		 */
-		$limit = apply_filters( 'cfprop_files_import_limit', $limit, $files_to_import );
+		$limit = (int) apply_filters( 'cfprop_files_import_limit', $limit, is_array( $block ) ? $block : array() );
 
 		// show cli hint.
-		$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import files', count( $files_to_import ) ) : false;
+		$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import files', max( 0, $total - $offset ) ) : false;
 
 		// loop through the list of files to import until we reach our limit.
-		foreach ( $files_to_import as $file_index => $file ) {
-			// bail if the limit has been reached: send a simple AJAX response to start a new request and break the loop.
+		while ( $offset < $total ) {
+			// bail if the limit has been reached: another run is needed.
 			if ( $limit > 0 && $counter >= $limit ) {
-				// keep the marker set: the next request refreshes it, a stale marker expires via Helper::is_process_running().
-				wp_send_json( array( 'load_more' => 1 ) );
+				$this->load_more = true;
+				break;
 			}
 
-			// get the immo object.
-			$immo_object_obj = $immo_objects_obj->get_object( $file['wp_post_id'] );
+			// keep the lock alive.
+			$lock->refresh();
 
-			// get the URL in the chosen image size (API v1 and v2 deliver them in different structures).
-			$url = $this->get_file_url( $file );
-
-			// bail if no URL could be found.
-			if ( empty( $url ) ) {
-				// add a log entry.
-				Log::get_instance()->add( __( 'Missing URL for the file during file import. The used file data from API:', 'connector-for-propstack' ) . ' <code>' . Helper::get_json( $file ) . '</code>', 'error', 'import' );
-
-				// update the counter.
-				$process_handler->set_count( $process_handler->get_count() + 1 );
-				$progress ? $progress->tick() : '';
-
-				// continue with the next file.
-				continue;
+			// load the block of the next file, if it is not loaded yet.
+			if ( intdiv( $offset, $block_size ) !== $block_index ) {
+				$block_index = intdiv( $offset, $block_size );
+				$block       = get_option( $this->files_work_list_option . '_block_' . $block_index, array() );
 			}
 
-			// get the file name.
-			$name = isset( $file['name'] ) ? $file['name'] : '';
-			if ( empty( $name ) ) {
-				$name = basename( $url );
+			// bail if the block is gone - continuing would loop forever.
+			if ( ! is_array( $block ) || empty( $block ) ) {
+				/* translators: %1$d will be replaced by the block number. */
+				Log::get_instance()->add( sprintf( __( 'Block %1$d of the list of files to import is missing. The import of files has been aborted.', 'connector-for-propstack' ), $block_index ), 'error', 'import' );
+
+				// end this import.
+				$this->end_files_import_after_error();
+
+				// do nothing more.
+				return;
 			}
 
-			// set new state text for process handler and setup.
-			/* translators: %1$s will be replaced by the name of the file. */
-			$new_state_text = sprintf( __( 'Import file %1$s for %2$s', 'connector-for-propstack' ), '<em>' . $name . '</em>', '<em>' . $immo_object_obj->get_title() . '</em>' );
+			// get the file.
+			$file = $block[ $offset - ( $block_index * $block_size ) ] ?? null;
 
-			// update status.
-			$process_handler->set_status( $new_state_text );
-
-			/**
-			 * Set the new state for the setup.
-			 *
-			 * @since 1.0.0 Available since 1.0.0.
-			 * @param string $new_state_text The new status.
-			 */
-			do_action( 'cfprop_import_object_set_status', $new_state_text );
-
-			// import this single file.
-			$attachment_id = $this->import_file( $file['wp_post_id'], $file['id'], $url, $name, $file );
-
-			// add this file to the list of images or document of the object.
-			if ( $attachment_id > 0 ) {
-				// update the corresponding list of files.
-				$immo_object_obj->add_to_image_list( $attachment_id );
-			}
-
-			// remove this file from the list and update it.
-			unset( $files_to_import[ $file_index ] );
-			set_transient( 'propstack_object_files_to_import', $files_to_import, DAY_IN_SECONDS );
-
-			/**
-			 * Run additional tasks after a file has been assigned to an object.
-			 *
-			 * @since 1.0.0 Available since 1.0.0.
-			 * @param int $attachment The attachment ID.
-			 * @param array<string,mixed> $file The file data from Propstack API.
-			 * @param ImmoObject $immo_object_obj The immo object.
-			 */
-			do_action( 'cfprop_file_is_assigned', $attachment_id, $file, $immo_object_obj );
-
-			// update this counter.
+			// move the position forward before the file is processed: a file which aborts the request
+			// (e.g. by the memory or time limit) is skipped by the next run instead of blocking the import.
+			++$offset;
 			++$counter;
+			update_option( $this->files_offset_option, $offset, false );
+
+			// remove the block as soon as its last file is taken.
+			if ( 0 === $offset % $block_size || $offset >= $total ) {
+				delete_option( $this->files_work_list_option . '_block_' . $block_index );
+			}
+
+			// import this file.
+			try {
+				$this->import_entry_of_list( $file, $process_handler, $immo_objects_obj );
+			} catch ( Throwable $e ) {
+				// add a log entry.
+				Log::get_instance()->add( __( 'Following error occurred during the import of a file. The file has been skipped:', 'connector-for-propstack' ) . ' <code>' . esc_html( is_array( $file ) ? Helper::get_json( $file ) : (string) wp_json_encode( $file ) ) . '</code><br>' . Helper::get_throwable_as_log_text( $e ), 'error', 'import' );
+			}
 
 			// update the global counter.
 			$process_handler->set_count( $process_handler->get_count() + 1 );
 			$progress ? $progress->tick() : '';
+		}
+
+		// stop here if another run is needed.
+		if ( $this->load_more ) {
+			// remember that this import is still in progress.
+			$work_list['updated'] = time();
+			update_option( $this->files_work_list_option, $work_list, false );
+
+			// do nothing more.
+			return;
 		}
 
 		// get dialog.
@@ -1315,7 +1500,7 @@ class Files {
 			// get the object.
 			$immo_object_obj = $immo_objects_obj->get_object( $post_id );
 			/* translators: %1$s will be replaced by the immo object title. */
-			$dialog['detail']['texts'][1]             = '<p>' . sprintf( __( 'You can now see them on the page of your object %1$s.', 'connector-for-propstack' ), '<em>' . $immo_object_obj->get_title() . '</em>' ) . '</p>';
+			$dialog['detail']['texts'][1]             = '<p>' . sprintf( __( 'You can now see them on the page of your object %1$s.', 'connector-for-propstack' ), '<em>' . esc_html( $immo_object_obj->get_title() ) . '</em>' ) . '</p>';
 			$dialog['detail']['buttons'][0]['action'] = 'location.reload();';
 			$dialog['detail']['buttons'][]            = array(
 				'action'  => 'location.href="' . esc_url( $immo_object_obj->get_link() ) . '";',
@@ -1324,9 +1509,8 @@ class Files {
 			);
 		}
 
-		// clear the cache of files to import as we are completed the import.
-		delete_transient( 'propstack_object_files_to_import' );
-		delete_transient( 'propstack_object_files_to_import_owner' );
+		// clear the list of files to import as we are completed the import.
+		$this->clear_files_work_list();
 
 		// add a log entry.
 		Log::get_instance()->add( __( 'Import of files has been run', 'connector-for-propstack' ), 'info', 'import' );
@@ -1350,6 +1534,347 @@ class Files {
 	}
 
 	/**
+	 * Import a single entry of the list of files to import.
+	 *
+	 * @param mixed          $file             The entry of the list.
+	 * @param ProcessHandler $process_handler  The process handler.
+	 * @param ImmoObjects    $immo_objects_obj The handler for immo objects.
+	 *
+	 * @return void
+	 */
+	private function import_entry_of_list( mixed $file, ProcessHandler $process_handler, ImmoObjects $immo_objects_obj ): void {
+		// bail if the entry is not usable.
+		if ( ! is_array( $file ) || empty( $file['wp_post_id'] ) || ! isset( $file['id'] ) ) {
+			// add a log entry.
+			Log::get_instance()->add( __( 'Unusable entry in the list of files to import. The used file data:', 'connector-for-propstack' ) . ' <code>' . esc_html( is_array( $file ) ? Helper::get_json( $file ) : (string) wp_json_encode( $file ) ) . '</code>', 'error', 'import' );
+
+			// do nothing more.
+			return;
+		}
+
+		// get the post-ID of the object.
+		$object_post_id = absint( $file['wp_post_id'] );
+
+		// bail if the object does not exist anymore.
+		if ( get_post_type( $object_post_id ) !== PostTypes\ImmoObject::get_instance()->get_name() ) {
+			return;
+		}
+
+		// get the immo object.
+		$immo_object_obj = $immo_objects_obj->get_object( $object_post_id );
+
+		// get the URL in the chosen image size (API v1 and v2 deliver them in different structures).
+		$url = $this->get_file_url( $file );
+
+		// bail if no URL could be found.
+		if ( empty( $url ) ) {
+			// add a log entry.
+			Log::get_instance()->add( __( 'Missing URL for the file during file import. The used file data from API:', 'connector-for-propstack' ) . ' <code>' . esc_html( Helper::get_json( $file ) ) . '</code>', 'error', 'import' );
+
+			// do nothing more.
+			return;
+		}
+
+		// get the file name.
+		$name = isset( $file['name'] ) && is_scalar( $file['name'] ) ? (string) $file['name'] : '';
+		if ( empty( $name ) ) {
+			$name = $this->get_file_name_from_url( $url );
+		}
+
+		// set new state text for process handler and setup.
+		/* translators: %1$s will be replaced by the name of the file. */
+		$new_state_text = sprintf( __( 'Import file %1$s for %2$s', 'connector-for-propstack' ), '<em>' . esc_html( $name ) . '</em>', '<em>' . esc_html( $immo_object_obj->get_title() ) . '</em>' );
+
+		// update status.
+		$process_handler->set_status( $new_state_text );
+
+		/**
+		 * Set the new state for the setup.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param string $new_state_text The new status.
+		 */
+		do_action( 'cfprop_import_object_set_status', $new_state_text );
+
+		// import this single file.
+		$attachment_id = $this->import_file( $object_post_id, absint( $file['id'] ), $url, $name, $file );
+
+		// add this file to the list of images or document of the object.
+		if ( $attachment_id > 0 ) {
+			// update the corresponding list of files.
+			$immo_object_obj->add_to_image_list( $attachment_id );
+		}
+
+		/**
+		 * Run additional tasks after a file has been assigned to an object.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param int $attachment The attachment ID.
+		 * @param array<string,mixed> $file The file data from Propstack API.
+		 * @param ImmoObject $immo_object_obj The immo object.
+		 */
+		do_action( 'cfprop_file_is_assigned', $attachment_id, $file, $immo_object_obj );
+	}
+
+	/**
+	 * Collect the files to import and save them as list in blocks.
+	 *
+	 * @param int            $post_id         The post-ID of the immo object (0 for all objects).
+	 * @param string         $list_owner      The owner of the list.
+	 * @param ProcessHandler $process_handler The process handler.
+	 *
+	 * @return array<string,mixed> The metadata of the list or an empty array if it could not be saved.
+	 */
+	private function build_files_work_list( int $post_id, string $list_owner, ProcessHandler $process_handler ): array {
+		// get the "immo objects" object.
+		$immo_objects_obj = ImmoObjects::get_instance();
+
+		// create the empty list as an array.
+		$files_to_import = array();
+
+		// get the objects where we want to import the files.
+		if ( $post_id > 0 ) {
+			// update status.
+			$process_handler->set_status( __( 'Collecting all files for your object to import', 'connector-for-propstack' ) );
+
+			// add a log entry.
+			Log::get_instance()->add( __( 'Collecting all files for your object to import', 'connector-for-propstack' ), 'info', 'import' );
+
+			// a single object.
+			$immo_objects = array( $immo_objects_obj->get_object( $post_id ) );
+		} else {
+			// update status.
+			$process_handler->set_status( __( 'Collecting all files for your objects to import', 'connector-for-propstack' ) );
+
+			// add a log entry.
+			Log::get_instance()->add( __( 'Collecting all files for your objects to import', 'connector-for-propstack' ), 'info', 'import' );
+
+			// all objects.
+			$immo_objects = $immo_objects_obj->get_objects( array( 'posts_per_page' => -1 ) );
+		}
+
+		// loop through the objects to create the list of files to import.
+		foreach ( $immo_objects as $object ) {
+			// get the API response for this object.
+			$api_response = $object->get_api_response();
+
+			// bail if the object has no images.
+			if ( empty( $api_response['images'] ) || ! is_array( $api_response['images'] ) ) {
+				continue;
+			}
+
+			// add their images to the list.
+			foreach ( $api_response['images'] as $document ) {
+				// bail if this is not a file.
+				if ( ! is_array( $document ) ) {
+					continue;
+				}
+
+				$document['wp_post_id'] = $object->get_id();
+				$files_to_import[]      = $document;
+			}
+		}
+
+		/**
+		 * Run additional tasks before the files are imported during object import.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param array<int,array<string,mixed>> $files_to_import The list of files.
+		 */
+		do_action( 'cfprop_files_before_import', $files_to_import );
+
+		// remove any list left over from an aborted import.
+		$this->clear_files_work_list();
+
+		$block_size = 100;
+		/**
+		 * Filter the amount of files stored in a single block of the list of files to import.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param int $block_size The block size.
+		 */
+		$block_size = max( 1, absint( apply_filters( 'cfprop_files_import_block_size', $block_size ) ) );
+
+		// save the list in blocks, which are not autoloaded.
+		$blocks = array_chunk( $files_to_import, $block_size );
+		foreach ( $blocks as $block_index => $block ) {
+			if ( ! update_option( $this->files_work_list_option . '_block_' . $block_index, $block, false ) ) {
+				// remove the blocks which have been saved.
+				$this->clear_files_work_list();
+
+				// return an empty list as the list could not be saved.
+				return array();
+			}
+		}
+
+		// save the metadata of the list.
+		$work_list = array(
+			'owner'      => $list_owner,
+			'total'      => count( $files_to_import ),
+			'blocks'     => count( $blocks ),
+			'block_size' => $block_size,
+			'created'    => time(),
+			'updated'    => time(),
+		);
+		update_option( $this->files_work_list_option, $work_list, false );
+		update_option( $this->files_offset_option, 0, false );
+
+		// add a log entry.
+		/* translators: %1$d will be replaced by the amount of files. */
+		Log::get_instance()->add( sprintf( _n( '%1$d file will be imported.', '%1$d files will be imported.', count( $files_to_import ), 'connector-for-propstack' ), count( $files_to_import ) ), 'info', 'import' );
+
+		// reset the counter as we start a new import.
+		$process_handler->set_count( 0 );
+		$process_handler->set_max_count( count( $files_to_import ) );
+
+		// return the metadata of the list.
+		return $work_list;
+	}
+
+	/**
+	 * Return the metadata of the list of files to import of an import which is in progress.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function get_files_work_list(): array {
+		// get the metadata.
+		$work_list = get_option( $this->files_work_list_option, array() );
+
+		// bail if it is not usable.
+		if ( ! is_array( $work_list ) || ! isset( $work_list['owner'], $work_list['total'], $work_list['block_size'] ) ) {
+			return array();
+		}
+
+		// return the metadata.
+		return $work_list;
+	}
+
+	/**
+	 * Remove the list of files to import with all its blocks and its position.
+	 *
+	 * The blocks are searched by their name, so blocks of an aborted import are removed, too.
+	 *
+	 * @return void
+	 */
+	public function clear_files_work_list(): void {
+		global $wpdb;
+
+		// get the names of all blocks.
+		$options = Db::get_instance()->get_results(
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+				$wpdb->esc_like( $this->files_work_list_option . '_block_' ) . '%'
+			)
+		);
+
+		// delete them via WordPress, so the object cache is cleaned, too.
+		foreach ( $options as $option ) {
+			// bail if the name is missing.
+			if ( ! is_array( $option ) || ! isset( $option['option_name'] ) ) {
+				continue;
+			}
+
+			delete_option( (string) $option['option_name'] );
+		}
+
+		// delete the metadata and the position.
+		delete_option( $this->files_work_list_option );
+		delete_option( $this->files_offset_option );
+
+		// delete the list of versions before 2.1.0.
+		delete_transient( 'propstack_object_files_to_import' );
+		delete_transient( 'propstack_object_files_to_import_owner' );
+	}
+
+	/**
+	 * Return the time in seconds after which the list of files of another, inactive import is replaced.
+	 *
+	 * @return int
+	 */
+	private function get_files_import_takeover_time(): int {
+		$time = 5 * MINUTE_IN_SECONDS;
+		/**
+		 * Filter the time in seconds after which the list of files of another import is replaced,
+		 * if this import did not continue in the meantime.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param int $time The time in seconds.
+		 */
+		return absint( apply_filters( 'cfprop_files_import_takeover_time', $time ) );
+	}
+
+	/**
+	 * Handle a run which could not start as another process imports files right now.
+	 *
+	 * An AJAX request asks for another run, so the progress dialog polls again.
+	 *
+	 * @param string $process_id The process ID.
+	 *
+	 * @return void
+	 */
+	private function handle_locked_import( string $process_id ): void {
+		// mark this run as locked, so callers which cannot poll could react on it.
+		$this->locked_by_other_process = true;
+
+		// update the status for the progress dialog.
+		$process_handler = ProcessHandler::get_instance();
+		$process_handler->set_id( $process_id );
+		$process_handler->set_status( __( 'Another import of files is still running. Please wait.', 'connector-for-propstack' ) );
+
+		// bail if this is not an AJAX request, which cannot poll.
+		if ( ! wp_doing_ajax() ) {
+			// add a log entry.
+			Log::get_instance()->add( __( 'Another import of files is still running. Please wait.', 'connector-for-propstack' ), 'info', 'import' );
+
+			// do nothing more.
+			return;
+		}
+
+		// request another run.
+		$this->load_more = true;
+
+		// wait a moment so the progress dialog does not hammer the server.
+		sleep( 1 );
+	}
+
+	/**
+	 * End the import of files after an error which prevents its continuation.
+	 *
+	 * @return void
+	 */
+	private function end_files_import_after_error(): void {
+		// remove the list.
+		$this->clear_files_work_list();
+
+		// this import cannot be continued.
+		$this->load_more = false;
+
+		// update the markers.
+		$process_handler = ProcessHandler::get_instance();
+		$process_handler->set_running( 0 );
+		$process_handler->set_message(
+			array(
+				'detail' => array(
+					'className' => 'cfprop-dialog',
+					'title'     => __( 'Error', 'connector-for-propstack' ),
+					'texts'     => array(
+						/* translators: %1$s will be replaced by a URL. */
+						'<p>' . sprintf( __( 'The import of files has been aborted. Check <a href="%1$s">the log</a> for details.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_logs' ) ) ) . '</p>',
+					),
+					'buttons'   => array(
+						array(
+							'action'  => 'closeDialog();',
+							'variant' => 'primary',
+							'text'    => __( 'OK', 'connector-for-propstack' ),
+						),
+					),
+				),
+			)
+		);
+		update_option( CFPROP_FILES_IMPORT_RUNNING, 0 );
+	}
+
+	/**
 	 * Run import of object files by request.
 	 *
 	 * @return void
@@ -1369,14 +1894,34 @@ class Files {
 			$process_id = '';
 		}
 
-		// run the import.
-		$this->import( 0, $process_id );
+		// count the runs to prevent an endless loop on a broken state.
+		$runs = 0;
+
+		// run the import until it is completed, every run processes a limited amount of files.
+		do {
+			$this->import( 0, $process_id );
+
+			++$runs;
+
+			// bail if the import does not finish.
+			if ( $runs > 10000 ) {
+				Log::get_instance()->add( __( 'The import of files did not finish and has been stopped.', 'connector-for-propstack' ), 'error', 'import' );
+
+				break;
+			}
+		} while ( $this->has_load_more() );
 
 		// show hint.
 		$transient_obj = Transients::get_instance()->add();
 		$transient_obj->set_name( 'propstack_object_import_files_run' );
-		$transient_obj->set_message( '<strong>' . __( 'The import of files from your Propstack account has been run.', 'connector-for-propstack' ) . '</strong>' );
-		$transient_obj->set_type( 'success' );
+		if ( $this->is_locked_by_other_process() ) {
+			// the files have not been imported as another process imports files right now.
+			$transient_obj->set_message( '<strong>' . __( 'Another import of files is running. The import of files has not been completed.', 'connector-for-propstack' ) . '</strong><br>' . __( 'Please try again in a few minutes.', 'connector-for-propstack' ) );
+			$transient_obj->set_type( 'error' );
+		} else {
+			$transient_obj->set_message( '<strong>' . __( 'The import of files from your Propstack account has been run.', 'connector-for-propstack' ) . '</strong>' );
+			$transient_obj->set_type( 'success' );
+		}
 		$transient_obj->save();
 
 		// redirect the user.

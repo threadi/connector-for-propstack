@@ -420,6 +420,27 @@ class Garage extends Object_Type_Base {
 	}
 
 	/**
+	 * Return the list of fields, which are disabled by default for this object type.
+	 *
+	 * @return array<int,Field_Base>
+	 */
+	protected function get_default_disabled_fields(): array {
+		$fields = array(
+			new Address(),
+		);
+
+		$instance = $this;
+		/**
+		 * Filter the list of files in this object type.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param array<int,Field_Base> $fields List of fields.
+		 * @param Object_Type_Base $instance The object type object.
+		 */
+		return apply_filters( 'cfprop_object_type_default_disabled_fields', $fields, $instance );
+	}
+
+	/**
 	 * Return the most important fields as objects.
 	 *
 	 * @return array<int,Field_Base>

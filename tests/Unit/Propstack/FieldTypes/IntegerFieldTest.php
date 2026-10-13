@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  * Object for tests against \ConnectorForPropstack\Propstack\FieldTypes\IntegerField.
  *
  * get_value() returns an int for a usable value and an empty string otherwise, so the
- * assertions use assertSame() to also cover the type. absint() silently turns a
+ * assertions use assertSame() to also cover the type. intval() silently turns a
  * non-empty array into 1 and an object into 1 with a PHP warning, which is why the
  * tests require the is_scalar() guard in get_value().
  */
@@ -45,7 +45,7 @@ class IntegerFieldTest extends TestCase {
 			'integer'         => array( 42, 42 ),
 			'numeric string'  => array( '42', 42 ),
 			'float truncates' => array( 3.9, 3 ),
-			'negative'        => array( -5, 5 ),
+			'negative'        => array( -5, -5 ),
 			'zero'            => array( 0, '' ),
 			'zero as string'  => array( '0', '' ),
 			'empty string'    => array( '', '' ),

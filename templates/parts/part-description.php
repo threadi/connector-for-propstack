@@ -11,4 +11,4 @@
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-echo '<p>' . wp_kses_post( $description_text ) . '</p>';
+echo '<p' . ( ! empty( $attributes['classes'] ) && is_string( $attributes['classes'] ) ? ' class="' . esc_attr( trim( $attributes['classes'] ) ) . '"' : '' ) . '>' . wp_kses_post( $description_text ) . '</p>';

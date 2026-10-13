@@ -61,7 +61,7 @@
         "threadi/easy-dialog-for-wordpress": "*",
         "threadi/easy-settings-for-wordpress": "*",
         "threadi/easy-setup-for-wordpress": "*",
-        "threadi/easy-transients-for-wordpress": "^1.4.3",
+        "threadi/easy-transients-for-wordpress": "^1.4.9",
         "threadi/crypt-for-wordpress": "*",
         "ext-simplexml": "*",
         "ext-libxml": "*"

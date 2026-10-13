@@ -55,26 +55,38 @@ class Installer {
 	 *
 	 * Either via activation-hook or via cli-plugin-reset.
 	 *
+	 * @param bool $network_wide True if the plugin is activated network-wide in a multisite, false for the current site only.
+	 *
 	 * @return void
 	 */
-	public function activation(): void {
+	public function activation( bool $network_wide = false ): void {
 		// mark the activation runner as running.
-		define( 'CFPROP_ACTIVATION_RUNNING', 1 );
+		if ( ! defined( 'CFPROP_ACTIVATION_RUNNING' ) ) {
+			define( 'CFPROP_ACTIVATION_RUNNING', 1 );
+		}
 
-		if ( is_multisite() ) {
+		if ( is_multisite() && $network_wide ) {
 			// loop through the blogs.
-			foreach ( Helper::get_blogs() as $blog_id ) {
+			foreach ( Helper::get_blogs() as $blog ) {
+				// get the blog ID (the rows are returned as associative arrays).
+				$blog_id = absint( is_array( $blog ) ? ( $blog['blog_id'] ?? 0 ) : 0 );
+
+				// bail if no valid ID is given.
+				if ( 0 === $blog_id ) {
+					continue;
+				}
+
 				// switch to the blog.
-				switch_to_blog( $blog_id['blog_id'] );
+				switch_to_blog( $blog_id );
 
 				// run tasks for activation in this single blog.
 				$this->activation_tasks();
-			}
 
-			// switch back to the original blog.
-			restore_current_blog();
+				// switch back to the original blog.
+				restore_current_blog();
+			}
 		} else {
-			// simply run the tasks on single-site-install.
+			// simply run the tasks on single-site-install or on the current site.
 			$this->activation_tasks();
 		}
 	}

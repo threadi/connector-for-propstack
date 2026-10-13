@@ -36,7 +36,7 @@ class NumberOfRooms extends Field_Base {
 	 *
 	 * @var string
 	 */
-	protected string $type = 'integer';
+	protected string $type = 'number';
 
 	/**
 	 * Return the field label.

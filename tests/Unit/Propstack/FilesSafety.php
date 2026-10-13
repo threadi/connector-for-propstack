@@ -109,9 +109,10 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 		// remove the request data.
 		unset( $_POST['post'] );
 
-		// remove the transients.
-		delete_transient( 'propstack_object_files_to_import' );
-		delete_transient( 'propstack_object_files_to_import_owner' );
+		// remove the list of files to import.
+		\ConnectorForPropstack\Propstack\Files::get_instance()->clear_files_work_list();
+		remove_filter( 'cfprop_files_import_limit', array( $this, 'get_limit_of_one' ) );
+		remove_filter( 'cfprop_file_import_post_array', array( $this, 'create_duplicate_during_import' ) );
 
 		// reset the process markers.
 		update_option( CFPROP_FILES_IMPORT_RUNNING, 0 );
@@ -223,6 +224,53 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 	 */
 	public function collect_files_list( array $files_to_import ): void {
 		$this->collected_lists[] = $files_to_import;
+	}
+
+	/**
+	 * Return 1 as limit of files per run.
+	 *
+	 * @return int
+	 */
+	public function get_limit_of_one(): int {
+		return 1;
+	}
+
+	/**
+	 * Create an attachment for the same Propstack file, like a parallel process would do it during the import.
+	 *
+	 * @param array<string,mixed> $post_array The post-query.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function create_duplicate_during_import( array $post_array ): array {
+		$this->create_file( 0, 515151, false );
+		return $post_array;
+	}
+
+	/**
+	 * Save a list of files to import like a previous run of the import would have left it.
+	 *
+	 * @param array<int,array<string,mixed>> $files   The list of files.
+	 * @param string                         $owner   The owner of the list.
+	 * @param int                            $updated The time of the last run of this import.
+	 *
+	 * @return void
+	 */
+	private function save_files_list( array $files, string $owner, int $updated ): void {
+		update_option( 'cfprop_files_to_import_block_0', $files, false );
+		update_option(
+			'cfprop_files_to_import',
+			array(
+				'owner'      => $owner,
+				'total'      => count( $files ),
+				'blocks'     => 1,
+				'block_size' => 100,
+				'created'    => $updated,
+				'updated'    => $updated,
+			),
+			false
+		);
+		update_option( 'cfprop_files_to_import_offset', 0, false );
 	}
 
 	/**
@@ -457,8 +505,7 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 		);
 
 		// simulate a list left over from an aborted import of another object in another process.
-		set_transient(
-			'propstack_object_files_to_import',
+		$this->save_files_list(
 			array(
 				array(
 					'id'         => 7777,
@@ -467,9 +514,9 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 					'wp_post_id' => $other_post_id,
 				),
 			),
-			DAY_IN_SECONDS
+			'other-process|' . $other_post_id,
+			time() - HOUR_IN_SECONDS
 		);
-		set_transient( 'propstack_object_files_to_import_owner', 'other-process|' . $other_post_id, DAY_IN_SECONDS );
 
 		add_filter( 'cfprop_files_import_limit', '__return_zero' );
 		add_filter( 'cfprop_prevent_file_import', array( $this, 'record_and_prevent_file_import' ), 1, 3 );
@@ -483,9 +530,10 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 		$this->assertSame( $post_id, $this->collected_lists[0][0]['wp_post_id'] );
 		$this->assertSame( array( 9001 ), $this->requested_file_ids );
 
-		// the cache must be cleaned up after the import.
-		$this->assertFalse( get_transient( 'propstack_object_files_to_import' ) );
-		$this->assertFalse( get_transient( 'propstack_object_files_to_import_owner' ) );
+		// the list must be cleaned up after the import.
+		$this->assertFalse( get_option( 'cfprop_files_to_import' ) );
+		$this->assertFalse( get_option( 'cfprop_files_to_import_block_0' ) );
+		$this->assertFalse( get_option( 'cfprop_files_to_import_offset' ) );
 		$this->assertSame( 0, absint( get_option( CFPROP_FILES_IMPORT_RUNNING ) ) );
 	}
 
@@ -508,8 +556,7 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 		);
 
 		// simulate the remaining list of the same import process.
-		set_transient(
-			'propstack_object_files_to_import',
+		$this->save_files_list(
 			array(
 				array(
 					'id'         => 9002,
@@ -518,9 +565,9 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 					'wp_post_id' => $post_id,
 				),
 			),
-			DAY_IN_SECONDS
+			'this-process|' . $post_id,
+			time()
 		);
-		set_transient( 'propstack_object_files_to_import_owner', 'this-process|' . $post_id, DAY_IN_SECONDS );
 
 		add_filter( 'cfprop_files_import_limit', '__return_zero' );
 		add_filter( 'cfprop_prevent_file_import', array( $this, 'record_and_prevent_file_import' ), 1, 3 );
@@ -717,5 +764,156 @@ class FilesSafety extends ConnectorForPropstackTestCase {
 		$file_id = $this->create_file( $this->create_object(), 556, true );
 
 		$this->assertSame( $file_id, \ConnectorForPropstack\Propstack\Files::get_instance()->is_file_in_media_library( 556 ) );
+	}
+
+	/**
+	 * Test that the list of an import of another owner, which is still in progress, is not replaced.
+	 *
+	 * @return void
+	 */
+	public function test_import_waits_for_active_list_of_other_owner(): void {
+		$other_post_id = $this->create_object();
+		$post_id       = $this->create_object(
+			array(
+				'images' => array(
+					array(
+						'id'      => 9001,
+						'name'    => 'own.png',
+						'big_url' => self::DOWNLOAD_URL,
+					),
+				),
+			)
+		);
+
+		// simulate the list of another import which is still in progress.
+		$this->save_files_list(
+			array(
+				array(
+					'id'         => 7777,
+					'name'       => 'foreign.png',
+					'big_url'    => self::DOWNLOAD_URL,
+					'wp_post_id' => $other_post_id,
+				),
+			),
+			'other-process|' . $other_post_id,
+			time()
+		);
+
+		add_filter( 'cfprop_prevent_file_import', array( $this, 'record_and_prevent_file_import' ), 1, 3 );
+		add_action( 'cfprop_files_before_import', array( $this, 'collect_files_list' ), 1 );
+
+		\ConnectorForPropstack\Propstack\Files::get_instance()->import( $post_id, 'this-process' );
+
+		// nothing has been changed.
+		$this->assertCount( 0, $this->collected_lists );
+		$this->assertSame( array(), $this->requested_file_ids );
+		$this->assertSame( 'other-process|' . $other_post_id, get_option( 'cfprop_files_to_import' )['owner'] );
+	}
+
+	/**
+	 * Test that the position is moved before a file is imported and that a run without AJAX ends without any output.
+	 *
+	 * @return void
+	 */
+	public function test_import_in_chunks_without_ajax(): void {
+		$post_id = $this->create_object(
+			array(
+				'images' => array(
+					array(
+						'id'      => 9101,
+						'name'    => 'first.png',
+						'big_url' => self::DOWNLOAD_URL,
+					),
+					array(
+						'id'      => 9102,
+						'name'    => 'second.png',
+						'big_url' => self::DOWNLOAD_URL,
+					),
+				),
+			)
+		);
+
+		add_filter( 'cfprop_files_import_limit', array( $this, 'get_limit_of_one' ) );
+		add_filter( 'cfprop_prevent_file_import', array( $this, 'record_and_prevent_file_import' ), 1, 3 );
+
+		// the first run imports the first file and asks for another run.
+		\ConnectorForPropstack\Propstack\Files::get_instance()->import( $post_id, 'this-process' );
+		$this->assertTrue( \ConnectorForPropstack\Propstack\Files::get_instance()->has_load_more() );
+		$this->assertSame( array( 9101 ), $this->requested_file_ids );
+		$this->assertSame( 1, absint( get_option( 'cfprop_files_to_import_offset' ) ) );
+		$this->assertGreaterThan( 0, absint( get_option( CFPROP_FILES_IMPORT_RUNNING ) ) );
+
+		// the second run imports the second file and completes the import.
+		\ConnectorForPropstack\Propstack\Files::get_instance()->import( $post_id, 'this-process' );
+		$this->assertFalse( \ConnectorForPropstack\Propstack\Files::get_instance()->has_load_more() );
+		$this->assertSame( array( 9101, 9102 ), $this->requested_file_ids );
+		$this->assertFalse( get_option( 'cfprop_files_to_import' ) );
+		$this->assertSame( 0, absint( get_option( CFPROP_FILES_IMPORT_RUNNING ) ) );
+	}
+
+	/**
+	 * Test that the import of files does not run while another process imports files.
+	 *
+	 * @return void
+	 */
+	public function test_import_does_not_run_while_locked(): void {
+		$post_id = $this->create_object(
+			array(
+				'images' => array(
+					array(
+						'id'      => 9201,
+						'name'    => 'locked.png',
+						'big_url' => self::DOWNLOAD_URL,
+					),
+				),
+			)
+		);
+
+		add_filter( 'cfprop_prevent_file_import', array( $this, 'record_and_prevent_file_import' ), 1, 3 );
+
+		// another process holds the lock.
+		$lock = \ConnectorForPropstack\Propstack\Files::get_instance()->get_import_lock();
+		$this->assertTrue( $lock->acquire() );
+
+		\ConnectorForPropstack\Propstack\Files::get_instance()->import( $post_id, 'this-process' );
+
+		$lock->release();
+
+		$this->assertSame( array(), $this->requested_file_ids );
+		$this->assertFalse( get_option( 'cfprop_files_to_import' ) );
+
+		// the caller could detect that nothing has been imported.
+		$this->assertTrue( \ConnectorForPropstack\Propstack\Files::get_instance()->is_locked_by_other_process() );
+
+		// the next run is not locked anymore.
+		\ConnectorForPropstack\Propstack\Files::get_instance()->import( $post_id, 'this-process' );
+		$this->assertFalse( \ConnectorForPropstack\Propstack\Files::get_instance()->is_locked_by_other_process() );
+	}
+
+	/**
+	 * Test that a file which has been imported by another process at the same time is not kept twice.
+	 *
+	 * @return void
+	 */
+	public function test_parallel_duplicate_is_removed(): void {
+		$post_id = $this->create_object();
+
+		add_filter( 'cfprop_file_import_post_array', array( $this, 'create_duplicate_during_import' ) );
+
+		$attachment_id = \ConnectorForPropstack\Propstack\Files::get_instance()->import_file( $post_id, 515151, self::DOWNLOAD_URL, 'test.png', array() );
+
+		// the older attachment of the other process is used, the new one has been removed.
+		$this->assertSame( $this->attachment_ids[0], $attachment_id );
+		$query = new \WP_Query(
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'meta_key'       => 'propstack_file_id', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value'     => 515151, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
+		$this->assertCount( 1, $query->posts );
 	}
 }

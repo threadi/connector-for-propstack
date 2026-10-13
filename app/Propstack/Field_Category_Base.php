@@ -116,7 +116,7 @@ class Field_Category_Base {
 				<p>
 					<?php
 					// show title, if set on the field.
-					$custom_label = get_post_meta( absint( get_the_ID() ), $field->get_name() . '_label', true );
+					$custom_label = get_post_meta( $post->ID, $field->get_name() . '_label', true );
 					if ( ! empty( $custom_label ) ) {
 						echo '<strong>' . esc_html( $custom_label ) . '</strong><br>';
 					}

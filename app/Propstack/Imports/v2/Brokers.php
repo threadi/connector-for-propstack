@@ -96,7 +96,7 @@ class Brokers extends Import_Base {
 		}
 
 		// get the broker.
-		$broker = $this->get_broker( absint( $immo_object['broker_id'] ) );
+		$broker = $this->get_broker( max( 0, (int) $immo_object['broker_id'] ) );
 
 		// bail if the API did not deliver this broker.
 		if ( empty( $broker ) ) {

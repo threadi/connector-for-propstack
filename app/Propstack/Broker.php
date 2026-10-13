@@ -92,9 +92,17 @@ class Broker {
 			return;
 		}
 
+		// get the name of the taxonomy.
+		$taxonomy = Taxonomies\Broker::get_instance()->get_name();
+
+		// bail if the name is unknown.
+		if ( '' === $taxonomy ) {
+			return;
+		}
+
 		// delete them.
 		foreach ( $terms as $term_id ) {
-			wp_delete_term( $term_id, Taxonomies\Broker::get_instance()->get_name() );
+			wp_delete_term( $term_id, $taxonomy );
 		}
 	}
 
@@ -108,7 +116,7 @@ class Broker {
 	 */
 	public function import_broker_image( array $immo_object, int $post_id ): void {
 		// bail if no broker or image is set.
-		if ( empty( $immo_object['broker'] ) || empty( $immo_object['broker']['avatar_url'] ) ) {
+		if ( empty( $immo_object['broker'] ) || ! is_array( $immo_object['broker'] ) || empty( $immo_object['broker']['avatar_url'] ) || ! is_string( $immo_object['broker']['avatar_url'] ) ) {
 			return;
 		}
 
@@ -142,7 +150,7 @@ class Broker {
 		if ( isset( $this->broker_avatars[ $broker_id ] ) ) {
 			$attachment_id = $this->broker_avatars[ $broker_id ];
 		} else {
-			$attachment_id                      = Files::get_instance()->import_file( 0, $broker_id, $immo_object['broker']['avatar_url'], basename( $immo_object['broker']['avatar_url'] ), array(), $broker_id );
+			$attachment_id                      = Files::get_instance()->import_file( 0, $broker_id, $immo_object['broker']['avatar_url'], Files::get_instance()->get_file_name_from_url( $immo_object['broker']['avatar_url'] ), array(), $broker_id );
 			$this->broker_avatars[ $broker_id ] = $attachment_id;
 		}
 

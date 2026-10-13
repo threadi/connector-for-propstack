@@ -135,6 +135,8 @@ class CleanupSafety extends ConnectorForPropstackTestCase {
 		remove_filter( 'cfprop_import_max_cleanup_ratio', array( $this, 'allow_full_cleanup' ) );
 		remove_filter( 'cfprop_object_import_limit', array( $this, 'set_limit_to_one' ) );
 		remove_action( 'cfprop_import_object', array( $this, 'save_object_id' ) );
+		delete_option( 'propstack_connector_preserve_files' );
+		delete_option( 'cfprop_import_current_object' );
 
 		// remove every object this test created.
 		foreach ( $this->get_object_post_ids() as $post_id ) {
@@ -566,5 +568,192 @@ class CleanupSafety extends ConnectorForPropstackTestCase {
 
 		// a complete import saves the hash.
 		$this->assertNotEmpty( get_option( 'cfprop_md5_de' ) );
+	}
+
+	/**
+	 * Return the post-ID of the object with the given Propstack-ID.
+	 *
+	 * @param int $id The Propstack-ID.
+	 *
+	 * @return int
+	 */
+	private function get_post_id_by_propstack_id( int $id ): int {
+		foreach ( $this->get_object_post_ids() as $post_id ) {
+			if ( absint( get_post_meta( $post_id, 'object_id', true ) ) === $id ) {
+				return $post_id;
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * Test that objects which have not been created by the import (no Propstack-ID) are never removed.
+	 *
+	 * @return void
+	 */
+	public function test_object_without_propstack_id_is_not_removed(): void {
+		$this->create_existing_objects( range( 1, 10 ) );
+
+		// a copy of another plugin without the Propstack-ID.
+		$copy_id = wp_insert_post(
+			array(
+				'post_type'   => ImmoObject::get_instance()->get_name(),
+				'post_title'  => 'Copy',
+				'post_status' => 'publish',
+			)
+		);
+
+		$this->api_ids = array( 1, 2, 3, 4, 5, 6, 8, 9, 10 );
+
+		$import_obj = $this->run_complete_import();
+
+		$this->assertEmpty( $this->get_error_codes( $import_obj ) );
+		$this->assertInstanceOf( \WP_Post::class, get_post( $copy_id ) );
+		$this->assertNull( get_post( $this->get_post_id_by_propstack_id( 7 ) ) );
+
+		wp_delete_post( $copy_id, true );
+	}
+
+	/**
+	 * Test that the cleanup removes the images and the entries in the queue of an obsolete object.
+	 *
+	 * @return void
+	 */
+	public function test_obsolete_object_loses_images_and_queue_entries(): void {
+		$this->create_existing_objects( range( 1, 10 ) );
+		$obsolete_id = $this->get_post_id_by_propstack_id( 7 );
+		$other_id    = $this->get_post_id_by_propstack_id( 8 );
+
+		// an image only of the obsolete object and one which is used by another object, too.
+		$own_image    = self::factory()->attachment->create( array( 'post_parent' => $obsolete_id ) );
+		$shared_image = self::factory()->attachment->create( array( 'post_parent' => $obsolete_id ) );
+		update_post_meta( $obsolete_id, 'images', array( $own_image, $shared_image ) );
+		update_post_meta( $other_id, 'images', array( $shared_image ) );
+
+		// an entry in the queue for the obsolete object.
+		$entry_id = wp_insert_post(
+			array(
+				'post_type'   => 'cfprop_queue',
+				'post_title'  => '4711',
+				'post_status' => 'publish',
+				'post_parent' => $obsolete_id,
+			)
+		);
+
+		$this->api_ids = array( 1, 2, 3, 4, 5, 6, 8, 9, 10 );
+
+		$import_obj = $this->run_complete_import();
+
+		$this->assertEmpty( $this->get_error_codes( $import_obj ) );
+		$this->assertNull( get_post( $obsolete_id ) );
+		$this->assertNull( get_post( $entry_id ) );
+		$this->assertNull( get_post( $own_image ) );
+		$this->assertInstanceOf( \WP_Post::class, get_post( $shared_image ) );
+
+		wp_delete_attachment( $shared_image, true );
+	}
+
+	/**
+	 * Test that the cleanup keeps the images of an obsolete object if files should be preserved.
+	 *
+	 * @return void
+	 */
+	public function test_obsolete_object_keeps_images_if_preserved(): void {
+		update_option( 'propstack_connector_preserve_files', 1 );
+		$this->create_existing_objects( range( 1, 10 ) );
+		$obsolete_id = $this->get_post_id_by_propstack_id( 7 );
+
+		$image = self::factory()->attachment->create( array( 'post_parent' => $obsolete_id ) );
+		update_post_meta( $obsolete_id, 'images', array( $image ) );
+
+		$this->api_ids = array( 1, 2, 3, 4, 5, 6, 8, 9, 10 );
+
+		$this->run_complete_import();
+
+		$this->assertNull( get_post( $obsolete_id ) );
+		$this->assertInstanceOf( \WP_Post::class, get_post( $image ) );
+
+		wp_delete_attachment( $image, true );
+	}
+
+	/**
+	 * Test that an object whose import aborted the previous run is skipped by the next run.
+	 *
+	 * @return void
+	 */
+	public function test_object_which_aborted_the_previous_run_is_skipped(): void {
+		$this->api_ids = array( 1, 2, 3 );
+
+		// import one object per run.
+		add_filter( 'cfprop_object_import_limit', array( $this, 'set_limit_to_one' ) );
+
+		// the first run imports the first object.
+		$import_obj = new Objects();
+		$import_obj->run();
+		$this->assertTrue( $import_obj->has_load_more() );
+		$this->assertSame( 1, absint( get_option( self::$offset_option ) ) );
+
+		// simulate a run which has been aborted during the import of the second object.
+		$import_data = get_option( self::$work_list_option );
+		update_option(
+			'cfprop_import_current_object',
+			array(
+				'run_id'   => absint( $import_data['run_id'] ),
+				'phase'    => 'import',
+				'position' => 1,
+			)
+		);
+
+		// the next runs skip this object and complete the import.
+		$import_obj = $this->run_complete_import();
+
+		$this->assertContains( 'propstack_object_import_error', $this->get_error_codes( $import_obj ) );
+		$this->assertSame( array( 1, 3 ), $this->get_existing_propstack_ids() );
+
+		// an incomplete import does not save the hash.
+		$this->assertEmpty( get_option( 'cfprop_md5_de' ) );
+	}
+
+	/**
+	 * Test that a run with a used up time stops after the first object and asks for another run.
+	 *
+	 * @return void
+	 */
+	public function test_deadline_stops_the_run(): void {
+		$this->api_ids = array( 1, 2, 3 );
+
+		$import_obj = new Objects();
+		$import_obj->set_deadline( microtime( true ) - 1 );
+		$import_obj->run();
+
+		$this->assertTrue( $import_obj->has_load_more() );
+		$this->assertSame( 1, absint( get_option( self::$offset_option ) ) );
+		$this->assertSame( array( 1 ), $this->get_existing_propstack_ids() );
+
+		// the import is completed by the next runs.
+		$this->run_complete_import();
+		$this->assertSame( array( 1, 2, 3 ), $this->get_existing_propstack_ids() );
+	}
+
+	/**
+	 * Test that the running marker is reset if a task before the start of the import adds an error.
+	 *
+	 * @return void
+	 */
+	public function test_error_before_start_resets_running_marker(): void {
+		$this->api_ids = array( 1 );
+
+		$add_error = static function ( $process_handler, Objects $instance ): void {
+			$instance->add_error( 'test_error', 'Test error' );
+		};
+		add_action( 'cfprop_import_object_before_start', $add_error, 10, 2 );
+
+		$import_obj = new Objects();
+		$import_obj->run();
+
+		remove_action( 'cfprop_import_object_before_start', $add_error );
+
+		$this->assertFalse( $import_obj->has_load_more() );
+		$this->assertSame( 0, absint( get_option( CFPROP_IMPORT_RUNNING ) ) );
 	}
 }

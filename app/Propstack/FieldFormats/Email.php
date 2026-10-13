@@ -29,10 +29,15 @@ class Email extends FieldFormat_Base {
 	 * @return string
 	 */
 	public function get_value(): string {
-		if ( empty( $this->value ) ) {
+		// bail if the value is empty or not scalar.
+		if ( empty( $this->value ) || ! is_scalar( $this->value ) ) {
 			return '';
 		}
 
-		return '<a href="mailto:' . $this->value . '">' . $this->value . '</a>';
+		// get the value as string.
+		$value = trim( (string) $this->value );
+
+		// return the link.
+		return '<a href="' . esc_url( 'mailto:' . $value ) . '">' . esc_html( $value ) . '</a>';
 	}
 }

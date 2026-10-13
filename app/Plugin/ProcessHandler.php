@@ -23,6 +23,13 @@ class ProcessHandler {
 	private string $process_id = '';
 
 	/**
+	 * The prefix for the transients which hold the values of each process.
+	 *
+	 * @var string
+	 */
+	public const TRANSIENT_PREFIX = 'cfprop_process_';
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?ProcessHandler
@@ -116,6 +123,8 @@ class ProcessHandler {
 	/**
 	 * Set a value for the actual process.
 	 *
+	 * Each process is saved in its own transient, so parallel processes do not overwrite their values.
+	 *
 	 * @param string $key The key.
 	 * @param mixed  $value The value.
 	 *
@@ -128,26 +137,16 @@ class ProcessHandler {
 		}
 
 		// get the actual values for the actual process ID.
-		$values = get_option( 'cfprop_process_values' );
-
-		// if this is not an array, create it.
-		if ( ! is_array( $values ) ) {
-			$values = array();
-		}
-
-		// create the entry for the ID if it does not exist.
-		if ( ! isset( $values[ $this->get_id() ] ) ) {
-			$values[ $this->get_id() ] = array();
-		}
+		$values = $this->get_values();
 
 		// add or update the given key with its value.
-		$values[ $this->get_id() ][ $key ] = $value;
+		$values[ $key ] = $value;
 
 		// remember when this process was touched the last time.
-		$values[ $this->get_id() ]['updated'] = time();
+		$values['updated'] = time();
 
-		// save it.
-		update_option( 'cfprop_process_values', $values );
+		// save it (the transient expires if it has not been touched for a while).
+		set_transient( $this->get_transient_name(), $values, $this->get_max_age() );
 	}
 
 	/**
@@ -164,25 +163,59 @@ class ProcessHandler {
 		}
 
 		// get the values.
-		$values = get_option( 'cfprop_process_values' );
-
-		// if this is not an array, create it.
-		if ( ! is_array( $values ) ) {
-			$values = array();
-		}
-
-		// bail if no values are set for the actual process ID.
-		if ( empty( $values[ $this->get_id() ] ) ) {
-			return '';
-		}
+		$values = $this->get_values();
 
 		// bail if the requested key is not set.
-		if ( ! isset( $values[ $this->get_id() ][ $key ] ) ) {
+		if ( ! isset( $values[ $key ] ) ) {
 			return '';
 		}
 
 		// return the value.
-		return $values[ $this->get_id() ][ $key ];
+		return $values[ $key ];
+	}
+
+	/**
+	 * Return all values of the actual process.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function get_values(): array {
+		// get the values.
+		$values = get_transient( $this->get_transient_name() );
+
+		// if this is not an array, create it.
+		if ( ! is_array( $values ) ) {
+			return array();
+		}
+
+		// return the values.
+		return $values;
+	}
+
+	/**
+	 * Return the name of the transient which holds the values of the actual process.
+	 *
+	 * @return string
+	 */
+	private function get_transient_name(): string {
+		return self::TRANSIENT_PREFIX . md5( $this->get_id() );
+	}
+
+	/**
+	 * Return the max age of process values in seconds.
+	 *
+	 * @return int
+	 */
+	private function get_max_age(): int {
+		$max_age = 15 * MINUTE_IN_SECONDS;
+
+		/**
+		 * Filter the max age of process values in seconds.
+		 *
+		 * @since 1.1.0 Available since 1.1.0.
+		 * @param int $max_age The max age in seconds.
+		 */
+		return max( 1, absint( apply_filters( 'cfprop_process_values_max_age', $max_age ) ) );
 	}
 
 	/**
@@ -323,50 +356,14 @@ class ProcessHandler {
 	 * Hint:
 	 * The values are not removed when they have been read, as a very fast process could
 	 * be finished before the dialog asked for its result the first time. They expire
-	 * after a while instead.
+	 * after a while instead (as transient).
 	 *
 	 * @return void
 	 */
 	private function delete(): void {
-		// get the values.
-		$values = get_option( 'cfprop_process_values' );
-
-		// bail if this is not an array.
-		if ( ! is_array( $values ) ) {
-			return;
+		// remove the list of all processes used before 2.1.0, if it still exists.
+		if ( false !== get_option( 'cfprop_process_values' ) ) {
+			delete_option( 'cfprop_process_values' );
 		}
-
-		$max_age = 15 * MINUTE_IN_SECONDS;
-
-		/**
-		 * Filter the max age of process values in seconds.
-		 *
-		 * @since 1.1.0 Available since 1.1.0.
-		 * @param int $max_age The max age in seconds.
-		 */
-		$max_age = absint( apply_filters( 'cfprop_process_values_max_age', $max_age ) );
-
-		// remove every entry which has not been touched for a while.
-		$changed = false;
-		foreach ( $values as $process_id => $process_values ) {
-			// bail if this entry is young enough.
-			if ( isset( $process_values['updated'] ) && ( time() - absint( $process_values['updated'] ) ) < $max_age ) {
-				continue;
-			}
-
-			// remove the entry.
-			unset( $values[ $process_id ] );
-
-			// set the change marker.
-			$changed = true;
-		}
-
-		// bail if nothing changed.
-		if ( ! $changed ) {
-			return;
-		}
-
-		// save it.
-		update_option( 'cfprop_process_values', $values );
 	}
 }

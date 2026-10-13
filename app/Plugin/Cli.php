@@ -18,6 +18,20 @@ use ConnectorForPropstack\Propstack\ImmoObjects;
  */
 class Cli {
 	/**
+	 * The amount of tries if another process imports files right now.
+	 *
+	 * @var int
+	 */
+	private const LOCKED_MAX_TRIES = 12;
+
+	/**
+	 * The seconds to wait between these tries.
+	 *
+	 * @var int
+	 */
+	private const LOCKED_WAIT_SECONDS = 5;
+
+	/**
 	 * Import all objects from Propstack to WordPress.
 	 *
 	 * Hint: run with "--user=xy".
@@ -121,8 +135,26 @@ class Cli {
 			}
 		);
 
-		// process the queue.
-		\ConnectorForPropstack\Propstack\Queue::get_instance()->process( '' );
+		// get the queue object.
+		$queue_obj = \ConnectorForPropstack\Propstack\Queue::get_instance();
+
+		// process the queue, wait and try again if another process imports files right now.
+		for ( $tries = 1; $tries <= self::LOCKED_MAX_TRIES; $tries++ ) {
+			$queue_obj->process( '' );
+
+			// bail if the queue has been processed.
+			if ( ! $queue_obj->was_locked() ) {
+				break;
+			}
+
+			// bail if the other process does not finish in time.
+			if ( $tries >= self::LOCKED_MAX_TRIES ) {
+				\WP_CLI::error( 'Another import of files is still running. The queue has not been processed. Please try again later.' );
+			}
+
+			\WP_CLI::log( 'Another import of files is running. Waiting ...' );
+			sleep( self::LOCKED_WAIT_SECONDS );
+		}
 
 		// output success-message.
 		\WP_CLI::success( 'Queue has been processed.' );
@@ -144,16 +176,31 @@ class Cli {
 	/**
 	 * Resets all settings of this plugin.
 	 *
+	 * Resets the current site only. In a multisite use "--url" to choose the site or
+	 * "--network" to reset the plugin on all sites of the network.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--network]
+	 * : Reset the plugin on all sites of the multisite network.
+	 *
 	 * @since        1.0.0
+	 *
+	 * @param array<int,string>    $args       The arguments.
+	 * @param array<string,string> $assoc_args The associative arguments.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-	public function reset_plugin(): void {
-		Uninstaller::get_instance()->run();
+	public function reset_plugin( array $args = array(), array $assoc_args = array() ): void {
+		// check if the reset should be run network-wide.
+		$network_wide = is_multisite() && isset( $assoc_args['network'] );
+
+		// remove all plugin data.
+		Uninstaller::get_instance()->run( $network_wide );
 
 		// run installer tasks.
-		Installer::get_instance()->activation();
+		Installer::get_instance()->activation( $network_wide );
 
 		// output success-message.
 		\WP_CLI::success( 'Plugin has been reset.' );
@@ -254,8 +301,45 @@ class Cli {
 			}
 		);
 
-		// import the files.
-		Files::get_instance()->import();
+		// get the files object.
+		$files_obj = Files::get_instance();
+
+		// import the files: repeat as long as the import needs another run, and wait if another process imports files right now.
+		$runs         = 0;
+		$locked_tries = 0;
+		while ( true ) {
+			$files_obj->import();
+			++$runs;
+
+			// wait and try again if another process imports files right now.
+			if ( $files_obj->is_locked_by_other_process() ) {
+				++$locked_tries;
+
+				// bail if the other process does not finish in time.
+				if ( $locked_tries >= self::LOCKED_MAX_TRIES ) {
+					\WP_CLI::error( 'Another import of files is still running. No files have been imported. Please try again later.' );
+				}
+
+				\WP_CLI::log( 'Another import of files is running. Waiting ...' );
+				sleep( self::LOCKED_WAIT_SECONDS );
+
+				// try it again.
+				continue;
+			}
+
+			// reset the counter for the next lock.
+			$locked_tries = 0;
+
+			// bail if the import is completed.
+			if ( ! $files_obj->has_load_more() ) {
+				break;
+			}
+
+			// bail if the import does not finish.
+			if ( $runs >= 1000 ) {
+				\WP_CLI::error( 'The import of files did not finish and has been stopped.' );
+			}
+		}
 
 		// output success-message.
 		\WP_CLI::success( 'Files have been imported.' );

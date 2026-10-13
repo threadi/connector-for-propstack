@@ -66,11 +66,11 @@ class HideAddress extends Field_Base {
 	/**
 	 * Return true if the functionality for this field is only available in the Pro version.
 	 *
-	 * Hint: the functionality is really only in the Pro plugin. This marker is used to show hints for it.
+	 * Hint: the free plugin respects this setting since version 2.1.0, so it is not only available in Pro.
 	 *
 	 * @return bool
 	 */
 	public function only_pro(): bool {
-		return true;
+		return false;
 	}
 }

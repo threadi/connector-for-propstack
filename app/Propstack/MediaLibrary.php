@@ -458,7 +458,7 @@ class MediaLibrary {
 		}
 
 		// get requested page.
-		$post_id = absint( filter_input( INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT ) );
+		$post_id = max( 0, (int) filter_input( INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT ) );
 
 		// get the post object.
 		$post = get_post( $post_id );

@@ -32,6 +32,13 @@ class ValuationPriceTo extends Field_Base {
 	protected string $name = 'valuation_price_to';
 
 	/**
+	 * Hide this field in the frontend, as it contains internal data.
+	 *
+	 * @var bool
+	 */
+	protected bool $hide_in_frontend = true;
+
+	/**
 	 * The type for the field (e.g., 'boolean', 'string', 'number', 'array').
 	 *
 	 * @var string

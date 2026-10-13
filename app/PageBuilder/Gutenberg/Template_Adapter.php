@@ -99,7 +99,7 @@ class Template_Adapter extends Template_Adapter_Base {
 			'description_type' => __( 'The description to show, see description_types.', 'connector-for-propstack' ),
 			'filters'          => __( 'The filters to show, e.g. ["city"].', 'connector-for-propstack' ),
 			'filter_alignment' => __( 'The alignment of the filters: "row" or "column".', 'connector-for-propstack' ),
-			'object_id'        => __( 'The post-ID of the object to show. Only needed outside of templates for objects.', 'connector-for-propstack' ),
+			'object_id'        => __( 'The Propstack ID of the object to show (not the post-ID in WordPress, see object_id in the results of the object abilities). Only needed outside of templates for objects.', 'connector-for-propstack' ),
 		);
 	}
 
@@ -138,7 +138,7 @@ class Template_Adapter extends Template_Adapter_Base {
 			self::BLOCK_PREFIX . 'broker-field' => '<!-- wp:connector-for-propstack/broker-field {"field_name":"' . $broker_field . '"} /-->',
 			self::BLOCK_PREFIX . 'description'  => '<!-- wp:connector-for-propstack/description {"description_type":"description_note"} /-->',
 			self::BLOCK_PREFIX . 'filter'       => '<!-- wp:connector-for-propstack/filter {"filters":["city"]} /-->',
-			self::BLOCK_PREFIX . 'single'       => '<!-- wp:connector-for-propstack/single {"object_id":123} /-->',
+			self::BLOCK_PREFIX . 'single'       => '<!-- wp:connector-for-propstack/single {"object_id":123456} /-->',
 		);
 
 		// return the example or a self-closing block without attributes.
@@ -458,14 +458,22 @@ class Template_Adapter extends Template_Adapter_Base {
 		}
 
 		// get the customized template.
-		$post    = $this->get_customized_post( $type );
-		$has_css = '' !== $this->get_css( $type );
+		$post = $this->get_customized_post( $type );
+
+		// the CSS could only be removed by users who are allowed to edit CSS (like on saving).
+		$can_edit_css = current_user_can( 'edit_css' );
+		$has_css      = '' !== $this->get_css( $type );
 
 		// prepare the result.
 		$result = array(
-			'action' => $post instanceof WP_Post || $has_css ? 'reset' : 'none',
+			'action' => $post instanceof WP_Post || ( $has_css && $can_edit_css ) ? 'reset' : 'none',
 			'id'     => $post instanceof WP_Post ? $post->ID : 0,
 		);
+
+		// add a note if the CSS is kept.
+		if ( $has_css && ! $can_edit_css ) {
+			$result['notes'] = array( __( 'The CSS of this template is kept, as you are not allowed to edit CSS.', 'connector-for-propstack' ) );
+		}
 
 		// bail on dry run or if nothing is to do.
 		if ( $dry_run || 'none' === $result['action'] ) {
@@ -477,8 +485,10 @@ class Template_Adapter extends Template_Adapter_Base {
 			return new WP_Error( 'cfprop_reset_failed', __( 'The customized template could not be removed.', 'connector-for-propstack' ) );
 		}
 
-		// remove the CSS.
-		Template_Styles::get_instance()->set_css( $type, '' );
+		// remove the CSS, if the user is allowed to.
+		if ( $can_edit_css ) {
+			Template_Styles::get_instance()->set_css( $type, '' );
+		}
 
 		// return the result.
 		return $result;

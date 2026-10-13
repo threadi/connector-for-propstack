@@ -94,11 +94,6 @@ class Field extends Widget_Base {
 			return '';
 		}
 
-		// bail if the field is hidden in frontend.
-		if ( $field->hide() || $field->hide_in_frontend() ) {
-			return '';
-		}
-
 		// get the assigned object type term on this object.
 		$object_type_term = wp_get_object_terms( $immo_object->get_id(), ObjectType::get_instance()->get_name() );
 
@@ -107,26 +102,8 @@ class Field extends Widget_Base {
 			return '';
 		}
 
-		// get the cache for disabled fields.
-		$disabled_fields = \ConnectorForPropstack\Plugin\Cache::get( 'disabled_fields' );
-
-		// bail if the field should not be shown.
-		if ( is_array( $disabled_fields ) && in_array( $field->get_name(), $disabled_fields, true ) ) {
-			return '';
-		}
-
-		$show_field = true;
-		/**
-		 * Filter whether a field should be shown in the frontend.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 * @param bool $show_field Whether the field should be shown in the frontend.
-		 * @param Field_Base $field The field.
-		 * @param \ConnectorForPropstack\Propstack\ImmoObject $immo_object The object.
-		 *
-		 * @noinspection PhpConditionAlreadyCheckedInspection
-		 */
-		if ( ! apply_filters( 'cfprop_show_field_in_frontend', $show_field, $field, $immo_object ) ) {
+		// bail if the field should not be visible in frontend for this object (checks hidden, disabled, hidden address and the filter "cfprop_show_field_in_frontend").
+		if ( ! Fields::get_instance()->is_field_visible_in_frontend( $field, $immo_object ) ) {
 			return '';
 		}
 

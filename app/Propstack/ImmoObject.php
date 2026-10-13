@@ -195,7 +195,7 @@ class ImmoObject {
 
 		// add a log entry.
 		/* translators: %1$s will be replaced by the attachment ID. */
-		Log::get_instance()->add( sprintf( __( 'Assign image %1$s to object %2$s.', 'connector-for-propstack' ), '<em>' . $attachment_id . '</em>', '<em>' . $this->get_title() . '</em>' ), 'info', 'import' );
+		Log::get_instance()->add( sprintf( __( 'Assign image %1$s to object %2$s.', 'connector-for-propstack' ), '<em>' . $attachment_id . '</em>', '<em>' . esc_html( $this->get_title() ) . '</em>' ), 'info', 'import' );
 
 		// save it.
 		update_post_meta( $this->get_id(), 'images', $list );

@@ -76,12 +76,14 @@ class Rest {
 					'field_category' => array(
 						'type'              => 'string',
 						'required'          => false,
-						'sanitize_callback' => 'sanitize_key',
+						'validate_callback' => 'rest_validate_request_arg',
+						'sanitize_callback' => array( $this, 'sanitize_key_arg' ),
 					),
 					'query'          => array(
 						'type'              => 'string',
 						'required'          => false,
-						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => 'rest_validate_request_arg',
+						'sanitize_callback' => array( $this, 'sanitize_text_arg' ),
 					),
 				),
 			)
@@ -96,6 +98,14 @@ class Rest {
 					'permission_callback' => function () {
 						return current_user_can( 'edit_posts' );
 					},
+					'args'                => array(
+						'query' => array(
+							'type'              => 'string',
+							'required'          => false,
+							'validate_callback' => 'rest_validate_request_arg',
+							'sanitize_callback' => array( $this, 'sanitize_text_arg' ),
+						),
+					),
 				)
 			);
 		}
@@ -113,6 +123,44 @@ class Rest {
 	}
 
 	/**
+	 * Sanitize a text argument of a REST API request.
+	 *
+	 * Returns an empty string for non-scalar values.
+	 *
+	 * @param mixed $value The value.
+	 *
+	 * @return string
+	 */
+	public function sanitize_text_arg( mixed $value ): string {
+		// bail if value is not a scalar.
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		// return the sanitized value.
+		return sanitize_text_field( (string) $value );
+	}
+
+	/**
+	 * Sanitize a key argument of a REST API request.
+	 *
+	 * Returns an empty string for non-scalar values.
+	 *
+	 * @param mixed $value The value.
+	 *
+	 * @return string
+	 */
+	public function sanitize_key_arg( mixed $value ): string {
+		// bail if value is not a scalar.
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		// return the sanitized value.
+		return sanitize_key( (string) $value );
+	}
+
+	/**
 	 * Return the list of available fields.
 	 *
 	 * @param WP_REST_Request $request The object with the data of the request.
@@ -120,7 +168,11 @@ class Rest {
 	 * @return array<int,mixed>
 	 */
 	public function get_fields( WP_REST_Request $request ): array {
-		return Fields::get_instance()->get_fields_by_request( $request->get_param( 'field_category' ), $request->get_param( 'query' ), true );
+		// get the params and make sure they are strings.
+		$field_category = $request->get_param( 'field_category' );
+		$query          = $request->get_param( 'query' );
+
+		return Fields::get_instance()->get_fields_by_request( is_string( $field_category ) ? $field_category : '', is_string( $query ) ? $query : '', true );
 	}
 
 	/**

@@ -56,7 +56,7 @@ class Schedules {
 		Intervals::get_instance()->init();
 
 		// use our own hooks.
-		if ( is_admin() ) {
+		if ( is_admin() && ! wp_doing_ajax() ) {
 			add_filter( 'cfprop_schedule_our_events', array( $this, 'check_events' ) );
 		}
 		add_action( 'init', array( $this, 'add_the_settings' ), 20 );
@@ -171,6 +171,11 @@ class Schedules {
 			return $our_events;
 		}
 
+		// bail if another process is checking the events at the moment (prevents duplicate events).
+		if ( ! Helper::acquire_lock( 'cfprop_schedules_lock', MINUTE_IN_SECONDS ) ) {
+			return $our_events;
+		}
+
 		// check the schedule objects if they are set.
 		foreach ( $this->get_schedule_object_names() as $object_name ) {
 			// bail if the class name does not exist.
@@ -204,6 +209,9 @@ class Schedules {
 			}
 		}
 
+		// release the lock.
+		Helper::release_lock( 'cfprop_schedules_lock' );
+
 		// return the resulting list.
 		return $our_events;
 	}
@@ -216,6 +224,11 @@ class Schedules {
 	public function delete_all(): void {
 		// delete the simple schedules from our plugin.
 		foreach ( $this->get_schedule_object_names() as $obj_name ) {
+			// bail if the class does not exist.
+			if ( ! class_exists( $obj_name ) ) {
+				continue;
+			}
+
 			// get the object.
 			$schedule_obj = new $obj_name();
 
@@ -237,6 +250,11 @@ class Schedules {
 	public function create_schedules(): void {
 		// install the schedules if they do not exist atm.
 		foreach ( $this->get_schedule_object_names() as $obj_name ) {
+			// bail if the class does not exist.
+			if ( ! class_exists( $obj_name ) ) {
+				continue;
+			}
+
 			// get the object.
 			$schedule_obj = new $obj_name();
 
@@ -332,6 +350,11 @@ class Schedules {
 	 * @return void
 	 */
 	public function check_events_on_shutdown(): void {
+		// bail on AJAX- and cron-requests.
+		if ( wp_doing_ajax() || wp_doing_cron() ) {
+			return;
+		}
+
 		// bail if the check is disabled.
 		if ( 1 !== absint( get_option( 'propstackConnectorEnableCronCheckInFrontend' ) ) ) {
 			return;

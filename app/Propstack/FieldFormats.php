@@ -52,6 +52,7 @@ class FieldFormats {
 	private function get_field_formats(): array {
 		$field_formats = array(
 			'\ConnectorForPropstack\Propstack\FieldFormats\Country',
+			'\ConnectorForPropstack\Propstack\FieldFormats\Date',
 			'\ConnectorForPropstack\Propstack\FieldFormats\DateTime',
 			'\ConnectorForPropstack\Propstack\FieldFormats\Email',
 			'\ConnectorForPropstack\Propstack\FieldFormats\Kilometer',
@@ -66,10 +67,22 @@ class FieldFormats {
 		/**
 		 * Filter the list of available field formats.
 		 *
+		 * Hint: this hook has been used for field formats and field types in the past. It is still
+		 * used here for backward compatibility. Entries which are not field formats are ignored.
+		 * Use "cfprop_field_formats" instead.
+		 *
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param array<int,string> $field_types List of field formats.
 		 */
-		return apply_filters( 'cfprop_field_types', $field_formats );
+		$field_formats = apply_filters( 'cfprop_field_types', $field_formats );
+
+		/**
+		 * Filter the list of available field formats.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<int,string> $field_formats List of field formats.
+		 */
+		return apply_filters( 'cfprop_field_formats', $field_formats );
 	}
 
 	/**

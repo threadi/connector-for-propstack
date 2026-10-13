@@ -49,6 +49,20 @@ class ImmoObjects {
 	private array $objects = array();
 
 	/**
+	 * List of field objects indexed by their names, used for the columns in the backend.
+	 *
+	 * @var array<string,Field_Base>|null
+	 */
+	private ?array $fields_by_name = null;
+
+	/**
+	 * Marker whether the cache has already been cleared after the deletion of an object during this request.
+	 *
+	 * @var bool
+	 */
+	private bool $cache_cleared_after_deletion = false;
+
+	/**
 	 * Variable for the instance of this Singleton object.
 	 *
 	 * @var ?ImmoObjects
@@ -126,6 +140,7 @@ class ImmoObjects {
 		add_filter( 'cfprop_object_type_fields', array( $this, 'hide_object_type_fields' ) );
 		add_filter( 'cfprop_object_import_response', array( $this, 'remove_document_from_response' ) );
 		add_filter( 'cfprop_object_import_response', array( $this, 'save_response' ) );
+		add_action( 'update_option_propstack_connector_debug', array( $this, 'remove_response_if_debug_disabled' ), 10, 2 );
 		add_filter( 'cfprop_api_object_url', array( $this, 'add_marketing_type_to_import_url' ) );
 		add_filter( 'cfprop_api_object_url', array( $this, 'add_object_type_to_import_url' ) );
 		add_filter( 'cfprop_api_object_url', array( $this, 'add_status_to_import_url' ) );
@@ -192,6 +207,11 @@ class ImmoObjects {
 
 		// bail on no results.
 		if ( 0 === $results->found_posts ) {
+			return array();
+		}
+
+		// bail if the results are not an array.
+		if ( ! is_array( $results->posts ) ) {
 			return array();
 		}
 
@@ -274,8 +294,13 @@ class ImmoObjects {
 		// add a log entry.
 		Log::get_instance()->add( __( 'Delete of all Propstack objects has been started.', 'connector-for-propstack' ), 'info', 'system' );
 
-		// get all objects.
-		$objects = $this->get_objects( array( 'posts_per_page' => -1 ) );
+		// get all objects, regardless of their status.
+		$objects = $this->get_objects(
+			array(
+				'posts_per_page' => -1,
+				'post_status'    => array( 'any', 'trash', 'auto-draft' ),
+			)
+		);
 
 		// get the object count.
 		$object_count = count( $objects );
@@ -300,7 +325,7 @@ class ImmoObjects {
 
 			// update marker.
 			/* translators: a title will replace %1$s. */
-			$process_handler->set_status( sprintf( __( 'Deleting object %1$s', 'connector-for-propstack' ), '<em>' . $object->get_title() . '</em>' ) );
+			$process_handler->set_status( sprintf( __( 'Deleting object %1$s', 'connector-for-propstack' ), '<em>' . esc_html( $object->get_title() ) . '</em>' ) );
 
 			// get the assigned images and delete them, if not disabled.
 			if ( 0 === $preserve_images ) {
@@ -310,7 +335,7 @@ class ImmoObjects {
 					// add a log entry.
 					if ( ! $delete_result instanceof WP_Post ) {
 						/* translators: a title will replace %1$s. */
-						Log::get_instance()->add( sprintf( __( 'Object %1$s could not be deleted.', 'connector-for-propstack' ), ' <em>' . $object->get_title() . '</em>' ), 'error', 'system' );
+						Log::get_instance()->add( sprintf( __( 'Object %1$s could not be deleted.', 'connector-for-propstack' ), ' <em>' . esc_html( $object->get_title() ) . '</em>' ), 'error', 'system' );
 					}
 				}
 			}
@@ -512,6 +537,7 @@ class ImmoObjects {
 		// add hidden setting for each language.
 		foreach ( Languages::get_instance()->get_languages() as $language_code => $name ) {
 			$setting = $settings_obj->add_setting( 'cfprop_md5_' . $language_code );
+			$setting->do_not_register( true ); // only an internal value without section, so it is not registered as setting.
 			$setting->prevent_export( true );
 			$setting->set_type( 'string' );
 			$setting->set_default( '' );
@@ -744,7 +770,8 @@ class ImmoObjects {
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
 		$setting->prevent_export( true );
-		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'string' ) ) ) );
+		$setting->set_autoload( false );
+		$setting->set_show_in_rest( array( 'schema' => array( 'items' => array( 'type' => 'object' ) ) ) );
 
 		// add setting.
 		$setting = $settings_obj->add_setting( 'cfprop_prevented_objects' );
@@ -992,8 +1019,8 @@ class ImmoObjects {
 		}
 
 		// add all fields.
-		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
-			$columns[ $field->get_name() ] = $field->get_label();
+		foreach ( $this->get_fields_by_name() as $field_name => $field ) {
+			$columns[ $field_name ] = $field->get_label();
 		}
 
 		// return the resulting list of columns.
@@ -1036,24 +1063,51 @@ class ImmoObjects {
 			return;
 		}
 
-		// check all files.
-		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
-			// bail if field does not match.
-			if ( $column_name !== $field->get_name() ) {
-				continue;
-			}
-
-			// get the value.
-			$value = get_post_meta( $post_id, $field->get_name(), true );
-
-			// bail if the value is not a string.
-			if ( ! is_string( $value ) ) {
-				continue;
-			}
-
-			// get the content.
-			echo wp_kses_post( $value );
+		// bail if this column is not one of our fields.
+		$fields = $this->get_fields_by_name();
+		if ( ! isset( $fields[ $column_name ] ) ) {
+			return;
 		}
+
+		// get the value.
+		$value = get_post_meta( $post_id, $column_name, true );
+
+		// bail if the value is not a string.
+		if ( ! is_string( $value ) ) {
+			return;
+		}
+
+		// get the content.
+		echo wp_kses_post( $value );
+	}
+
+	/**
+	 * Return the list of field objects indexed by their names.
+	 *
+	 * Fields without a name are not part of this list.
+	 *
+	 * @return array<string,Field_Base>
+	 */
+	private function get_fields_by_name(): array {
+		// return the list if it has already been built during this request.
+		if ( is_array( $this->fields_by_name ) ) {
+			return $this->fields_by_name;
+		}
+
+		// build the list.
+		$this->fields_by_name = array();
+		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
+			// bail if the field has no name.
+			if ( empty( $field->get_name() ) ) {
+				continue;
+			}
+
+			// add it to the list.
+			$this->fields_by_name[ $field->get_name() ] = $field;
+		}
+
+		// return the resulting list.
+		return $this->fields_by_name;
 	}
 
 	/**
@@ -1115,38 +1169,109 @@ class ImmoObjects {
 		}
 
 		// bail if this is not our post type.
-		if ( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() !== $query->query['post_type'] ) {
+		if ( ! isset( $query->query['post_type'] ) || \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() !== $query->query['post_type'] ) {
 			return;
+		}
+
+		// extend the search SQL of this query (the default search for title and content is kept).
+		add_filter( 'posts_search', array( $this, 'extend_search_sql' ), 10, 2 );
+	}
+
+	/**
+	 * Extend the search SQL for objects in the backend with some of their meta-fields.
+	 *
+	 * @param string   $search The search SQL.
+	 * @param WP_Query $query  The "WP_Query" object.
+	 *
+	 * @return string
+	 */
+	public function extend_search_sql( string $search, WP_Query $query ): string {
+		// bail if this is not the main query or the search SQL is empty.
+		if ( ! $query->is_main_query() || empty( $search ) ) {
+			return $search;
+		}
+
+		// bail if this is not our post type.
+		if ( ! isset( $query->query['post_type'] ) || \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() !== $query->query['post_type'] ) {
+			return $search;
 		}
 
 		// get the search term.
 		$search_term = $query->get( 's' );
 
-		// get the "meta_query".
-		$meta_query = $query->get( 'meta_query' );
-
-		// if it is empty, create an array.
-		if ( empty( $meta_query ) ) {
-			$meta_query = array();
+		// bail if the search term is not usable.
+		if ( ! is_string( $search_term ) || '' === trim( $search_term ) ) {
+			return $search;
 		}
 
-		// update the relational.
-		$meta_query['relation'] = 'OR';
+		// get the meta keys to search in.
+		$meta_keys = $this->get_search_meta_keys();
 
-		// add the fields we want to use for search.
-		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
-			$meta_query[] = array(
-				'key'     => $field->get_name(),
-				'value'   => $search_term,
-				'compare' => 'LIKE',
-			);
+		// bail if no keys are given.
+		if ( empty( $meta_keys ) ) {
+			return $search;
 		}
 
-		// set the meta-query.
-		$query->set( 'meta_query', $meta_query );
+		global $wpdb;
 
-		// remove default search.
-		$query->set( 's', '' );
+		// create the SQL for the search in the meta-fields.
+		$placeholders = implode( ', ', array_fill( 0, count( $meta_keys ), '%s' ) );
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders are generated above, values are passed as arguments.
+		$meta_sql = $wpdb->prepare(
+			"{$wpdb->posts}.ID IN ( SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key IN ( {$placeholders} ) AND meta_value LIKE %s )",
+			array_merge( $meta_keys, array( '%' . $wpdb->esc_like( trim( $search_term ) ) . '%' ) )
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+
+		// bail if the SQL could not be prepared.
+		if ( ! is_string( $meta_sql ) || '' === $meta_sql ) {
+			return $search;
+		}
+
+		// add it to the first condition of the search (which contains the search in title and content).
+		$new_search = preg_replace( '/^\s*AND\s*\(/', ' AND ( ' . str_replace( array( '\\', '$' ), array( '\\\\', '\\$' ), $meta_sql ) . ' OR ', $search, 1 );
+
+		// return the resulting search SQL.
+		return is_string( $new_search ) ? $new_search : $search;
+	}
+
+	/**
+	 * Return the meta keys of objects which are used for the search in the backend.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_search_meta_keys(): array {
+		$meta_keys = array(
+			'object_id',
+			'unit_id',
+			'expose_id',
+			'project_id',
+			'street',
+			'house_number',
+			'zip_code',
+			'city',
+			'district',
+			'region',
+			'location_name',
+			'address',
+			'short_address',
+		);
+
+		/**
+		 * Filter the meta keys of objects which are used for the search in the backend.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<int,string> $meta_keys List of meta keys.
+		 */
+		$meta_keys = apply_filters( 'cfprop_object_search_meta_keys', $meta_keys );
+
+		// bail if the result is not an array.
+		if ( ! is_array( $meta_keys ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			return array();
+		}
+
+		// return only usable keys.
+		return array_values( array_filter( $meta_keys, static fn( $meta_key ) => is_string( $meta_key ) && '' !== $meta_key ) ); // @phpstan-ignore function.alreadyNarrowedType
 	}
 
 	/**
@@ -1269,7 +1394,7 @@ class ImmoObjects {
 		}
 
 		// check for configured prevention.
-		return $this->prevent_import_by_taxonomy( 'propstack_connector_import_object_type', (string) $immo_object['rs_type'], $prevent_import );
+		return $this->prevent_import_by_taxonomy( 'propstack_connector_import_object_type', $this->get_api_value_as_string( $object_type_name ), $prevent_import );
 	}
 
 	/**
@@ -1615,7 +1740,7 @@ class ImmoObjects {
 
 			// bail if no image was found.
 			if ( ! $attachment_id_for_thumbnail ) {
-				return;
+				continue;
 			}
 
 			// add a log entry.
@@ -1692,6 +1817,11 @@ class ImmoObjects {
 			return $fields;
 		}
 
+		// bail if the fields are requested for an import (also via cron or WP CLI), as hidden fields must be imported, too.
+		if ( Fields::get_instance()->is_importing_fields() || wp_doing_cron() || Helper::is_cli() ) {
+			return $fields;
+		}
+
 		// check the fields.
 		foreach ( $fields as $index => $field ) {
 			if ( $field->hide() ) {
@@ -1719,6 +1849,12 @@ class ImmoObjects {
 	 */
 	public function after_deletion_of_object(): void {
 		$this->set_has_objects();
+
+		// clear the cache only once per request, as many objects could be deleted in one request (e.g. during import).
+		if ( $this->cache_cleared_after_deletion ) {
+			return;
+		}
+		$this->cache_cleared_after_deletion = true;
 		Cache::get_instance()->clear_cache();
 	}
 
@@ -1997,11 +2133,14 @@ class ImmoObjects {
 	public function save_response( array $data ): array {
 		// bail if debug is disabled.
 		if ( 1 !== absint( get_option( 'propstack_connector_debug', 0 ) ) ) {
+			// remove any response saved before, as it contains personal data.
+			$this->delete_saved_response();
+
 			return $data;
 		}
 
-		// save the response.
-		update_option( 'cfprop_last_api_response', $data );
+		// save the response (without autoload, as it is only used for debugging).
+		update_option( 'cfprop_last_api_response', $data, false );
 
 		// return the response data.
 		return $data;
@@ -2075,6 +2214,40 @@ class ImmoObjects {
 
 		// add the status to the URL.
 		return add_query_arg( array( 'status' => implode( ',', array_values( $import_states ) ) ), $url );
+	}
+
+	/**
+	 * Remove the saved API response if the debug mode has been disabled.
+	 *
+	 * @param mixed $old_value The old value of the debug setting.
+	 * @param mixed $new_value The new value of the debug setting.
+	 *
+	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function remove_response_if_debug_disabled( mixed $old_value, mixed $new_value ): void {
+		// bail if debug mode is enabled.
+		if ( is_scalar( $new_value ) && 1 === absint( $new_value ) ) {
+			return;
+		}
+
+		// remove the saved response.
+		$this->delete_saved_response();
+	}
+
+	/**
+	 * Delete the saved API response, if one is saved.
+	 *
+	 * @return void
+	 */
+	private function delete_saved_response(): void {
+		// bail if no response is saved.
+		if ( empty( get_option( 'cfprop_last_api_response' ) ) ) {
+			return;
+		}
+
+		// delete it.
+		delete_option( 'cfprop_last_api_response' );
 	}
 
 	/**

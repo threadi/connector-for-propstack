@@ -82,7 +82,7 @@ class Archive extends Blocks_Basis {
 			// get styles.
 			$styles = Helper::get_attribute_value_from_html( 'style', $block_html_attributes );
 			if ( ! empty( $styles ) ) {
-				$styles_array[] = '.entry-content.' . $classes . ' { ' . $styles . ' }';
+				$styles_array[] = \ConnectorForPropstack\Plugin\Templates::get_block_css_rule( $classes, $styles );
 			}
 		}
 

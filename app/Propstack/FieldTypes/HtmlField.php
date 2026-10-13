@@ -51,6 +51,9 @@ class HtmlField extends FieldType_Base {
 
 		// remove the style and id attributes.
 		$pre_cleaned_value = preg_replace( '/ style=("|\')(.*?)("|\')/', '', (string) $this->value );
-		return preg_replace( '/ id=("|\')(.*?)("|\')/', '', (string) $pre_cleaned_value );
+		$cleaned_value     = preg_replace( '/ id=("|\')(.*?)("|\')/', '', (string) $pre_cleaned_value );
+
+		// allow only HTML-code which is allowed in posts.
+		return wp_kses_post( (string) $cleaned_value );
 	}
 }

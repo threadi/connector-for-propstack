@@ -1,7 +1,7 @@
 === Connector for Propstack ===
 Contributors: laolaweb, threadi
 Tags: propstack, real estate, immobilien, rental, property
-Requires at least: 6.0
+Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.2
 License: GPL-2.0-or-later
@@ -67,6 +67,10 @@ Connector for Propstack is developed by [laOlaWeb](https://laolaweb.com), a Word
 ### External services
 
 This plugin connects to the Propstack API at [www.propstack.de](https://www.propstack.de) to retrieve the objects of your personal account.
+
+* **What is sent:** the API key you entered is sent in the "X-API-KEY" header of every request to the Propstack API at api.propstack.de, together with the parameters of the request (e.g. language, page, filter for the objects to import). No data about the visitors of your website is sent.
+* **When it is sent:** when you validate the API key during the setup, when you start an import manually, during the automatic imports via WP-Cron (if enabled) and when you run an import via WP-CLI.
+* **Downloaded files:** images and files of your objects and brokers are downloaded from the URLs contained in the API response (usually images.propstack.de, but also other public HTTPS hosts referenced by Propstack). Only HTTPS-URLs are accepted. Developers can restrict the allowed hosts with the filter "cfprop_allowed_file_hosts".
 
 This API service is provided by Propstack: [terms of service](https://www.propstack.de/nutzungsbedingungen/), [privacy policy](https://www.propstack.de/datenschutz/).
 

@@ -22,6 +22,13 @@ class Compatibilities {
 	private static ?Compatibilities $instance = null;
 
 	/**
+	 * Name of the transient which marks the last run of the checks.
+	 *
+	 * @var string
+	 */
+	private const CHECK_TRANSIENT = 'cfprop_compatibility_checks_run';
+
+	/**
 	 * Constructor for Schedules-Handler.
 	 */
 	private function __construct() {}
@@ -55,6 +62,21 @@ class Compatibilities {
 
 		// check each compatibility.
 		add_action( 'init', array( $this, 'check' ) );
+
+		// force a new check after changes on plugins or themes.
+		add_action( 'activated_plugin', array( $this, 'reset_check_interval' ), 10, 0 );
+		add_action( 'deactivated_plugin', array( $this, 'reset_check_interval' ), 10, 0 );
+		add_action( 'switch_theme', array( $this, 'reset_check_interval' ), 10, 0 );
+		add_action( 'upgrader_process_complete', array( $this, 'reset_check_interval' ), 10, 0 );
+	}
+
+	/**
+	 * Reset the interval for the compatibility checks, so they will be run on the next request in backend.
+	 *
+	 * @return void
+	 */
+	public function reset_check_interval(): void {
+		delete_transient( self::CHECK_TRANSIENT );
 	}
 
 	/**
@@ -76,6 +98,26 @@ class Compatibilities {
 		if ( apply_filters( 'cfprop_run_compatibility_checks', $false ) ) {
 			return;
 		}
+
+		// bail on AJAX- and cron-requests (e.g., the heartbeat).
+		if ( wp_doing_ajax() || wp_doing_cron() ) {
+			return;
+		}
+
+		// bail if the checks have been run recently (the resulting hints are kept until the next check).
+		if ( get_transient( self::CHECK_TRANSIENT ) ) {
+			return;
+		}
+
+		// mark the checks as run.
+		$interval = 12 * HOUR_IN_SECONDS;
+		/**
+		 * Filter the interval in seconds in which the compatibility checks are run.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param int $interval The interval in seconds.
+		 */
+		set_transient( self::CHECK_TRANSIENT, 1, max( 1, absint( apply_filters( 'cfprop_compatibility_checks_interval', $interval ) ) ) );
 
 		// loop through our compatibility-checks.
 		foreach ( $this->get_compatibility_checks_as_object() as $compatibility_check_obj ) {

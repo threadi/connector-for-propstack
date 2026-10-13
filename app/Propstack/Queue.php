@@ -25,6 +25,7 @@ use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\ProcessHandler;
 use ConnectorForPropstack\Plugin\Schedules;
 use ConnectorForPropstack\Plugin\Settings;
+use Throwable;
 use WP_Post;
 use WP_Query;
 
@@ -38,6 +39,20 @@ class Queue {
 	 * @var array<string,int>|null
 	 */
 	private ?array $queue_map = null;
+
+	/**
+	 * The amount of entries the last request of the queue found in total (without the limit).
+	 *
+	 * @var int
+	 */
+	private int $last_found_posts = 0;
+
+	/**
+	 * Marker whether the last call of process() could not run as another process imports files right now.
+	 *
+	 * @var bool
+	 */
+	private bool $locked = false;
 
 	/**
 	 * Variable for the instance of this Singleton object.
@@ -170,17 +185,20 @@ class Queue {
 			return;
 		}
 
-		// get the immo object title.
+		// get the immo object title, the API v1 delivers it as a field with label and value.
 		$title = '';
-		if ( is_array( $immo_object['title'] ) ) {
-			$title = $immo_object['title']['value'];
+		if ( isset( $immo_object['title'] ) && is_array( $immo_object['title'] ) ) {
+			$title = $immo_object['title']['value'] ?? '';
 		} elseif ( ! empty( $immo_object['title'] ) ) {
 			$title = $immo_object['title'];
+		}
+		if ( ! is_scalar( $title ) ) {
+			$title = '';
 		}
 
 		// add a log entry.
 		/* translators: %1$s: the given title. */
-		Log::get_instance()->add( sprintf( __( 'Adding files for %1$s during import.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'queue' );
+		Log::get_instance()->add( sprintf( __( 'Adding files for %1$s during import.', 'connector-for-propstack' ), '<em>' . esc_html( (string) $title ) . '</em>' ), 'info', 'queue' );
 
 		// bail if no images are given.
 		if ( empty( $immo_object['images'] ) || ! is_array( $immo_object['images'] ) ) {
@@ -192,6 +210,11 @@ class Queue {
 
 		// add the images of this object to the queue.
 		foreach ( $immo_object['images'] as $file ) {
+			// bail if this is not a usable file entry.
+			if ( ! is_array( $file ) || ! isset( $file['id'] ) || ! is_scalar( $file['id'] ) ) {
+				continue;
+			}
+
 			// get its post-ID in the queue.
 			$queue_post_id = 0;
 			$state         = 0;
@@ -213,7 +236,7 @@ class Queue {
 			}
 
 			// bail if the given URL is already in the media library.
-			$attachment_id = Files::get_instance()->is_file_in_media_library( absint( $file['id'] ) );
+			$attachment_id = Files::get_instance()->is_file_in_media_library( max( 0, (int) $file['id'] ) );
 			if ( $attachment_id > 0 ) {
 				// add a log entry.
 				/* translators: %1$s: the given URL. */
@@ -253,7 +276,7 @@ class Queue {
 				'ID'           => $queue_post_id,
 				'post_type'    => PostTypes\Queue::get_instance()->get_name(),
 				'post_status'  => 'publish',
-				'post_title'   => $file['id'],
+				'post_title'   => (string) $file['id'],
 				'post_author'  => Helper::get_author_during_object_creation(),
 				'post_parent'  => $post_id,
 				'post_content' => '',
@@ -344,6 +367,9 @@ class Queue {
 		// request them.
 		$result = new WP_Query( $query );
 
+		// remember the total amount of entries.
+		$this->last_found_posts = absint( $result->found_posts );
+
 		// return an empty list of nothing could be found.
 		if ( 0 === $result->found_posts ) {
 			return array();
@@ -363,6 +389,15 @@ class Queue {
 	}
 
 	/**
+	 * Return the amount of entries the last call of get_queue() found in total (without its limit).
+	 *
+	 * @return int
+	 */
+	public function get_last_found_posts(): int {
+		return $this->last_found_posts;
+	}
+
+	/**
 	 * Process the queue.
 	 *
 	 * Load X entries and import their files.
@@ -379,6 +414,54 @@ class Queue {
 			return;
 		}
 
+		// this run is not locked until now.
+		$this->locked = false;
+
+		// get the lock for the import of files, so no file is imported by two requests at the same time.
+		$lock = Files::get_instance()->get_import_lock();
+		if ( ! $lock->acquire() ) {
+			// mark this run as locked.
+			$this->locked = true;
+
+			// add a log entry.
+			Log::get_instance()->add( __( 'Another import of files is running. The queue will be processed during its next run.', 'connector-for-propstack' ), 'info', 'queue' );
+
+			// update the process handler.
+			$process_handler = ProcessHandler::get_instance();
+			$process_handler->set_id( $process_id );
+			$process_handler->set_running( 0 );
+			$process_handler->set_message( $this->get_locked_dialog_config() );
+
+			// do nothing more.
+			return;
+		}
+
+		// process the entries and release the lock in any case.
+		try {
+			$this->process_entries( $process_id, $lock );
+		} finally {
+			$lock->release();
+		}
+	}
+
+	/**
+	 * Return whether the last call of process() did not process the queue as another process imports files right now.
+	 *
+	 * @return bool
+	 */
+	public function was_locked(): bool {
+		return $this->locked;
+	}
+
+	/**
+	 * Process the entries of the queue while this request holds the lock for the import of files.
+	 *
+	 * @param string $process_id The process ID.
+	 * @param Lock   $lock       The lock for the import of files.
+	 *
+	 * @return void
+	 */
+	private function process_entries( string $process_id, Lock $lock ): void {
 		// get the actual but limited queue.
 		$queue = $this->get_queue();
 
@@ -406,64 +489,62 @@ class Queue {
 		// get the immo objects handler.
 		$immo_objects = ImmoObjects::get_instance();
 
+		// get the name of the post type for objects.
+		$object_post_type = PostTypes\ImmoObject::get_instance()->get_name();
+
 		// show cli hint.
 		$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Process queue to import files', count( $queue ) ) : false;
 
 		// import the given files.
 		foreach ( $queue as $post ) {
-			// get the URL in the chosen image size.
-			$url = $this->get_file_url_of_entry( $post->ID );
+			// keep the lock alive.
+			$lock->refresh();
 
-			// get the file name.
-			$name = get_post_meta( $post->ID, 'name', true );
-			if ( empty( $name ) ) {
-				$name = basename( $url );
-			}
+			// no file has been imported for this entry yet.
+			$attachment_id = 0;
 
-			// get the immo object.
-			$immo_object = $immo_objects->get_object( $post->post_parent );
+			try {
+				// get the URL in the chosen image size.
+				$url = $this->get_file_url_of_entry( $post->ID );
 
-			// remove entries from the queue, which would not be imported anyway (e.g. private files added by older versions).
-			if ( $this->is_file_import_prevented( (array) get_post_meta( $post->ID, 'api_response', true ), (string) $url ) ) {
-				wp_delete_post( $post->ID, true );
-
-				// show progress.
-				$process_handler->set_count( $process_handler->get_count() + 1 );
-				$progress ? $progress->tick() : '';
-
-				// continue with the next entry.
-				continue;
-			}
-
-			// show status.
-			/* translators: %1$s: the file name. */
-			$process_handler->set_status( sprintf( __( 'Processing file %1$s for %2$s', 'connector-for-propstack' ), '<em>' . $name . '</em>', '<em>' . $immo_object->get_title() . '</em>' ) );
-
-			// save it.
-			$attachment_id = $files_obj->import_file( $post->post_parent, absint( get_post_meta( $post->ID, 'id', true ) ), $url, $name, (array) get_post_meta( $post->ID, 'api_response', true ) );
-
-			// add this file to the list of files for the object.
-			if ( $attachment_id > 0 ) {
-				// update the corresponding list of files.
-				$immo_object->add_to_image_list( $attachment_id );
+				// get the file name.
+				$name = get_post_meta( $post->ID, 'name', true );
+				if ( empty( $name ) || ! is_string( $name ) ) {
+					$name = Files::get_instance()->get_file_name_from_url( $url );
+				}
 
 				// get the API response for this file.
 				$file = get_post_meta( $post->ID, 'api_response', true );
+				if ( ! is_array( $file ) ) {
+					$file = array();
+				}
 
-				/**
-				 * Run additional tasks after a file has been assigned to an object.
-				 *
-				 * @since 1.0.0 Available since 1.0.0.
-				 * @param int $attachment The attachment ID.
-				 * @param array<string,mixed> $file The file data from Propstack API.
-				 * @param ImmoObject $immo_object_obj The immo object.
-				 */
-				do_action( 'cfprop_file_is_assigned', $attachment_id, $file, $immo_object );
+				// check whether the object of this entry does not exist anymore, e.g. as it has been removed by the cleanup of an import.
+				$object_missing = $post->post_parent <= 0 || get_post_type( $post->post_parent ) !== $object_post_type;
 
-				// delete it from the queue.
-				wp_delete_post( $post->ID, true );
-			} else {
-				// mark as failure and count the attempts, so it will be retried in later runs until the max attempts are reached.
+				// remove entries whose object is missing or which would not be imported anyway (e.g. private files added by older versions).
+				if ( $object_missing || $this->is_file_import_prevented( $file, $url ) ) {
+					wp_delete_post( $post->ID, true );
+
+					// add a log entry.
+					if ( $object_missing ) {
+						/* translators: %1$s: the file ID. */
+						Log::get_instance()->add( sprintf( __( 'File ID %1$s has been removed from the queue as its object does not exist anymore.', 'connector-for-propstack' ), '<em>' . esc_html( $post->post_title ) . '</em>' ), 'info', 'queue' );
+					}
+
+					// show progress.
+					$process_handler->set_count( $process_handler->get_count() + 1 );
+					$progress ? $progress->tick() : '';
+
+					// continue with the next entry.
+					continue;
+				}
+
+				// get the immo object.
+				$immo_object = $immo_objects->get_object( $post->post_parent );
+
+				// count this attempt before the import: an entry which aborts the request (e.g. by the memory or time limit)
+				// is moved behind the other entries and stops being processed after the max attempts.
 				$failed_attempts = absint( get_post_meta( $post->ID, 'failed_attempts', true ) ) + 1;
 				wp_update_post(
 					array(
@@ -476,9 +557,39 @@ class Queue {
 					)
 				);
 
-				// add a log entry.
-				/* translators: %1$s: the file ID, %2$d: the count of failed attempts, %3$d: the max attempts. */
-				Log::get_instance()->add( sprintf( __( 'Import of file ID %1$s from the queue failed (attempt %2$d of %3$d).', 'connector-for-propstack' ), '<em>' . esc_html( $post->post_title ) . '</em>', $failed_attempts, $this->get_max_attempts() ), 'error', 'queue' );
+				// show status.
+				/* translators: %1$s: the file name. */
+				$process_handler->set_status( sprintf( __( 'Processing file %1$s for %2$s', 'connector-for-propstack' ), '<em>' . esc_html( $name ) . '</em>', '<em>' . esc_html( $immo_object->get_title() ) . '</em>' ) );
+
+				// save it.
+				$attachment_id = $files_obj->import_file( $post->post_parent, absint( get_post_meta( $post->ID, 'id', true ) ), $url, $name, $file );
+
+				// add this file to the list of files for the object.
+				if ( $attachment_id > 0 ) {
+					// update the corresponding list of files.
+					$immo_object->add_to_image_list( $attachment_id );
+
+					/**
+					 * Run additional tasks after a file has been assigned to an object.
+					 *
+					 * @since 1.0.0 Available since 1.0.0.
+					 * @param int $attachment The attachment ID.
+					 * @param array<string,mixed> $file The file data from Propstack API.
+					 * @param ImmoObject $immo_object_obj The immo object.
+					 */
+					do_action( 'cfprop_file_is_assigned', $attachment_id, $file, $immo_object );
+
+					// delete it from the queue.
+					wp_delete_post( $post->ID, true );
+				} else {
+					// add a log entry, the attempt has already been counted.
+					/* translators: %1$s: the file ID, %2$d: the count of failed attempts, %3$d: the max attempts. */
+					Log::get_instance()->add( sprintf( __( 'Import of file ID %1$s from the queue failed (attempt %2$d of %3$d).', 'connector-for-propstack' ), '<em>' . esc_html( $post->post_title ) . '</em>', $failed_attempts, $this->get_max_attempts() ), 'error', 'queue' );
+				}
+			} catch ( Throwable $e ) {
+				// add a log entry, the attempt has already been counted.
+				/* translators: %1$s: the file ID. */
+				Log::get_instance()->add( sprintf( __( 'Import of file ID %1$s from the queue failed with an error:', 'connector-for-propstack' ), '<em>' . esc_html( $post->post_title ) . '</em>' ) . '<br>' . Helper::get_throwable_as_log_text( $e ), 'error', 'queue' );
 			}
 
 			/**
@@ -525,6 +636,132 @@ class Queue {
 		$process_handler->set_running( 0 );
 		$process_handler->set_message( $dialog );
 		$progress ? $progress->finish() : '';
+	}
+
+	/**
+	 * Return the dialog configuration if the queue could not be processed as another import of files is running.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function get_locked_dialog_config(): array {
+		return array(
+			'detail' => array(
+				'className' => 'cfprop-dialog',
+				'title'     => __( 'Queue has not been processed', 'connector-for-propstack' ),
+				'texts'     => array(
+					'<p><strong>' . __( 'Another import of files is running.', 'connector-for-propstack' ) . '</strong></p>',
+					'<p>' . __( 'Please try again in a few minutes.', 'connector-for-propstack' ) . '</p>',
+				),
+				'buttons'   => array(
+					array(
+						'action'  => 'location.reload();',
+						'variant' => 'primary',
+						'text'    => __( 'OK', 'connector-for-propstack' ),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Delete all entries of the given object from the queue, e.g. if the object has been deleted.
+	 *
+	 * @param int $post_id The post-ID of the object.
+	 *
+	 * @return void
+	 */
+	public function delete_entries_of_object( int $post_id ): void {
+		// bail if no object is given.
+		if ( $post_id <= 0 ) {
+			return;
+		}
+
+		// get the entries of this object.
+		$entries = get_posts(
+			array(
+				'post_type'      => PostTypes\Queue::get_instance()->get_name(),
+				'post_status'    => 'any',
+				'post_parent'    => $post_id,
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+			)
+		);
+
+		// delete them.
+		foreach ( $entries as $entry_id ) {
+			wp_delete_post( absint( $entry_id ), true );
+		}
+
+		// the map of entries is not up to date anymore.
+		$this->queue_map = null;
+	}
+
+	/**
+	 * Delete entries which reached the max attempts and failed for the last time a long time ago.
+	 *
+	 * These entries are not processed anymore. They are added again if their object delivers them
+	 * during a later import, so they would only fill the database.
+	 *
+	 * @return int The amount of deleted entries.
+	 */
+	public function purge_failed_entries(): int {
+		$days = 30;
+		/**
+		 * Filter the amount of days after which an entry of the queue which reached the max attempts is deleted.
+		 *
+		 * Use 0 to keep these entries.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param int $days The amount of days.
+		 */
+		$days = absint( apply_filters( 'cfprop_queue_failed_entries_lifetime', $days ) );
+
+		// bail if these entries should be kept.
+		if ( 0 === $days ) {
+			return 0;
+		}
+
+		// get the entries.
+		$entries = get_posts(
+			array(
+				'post_type'      => PostTypes\Queue::get_instance()->get_name(),
+				'post_status'    => 'any',
+				'posts_per_page' => 100,
+				'fields'         => 'ids',
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; sync context.
+					'relation' => 'AND',
+					array(
+						'key'     => 'failed_attempts',
+						'value'   => $this->get_max_attempts(),
+						'compare' => '>=',
+						'type'    => 'NUMERIC',
+					),
+					array(
+						'key'     => 'failed',
+						'value'   => time() - $days * DAY_IN_SECONDS,
+						'compare' => '<',
+						'type'    => 'NUMERIC',
+					),
+				),
+			)
+		);
+
+		// delete them.
+		foreach ( $entries as $entry_id ) {
+			wp_delete_post( absint( $entry_id ), true );
+		}
+
+		// add a log entry.
+		if ( ! empty( $entries ) ) {
+			/* translators: %1$d will be replaced by the amount of entries, %2$d by the amount of days. */
+			Log::get_instance()->add( sprintf( __( '%1$d entries of the queue which failed for more than %2$d days have been deleted.', 'connector-for-propstack' ), count( $entries ), $days ), 'info', 'queue' );
+
+			// the map of entries is not up to date anymore.
+			$this->queue_map = null;
+		}
+
+		// return the amount of deleted entries.
+		return count( $entries );
 	}
 
 	/**
@@ -675,8 +912,14 @@ class Queue {
 		// show a message.
 		$transient_obj = Transients::get_instance()->add();
 		$transient_obj->set_name( 'propstack_connector_queue_processed' );
-		$transient_obj->set_message( '<strong>' . __( 'The queue has been processed.', 'connector-for-propstack' ) . '</strong><br>' . __( 'Some files have been imported. Check your objects.', 'connector-for-propstack' ) );
-		$transient_obj->set_type( 'success' );
+		if ( $this->was_locked() ) {
+			// the queue has not been processed as another process imports files right now.
+			$transient_obj->set_message( '<strong>' . __( 'Another import of files is running. The queue has not been processed.', 'connector-for-propstack' ) . '</strong><br>' . __( 'Please try again in a few minutes.', 'connector-for-propstack' ) );
+			$transient_obj->set_type( 'error' );
+		} else {
+			$transient_obj->set_message( '<strong>' . __( 'The queue has been processed.', 'connector-for-propstack' ) . '</strong><br>' . __( 'Some files have been imported. Check your objects.', 'connector-for-propstack' ) );
+			$transient_obj->set_type( 'success' );
+		}
 		$transient_obj->save();
 
 		// redirect back to the referring page.
@@ -813,7 +1056,7 @@ class Queue {
 		 *
 		 * @noinspection PhpConditionAlreadyCheckedInspection
 		 */
-		return (bool) apply_filters( 'cfprop_prevent_file_import', $false, $file, absint( $file['id'] ?? 0 ), $url, ! empty( $file['name'] ) ? (string) $file['name'] : basename( $url ) );
+		return (bool) apply_filters( 'cfprop_prevent_file_import', $false, $file, absint( $file['id'] ?? 0 ), $url, ! empty( $file['name'] ) && is_scalar( $file['name'] ) ? (string) $file['name'] : Files::get_instance()->get_file_name_from_url( $url ) );
 	}
 
 	/**

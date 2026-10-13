@@ -11,7 +11,6 @@ namespace ConnectorForPropstack\Propstack;
 defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
-use ConnectorForPropstack\Propstack\Fields\Broker\Email;
 use ConnectorForPropstack\Propstack\Fields\Broker\Name;
 use ConnectorForPropstack\Propstack\Fields\Broker\Position;
 use ConnectorForPropstack\Propstack\Fields\Broker\PublicEmail;
@@ -158,6 +157,116 @@ class Templates {
 	}
 
 	/**
+	 * Return the list of template names which could be used in the archive and single widgets.
+	 *
+	 * Each name is used for the action "cfprop_template_<name>". Only names in this list are allowed
+	 * as other hooks with this prefix (e.g., filters) must not be called via user-defined attributes.
+	 *
+	 * @return array<int,string>
+	 */
+	public function get_template_names(): array {
+		// list of our own template hooks.
+		$list = array(
+			'thumbnail',
+			'location_object_type',
+			'title',
+			'broker',
+			'values',
+			'marketing_type',
+			'key_facts',
+			'detail_link',
+			'property_details',
+			'2column_content',
+			'gallery',
+		);
+
+		// add the registered category types.
+		foreach ( FieldCategories::get_instance()->get_category_types_as_objects() as $category_type ) {
+			$list[] = $category_type->get_name();
+		}
+
+		/**
+		 * Filter the list of allowed template names for the archive and single widgets.
+		 *
+		 * Each name is used to run the action "cfprop_template_<name>".
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<int,string> $list List of template names.
+		 */
+		$list = apply_filters( 'cfprop_template_names', $list );
+
+		// bail if the result is not an array.
+		if ( ! is_array( $list ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			return array();
+		}
+
+		// return the unique list of strings.
+		return array_values( array_unique( array_filter( $list, 'is_string' ) ) );
+	}
+
+	/**
+	 * Return only the allowed template names from the given list.
+	 *
+	 * Allowed are:
+	 * - the names from get_template_names().
+	 * - names for which an action "cfprop_template_<name>" has been added (e.g., by the Pro plugin or custom code),
+	 *   except names of hooks with this prefix which are filters with a different signature (see get_denied_template_names()).
+	 *
+	 * @param array<int,string> $template_names List of template names.
+	 *
+	 * @return array<int,string>
+	 */
+	public function get_allowed_template_names( array $template_names ): array {
+		// get the known template names.
+		$known_names = $this->get_template_names();
+
+		// get the denied template names.
+		$denied_names = $this->get_denied_template_names();
+
+		// check each name.
+		$allowed_names = array();
+		foreach ( $template_names as $template_name ) {
+			// bail if the name is not a string.
+			if ( ! is_string( $template_name ) ) { // @phpstan-ignore function.alreadyNarrowedType
+				continue;
+			}
+
+			// allow known names.
+			if ( in_array( $template_name, $known_names, true ) ) {
+				$allowed_names[] = $template_name;
+				continue;
+			}
+
+			// bail if the name contains unexpected characters or is denied.
+			if ( sanitize_key( $template_name ) !== $template_name || in_array( $template_name, $denied_names, true ) ) {
+				continue;
+			}
+
+			// allow names for which a custom template hook is registered.
+			if ( has_action( 'cfprop_template_' . $template_name ) ) {
+				$allowed_names[] = $template_name;
+			}
+		}
+
+		// return the resulting list.
+		return $allowed_names;
+	}
+
+	/**
+	 * Return the list of template names which must never be used for the template hooks.
+	 *
+	 * These are names of other hooks with the prefix "cfprop_template_" which are filters with a different signature.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_denied_template_names(): array {
+		return array(
+			'ability_adapters',
+			'names',
+		);
+	}
+
+	/**
 	 * Show the thumbnail for the given object.
 	 *
 	 * @param ImmoObject $immo_object The immo object.
@@ -213,10 +322,10 @@ class Templates {
 	 */
 	public function show_location_and_object_type( ImmoObject $immo_object ): void {
 		// get the zip code for this object.
-		$zip_code = Fields::get_instance()->get_field_value( $immo_object->get_id(), new ZipCode() );
+		$zip_code = $this->get_visible_field_value( $immo_object, new ZipCode() );
 
 		// get the city for this object.
-		$city = Fields::get_instance()->get_field_value( $immo_object->get_id(), new City() );
+		$city = $this->get_visible_field_value( $immo_object, new City() );
 
 		// get the object type.
 		$object_type_term = wp_get_object_terms( $immo_object->get_id(), ObjectType::get_instance()->get_name() );
@@ -227,7 +336,7 @@ class Templates {
 
 		// output.
 		echo '<div class="cfprop-location-object-type">';
-		echo '<p>' . esc_html( $zip_code . ' ' . $city ) . '</p>';
+		echo '<p>' . esc_html( trim( $zip_code . ' ' . $city ) ) . '</p>';
 		echo '<p>' . esc_html( $object_type ) . '</p>';
 		echo '</div>';
 	}
@@ -252,16 +361,16 @@ class Templates {
 	 */
 	public function show_values( ImmoObject $immo_object ): void {
 		// get the total rent.
-		$total_rent = Fields::get_instance()->get_field_value( $immo_object->get_id(), new TotalRent() );
+		$total_rent = $this->get_visible_field_value( $immo_object, new TotalRent() );
 
 		// get the price.
-		$price = Fields::get_instance()->get_field_value( $immo_object->get_id(), new Price() );
+		$price = $this->get_visible_field_value( $immo_object, new Price() );
 
-		// get the price.
-		$living_space = Fields::get_instance()->get_field_value( $immo_object->get_id(), new LivingSpace() );
+		// get the living space.
+		$living_space = $this->get_visible_field_value( $immo_object, new LivingSpace() );
 
-		// get the price.
-		$net_floor_space = Fields::get_instance()->get_field_value( $immo_object->get_id(), new NetFloorSpace() );
+		// get the net floor space.
+		$net_floor_space = $this->get_visible_field_value( $immo_object, new NetFloorSpace() );
 
 		// output.
 		echo '<div class="cfprop-values"><div class="cfprop-costs">';
@@ -387,7 +496,7 @@ class Templates {
 		}
 
 		// set the fields.
-		$attributes['object_data'] = $this->get_fields_by_category_type( $category_type, $object_type );
+		$attributes['object_data'] = $this->get_fields_by_category_type( $category_type, $object_type, $immo_object );
 
 		// bail if no fields are set.
 		if ( empty( $attributes['object_data'] ) ) {
@@ -408,10 +517,11 @@ class Templates {
 	 *
 	 * @param Field_Category_Type_Base $category_type_to_check The category type to check.
 	 * @param Object_Type_Base         $object_type The object type.
+	 * @param ImmoObject|null          $immo_object The object, if given only fields visible on this object will be returned.
 	 *
 	 * @return array<int,string>
 	 */
-	public function get_fields_by_category_type( Field_Category_Type_Base $category_type_to_check, Object_Type_Base $object_type ): array {
+	public function get_fields_by_category_type( Field_Category_Type_Base $category_type_to_check, Object_Type_Base $object_type, ?ImmoObject $immo_object = null ): array {
 		// get the category types for this object type.
 		$category_types = array();
 
@@ -446,6 +556,16 @@ class Templates {
 			foreach ( $field_objects as $field_object ) {
 				// skip an empty field name.
 				if ( $field_object->hide() || $field_object->hide_in_frontend() || empty( $field_object->get_name() ) ) {
+					continue;
+				}
+
+				// skip fields which are disabled for this object type.
+				if ( Fields::get_instance()->is_field_disabled_for_object_type( $field_object, $object_type ) ) {
+					continue;
+				}
+
+				// skip fields which are not visible on the given object.
+				if ( $immo_object instanceof ImmoObject && ! Fields::get_instance()->is_field_visible_in_frontend( $field_object, $immo_object ) ) {
 					continue;
 				}
 				$fields[] = $field_object->get_name();
@@ -583,14 +703,7 @@ class Templates {
 		<div class="cfprop-property-details">
 			<?php
 			foreach ( $fields as $field ) {
-				echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
-					Field::get_instance()->render(
-						array(
-							'field_name' => $field->get_name(),
-							'object'     => $immo_object,
-						)
-					)
-				) . '</div>';
+				echo wp_kses_post( $this->get_field_row( $field, $immo_object, ':' ) );
 			}
 			?>
 		</div>
@@ -681,20 +794,8 @@ class Templates {
 			new PublicPhone(),
 		);
 
-		// get the broker to get the email.
-		$broker_terms = wp_get_object_terms( $immo_object->get_id(), Broker::get_instance()->get_name() );
-		$email        = '';
-
-		// get the email for the broker.
-		if ( is_array( $broker_terms ) && ! empty( $broker_terms ) ) {
-			$email = (string) Taxonomies::get_instance()->get_field_value( $broker_terms[0]->term_id, new PublicEmail(), true, true );
-			if ( empty( $email ) ) {
-				$email = (string) Taxonomies::get_instance()->get_field_value( $broker_terms[0]->term_id, new Email(), true, true );
-			}
-		}
-		if ( ! empty( $email ) ) {
-			$email = 'mailto:' . $email;
-		}
+		// get the public email of the broker (never use the private email of the broker in frontend).
+		$email = $this->get_broker_public_email( $immo_object );
 
 		?>
 			<div class="cfprop-2column-content">
@@ -731,14 +832,7 @@ class Templates {
 					<div class="cfprop-costs">
 						<?php
 						foreach ( $costs_fields as $field ) {
-							echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
-								Field::get_instance()->render(
-									array(
-										'field_name' => $field->get_name(),
-										'object'     => $immo_object,
-									)
-								)
-							) . '</div>';
+							echo wp_kses_post( $this->get_field_row( $field, $immo_object, ':' ) );
 						}
 						?>
 					</div>
@@ -760,14 +854,7 @@ class Templates {
 						<div class="cfprop-features">
 							<?php
 							foreach ( $feature_fields as $field ) {
-								echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . '</span></p>' . wp_kses_post(
-									Field::get_instance()->render(
-										array(
-											'field_name' => $field->get_name(),
-											'object'     => $immo_object,
-										)
-									)
-								) . '</div>';
+								echo wp_kses_post( $this->get_field_row( $field, $immo_object, '' ) );
 							}
 							?>
 						</div>
@@ -778,28 +865,14 @@ class Templates {
 							<div class="cfprop-building-conditions">
 								<?php
 								foreach ( $buildings_conditions_fields as $field ) {
-									echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
-										Field::get_instance()->render(
-											array(
-												'field_name' => $field->get_name(),
-												'object' => $immo_object,
-											)
-										)
-									) . '</div>';
+									echo wp_kses_post( $this->get_field_row( $field, $immo_object, ':' ) );
 								}
 								?>
 							</div>
 							<div class="cfprop-energy">
 								<?php
 								foreach ( $energy_fields as $field ) {
-									echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
-										Field::get_instance()->render(
-											array(
-												'field_name' => $field->get_name(),
-												'object' => $immo_object,
-											)
-										)
-									) . '</div>';
+									echo wp_kses_post( $this->get_field_row( $field, $immo_object, ':' ) );
 								}
 								?>
 							</div>
@@ -838,14 +911,7 @@ class Templates {
 						<div class="cfprop-distances">
 							<?php
 							foreach ( $distance_fields as $field ) {
-								echo '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . ':</span></p>' . wp_kses_post(
-									Field::get_instance()->render(
-										array(
-											'field_name' => $field->get_name(),
-											'object'     => $immo_object,
-										)
-									)
-								) . '</div>';
+								echo wp_kses_post( $this->get_field_row( $field, $immo_object, ':' ) );
 							}
 							?>
 						</div>
@@ -882,11 +948,116 @@ class Templates {
 								?>
 							</div>
 						</div>
-						<a href="<?php echo esc_attr( $email ); ?>" class="button"><?php echo esc_html__( 'Send inquiry', 'connector-for-propstack' ); ?></a>
+						<?php
+						if ( ! empty( $email ) ) {
+							?>
+							<a href="<?php echo esc_url( 'mailto:' . antispambot( $email ) ); ?>" class="button"><?php echo esc_html__( 'Send inquiry', 'connector-for-propstack' ); ?></a>
+							<?php
+						}
+						?>
 					</div>
 				</div>
 			</div>
 		<?php
+	}
+
+	/**
+	 * Return the public email of the broker of the given object.
+	 *
+	 * Returns an empty string if no broker is assigned, no public email is set or the field
+	 * should not be visible in frontend. The private email of the broker is never used.
+	 *
+	 * @param ImmoObject $immo_object The immo object.
+	 *
+	 * @return string
+	 */
+	private function get_broker_public_email( ImmoObject $immo_object ): string {
+		// get the broker of this object.
+		$broker_terms = wp_get_object_terms( $immo_object->get_id(), Broker::get_instance()->get_name() );
+
+		// bail if no broker is assigned.
+		if ( ! is_array( $broker_terms ) || empty( $broker_terms ) ) {
+			return '';
+		}
+
+		// get the field.
+		$field = new PublicEmail();
+
+		// bail if the field should not be visible in frontend.
+		if ( $field->hide() || $field->hide_in_frontend() ) {
+			return '';
+		}
+
+		// bail if the field is disabled.
+		if ( 1 === absint( get_option( 'propstack_connector_fields_' . Broker::get_instance()->get_name() . '_' . $field->get_name() . '_disabled' ) ) ) {
+			return '';
+		}
+
+		// get the value.
+		$email = Taxonomies::get_instance()->get_field_value( $broker_terms[0]->term_id, $field, true, true );
+
+		// bail if the value is not a valid email.
+		if ( ! is_string( $email ) || ! is_email( $email ) ) {
+			return '';
+		}
+
+		// return the email.
+		return $email;
+	}
+
+	/**
+	 * Return the value of a field on an object if it is visible in frontend, otherwise an empty string.
+	 *
+	 * @param ImmoObject $immo_object The immo object.
+	 * @param Field_Base $field       The field.
+	 *
+	 * @return string
+	 */
+	private function get_visible_field_value( ImmoObject $immo_object, Field_Base $field ): string {
+		// bail if the field should not be visible.
+		if ( ! Fields::get_instance()->is_field_visible_in_frontend( $field, $immo_object ) ) {
+			return '';
+		}
+
+		// get the value.
+		$value = Fields::get_instance()->get_field_value( $immo_object->get_id(), $field );
+
+		// bail if value is not a scalar.
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		// return the value as string.
+		return (string) $value;
+	}
+
+	/**
+	 * Return the HTML-code for a row with label and value of a single field on the given object.
+	 *
+	 * Returns an empty string if the field should not be visible on this object.
+	 *
+	 * @param Field_Base $field       The field.
+	 * @param ImmoObject $immo_object The immo object.
+	 * @param string     $separator   The separator after the label.
+	 *
+	 * @return string
+	 */
+	private function get_field_row( Field_Base $field, ImmoObject $immo_object, string $separator ): string {
+		// get the rendered field.
+		$value = Field::get_instance()->render(
+			array(
+				'field_name' => $field->get_name(),
+				'object'     => $immo_object,
+			)
+		);
+
+		// bail if field is not visible.
+		if ( empty( $value ) ) {
+			return '';
+		}
+
+		// return the row.
+		return '<div class="wp-block-group"><p><span>' . wp_kses_post( $field->get_label() ) . esc_html( $separator ) . '</span></p>' . wp_kses_post( $value ) . '</div>';
 	}
 
 	/**

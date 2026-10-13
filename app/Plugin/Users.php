@@ -55,7 +55,12 @@ class Users {
 	 * @return void
 	 */
 	public function init(): void {
+		// reset the caches on any change of users or their roles.
 		add_action( 'set_user_role', array( $this, 'reset_cache' ), 10, 0 );
+		add_action( 'add_user_role', array( $this, 'reset_cache' ), 10, 0 );
+		add_action( 'remove_user_role', array( $this, 'reset_cache' ), 10, 0 );
+		add_action( 'deleted_user', array( $this, 'reset_cache' ), 10, 0 );
+		add_action( 'remove_user_from_blog', array( $this, 'reset_cache' ), 10, 0 );
 	}
 
 	/**
@@ -67,9 +72,12 @@ class Users {
 		// get value from the cache.
 		$user_id = absint( get_option( 'cfprop_admin_id', 0 ) );
 
-		// return the ID from cache, if given.
+		// return the ID from cache, if given and if it is still a valid administrator.
 		if ( $user_id > 0 ) {
-			return $user_id;
+			$user = get_userdata( $user_id );
+			if ( $user instanceof WP_User && in_array( 'administrator', $user->roles, true ) ) {
+				return $user_id;
+			}
 		}
 
 		// get the first user with administrator role.
@@ -114,6 +122,11 @@ class Users {
 	 */
 	public function reset_cache(): void {
 		delete_option( 'cfprop_admin_id' );
+
+		// remove the cached list of users for the settings in all languages (not the complete cache).
+		foreach ( array_keys( Languages::get_instance()->get_languages() ) as $language_code ) {
+			delete_option( 'cfprop_cache_users_for_settings_' . $language_code );
+		}
 	}
 
 	/**
@@ -139,19 +152,32 @@ class Users {
 
 		// get the users and create the list.
 		$users = array();
-		foreach ( get_users() as $user ) {
-			// bail if user is not a "WP_User" object.
-			if ( ! $user instanceof WP_User ) {
+		$query = array(
+			'capability' => array( 'edit_posts' ),
+			'number'     => 500,
+			'orderby'    => 'display_name',
+			'fields'     => array( 'ID', 'display_name' ),
+		);
+		/**
+		 * Filter the query to get the users for the settings (e.g., the author of imported objects).
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<string,mixed> $query The query for get_users().
+		 */
+		$query = apply_filters( 'cfprop_users_for_settings_query', $query );
+		foreach ( get_users( $query ) as $user ) {
+			// bail if user is not an object.
+			if ( ! is_object( $user ) || ! isset( $user->ID, $user->display_name ) ) {
 				continue;
 			}
 
 			// bail if this is the actual user, it this is enabled.
-			if ( $ignore_actual_user && get_current_user_id() === $user->ID ) {
+			if ( $ignore_actual_user && get_current_user_id() === absint( $user->ID ) ) {
 				continue;
 			}
 
 			// add to the list.
-			$users[ (string) $user->ID ] = $user->display_name;
+			$users[ (string) $user->ID ] = (string) $user->display_name;
 		}
 
 		// save in the cache.

@@ -33,6 +33,10 @@
 		},
 		"blockId": {
 			"type": "string"
+		},
+		"preview": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"example": {

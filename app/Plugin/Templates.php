@@ -25,6 +25,13 @@ class Templates {
 	private static ?Templates $instance = null;
 
 	/**
+	 * Cached result whether the global extension of the kses "post" context is needed.
+	 *
+	 * @var bool|null
+	 */
+	private ?bool $global_kses_extension_needed = null;
+
+	/**
 	 * Constructor for this object.
 	 */
 	private function __construct() {}
@@ -55,12 +62,14 @@ class Templates {
 	public function init(): void {
 		// check for changed templates.
 		add_action( 'admin_init', array( $this, 'check_child_theme_templates' ) );
+		add_action( 'switch_theme', array( $this, 'reset_child_theme_templates_check' ) );
+		add_action( 'upgrader_process_complete', array( $this, 'reset_child_theme_templates_check' ) );
 
 		// add the template hooks.
 		add_filter( 'single_template', array( $this, 'get_single_template' ) );
 		add_filter( 'archive_template', array( $this, 'get_archive_template' ) );
 
-		// expand kses-filter.
+		// expand kses-filter (only if explicitly enabled, see add_kses_html()).
 		add_filter( 'wp_kses_allowed_html', array( $this, 'add_kses_html' ), 10, 2 );
 
 		// use our own hooks.
@@ -187,28 +196,44 @@ class Templates {
 	 * @return void
 	 */
 	public function check_child_theme_templates(): void {
+		// bail on AJAX-, cron- and REST-requests, the check is only necessary for visible pages in backend.
+		if ( wp_doing_ajax() || wp_doing_cron() || Helper::is_rest_request() ) {
+			return;
+		}
+
+		// get the signature of the actual state to check (theme, its template directory and plugin version).
+		$path      = trailingslashit( get_stylesheet_directory() ) . 'connector-for-propstack/';
+		$signature = md5( get_stylesheet() . '|' . ( file_exists( $path ) ? (string) filemtime( $path ) : '' ) . '|' . CFPROP_VERSION );
+
+		// bail if this state has already been checked.
+		if ( get_transient( 'cfprop_child_theme_templates_checked' ) === $signature ) {
+			return;
+		}
+
+		// mark this state as checked (re-check it at least once per day).
+		set_transient( 'cfprop_child_theme_templates_checked', $signature, DAY_IN_SECONDS );
+
 		// bail if it is not a child-theme.
 		if ( ! is_child_theme() ) {
 			Transients::get_instance()->get_transient_by_name( 'propstack_connector_old_templates' )->delete();
 			return;
 		}
 
-		// get path for child-theme-templates-directory and check its existence.
-		$path = trailingslashit( get_stylesheet_directory() ) . 'connector-for-propstack/';
+		// check the existence of the child-theme-templates-directory.
 		if ( ! file_exists( $path ) ) {
 			Transients::get_instance()->get_transient_by_name( 'propstack_connector_old_templates' )->delete();
 			return;
 		}
 
-		// get all files from the child-theme-templates directory.
-		$files = Helper::get_files_from_directory( $path );
+		// get all files from the child-theme-templates directory (local, without any remote filesystem connection).
+		$files = $this->get_local_files_from_directory( $path );
 		if ( empty( $files ) ) {
 			Transients::get_instance()->get_transient_by_name( 'propstack_connector_old_templates' )->delete();
 			return;
 		}
 
 		// get the list of all templates in this plugin.
-		$plugin_files = Helper::get_files_from_directory( Helper::get_plugin_path() . 'templates/' );
+		$plugin_files = $this->get_local_files_from_directory( Helper::get_plugin_path() . 'templates/' );
 
 		// collect warnings.
 		$warnings = array();
@@ -273,6 +298,69 @@ class Templates {
 		} else {
 			$transients_obj->get_transient_by_name( 'propstack_connector_old_templates' )->delete();
 		}
+	}
+
+	/**
+	 * Reset the check for changed templates in the child theme, so it runs on the next request in backend.
+	 *
+	 * @return void
+	 */
+	public function reset_child_theme_templates_check(): void {
+		delete_transient( 'cfprop_child_theme_templates_checked' );
+	}
+
+	/**
+	 * Return the list of files in the given local directory, recursively.
+	 *
+	 * Uses the direct filesystem access as these are local files (theme and plugin), so no
+	 * connection to a remote filesystem (e.g., FTP) is necessary.
+	 *
+	 * @param string $path The absolute path to the directory.
+	 *
+	 * @return array<string,string> List of files with the filename as index and the absolute path as value.
+	 */
+	private function get_local_files_from_directory( string $path ): array {
+		// get the list of files.
+		$files = Helper::get_wp_filesystem( true )->dirlist( $path, true, true );
+
+		// bail if no files could be loaded.
+		if ( ! is_array( $files ) || empty( $files ) ) {
+			return array();
+		}
+
+		// return the resulting list.
+		return $this->get_local_files( $files, trailingslashit( $path ) );
+	}
+
+	/**
+	 * Recursively collect the files from the given list of a directory.
+	 *
+	 * @param array<string,mixed>  $files     The list of files from dirlist().
+	 * @param string               $path      The absolute path of this list.
+	 * @param array<string,string> $file_list The list of files collected so far.
+	 *
+	 * @return array<string,string>
+	 */
+	private function get_local_files( array $files, string $path, array $file_list = array() ): array {
+		foreach ( $files as $filename => $settings ) {
+			// bail if settings are not an array.
+			if ( ! is_array( $settings ) || empty( $settings['type'] ) ) {
+				continue;
+			}
+
+			// add a file.
+			if ( 'f' === $settings['type'] ) {
+				$file_list[ (string) $filename ] = $path . $filename;
+			}
+
+			// collect the files of a directory.
+			if ( 'd' === $settings['type'] && ! empty( $settings['files'] ) && is_array( $settings['files'] ) ) {
+				$file_list = $this->get_local_files( $settings['files'], $path . trailingslashit( (string) $filename ), $file_list );
+			}
+		}
+
+		// return the resulting list.
+		return $file_list;
 	}
 
 	/**
@@ -378,7 +466,16 @@ class Templates {
 	}
 
 	/**
-	 * Extend kses-filter if our own cpt is called.
+	 * Extend the kses "post" context globally with the form elements of the filter, if enabled.
+	 *
+	 * Hint: until version 2.0.x this was always enabled. Now it is only for backwards compatibility,
+	 * use get_allowed_filter_html() with wp_kses() for the output of the filter instead.
+	 *
+	 * The extension is enabled by default only where it is needed for backwards compatibility:
+	 * - if the Pro plugin seems to be active (its page builder widgets could output the filter via wp_kses_post()).
+	 * - if the active theme contains an override of the archive template or the filter template part in its
+	 *   "connector-for-propstack" directory (older versions of these templates output the filter via wp_kses_post()).
+	 * In all other cases it is disabled by default. The filter "cfprop_extend_post_kses_globally" overrides the default.
 	 *
 	 * @param array<string,mixed> $allowed_tags List of allowed tags and attributes.
 	 * @param string              $context The context where this is called.
@@ -386,6 +483,32 @@ class Templates {
 	 * @return array<string,mixed>
 	 */
 	public function add_kses_html( array $allowed_tags, string $context ): array {
+		// bail if context is not "post" (checked first, as this filter is called very often).
+		if ( 'post' !== $context ) {
+			return $allowed_tags;
+		}
+
+		// get the default: only enabled if necessary for backwards compatibility.
+		$extend_post_kses = $this->is_global_kses_extension_needed();
+
+		/**
+		 * Filter whether the allowed HTML of the "post" context of kses should be extended globally
+		 * with form elements for the filter.
+		 *
+		 * This was the default until version 2.0.x. It allows all users who could save posts without
+		 * "unfiltered_html" to use form elements. Use \ConnectorForPropstack\Plugin\Templates::get_instance()->get_allowed_filter_html()
+		 * with wp_kses() for the output of the filter instead.
+		 *
+		 * Defaults to true if the Pro plugin seems to be active or if the theme overrides the archive
+		 * template or the filter template part, otherwise false.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param bool $extend_post_kses True to extend the "post" context globally.
+		 */
+		if ( ! apply_filters( 'cfprop_extend_post_kses_globally', $extend_post_kses ) ) {
+			return $allowed_tags;
+		}
+
 		$false = false;
 		/**
 		 * Prevent filtering the HTML code via kses.
@@ -400,11 +523,119 @@ class Templates {
 			return $allowed_tags;
 		}
 
-		// bail if context is not "post".
-		if ( 'post' !== $context ) {
-			return $allowed_tags;
+		// add the form elements and return the resulting list.
+		return $this->add_form_elements_to_allowed_html( $allowed_tags );
+	}
+
+	/**
+	 * Return whether the global extension of the kses "post" context is needed for backwards compatibility.
+	 *
+	 * This is the case if:
+	 * - the Pro plugin seems to be active (it hooks into "cfprop_hide_pro_hints" or an active plugin
+	 *   has a directory starting with "connector-for-propstack-pro").
+	 * - the active theme (or its parent theme) contains an override of the archive template or the
+	 *   filter template part in its "connector-for-propstack" directory.
+	 *
+	 * @return bool
+	 */
+	private function is_global_kses_extension_needed(): bool {
+		// use the cached result.
+		if ( is_bool( $this->global_kses_extension_needed ) ) {
+			return $this->global_kses_extension_needed;
 		}
 
+		// get the result.
+		$needed = $this->is_pro_plugin_active() || $this->has_theme_filter_template_override();
+
+		// cache it only after all plugins have been loaded (before that, the Pro plugin might not have added its hooks).
+		if ( did_action( 'plugins_loaded' ) ) {
+			$this->global_kses_extension_needed = $needed;
+		}
+
+		// return the result.
+		return $needed;
+	}
+
+	/**
+	 * Return whether the Pro plugin seems to be active.
+	 *
+	 * @return bool
+	 */
+	private function is_pro_plugin_active(): bool {
+		// the Pro plugin uses this hook.
+		if ( has_filter( 'cfprop_hide_pro_hints' ) ) {
+			return true;
+		}
+
+		// get the list of active plugins.
+		$active_plugins = (array) get_option( 'active_plugins', array() );
+
+		// add the network-wide active plugins on multisite.
+		if ( is_multisite() ) {
+			$active_plugins = array_merge( $active_plugins, array_keys( (array) get_site_option( 'active_sitewide_plugins', array() ) ) );
+		}
+
+		// check each plugin for the directory of the Pro plugin.
+		foreach ( $active_plugins as $plugin ) {
+			if ( is_string( $plugin ) && str_starts_with( $plugin, 'connector-for-propstack-pro' ) ) {
+				return true;
+			}
+		}
+
+		// Pro plugin is not active.
+		return false;
+	}
+
+	/**
+	 * Return whether the active theme overrides the archive template or the filter template part.
+	 *
+	 * @return bool
+	 */
+	private function has_theme_filter_template_override(): bool {
+		// check the directories of the theme and its parent theme.
+		foreach ( array_unique( array( get_stylesheet_directory(), get_template_directory() ) ) as $directory ) {
+			$path = trailingslashit( $directory ) . trailingslashit( basename( dirname( CFPROP_PLUGIN ) ) );
+			if ( file_exists( $path . 'archive-' . ImmoObject::get_instance()->get_name() . '.php' ) || file_exists( $path . 'parts/part-filter.php' ) ) {
+				return true;
+			}
+		}
+
+		// no override found.
+		return false;
+	}
+
+	/**
+	 * Return the allowed HTML for outputs which contain the filter form.
+	 *
+	 * This is the allowed HTML of the "post" context of kses extended by the form elements of the filter.
+	 * Use it with wp_kses() for outputs of the filter (and only for them).
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function get_allowed_filter_html(): array {
+		// get the allowed HTML for posts.
+		$allowed_tags = wp_kses_allowed_html( 'post' );
+
+		// add the form elements.
+		$allowed_tags = $this->add_form_elements_to_allowed_html( $allowed_tags );
+
+		/**
+		 * Filter the allowed HTML for the output of the filter form.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<string,mixed> $allowed_tags List of allowed tags and their attributes.
+		 */
+		return apply_filters( 'cfprop_allowed_filter_html', $allowed_tags );
+	}
+
+	/**
+	 * Add the form elements for our filter to the given list of allowed HTML elements.
+	 *
+	 * @param array<string,mixed> $allowed_tags List of allowed tags and attributes.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function add_form_elements_to_allowed_html( array $allowed_tags ): array {
 		// add the necessary fields for the filter, if not already set.
 		if ( empty( $allowed_tags['form'] ) ) {
 			$allowed_tags['form'] = array(
@@ -449,6 +680,72 @@ class Templates {
 	}
 
 	/**
+	 * Return the given CSS declarations (e.g., from the style attribute of a block) sanitized.
+	 *
+	 * Returns an empty string if the declarations contain characters, which could be used to
+	 * break out of the declaration block or to load external resources.
+	 *
+	 * @param string $declarations The CSS declarations (e.g., "color: red; padding: 1em").
+	 *
+	 * @return string
+	 */
+	public static function sanitize_css_declarations( string $declarations ): string {
+		// remove any tags.
+		$declarations = trim( wp_strip_all_tags( $declarations ) );
+
+		// bail if empty.
+		if ( empty( $declarations ) ) {
+			return '';
+		}
+
+		// bail if declarations contain forbidden characters.
+		foreach ( array( '{', '}', '<', '>', '@', '\\', '/*', '*/', 'expression(', 'javascript:' ) as $forbidden ) {
+			if ( str_contains( strtolower( $declarations ), $forbidden ) ) {
+				return '';
+			}
+		}
+
+		// return the sanitized declarations.
+		return $declarations;
+	}
+
+	/**
+	 * Return the CSS rule for the given block class and the given style declarations.
+	 *
+	 * Returns an empty string if no valid class or declarations are given.
+	 *
+	 * @param string       $class_name   The class of the block (e.g., "cfprop-block-xy").
+	 * @param string|false $declarations The CSS declarations.
+	 *
+	 * @return string
+	 */
+	public static function get_block_css_rule( string $class_name, string|false $declarations ): string {
+		// bail if no declarations are given.
+		if ( ! is_string( $declarations ) ) {
+			return '';
+		}
+
+		// sanitize the class.
+		$class_name = sanitize_html_class( $class_name );
+
+		// bail if no class is given.
+		if ( empty( $class_name ) ) {
+			return '';
+		}
+
+		// sanitize the declarations.
+		$declarations = self::sanitize_css_declarations( $declarations );
+
+		// bail if no declarations are left.
+		if ( empty( $declarations ) ) {
+			return '';
+		}
+
+		// return the rule (the class is set on the element of the block itself).
+		return '.' . $class_name . ' { ' . $declarations . ' }';
+	}
+
+	/**
 	 * Add custom widget styles depending on the theme type:
 	 * - add via wp block-library-handle for block themes
 	 * - add via the custom handle for all other themes
@@ -463,12 +760,27 @@ class Templates {
 			return;
 		}
 
+		// bail if styles are not a string.
+		if ( ! is_string( $attributes['styles'] ) ) {
+			return;
+		}
+
 		// get the styles.
 		$css = $attributes['styles'];
 
-		// clean the CSS.
+		// clean the CSS (">" is kept as it is used for child combinators).
 		$prepared_css = wp_strip_all_tags( $css );
-		$prepared_css = str_replace( array( '</style>', '<style' ), '', $prepared_css );
+		$prepared_css = str_replace( array( '<', '@import' ), '', $prepared_css );
+
+		// bail if the CSS contains comments (they could hide or break the following rules).
+		if ( str_contains( $prepared_css, '/*' ) || str_contains( $prepared_css, '*/' ) ) {
+			return;
+		}
+
+		// bail if the curly brackets are not balanced (each rule must be complete).
+		if ( substr_count( $prepared_css, '{' ) !== substr_count( $prepared_css, '}' ) ) {
+			return;
+		}
 
 		// if this is a block theme, add styles the modern way.
 		if ( Helper::theme_is_fse_theme() && ! Helper::is_rest_request() ) {

@@ -107,6 +107,34 @@ class Import_Base {
 	private array $logged_errors = array();
 
 	/**
+	 * The option which holds the object a paginated import is processing right now.
+	 *
+	 * @var string
+	 */
+	protected string $current_object_option = 'cfprop_import_current_object';
+
+	/**
+	 * The time (as Unix timestamp with microseconds) after which this import must not start with another object (0 for no limit).
+	 *
+	 * @var float
+	 */
+	private float $deadline = 0.0;
+
+	/**
+	 * Marker whether a fatal error during this request has already been handled.
+	 *
+	 * @var bool
+	 */
+	private static bool $fatal_error_handled = false;
+
+	/**
+	 * The amount of fatal errors in a row without progress after which a paginated import is discarded.
+	 *
+	 * @var int
+	 */
+	private const MAX_FATAL_ERRORS_WITHOUT_PROGRESS = 3;
+
+	/**
 	 * Return the header to be used for any API request.
 	 *
 	 * @return array<string,mixed>
@@ -207,6 +235,37 @@ class Import_Base {
 	 * @return array{found:bool,object:array<string,mixed>,checked:int,full_scan:bool,url:string}
 	 */
 	public function find_object( string $value, string $language_code, string $field = 'id', bool $full_scan = false ): array {
+		try {
+			return $this->find_object_in_pages( $value, $language_code, $field, $full_scan );
+		} catch ( \Throwable $e ) {
+			// log this event.
+			Log::get_instance()->add( __( 'Following error occurred during the check of an object:', 'connector-for-propstack' ) . '<br>' . Helper::get_throwable_as_log_text( $e ), 'error', 'import' );
+
+			// add the error, the result is not reliable.
+			$this->add_error( 'propstack_object_find_error', __( 'An error occurred during the check of the object.', 'connector-for-propstack' ) );
+
+			// return an empty result.
+			return array(
+				'found'     => false,
+				'object'    => array(),
+				'checked'   => 0,
+				'full_scan' => $full_scan,
+				'url'       => '',
+			);
+		}
+	}
+
+	/**
+	 * Check whether the API delivers a specific object for the import, see find_object().
+	 *
+	 * @param string $value         The value to search for.
+	 * @param string $language_code The language to check.
+	 * @param string $field         The field of the API which must contain the value ("id", "unit_id" or "exposee_id").
+	 * @param bool   $full_scan     True to request all pages in any case.
+	 *
+	 * @return array{found:bool,object:array<string,mixed>,checked:int,full_scan:bool,url:string}
+	 */
+	private function find_object_in_pages( string $value, string $language_code, string $field, bool $full_scan ): array {
 		// the API can be asked for a single object only by its Propstack-ID.
 		if ( ! $full_scan && 'id' === $field && ctype_digit( $value ) ) {
 			// remember the errors so far to be able to drop the ones of this attempt.
@@ -819,7 +878,7 @@ class Import_Base {
 
 		// get the ID and the time of the existing lock.
 		$parts                       = explode( '|', $existing );
-		$created                     = absint( end( $parts ) );
+		$created                     = max( 0, (int) end( $parts ) );
 		$this->foreign_chunk_lock_id = $parts[0];
 
 		// bail if the existing lock is not stale.
@@ -859,7 +918,7 @@ class Import_Base {
 
 		// bail if the lock has been refreshed during the last minute.
 		$parts = explode( '|', $this->chunk_lock_token );
-		if ( ( time() - absint( end( $parts ) ) ) < MINUTE_IN_SECONDS ) {
+		if ( ( time() - max( 0, (int) end( $parts ) ) ) < MINUTE_IN_SECONDS ) {
 			return;
 		}
 
@@ -1010,10 +1069,18 @@ class Import_Base {
 		// release the lock of the chunk which has been aborted.
 		$this->release_chunk_lock();
 
+		// bail if the fatal error has already been handled by another instance in this request.
+		if ( self::$fatal_error_handled ) {
+			return;
+		}
+
 		// bail if import already finished cleanly.
 		if ( 0 === absint( get_option( CFPROP_IMPORT_RUNNING, 0 ) ) ) {
 			return;
 		}
+
+		// mark the fatal error as handled.
+		self::$fatal_error_handled = true;
 
 		// log this event.
 		Log::get_instance()->add(
@@ -1022,9 +1089,77 @@ class Import_Base {
 			'import'
 		);
 
+		// keep the state of an import whose work list is complete: the next run continues with it
+		// and skips the object which caused the error, instead of starting from the beginning again.
+		$import_data = get_option( $this->work_list_option, array() );
+		if ( is_array( $import_data ) && isset( $import_data['blocks'], $import_data['run_id'] ) ) {
+			// get the position the import has reached, to detect whether it progresses since the last fatal error.
+			$position = $this->get_fatal_error_position( $import_data );
+
+			// count the fatal errors at this position, the counter starts again if the import has progressed.
+			$fatal_count = isset( $import_data['fatal_count'], $import_data['fatal_offset'] ) && $position === $import_data['fatal_offset'] ? absint( $import_data['fatal_count'] ) + 1 : 1;
+
+			// discard the state if the import does not progress, as every continuation would abort again.
+			if ( $fatal_count >= self::MAX_FATAL_ERRORS_WITHOUT_PROGRESS ) {
+				// log this event.
+				Log::get_instance()->add(
+					/* translators: %1$d will be replaced by a number. */
+					sprintf( __( 'The import has been aborted %1$d times in a row by a fatal PHP error without any progress. It will not be continued. Please check the log and start the import again.', 'connector-for-propstack' ), $fatal_count ),
+					'error',
+					'import'
+				);
+
+				// reset the running-flag and the state so the user is not stuck.
+				update_option( CFPROP_IMPORT_RUNNING, 0 );
+				$this->clear_work_list();
+
+				// do nothing more.
+				return;
+			}
+
+			// save the counter with the work list.
+			$import_data['fatal_count']  = $fatal_count;
+			$import_data['fatal_offset'] = $position;
+			update_option( $this->work_list_option, $import_data );
+
+			// refresh the running marker, so the state is not discarded as stale.
+			update_option( CFPROP_IMPORT_RUNNING, time() );
+
+			// continue the import via WP-Cron.
+			Schedules\Objects::schedule_continuation();
+
+			// log this event.
+			Log::get_instance()->add( __( 'The import will be continued automatically in a few moments.', 'connector-for-propstack' ), 'info', 'import' );
+
+			// do nothing more.
+			return;
+		}
+
 		// reset the running-flag so the user is not stuck.
 		update_option( CFPROP_IMPORT_RUNNING, 0 );
 		$this->clear_work_list();
+	}
+
+	/**
+	 * Return the position a paginated import has reached, to detect whether it progresses between fatal errors.
+	 *
+	 * It consists of the phase, the position in the work list and the object which has been processed as last
+	 * (which is also the object deleted as last during the cleanup).
+	 *
+	 * @param array<string,mixed> $import_data The work list data.
+	 *
+	 * @return string
+	 */
+	private function get_fatal_error_position( array $import_data ): string {
+		// get the object which has been processed as last.
+		$marker   = get_option( $this->current_object_option, array() );
+		$position = is_array( $marker ) && isset( $marker['phase'], $marker['position'] ) && is_scalar( $marker['phase'] ) ? $marker['phase'] . '-' . absint( $marker['position'] ) : '';
+
+		// get the phase.
+		$phase = isset( $import_data['phase'] ) && is_scalar( $import_data['phase'] ) ? (string) $import_data['phase'] : '';
+
+		// return the combined position.
+		return $phase . ':' . absint( get_option( $this->offset_option, 0 ) ) . ':' . $position;
 	}
 
 	/**
@@ -1059,6 +1194,311 @@ class Import_Base {
 		// reset the metadata and the position.
 		update_option( $this->work_list_option, array() );
 		update_option( $this->offset_option, 0 );
+
+		// forget the object which has been processed.
+		$this->clear_current_object();
+	}
+
+	/**
+	 * Set the time after which this import must not start with another object.
+	 *
+	 * Used by runs with a limited time, e.g. via WP-Cron. The run stops after the object it
+	 * processes when the time is reached and asks for another run via has_load_more().
+	 *
+	 * @param float $deadline The time as Unix timestamp with microseconds (0 for no limit).
+	 *
+	 * @return void
+	 */
+	public function set_deadline( float $deadline ): void {
+		$this->deadline = max( 0.0, $deadline );
+	}
+
+	/**
+	 * Return the time after which this import must not start with another object (0 for no limit).
+	 *
+	 * @return float
+	 */
+	public function get_deadline(): float {
+		return $this->deadline;
+	}
+
+	/**
+	 * Return whether the time for this run is used up.
+	 *
+	 * @return bool
+	 */
+	protected function is_deadline_reached(): bool {
+		return $this->deadline > 0 && microtime( true ) >= $this->deadline;
+	}
+
+	/**
+	 * Remember the object a paginated import is processing right now.
+	 *
+	 * If the request is aborted (e.g. by the memory or time limit), the next run knows the
+	 * object which caused it and skips it.
+	 *
+	 * @param int    $run_id   The ID of the import run.
+	 * @param string $phase    The phase of the import ("import" or "cleanup").
+	 * @param int    $position The position in the work list (import) or the post-ID (cleanup).
+	 *
+	 * @return void
+	 */
+	protected function mark_current_object( int $run_id, string $phase, int $position ): void {
+		update_option(
+			$this->current_object_option,
+			array(
+				'run_id'   => $run_id,
+				'phase'    => $phase,
+				'position' => $position,
+			),
+			false
+		);
+	}
+
+	/**
+	 * Return the object a previous run of this import was processing as last.
+	 *
+	 * @param int    $run_id The ID of the import run.
+	 * @param string $phase  The phase of the import ("import" or "cleanup").
+	 *
+	 * @return int The position in the work list (import) or the post-ID (cleanup), -1 if unknown.
+	 */
+	protected function get_marked_object( int $run_id, string $phase ): int {
+		// get the marker.
+		$marker = get_option( $this->current_object_option, array() );
+
+		// bail if it does not belong to this run and phase.
+		if ( ! is_array( $marker ) || ! isset( $marker['run_id'], $marker['phase'], $marker['position'] ) || absint( $marker['run_id'] ) !== $run_id || $phase !== $marker['phase'] ) {
+			return -1;
+		}
+
+		// return the position.
+		return absint( $marker['position'] );
+	}
+
+	/**
+	 * Forget the object a paginated import has processed as last.
+	 *
+	 * @return void
+	 */
+	protected function clear_current_object(): void {
+		delete_option( $this->current_object_option );
+	}
+
+	/**
+	 * Return the title of an object from the API, for log entries and status texts.
+	 *
+	 * The result is not escaped.
+	 *
+	 * @param array<string,mixed> $immo_object The object data from API.
+	 *
+	 * @return string
+	 */
+	protected function get_object_title( array $immo_object ): string {
+		// get the title, the API v1 delivers it as a field with label and value.
+		$title = $immo_object['title'] ?? '';
+		if ( is_array( $title ) ) {
+			$title = $title['value'] ?? '';
+		}
+
+		// use the name if no title is given.
+		if ( ! is_scalar( $title ) || '' === (string) $title ) {
+			$title = $immo_object['name'] ?? '';
+		}
+
+		// return the title.
+		return is_scalar( $title ) ? (string) $title : '';
+	}
+
+	/**
+	 * Handle an object whose import aborted a previous run, e.g. by the memory or time limit.
+	 *
+	 * The object is skipped, as it would abort every run again. The import is marked as faulty,
+	 * so no object is removed by the cleanup and the next import tries it again.
+	 *
+	 * @param array<string,mixed> $immo_object The object data from API.
+	 *
+	 * @return void
+	 */
+	protected function handle_aborted_object( array $immo_object ): void {
+		// log this event.
+		Log::get_instance()->add(
+			sprintf(
+				/* translators: %1$s will be replaced by the object title, %2$d by its Propstack-ID. */
+				__( 'The import of object %1$s (Propstack-ID %2$d) aborted the previous run, e.g. by the memory or time limit of PHP. The object has been skipped.', 'connector-for-propstack' ),
+				'<em>' . esc_html( $this->get_object_title( $immo_object ) ) . '</em>',
+				isset( $immo_object['id'] ) && is_scalar( $immo_object['id'] ) ? absint( $immo_object['id'] ) : 0
+			),
+			'error',
+			'import'
+		);
+
+		// mark the import as faulty so the error dialog is shown.
+		$this->add_error(
+			'propstack_object_import_error',
+			/* translators: %1$s will be replaced by a URL. */
+			sprintf( __( 'At least one object could not be imported. Check <a href="%1$s">the log</a> for details.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_logs' ) ) )
+		);
+	}
+
+	/**
+	 * Handle an object whose deletion during the cleanup aborted a previous run.
+	 *
+	 * The object is excluded from the cleanup of this import, as it would abort every run again.
+	 *
+	 * @param int $post_id The post-ID of the object.
+	 * @param int $run_id  The ID of the import run.
+	 *
+	 * @return void
+	 */
+	protected function handle_aborted_cleanup( int $post_id, int $run_id ): void {
+		// forget the marker.
+		$this->clear_current_object();
+
+		// bail if the object has been removed.
+		$post_status = get_post_status( $post_id );
+		if ( false === $post_status || 'trash' === $post_status ) {
+			return;
+		}
+
+		// exclude it from the cleanup of this import.
+		update_post_meta( $post_id, 'changed', $run_id );
+
+		// log this event.
+		Log::get_instance()->add(
+			/* translators: %1$d will be replaced by the post-ID. */
+			sprintf( __( 'The deletion of the obsolete object with the post-ID %1$d aborted the previous run, e.g. by the memory or time limit of PHP. The object has been skipped.', 'connector-for-propstack' ), $post_id ),
+			'error',
+			'import'
+		);
+
+		// mark the import as faulty so the error dialog is shown.
+		$this->add_error(
+			'propstack_object_import_cleanup_error',
+			/* translators: %1$s will be replaced by a URL. */
+			sprintf( __( 'At least one obsolete object could not be deleted. Check <a href="%1$s">the log</a> for details.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_logs' ) ) )
+		);
+	}
+
+	/**
+	 * Return the meta query for objects which have been imported, but are not part of the given import run.
+	 *
+	 * Objects without a Propstack-ID have not been created by the import (e.g. copies of other plugins)
+	 * and are never part of the cleanup.
+	 *
+	 * @param int $run_id The ID of the import run.
+	 *
+	 * @return array<int|string,mixed>
+	 */
+	protected function get_obsolete_objects_meta_query( int $run_id ): array {
+		return array(
+			'relation' => 'AND',
+			array(
+				'key'     => 'object_id',
+				'compare' => 'EXISTS',
+			),
+			array(
+				'relation' => 'OR',
+				array(
+					'key'     => 'changed',
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key'     => 'changed',
+					'value'   => $run_id,
+					'compare' => '!=',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Delete an obsolete object during the cleanup of an import.
+	 *
+	 * Its images are deleted, too, if it is deleted permanently and the files should not be preserved.
+	 * Images which are used by another object are kept. Its entries in the queue are removed.
+	 *
+	 * @param int  $post_id      The post-ID of the object.
+	 * @param bool $force_delete True to bypass the trash.
+	 * @param int  $run_id       The ID of the import run.
+	 *
+	 * @return bool True if the object has been deleted.
+	 */
+	protected function delete_obsolete_object( int $post_id, bool $force_delete, int $run_id ): bool {
+		// get the images before the object is deleted, as its metadata is removed with it.
+		$images = array();
+		if ( $force_delete && 1 !== absint( get_option( 'propstack_connector_preserve_files' ) ) ) {
+			$images = ImmoObjects::get_instance()->get_object( $post_id )->get_images();
+		}
+
+		// delete the object.
+		$result = wp_delete_post( $post_id, $force_delete );
+
+		// bail if the object could not be deleted.
+		if ( ! $result instanceof \WP_Post ) {
+			// exclude it from the cleanup of this import, so it is not matched again and again.
+			update_post_meta( $post_id, 'changed', $run_id );
+
+			// log this event.
+			/* translators: %1$d will be replaced by the post-ID. */
+			Log::get_instance()->add( sprintf( __( 'The obsolete object with the post-ID %1$d could not be deleted.', 'connector-for-propstack' ), $post_id ), 'error', 'import' );
+
+			// return false as the object has not been deleted.
+			return false;
+		}
+
+		// remove its entries from the queue.
+		Queue::get_instance()->delete_entries_of_object( $post_id );
+
+		// delete its images.
+		foreach ( $images as $attachment_id ) {
+			$attachment_id = absint( $attachment_id );
+
+			// bail if this is not an attachment.
+			if ( 0 === $attachment_id || 'attachment' !== get_post_type( $attachment_id ) ) {
+				continue;
+			}
+
+			// bail if this is a broker avatar.
+			if ( absint( get_post_meta( $attachment_id, 'cfprop_broker_avatar', true ) ) > 0 ) {
+				continue;
+			}
+
+			// bail if another object uses this image, e.g. the same object in another language.
+			if ( $this->is_image_used_by_any_object( $attachment_id ) ) {
+				continue;
+			}
+
+			// delete the image including its files.
+			wp_delete_attachment( $attachment_id, true );
+		}
+
+		// return true as the object has been deleted.
+		return true;
+	}
+
+	/**
+	 * Return whether any object has the given attachment in its list of images.
+	 *
+	 * @param int $attachment_id The attachment ID.
+	 *
+	 * @return bool
+	 */
+	private function is_image_used_by_any_object( int $attachment_id ): bool {
+		global $wpdb;
+
+		// search the ID in the serialized lists of images.
+		$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM `$wpdb->postmeta` WHERE `meta_key` = %s AND ( `meta_value` LIKE %s OR `meta_value` LIKE %s )", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				'images',
+				'%' . $wpdb->esc_like( 'i:' . $attachment_id . ';' ) . '%',
+				'%' . $wpdb->esc_like( ':"' . $attachment_id . '";' ) . '%'
+			)
+		);
+
+		// return whether it has been found.
+		return absint( $count ) > 0;
 	}
 
 	/**

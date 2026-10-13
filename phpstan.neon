@@ -2,13 +2,12 @@ parameters:
   level: 8
   reportUnmatchedIgnoredErrors: false
   ignoreErrors:
-    - "#WP_PLUGIN_DIR#"
-    - "#CFPROP_#"
-    - "#ARRAY_A#"
-    - "#_IN_SECONDS#"
-    - "#WP_CLI#"
-    - "#WP_Icon_Collections_Registry#"
-    - "#MB_IN_BYTES#"
+    # plugin constants which are only defined at runtime (e.g. during an import).
+    - '#^Constant CFPROP_[A-Z_]+ not found\.$#'
+    # WordPress and WP-CLI constants which are not known to the stubs.
+    - '#^Constant (WP_PLUGIN_DIR|ARRAY_A|MB_IN_BYTES|[A-Z]+_IN_SECONDS|WP_CLI) not found\.$#'
+    # class which is only available in newer WordPress versions (guarded by function_exists() checks in the code).
+    - '#(unknown class|Class) WP_Icon_Collections_Registry( not found)?\.$#'
   paths:
     - app
     - connector-for-propstack.php

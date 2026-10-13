@@ -90,6 +90,9 @@ class Init {
 		// initialize the intro.
 		Intro::get_instance()->init();
 
+		// initialize the user handling.
+		Users::get_instance()->init();
+
 		// register cli.
 		add_action( 'cli_init', array( $this, 'cli' ) );
 
@@ -154,6 +157,10 @@ class Init {
 	public function deactivation(): void {
 		// remove our schedules.
 		Schedules::get_instance()->delete_all();
+
+		// remove single events used to continue running imports.
+		wp_clear_scheduled_hook( \ConnectorForPropstack\Propstack\Schedules\Objects::CONTINUATION_HOOK );
+		wp_clear_scheduled_hook( 'cfprop_run_import_by_ability' );
 	}
 
 	/**
@@ -170,7 +177,7 @@ class Init {
 		 * @param array<int,string> $objects List of objects.
 		 */
 		foreach ( apply_filters( 'cfprop_objects_with_db_tables', $objects ) as $obj_name ) {
-			if ( str_contains( $obj_name, 'ConnectorForPropstack\\' ) ) {
+			if ( str_contains( $obj_name, 'ConnectorForPropstack\\' ) && class_exists( $obj_name ) ) {
 				$obj = new $obj_name();
 				if ( method_exists( $obj, 'delete_table' ) ) {
 					$obj->delete_table();

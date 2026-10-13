@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\PageBuilder\Gutenberg\Blocks_Basis;
 use ConnectorForPropstack\PageBuilder\Gutenberg\Templates;
+use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 use ConnectorForPropstack\Propstack\Taxonomies;
@@ -59,6 +60,10 @@ class Gutenberg extends PageBuilder_Base {
 
 		// add our custom block category.
 		add_filter( 'block_categories_all', array( $this, 'add_block_category' ) );
+
+		// add the concatenated styles of our blocks in classic themes.
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_blocks_css' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_blocks_css' ) );
 
 		// make the block templates accessible for abilities.
 		add_filter( 'cfprop_template_ability_adapters', array( $this, 'add_template_adapter' ) );
@@ -178,6 +183,37 @@ class Gutenberg extends PageBuilder_Base {
 	}
 
 	/**
+	 * Enqueue the concatenated styles of our blocks in classic themes.
+	 *
+	 * In classic themes the styles of the single blocks are deregistered (see Blocks_Basis::register()), so we
+	 * use the concatenated file "css/blocks.css" instead, which is generated during the build.
+	 *
+	 * @return void
+	 */
+	public function enqueue_blocks_css(): void {
+		// bail if this is a block theme, it uses the styles of the single blocks.
+		if ( Helper::theme_is_fse_theme() ) {
+			return;
+		}
+
+		// get the path.
+		$path = Helper::get_plugin_path() . 'css/blocks.css';
+
+		// bail if the file does not exist.
+		if ( ! file_exists( $path ) ) {
+			return;
+		}
+
+		// enqueue the file.
+		wp_enqueue_style(
+			'connector-for-propstack-blocks',
+			Helper::get_plugin_url() . 'css/blocks.css',
+			array(),
+			Helper::get_file_version( $path )
+		);
+	}
+
+	/**
 	 * Remove our own templates on uninstallation.
 	 *
 	 * @return void
@@ -214,7 +250,7 @@ class Gutenberg extends PageBuilder_Base {
 	 */
 	public function prevent_post_term_links( string $block_content, array $block ): string {
 		// bail if no term is set.
-		if ( empty( $block['attrs']['term'] ) ) {
+		if ( empty( $block['attrs']['term'] ) || ! is_string( $block['attrs']['term'] ) ) {
 			return $block_content;
 		}
 
@@ -293,11 +329,17 @@ class Gutenberg extends PageBuilder_Base {
 	/**
 	 * Add the adapter, which makes the block templates accessible for abilities.
 	 *
-	 * @param array<int,\ConnectorForPropstack\Propstack\Template_Adapter_Base> $adapters List of adapters.
+	 * @param mixed $adapters List of adapters (array<int,\ConnectorForPropstack\Propstack\Template_Adapter_Base>).
 	 *
 	 * @return array<int,\ConnectorForPropstack\Propstack\Template_Adapter_Base>
 	 */
-	public function add_template_adapter( array $adapters ): array {
+	public function add_template_adapter( mixed $adapters ): array {
+		// use an empty list if the given value is not an array (e.g., if this hook is called with an unexpected value).
+		if ( ! is_array( $adapters ) ) {
+			$adapters = array();
+		}
+
+		// add our adapter.
 		$adapters[] = new Gutenberg\Template_Adapter();
 		return $adapters;
 	}

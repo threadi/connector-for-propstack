@@ -76,6 +76,12 @@ let import_running = false;
 let propstack_connector_progress_timeout = false;
 // marker to show the result dialog only once per process.
 let propstack_connector_result_shown = false;
+// max. number of retries after failed requests in a row.
+const propstack_connector_max_retries = 20;
+// counter for failed requests of chunks in a row.
+let propstack_connector_chunk_retries = 0;
+// counter for failed requests of process infos in a row.
+let propstack_connector_info_retries = 0;
 
 /**
  * Function to handle any AJAX process.
@@ -107,6 +113,8 @@ function propstack_connector_start_ajax_process( config ) {
   // mark in JS as running.
   import_running = true;
   propstack_connector_result_shown = false;
+  propstack_connector_chunk_retries = 0;
+  propstack_connector_info_retries = 0;
 
   // get info about progress, start immediately so a very fast process is not missed.
   propstack_connector_ajax_process( config );
@@ -132,7 +140,10 @@ function propstack_connector_run_ajax_chunk( config ) {
       'process_id': config.process_id
     },
     success: function( response ) {
-      if( response.load_more ) {
+      // reset the retry counter.
+      propstack_connector_chunk_retries = 0;
+
+      if( response && response.load_more ) {
         // continue with the next chunk.
         propstack_connector_run_ajax_chunk( config );
       }
@@ -143,22 +154,38 @@ function propstack_connector_run_ajax_chunk( config ) {
     },
     error: function( jqXHR, textStatus, errorThrown ) {
       // a gateway timeout does not mean the import stopped - the server may still be working.
-      if( jqXHR.status === 0 || jqXHR.status === 502 || jqXHR.status === 504 ) {
+      // but stop after too many failed requests in a row.
+      if( ( jqXHR.status === 0 || jqXHR.status === 502 || jqXHR.status === 504 ) && propstack_connector_chunk_retries < propstack_connector_max_retries ) {
+        propstack_connector_chunk_retries++;
+
         // wait a moment and continue with the next chunk.
         setTimeout( function() { propstack_connector_run_ajax_chunk( config ) }, 5000 );
 
         return;
       }
 
-      // mark import as not running and stop the polling.
-      import_running = false;
-      clearTimeout( propstack_connector_progress_timeout );
-
-      // show the error instead of the result.
-      propstack_connector_result_shown = true;
-      propstack_connector_ajax_error_dialog( errorThrown )
+      // stop the process and show the error.
+      propstack_connector_stop_with_error( errorThrown );
     }
   });
+}
+
+/**
+ * Stop the process, its polling and show the error.
+ */
+function propstack_connector_stop_with_error( errorThrown ) {
+  // mark import as not running and stop the polling.
+  import_running = false;
+  clearTimeout( propstack_connector_progress_timeout );
+
+  // bail if the result or an error has already been shown.
+  if( propstack_connector_result_shown ) {
+    return;
+  }
+
+  // show the error instead of the result.
+  propstack_connector_result_shown = true;
+  propstack_connector_ajax_error_dialog( errorThrown )
 }
 
 /**
@@ -175,7 +202,8 @@ function propstack_connector_ajax_process( config ) {
     },
     error: function( jqXHR, textStatus, errorThrown ) {
       // retry while the process is still running, the request may have been dropped.
-      if ( import_running ) {
+      if ( import_running && propstack_connector_info_retries < propstack_connector_max_retries ) {
+        propstack_connector_info_retries++;
         propstack_connector_progress_timeout = setTimeout( function () {
           propstack_connector_ajax_process( config )
         }, 1000 );
@@ -183,14 +211,40 @@ function propstack_connector_ajax_process( config ) {
         return;
       }
 
-      propstack_connector_ajax_error_dialog( errorThrown )
+      propstack_connector_stop_with_error( errorThrown );
     },
     success: function (data) {
+      // check the response, it must be an array with the process infos.
+      let dialog_config = false;
+      if( Array.isArray( data ) && data.length >= 5 && data[4] ) {
+        try {
+          dialog_config = JSON.parse( data[4] );
+        }
+        catch( e ) {
+          dialog_config = false;
+        }
+      }
+
+      // handle an invalid response like an error.
+      if( false === dialog_config ) {
+        if ( import_running && propstack_connector_info_retries < propstack_connector_max_retries ) {
+          propstack_connector_info_retries++;
+          propstack_connector_progress_timeout = setTimeout( function () {
+            propstack_connector_ajax_process( config )
+          }, 1000 );
+          return;
+        }
+        propstack_connector_stop_with_error( '' );
+        return;
+      }
+
+      // reset the retry counter.
+      propstack_connector_info_retries = 0;
+
       let count = parseInt( data[0] );
       let max = parseInt( data[1] );
       let running = parseInt( data[2] );
       let status = data[3];
-      let dialog_config = JSON.parse( data[4] );
 
       // show progress, but only if the maximum is already known.
       if( max > 0 ) {

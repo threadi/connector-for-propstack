@@ -87,8 +87,16 @@ class Energy_Scale extends Widget_Base {
 			return '';
 		}
 
+		// get the energy efficiency class field.
+		$energy_efficiency_class_field = new EnergyEfficiencyClass();
+
+		// bail if the energy efficiency class should not be visible in frontend for this object.
+		if ( ! Fields::get_instance()->is_field_visible_in_frontend( $energy_efficiency_class_field, $immo_object, false ) ) {
+			return '';
+		}
+
 		// get the energy efficiency class of this object.
-		$energy_efficiency_class = Fields::get_instance()->get_field_value( $immo_object->get_id(), new EnergyEfficiencyClass() );
+		$energy_efficiency_class = Fields::get_instance()->get_field_value( $immo_object->get_id(), $energy_efficiency_class_field );
 
 		// enable the styles.
 		wp_enqueue_style( 'cfprop-energy-scale' );

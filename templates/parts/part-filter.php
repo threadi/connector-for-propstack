@@ -5,7 +5,7 @@
  * @param array<string,mixed> $attributes List of attributes for displaying templates.
  *
  * @package connector-for-propstack
- * @version: 1.0.0
+ * @version: 2.1.0
  */
 
 // prevent direct access.
@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
 	do_action( 'cfprop_filter_before', $attributes );
 
 	foreach ( $attributes['filter_objects'] as $cfprop_filter ) {
-		echo wp_kses_post( $cfprop_filter->render() );
+		echo wp_kses( $cfprop_filter->render(), \ConnectorForPropstack\Plugin\Templates::get_instance()->get_allowed_filter_html() );
 	}
 
 	/**

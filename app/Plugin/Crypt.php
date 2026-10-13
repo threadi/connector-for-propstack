@@ -111,7 +111,23 @@ class Crypt {
 	 * @return \Closure
 	 */
 	public function get_save_callback( string $context ): \Closure {
-		return fn( $value ) => $this->encrypt( (string) $value, $context );
+		return function ( $value, $old_value = '' ) use ( $context ) {
+			$value     = (string) $value;
+			$encrypted = $this->encrypt( $value, $context );
+
+			// bail if the encryption was successful or if the value is empty.
+			if ( '' !== $encrypted || '' === $value ) {
+				return $encrypted;
+			}
+
+			// show an error, if possible.
+			if ( function_exists( 'add_settings_error' ) ) {
+				add_settings_error( $context, $context, __( 'The value could not be encrypted and has therefore not been saved. Please check the encryption support of your hosting.', 'connector-for-propstack' ) );
+			}
+
+			// return the old value: "update_option()" will not change the stored (encrypted) value as the value is unchanged.
+			return $old_value;
+		};
 	}
 
 	/**

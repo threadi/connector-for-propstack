@@ -30,6 +30,14 @@ class Renter extends Field_Base {
 	 * @var string
 	 */
 	protected string $name = 'renter';
+
+	/**
+	 * Hide this field in the frontend, as it contains internal data.
+	 *
+	 * @var bool
+	 */
+	protected bool $hide_in_frontend = true;
+
 	/**
 	 * Return the field label.
 	 *

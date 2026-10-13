@@ -42,21 +42,32 @@ class Queue extends WP_List_Table {
 	}
 
 	/**
-	 * Get the table data
+	 * Get the table data of a single page.
+	 *
+	 * @param int $per_page     The amount of entries per page.
+	 * @param int $current_page The page to show.
 	 *
 	 * @return array<int,WP_Post>
 	 */
-	private function table_data(): array {
-		add_filter(
-			'cfprop_queue_query',
-			static function ( array $query ) {
-				$query['posts_per_page'] = -1;
-				// show also entries which reached the max attempts.
-				unset( $query['meta_query'] );
-				return $query;
-			}
-		);
-		return \ConnectorForPropstack\Propstack\Queue::get_instance()->get_queue();
+	private function table_data( int $per_page, int $current_page ): array {
+		// request only the entries of this page.
+		$filter = static function ( array $query ) use ( $per_page, $current_page ): array {
+			$query['posts_per_page'] = $per_page;
+			$query['paged']          = $current_page;
+			// show also entries which reached the max attempts.
+			unset( $query['meta_query'] );
+			return $query;
+		};
+		add_filter( 'cfprop_queue_query', $filter );
+
+		// get the entries.
+		$entries = \ConnectorForPropstack\Propstack\Queue::get_instance()->get_queue();
+
+		// remove the filter, so it does not affect any other request of the queue.
+		remove_filter( 'cfprop_queue_query', $filter );
+
+		// return the entries.
+		return $entries;
 	}
 
 	/**
@@ -69,11 +80,11 @@ class Queue extends WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 
-		$data = $this->table_data();
-
 		$per_page     = 50;
 		$current_page = $this->get_pagenum();
-		$total_items  = count( $data );
+
+		$data        = $this->table_data( $per_page, $current_page );
+		$total_items = \ConnectorForPropstack\Propstack\Queue::get_instance()->get_last_found_posts();
 
 		$this->set_pagination_args(
 			array(
@@ -81,8 +92,6 @@ class Queue extends WP_List_Table {
 				'per_page'    => $per_page,
 			)
 		);
-
-		$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 		$this->items           = $data;
@@ -281,7 +290,7 @@ class Queue extends WP_List_Table {
 		// if still no URL is set, get the doc URL.
 		if ( empty( $url ) ) {
 			$urls = (array) get_post_meta( $item->ID, 'doc', true );
-			if ( ! empty( $urls ) ) {
+			if ( ! empty( $urls['url'] ) && is_string( $urls['url'] ) ) {
 				$url = Helper::shorten_url( $urls['url'] );
 			}
 		}

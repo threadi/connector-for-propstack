@@ -188,12 +188,11 @@ class ObjectsChunkedImport extends ConnectorForPropstackTestCase {
 		} while ( $import_obj->has_load_more() );
 
 		// get the message of this process.
-		$values = get_option( 'cfprop_process_values' );
+		$values = get_transient( \ConnectorForPropstack\Plugin\ProcessHandler::TRANSIENT_PREFIX . md5( 'cfprop-test-process' ) );
 		$this->assertIsArray( $values );
-		$this->assertArrayHasKey( 'cfprop-test-process', $values );
-		$this->assertIsArray( $values['cfprop-test-process']['message']['detail']['texts'] );
+		$this->assertIsArray( $values['message']['detail']['texts'] );
 
-		return implode( ' ', $values['cfprop-test-process']['message']['detail']['texts'] );
+		return implode( ' ', $values['message']['detail']['texts'] );
 	}
 
 	/**

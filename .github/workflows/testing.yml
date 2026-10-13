@@ -5,6 +5,11 @@ on:
     branches:
       - master
   workflow_dispatch:
+  # allow the release workflow to run the tests before a release is created.
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -12,27 +17,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install dependencies
         run: composer install
 
       - name: Set version number 1
-        uses: richardrigutins/replace-in-files@v3
+        uses: richardrigutins/replace-in-files@bca25c5a547c8caa5e4db158b34ee8e8c7539ccf # v3.1.3
         with:
           files: 'connector-for-propstack.php'
           search-text: '@@VersionNumber@@'
           replacement-text: ${{ github.ref_name }}
 
       - name: Set version number 2
-        uses: richardrigutins/replace-in-files@v3
+        uses: richardrigutins/replace-in-files@bca25c5a547c8caa5e4db158b34ee8e8c7539ccf # v3.1.3
         with:
           files: 'uninstall.php'
           search-text: '@@VersionNumber@@'
           replacement-text: ${{ github.ref_name }}
 
       - name: Set version number 3
-        uses: richardrigutins/replace-in-files@v3
+        uses: richardrigutins/replace-in-files@bca25c5a547c8caa5e4db158b34ee8e8c7539ccf # v3.1.3
         with:
           files: 'readme.txt'
           search-text: '@@VersionNumber@@'
@@ -55,7 +62,7 @@ jobs:
         php-version: ['8.5', '8.4', '8.3', '8.2']
     services:
       database:
-        image: mysql:latest
+        image: mysql:8.0
         env:
           MYSQL_DATABASE: wordpress_tests
           MYSQL_ROOT_PASSWORD: root
@@ -63,29 +70,32 @@ jobs:
           - 3306:3306
     steps:
       - name: Check out source code
-        uses: actions/checkout@v7
-
-      - name: Run package installs and builds
-        run: |
-          composer install
-          npm i
-          npm i concurrently
-          npm run build:archive
-          npm run build:broker-field
-          npm run build:description
-          npm run build:field
-          npm run build:filter
-          npm run build:single
-          npm run build:gallery
-          npm run build:lightbox
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
             php-version: ${{ matrix.php-version }}
             tools: phpunit-polyfills:1.1
             extensions: mbstring, xml, zip, intl, pdo, mysql
             coverage: none
+
+      - name: Run package installs and builds
+        run: |
+          composer install
+          npm ci
+          npm run build:archive
+          npm run build:broker-field
+          npm run build:description
+          npm run build:energy_scale
+          npm run build:field
+          npm run build:filter
+          npm run build:single
+          npm run build:gallery
+          npm run build:lightbox
+          npm run copy:driver
 
       - name: Install SVN
         run: sudo apt-get update && sudo apt-get install -y subversion

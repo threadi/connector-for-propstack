@@ -43,7 +43,12 @@ class NumberFieldTest extends TestCase {
 		return array(
 			'integer'         => array( 1234, '1.234' ),
 			'numeric string'  => array( '1234', '1.234' ),
-			'float rounds up' => array( 1234.5, '1.235' ),
+			'one decimal'     => array( 1234.5, '1.234,5' ),
+			'area'            => array( 62.5, '62,5' ),
+			'two decimals'    => array( '62.25', '62,25' ),
+			'rounds to two'   => array( 62.257, '62,26' ),
+			'rounds to int'   => array( 62.001, '62' ),
+			'negative'        => array( -2.5, '-2,5' ),
 			'small integer'   => array( 7, '7' ),
 			'zero'            => array( 0, '' ),
 			'zero as string'  => array( '0', '' ),

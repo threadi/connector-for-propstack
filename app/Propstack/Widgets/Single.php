@@ -67,13 +67,16 @@ class Single extends Widget_Base {
 	 * @return string
 	 */
 	public function render( array $attributes ): string {
-		// bail if no object ID is set.
-		if ( empty( $attributes['object_id'] ) ) {
+		// get the object for the selected object ID.
+		if ( ! empty( $attributes['object_id'] ) ) {
+			$attributes['object'] = ImmoObjects::get_instance()->get_object_by_object_id( (string) $attributes['object_id'], Languages::get_instance()->get_current_lang() );
+		} elseif ( ! empty( $attributes['preview'] ) ) {
+			// use the newest object for the preview in the block inserter (only available for editors during REST requests).
+			$attributes['object'] = $this->get_object_by_request();
+		} else {
+			// bail if no object ID is set.
 			return '';
 		}
-
-		// get the object for the selected object ID.
-		$attributes['object'] = ImmoObjects::get_instance()->get_object_by_object_id( (string) $attributes['object_id'], Languages::get_instance()->get_current_lang() );
 
 		// bail if no object could be found.
 		if ( ! $attributes['object'] instanceof ImmoObject ) {
@@ -81,7 +84,7 @@ class Single extends Widget_Base {
 		}
 
 		// set some attributes to configure the rendering.
-		$attributes['classes']   = 'cfprop-object default-max-width';
+		$attributes['classes']   = trim( 'cfprop-object default-max-width ' . ( isset( $attributes['classes'] ) && is_string( $attributes['classes'] ) ? $attributes['classes'] : '' ) );
 		$attributes['template']  = ! empty( $attributes['template'] ) && is_string( $attributes['template'] ) ? sanitize_key( $attributes['template'] ) : 'default';
 		$attributes['templates'] = ! empty( $attributes['templates'] ) ? $this->get_list_attribute( $attributes['templates'] ) : array(
 			'thumbnail',
@@ -99,6 +102,9 @@ class Single extends Widget_Base {
 		 * @param array<string,mixed> $attributes The attributes for the single widget.
 		 */
 		$attributes = apply_filters( 'cfprop_widget_single_attributes', $attributes );
+
+		// use only allowed template names (as they are used for hooks).
+		$attributes['templates'] = \ConnectorForPropstack\Propstack\Templates::get_instance()->get_allowed_template_names( $this->get_list_attribute( $attributes['templates'] ?? array() ) );
 
 		// use only existing single templates (prevents path traversal).
 		$attributes['template'] = sanitize_key( (string) $attributes['template'] );

@@ -1,13 +1,14 @@
 <wpml-config>
     <custom-types>
-        <custom-type translate="1">propstack_object</custom-type>
-        <custom-type translate="0">propstack_queue</custom-type>
+        <custom-type translate="1">cfprop_object</custom-type>
+        <custom-type translate="0">cfprop_queue</custom-type>
     </custom-types>
     <taxonomies>
-        <taxonomy translate="0">propstack_object_broker</taxonomy>
-        <taxonomy translate="0">propstack_object_type</taxonomy>
-        <taxonomy translate="0">propstack_object_category</taxonomy>
-        <taxonomy translate="0">propstack_object_marketing_type</taxonomy>
-        <taxonomy translate="0">propstack_object_property_type</taxonomy>
+        <taxonomy translate="0">cfprop_object_broker</taxonomy>
+        <taxonomy translate="0">cfprop_object_type</taxonomy>
+        <taxonomy translate="0">cfprop_object_category</taxonomy>
+        <taxonomy translate="0">cfprop_object_marketing_type</taxonomy>
+        <taxonomy translate="0">cfprop_object_property_type</taxonomy>
+        <taxonomy translate="0">cfprop_object_status</taxonomy>
     </taxonomies>
 </wpml-config>

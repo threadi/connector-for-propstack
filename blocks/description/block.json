@@ -37,7 +37,11 @@
         "description_type": {
             "type": "string",
             "default": "description_note"
-        }
+        },
+		"preview": {
+			"type": "boolean",
+			"default": false
+		}
 	},
 	"example": {
 		"attributes": {
