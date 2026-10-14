@@ -21,32 +21,35 @@ jQuery(document).ready(function($) {
   });
 
   /**
-   * Open the WordPress help with a specific tab via links with the class "cfprop-open-help".
+   * Open an entry of the WordPress help via links with the class "cfprop-open-help".
    *
-   * The href of the link must be the anchor of the help tab panel, e.g. "#tab-panel-cfprop_object-insufficient_permissions".
+   * The link names the entry via the attribute "data-help-entry" or via an anchor like "#cfprop-help-insufficient_permissions" as href.
+   * If the entry is not available on the actual page, the link is followed (it leads to the settings, where the entry is opened).
    */
   $( document ).on( 'click', 'a.cfprop-open-help', function ( e ) {
-    let anchor = $( this ).attr( 'href' );
-    let tab_link = $( '.contextual-help-tabs a' ).filter( function () {
-      return $( this ).attr( 'href' ) === anchor;
-    } );
+    let entry = $( this ).data( 'help-entry' );
+    if ( ! entry ) {
+      let href = $( this ).attr( 'href' ) || '';
+      if ( href.indexOf( '#cfprop-help-' ) === 0 ) {
+        entry = href.substring( 13 );
+      }
+    }
 
-    // bail if the help tab is not available on this page.
-    if ( ! tab_link.length ) {
+    // bail if the entry is not available on this page.
+    if ( ! entry || ! cfprop_open_help_entry( entry ) ) {
       return;
     }
 
     e.preventDefault();
-
-    // open the help if it is closed.
-    if ( ! $( '#contextual-help-wrap' ).is( ':visible' ) ) {
-      $( '#contextual-help-link' ).trigger( 'click' );
-    }
-
-    // show the requested tab and scroll to the help.
-    tab_link.trigger( 'click' );
-    $( 'html, body' ).animate( { scrollTop: 0 }, 200 );
   } );
+
+  /**
+   * Open the help entry which is requested via the URL parameter "cfprop_help".
+   */
+  let requested_help = new URLSearchParams( window.location.search ).get( 'cfprop_help' );
+  if ( requested_help && /^[a-z0-9_]+$/.test( requested_help ) ) {
+    cfprop_open_help_entry( requested_help );
+  }
 
   /**
    * Copy strings via click.
@@ -167,4 +170,53 @@ function propstack_connector_copy_to_clipboard( text ) {
   }
   document.body.removeChild(helper);
   return false;
+}
+
+/**
+ * Open the WordPress help and show the given entry.
+ *
+ * Opens the help, shows the tab which contains the entry, expands the entry and scrolls to it.
+ *
+ * @param {string} entry The internal name of the entry.
+ * @returns {boolean} True if the entry exists on this page.
+ */
+function cfprop_open_help_entry( entry ) {
+  let entry_obj = document.getElementById( 'cfprop-help-' + entry );
+
+  // bail if the entry is not available on this page.
+  if ( ! entry_obj ) {
+    return false;
+  }
+
+  // get the tab which contains the entry.
+  let panel = entry_obj.closest( '.help-tab-content' );
+  if ( ! panel ) {
+    return false;
+  }
+  let tab_link = jQuery( '#' + CSS.escape( panel.id.replace( 'tab-panel-', 'tab-link-' ) ) + ' a' );
+
+  // open the help if it is closed.
+  if ( ! jQuery( '#contextual-help-wrap' ).is( ':visible' ) ) {
+    jQuery( '#contextual-help-link' ).trigger( 'click' );
+  }
+
+  // show the tab.
+  tab_link.trigger( 'click' );
+
+  // collapse the other entries of this tab, expand the requested entry and mark it.
+  panel.querySelectorAll( 'details.cfprop-knowledge-center-entry[open]' ).forEach( function ( details ) {
+    if ( details !== entry_obj ) {
+      details.open = false;
+    }
+  } );
+  entry_obj.open = true;
+  entry_obj.classList.remove( 'cfprop-highlight' );
+  void entry_obj.offsetWidth;
+  entry_obj.classList.add( 'cfprop-highlight' );
+
+  // scroll to the entry after the help has been opened.
+  setTimeout( function () {
+    entry_obj.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+  }, 300 );
+  return true;
 }

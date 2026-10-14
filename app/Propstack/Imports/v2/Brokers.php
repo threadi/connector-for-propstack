@@ -140,7 +140,7 @@ class Brokers extends Import_Base {
 			if ( 200 !== $request_object->get_http_status() ) {
 				// add a log entry.
 				/* translators: %1$s will be replaced by the HTTP status, %2$s by a URL. */
-				Log::get_instance()->add( sprintf( __( 'The brokers could not be loaded from Propstack (HTTP status %1$s). The objects are imported without the data of their brokers. Please check whether <a href="%2$s" target="_blank">your API key</a> has the permission to read brokers.', 'connector-for-propstack' ), '<code>' . $request_object->get_http_status() . '</code>', esc_url( Helper::get_propstack_api_page_url() ) ), 'error', 'import' );
+				Log::get_instance()->add( sprintf( __( 'The brokers could not be loaded from Propstack (HTTP status %1$s). The objects are imported without the data of their brokers. Please check whether <a href="%2$s" target="_blank">your API key</a> has the permission to read brokers.', 'connector-for-propstack' ), '<code>' . $request_object->get_http_status() . '</code>', esc_url( Helper::get_propstack_api_page_url() ) ) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'api_v2_data' ), 'error', 'import' );
 
 				// use the brokers we got until now.
 				break;

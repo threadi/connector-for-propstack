@@ -962,8 +962,8 @@ class ImmoObjects {
 			'cfprop-imports',
 			'propstackConnectorJsErrors',
 			array(
-				'Request Timeout'  => __( '<u>Request Timeout</u> - The import apparently took too long to be completed.', 'connector-for-propstack' ),
-				'Gateway Time-out' => __( '<u>Gateway Timeout</u> - The import apparently took too long to be completed.', 'connector-for-propstack' ),
+				'Request Timeout'  => __( '<u>Request Timeout</u> - The import apparently took too long to be completed.', 'connector-for-propstack' ) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'import_timeout' ),
+				'Gateway Time-out' => __( '<u>Gateway Timeout</u> - The import apparently took too long to be completed.', 'connector-for-propstack' ) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'import_timeout' ),
 			)
 		);
 	}

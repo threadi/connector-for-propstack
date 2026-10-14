@@ -27,6 +27,20 @@ class Avada extends Compatibilities_Base {
 	protected string $name = 'cfprop_compatibility_avada';
 
 	/**
+	 * Human-readable name of the checked product.
+	 *
+	 * @var string
+	 */
+	protected string $label = 'Avada';
+
+	/**
+	 * Whether the checked product is a page builder, which is not natively supported.
+	 *
+	 * @var bool
+	 */
+	protected bool $is_page_builder = true;
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Avada

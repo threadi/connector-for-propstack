@@ -514,7 +514,7 @@ class Setup {
 		} elseif ( 0 === $this->object_count ) {
 			$completed_text = '<strong>' . __( 'Setup has been run, but no objects have been imported.', 'connector-for-propstack' ) . '</strong> ';
 			/* translators: %1$s will be replaced by a URL. */
-			$completed_text .= sprintf( __( 'Your Propstack account did not deliver any object. If you expected objects here, check <a href="%1$s">your import settings</a> - a restriction on marketing type or status can exclude all of them.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_import' ) ) );
+			$completed_text .= sprintf( __( 'Your Propstack account did not deliver any object. If you expected objects here, check <a href="%1$s">your import settings</a> - a restriction on marketing type or status can exclude all of them.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_import' ) ) ) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'object_not_imported' );
 		} elseif ( $this->imported_count < $this->object_count ) {
 			$completed_text  = '<strong>' . __( 'Setup has been run.', 'connector-for-propstack' ) . '</strong> ';
 			$completed_text .= sprintf(

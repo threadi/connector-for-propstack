@@ -161,7 +161,14 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
+- Fixed: values in the list of objects (e.g. prices) no longer overlap in narrow columns
+- Fixed: the list of objects and the detail view in classic themes show the default image for objects without an image
 - Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help
+- Added help entries for showing objects on the website, editing their views, import problems, missing images, API v2, automatic import, hidden addresses, sold objects, languages and support, grouped by topic as expandable sections
+- Help entries for displaying objects adapt to the used theme and detected page builders
+- Added links from log entries and dialogs to the matching help entries
+- Added entry "Edit object view" in the admin bar for administrators on the detail view and the list of objects, which shows the used template and links to it (can be disabled in the settings)
+- Added block patterns for a list of objects with filter, the newest objects and the contact with the broker
 - Added new widget for show the energy scale of a single object, usable as Block and via shortcode
 - Added new field type for energy efficiency classes with check against a whitelist for value A+ to H
 - Added new field type for geo coordinates to output them with 4 digits

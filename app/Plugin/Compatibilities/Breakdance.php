@@ -27,6 +27,20 @@ class Breakdance extends Compatibilities_Base {
 	protected string $name = 'cfprop_compatibility_breakdance';
 
 	/**
+	 * Human-readable name of the checked product.
+	 *
+	 * @var string
+	 */
+	protected string $label = 'Breakdance';
+
+	/**
+	 * Whether the checked product is a page builder, which is not natively supported.
+	 *
+	 * @var bool
+	 */
+	protected bool $is_page_builder = true;
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Breakdance

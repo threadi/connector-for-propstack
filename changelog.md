@@ -5,6 +5,11 @@
 ### Added
 
 - Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help
+- Added help entries for showing objects on the website, editing their views, import problems, missing images, API v2, automatic import, hidden addresses, sold objects, languages and support
+- Help entries for displaying objects adapt to the used theme and detected page builders
+- Added links from log entries and dialogs to the matching help entries
+- Added entry "Edit object view" in the admin bar for administrators on the detail view and the list of objects, which shows the used template and links to it (can be disabled in the settings)
+- Added block patterns for a list of objects with filter, the newest objects and the contact with the broker
 - Show the reason why an object has not been imported
 - Added WP CLI command to check whether the Propstack API delivers a specific object
 - Added multiple hooks

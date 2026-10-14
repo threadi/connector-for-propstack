@@ -593,7 +593,7 @@ class Import_Base {
 				__( 'Import of object %1$s (Propstack-ID %2$d) prevented.', 'connector-for-propstack' ),
 				'<em>' . esc_html( (string) $title ) . '</em>',
 				$object_id
-			) . ' ' . esc_html( implode( ' ', $reasons ) ),
+			) . ' ' . esc_html( implode( ' ', $reasons ) ) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'object_not_imported' ),
 			'info',
 			'import'
 		);
@@ -1334,7 +1334,7 @@ class Import_Base {
 				__( 'The import of object %1$s (Propstack-ID %2$d) aborted the previous run, e.g. by the memory or time limit of PHP. The object has been skipped.', 'connector-for-propstack' ),
 				'<em>' . esc_html( $this->get_object_title( $immo_object ) ) . '</em>',
 				isset( $immo_object['id'] ) && is_scalar( $immo_object['id'] ) ? absint( $immo_object['id'] ) : 0
-			),
+			) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'import_timeout' ),
 			'error',
 			'import'
 		);

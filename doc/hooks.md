@@ -805,7 +805,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/PageBuilder/Gutenberg.php](PageBuilder/Gutenberg.php), [line 122](PageBuilder/Gutenberg.php#L122-L128)
+Source: [app/PageBuilder/Gutenberg.php](PageBuilder/Gutenberg.php), [line 125](PageBuilder/Gutenberg.php#L125-L131)
 
 ### `cfprop_gutenberg_blocks`
 
@@ -823,7 +823,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/PageBuilder/Gutenberg.php](PageBuilder/Gutenberg.php), [line 148](PageBuilder/Gutenberg.php#L148-L154)
+Source: [app/PageBuilder/Gutenberg.php](PageBuilder/Gutenberg.php), [line 151](PageBuilder/Gutenberg.php#L151-L157)
 
 ### `cfprop_block_help_url`
 
@@ -888,6 +888,24 @@ Version | Description
 `1.0.0` | Available since 1.0.0.
 
 Source: [app/PageBuilder/Gutenberg/Templates.php](PageBuilder/Gutenberg/Templates.php), [line 222](PageBuilder/Gutenberg/Templates.php#L222-L229)
+
+### `cfprop_block_patterns`
+
+*Filter the block patterns of this plugin.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$patterns` | `array<string,array<string,mixed>>` | List of patterns (name => settings for register_block_pattern()).
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/PageBuilder/Gutenberg/Patterns.php](PageBuilder/Gutenberg/Patterns.php), [line 128](PageBuilder/Gutenberg/Patterns.php#L128-L134)
 
 ### `cfprop_pagebuilder`
 
@@ -1279,6 +1297,16 @@ Version | Description
 
 Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 489](Plugin/Helper.php#L489-L495)
 
+### `cfprop_hide_pro_hints`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$false` |  | 
+
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 615](Plugin/Helper.php#L615-L615)
+
 ### `cfprop_process_lock_timeout`
 
 **Arguments**
@@ -1288,7 +1316,7 @@ Argument | Type | Description
 `$hour` |  | 
 `$option_name` |  | 
 
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 687](Plugin/Helper.php#L687-L687)
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 706](Plugin/Helper.php#L706-L706)
 
 ### `cfprop_schedule_our_events`
 
@@ -1608,7 +1636,7 @@ Version | Description
 ------- | -----------
 `1.0.5` | Available since 1.0.5.
 
-Source: [app/Plugin/Compatibilities.php](Plugin/Compatibilities.php), [line 187](Plugin/Compatibilities.php#L187-L194)
+Source: [app/Plugin/Compatibilities.php](Plugin/Compatibilities.php), [line 204](Plugin/Compatibilities.php#L204-L211)
 
 ### `cfprop_users_for_settings_query`
 
@@ -1690,7 +1718,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Plugin/Admin/Admin.php](Plugin/Admin/Admin.php), [line 184](Plugin/Admin/Admin.php#L184-L191)
+Source: [app/Plugin/Admin/Admin.php](Plugin/Admin/Admin.php), [line 185](Plugin/Admin/Admin.php#L185-L192)
 
 ### `cfprop_hide_pro_hints`
 
@@ -1708,7 +1736,26 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0
 
-Source: [app/Plugin/Admin/Admin.php](Plugin/Admin/Admin.php), [line 310](Plugin/Admin/Admin.php#L310-L319)
+Source: [app/Plugin/Admin/Admin.php](Plugin/Admin/Admin.php), [line 311](Plugin/Admin/Admin.php#L311-L320)
+
+### `cfprop_knowledge_center_entry_text`
+
+*Filter the text of a knowledge center entry.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$text` | `string` | The text.
+`$this` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/KnowledgeCenter_Base.php](Propstack/KnowledgeCenter_Base.php), [line 150](Propstack/KnowledgeCenter_Base.php#L150-L157)
 
 ### `cfprop_ability_import_time_budget`
 
@@ -2971,6 +3018,45 @@ Version | Description
 
 Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 542](Propstack/Taxonomy.php#L542-L548)
 
+### `cfprop_show_frontend_hints`
+
+*Filter whether the hints for administrators should be shown in the frontend.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$true` | `bool` | True to show the hints.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Frontend_Hints.php](Propstack/Frontend_Hints.php), [line 111](Propstack/Frontend_Hints.php#L111-L117)
+
+### `cfprop_frontend_template_info`
+
+*Filter the information about the template which is used for the actual view of objects.*
+
+Used e.g. by page builders, which provide their own templates for objects.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$info` | `array<string,string>` | The information: "label" describes the used template, "edit_url" is the URL to edit it.
+`$type` | `string` | The view type ("single" or "archive").
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Frontend_Hints.php](Propstack/Frontend_Hints.php), [line 161](Propstack/Frontend_Hints.php#L161-L170)
+
 ### `cfprop_filter_hide_field_by_value`
 
 *Prevent the usage of this filter value.*
@@ -3343,7 +3429,19 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 74](Propstack/KnowledgeCenter.php#L74-L80)
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 104](Propstack/KnowledgeCenter.php#L104-L110)
+
+### `cfprop_knowledge_center_entry_visible`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$visible` |  | 
+`$entry` |  | 
+`$screen_name` |  | 
+
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 183](Propstack/KnowledgeCenter.php#L183-L183)
 
 ### `cfprop_show_help`
 
@@ -3354,7 +3452,7 @@ Argument | Type | Description
 `$allowed` |  | 
 `$screen` |  | 
 
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 150](Propstack/KnowledgeCenter.php#L150-L150)
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 273](Propstack/KnowledgeCenter.php#L273-L273)
 
 ### `cfprop_help_tabs`
 
@@ -3372,7 +3470,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 179](Propstack/KnowledgeCenter.php#L179-L185)
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 302](Propstack/KnowledgeCenter.php#L302-L308)
 
 ### `cfprop_help_sidebar_content`
 
@@ -3390,7 +3488,25 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 199](Propstack/KnowledgeCenter.php#L199-L205)
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 322](Propstack/KnowledgeCenter.php#L322-L328)
+
+### `cfprop_knowledge_center_groups`
+
+*Filter the groups of the knowledge center entries. Each group is shown as one tab in the help.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$groups` | `array<string,string>` | List of groups (internal name => title).
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 370](Propstack/KnowledgeCenter.php#L370-L376)
 
 ### `cfprop_category_default_terms`
 

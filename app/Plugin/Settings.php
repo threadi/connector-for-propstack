@@ -174,9 +174,8 @@ class Settings {
 		$field = new Password( $settings_obj );
 		$field->set_title( __( 'API Key', 'connector-for-propstack' ) );
 		/* translators: %1$s will be replaced by a URL. */
-		$description = sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() );
-		/* translators: %1$s will be replaced by an anchor which opens the help. */
-		$description .= ' ' . sprintf( __( 'Please make sure that the permissions of the API key are set accordingly, as they differ between the API v1 and the API v2. <a href="%1$s" class="cfprop-open-help">Show the required permissions</a>.', 'connector-for-propstack' ), esc_attr( ( new InsufficientPermissions() )->get_help_tab_anchor() ) );
+		$description  = sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() );
+		$description .= ' ' . __( 'Please make sure that the permissions of the API key are set accordingly, as they differ between the API v1 and the API v2.', 'connector-for-propstack' ) . ' ' . ( new InsufficientPermissions() )->get_link( __( 'Show the required permissions', 'connector-for-propstack' ) ) . '.';
 		$field->set_description( $description );
 		if ( ! Setup::get_instance()->is_completed() ) {
 			$field->set_placeholder( __( 'Enter your API key', 'connector-for-propstack' ) );
@@ -382,6 +381,15 @@ class Settings {
 		$field = new Checkbox( $this->get_settings_obj() );
 		$field->set_title( __( 'Show help', 'connector-for-propstack' ) );
 		$field->set_description( __( 'If enabled we will show hints in your page builder.', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
+
+		// add setting.
+		$setting = $this->get_settings_obj()->add_setting( 'propstack_connector_show_frontend_hints' );
+		$setting->set_section( $advanced_section );
+		$setting->set_default( 1 );
+		$field = new Checkbox( $this->get_settings_obj() );
+		$field->set_title( __( 'Show hints in frontend', 'connector-for-propstack' ) );
+		$field->set_description( __( 'If enabled administrators will see an entry in the admin bar on the detail view and the list of objects. It shows which template is used and where you can edit it. Visitors of your website will never see it.', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
 		// add setting.

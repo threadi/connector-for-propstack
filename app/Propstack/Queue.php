@@ -587,7 +587,7 @@ class Queue {
 				} else {
 					// add a log entry, the attempt has already been counted.
 					/* translators: %1$s: the file ID, %2$d: the count of failed attempts, %3$d: the max attempts. */
-					Log::get_instance()->add( sprintf( __( 'Import of file ID %1$s from the queue failed (attempt %2$d of %3$d).', 'connector-for-propstack' ), '<em>' . esc_html( $post->post_title ) . '</em>', $failed_attempts, $this->get_max_attempts() ), 'error', 'queue' );
+					Log::get_instance()->add( sprintf( __( 'Import of file ID %1$s from the queue failed (attempt %2$d of %3$d).', 'connector-for-propstack' ), '<em>' . esc_html( $post->post_title ) . '</em>', $failed_attempts, $this->get_max_attempts() ) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'missing_images' ), 'error', 'queue' );
 				}
 			} catch ( Throwable $e ) {
 				// add a log entry, the attempt has already been counted.

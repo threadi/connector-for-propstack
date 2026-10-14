@@ -25,6 +25,20 @@ class InsufficientPermissions extends KnowledgeCenter_Base {
 	protected string $name = 'insufficient_permissions';
 
 	/**
+	 * The position of this entry in the list of help tabs.
+	 *
+	 * @var int
+	 */
+	protected int $priority = 50;
+
+	/**
+	 * The group of this entry.
+	 *
+	 * @var string
+	 */
+	protected string $group = 'import';
+
+	/**
 	 * Return the title of the knowledge center entry.
 	 *
 	 * @return string

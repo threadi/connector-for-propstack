@@ -40,12 +40,16 @@
 
 .cfprop-values {
 	display: flex;
+	flex-wrap: wrap;
+	gap: .5em 1em;
 	justify-content: space-between;
 	margin-top: 1em;
 	padding: 0 1rem;
 	div {
 		display: flex;
 		flex-direction: row;
+		flex-wrap: wrap;
+		gap: .5em;
 	}
 }
 

@@ -29,6 +29,21 @@ class Compatibilities_Base {
 	protected string $plugin_url = '';
 
 	/**
+	 * Human-readable name of the checked product.
+	 *
+	 * @var string
+	 */
+	protected string $label = '';
+
+	/**
+	 * Whether the checked product is a page builder or theme with own page builder, which is not natively supported
+	 * by this plugin.
+	 *
+	 * @var bool
+	 */
+	protected bool $is_page_builder = false;
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Compatibilities_Base
@@ -90,5 +105,24 @@ class Compatibilities_Base {
 	 */
 	public function get_plugin_url(): string {
 		return $this->plugin_url;
+	}
+
+	/**
+	 * Return the human-readable name of the checked product.
+	 *
+	 * @return string
+	 */
+	public function get_label(): string {
+		return $this->label;
+	}
+
+	/**
+	 * Return whether the checked product is a page builder (or theme with own page builder),
+	 * which is not natively supported by this plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_page_builder(): bool {
+		return $this->is_page_builder;
 	}
 }
