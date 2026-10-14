@@ -24,3 +24,6 @@
 /svn export-ignore
 /tests export-ignore
 /blocks/*/src export-ignore
+/playwright.config.ts export-ignore
+/dist export-ignore
+/tmp export-ignore

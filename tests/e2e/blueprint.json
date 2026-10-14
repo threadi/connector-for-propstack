@@ -1,0 +1,21 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/wp-admin/",
+	"steps": [
+		{
+			"step": "activatePlugin",
+			"pluginPath": "connector-for-propstack/connector-for-propstack.php"
+		},
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"permalink_structure": "/%postname%/",
+				"blogname": "Connector for Propstack E2E"
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; wp_set_current_user( 1 ); global $wpdb; delete_option( 'propstack_connector_api_key' ); $wpdb->insert( $wpdb->options, array( 'option_name' => 'propstack_connector_api_key', 'option_value' => \\ConnectorForPropstack\\Plugin\\Crypt::get_instance()->encrypt( 'test_api_key', 'propstack_connector_api_key' ), 'autoload' => 'off' ) ); wp_cache_delete( 'propstack_connector_api_key', 'options' ); wp_cache_delete( 'notoptions', 'options' ); if ( 'test_api_key' !== \\ConnectorForPropstack\\Plugin\\Crypt::get_instance()->decrypt( (string) get_option( 'propstack_connector_api_key' ), 'propstack_connector_api_key' ) ) { throw new Exception( 'The API key could not be saved encrypted.' ); } update_option( 'cfprop_intro', 1 ); \\easySetupForWordPress\\Setup::get_instance()->set_completed( \\ConnectorForPropstack\\Plugin\\Setup::get_instance()->get_setup_name(), true ); $runs = 0; do { $import = \\ConnectorForPropstack\\Propstack\\ImmoObjects::get_instance()->import( '' ); ++$runs; } while ( $import->has_load_more() && $runs < 100 ); if ( $import->has_errors() ) { throw new Exception( 'Import of the test data failed: ' . $import->get_errors()[0]->get_error_message() ); } wp_insert_user( array( 'user_login' => 'subscriber', 'user_pass' => 'subscriber', 'user_email' => 'subscriber@example.com', 'role' => 'subscriber' ) ); wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'E2E Shortcodes', 'post_name' => 'e2e-shortcodes', 'post_content' => '[cfprop_widget_archive] [cfprop_widget_archive templates=\"ability_adapters,title\"] [cfprop_widget_filter]' ) ); flush_rewrite_rules();"
+		}
+	]
+}

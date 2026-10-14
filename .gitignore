@@ -6,3 +6,13 @@
 languages/*.json
 /vendor/
 /admin/driver/
+/dist/
+/releases/
+/test-results/
+/playwright-report/
+/tests/e2e/.auth/
+/node_modules/
+/build/*.txt
+/js/generated/*
+!/js/generated/.gitkeep
+/tmp/

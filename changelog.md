@@ -8,6 +8,7 @@
 - Added WP CLI command to check whether the Propstack API delivers a specific object
 - Added multiple hooks
 - Added option --network to the WP CLI command reset_plugin to reset all sites of a multisite network
+- Added Playwright tests as part of the release process
 
 ### Changed
 
@@ -60,6 +61,7 @@
   automatically during the update
 - Replaced custom TextInfo object with the new one from settings lib
 - The API key field is now a password field which restricts the visibility of your API key
+- Updated the process to check any changed and create the release on GitHub
 - Updated hints how to use MCP with our abilities
 - Updated dependencies
 - More PHP Unit Tests
