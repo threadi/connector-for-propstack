@@ -215,11 +215,14 @@ class Queue {
 				continue;
 			}
 
+			// get the file ID as string, as it is used as array key.
+			$file_id = (string) $file['id'];
+
 			// get its post-ID in the queue.
 			$queue_post_id = 0;
 			$state         = 0;
-			if ( isset( $list_of_existing_files_in_queue[ $file['id'] ] ) ) {
-				$queue_post_id = $list_of_existing_files_in_queue[ $file['id'] ];
+			if ( isset( $list_of_existing_files_in_queue[ $file_id ] ) ) {
+				$queue_post_id = $list_of_existing_files_in_queue[ $file_id ];
 				$state         = 1;
 			}
 
@@ -228,7 +231,7 @@ class Queue {
 				// remove the queue entry.
 				if ( $queue_post_id > 0 ) {
 					wp_delete_post( $queue_post_id, true );
-					unset( $this->queue_map[ (string) $file['id'] ] );
+					unset( $this->queue_map[ $file_id ] );
 				}
 
 				// do nothing more with this file.
@@ -240,12 +243,12 @@ class Queue {
 			if ( $attachment_id > 0 ) {
 				// add a log entry.
 				/* translators: %1$s: the given URL. */
-				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s is already in the media library and will not be added to the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'queue' );
+				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s is already in the media library and will not be added to the queue.', 'connector-for-propstack' ), ' <em>' . esc_html( $file_id ) . '</em>' ), 'info', 'queue' );
 
 				// remove the queue entry.
-				if ( isset( $list_of_existing_files_in_queue[ $file['id'] ] ) ) {
-					wp_delete_post( $list_of_existing_files_in_queue[ $file['id'] ], true );
-					unset( $this->queue_map[ (string) $file['id'] ] );
+				if ( isset( $list_of_existing_files_in_queue[ $file_id ] ) ) {
+					wp_delete_post( $list_of_existing_files_in_queue[ $file_id ], true );
+					unset( $this->queue_map[ $file_id ] );
 				}
 
 				// do nothing more with this file.
@@ -276,7 +279,7 @@ class Queue {
 				'ID'           => $queue_post_id,
 				'post_type'    => PostTypes\Queue::get_instance()->get_name(),
 				'post_status'  => 'publish',
-				'post_title'   => (string) $file['id'],
+				'post_title'   => $file_id,
 				'post_author'  => Helper::get_author_during_object_creation(),
 				'post_parent'  => $post_id,
 				'post_content' => '',
@@ -295,7 +298,7 @@ class Queue {
 			}
 
 			// keep the map up to date.
-			$this->queue_map[ (string) $file['id'] ] = absint( $queue_post_id );
+			$this->queue_map[ $file_id ] = absint( $queue_post_id );
 
 			// save the structure we get from the API.
 			update_post_meta( $queue_post_id, 'api_response', $file );
@@ -310,10 +313,10 @@ class Queue {
 			// add a log entry.
 			if ( 0 === $state ) {
 				/* translators: %1$s: the given URL. */
-				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s has been added in the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'queue' );
+				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s has been added in the queue.', 'connector-for-propstack' ), ' <em>' . esc_html( $file_id ) . '</em>' ), 'info', 'queue' );
 			} else {
 				/* translators: %1$s: the given URL. */
-				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s has been updated in the queue.', 'connector-for-propstack' ), ' <em>' . $file['id'] . '</em>' ), 'info', 'queue' );
+				Log::get_instance()->add( sprintf( __( 'Given file ID %1$s has been updated in the queue.', 'connector-for-propstack' ), ' <em>' . esc_html( $file_id ) . '</em>' ), 'info', 'queue' );
 			}
 		}
 	}

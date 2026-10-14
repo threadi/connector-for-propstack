@@ -8,6 +8,9 @@ parameters:
     - '#^Constant (WP_PLUGIN_DIR|ARRAY_A|MB_IN_BYTES|[A-Z]+_IN_SECONDS|WP_CLI) not found\.$#'
     # class which is only available in newer WordPress versions (guarded by function_exists() checks in the code).
     - '#(unknown class|Class) WP_Icon_Collections_Registry( not found)?\.$#'
+    # the progress bar of WP-CLI is cli\progress\Bar or WP_CLI\NoOp, which handles all calls via __call().
+    - '#^Call to an undefined method cli\\progress\\Bar\|WP_CLI\\NoOp::(tick|finish)\(\)\.$#'
+    - '#^Call to method (tick|finish)\(\) on an unknown class cli\\progress\\Bar\.$#'
   paths:
     - app
     - connector-for-propstack.php

@@ -222,7 +222,7 @@ class Template {
 
 		// get the theme name.
 		$theme_name = wp_get_theme()->get( 'TextDomain' );
-		if ( ! is_string( $theme_name ) || empty( $theme_name ) ) {
+		if ( ! is_string( $theme_name ) || empty( $theme_name ) ) { // @phpstan-ignore function.alreadyNarrowedType
 			$theme_name = wp_get_theme()->get_stylesheet();
 		}
 

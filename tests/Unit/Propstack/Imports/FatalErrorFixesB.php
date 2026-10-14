@@ -76,7 +76,6 @@ class FatalErrorFixesB extends ConnectorForPropstackTestCase {
 	private function simulate_fatal_error(): void {
 		// every request handles its fatal error once.
 		$handled = new ReflectionProperty( Import_Base::class, 'fatal_error_handled' );
-		$handled->setAccessible( true );
 		$handled->setValue( null, false );
 
 		// the continuation of the last request has been run.

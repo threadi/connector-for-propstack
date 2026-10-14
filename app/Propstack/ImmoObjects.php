@@ -210,16 +210,11 @@ class ImmoObjects {
 			return array();
 		}
 
-		// bail if the results are not an array.
-		if ( ! is_array( $results->posts ) ) {
-			return array();
-		}
-
 		// prepare the list.
 		$list = array();
 
-		// convert the results to an array with PropstackImmoObject.
-		foreach ( $results->posts as $post_id ) {
+		// convert the results to an array with PropstackImmoObject (the cast covers "posts" being null on a failed query).
+		foreach ( (array) $results->posts as $post_id ) {
 			// bail on a wrong object.
 			if ( ! is_int( $post_id ) ) {
 				continue;

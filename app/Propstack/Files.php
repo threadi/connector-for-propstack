@@ -1408,7 +1408,7 @@ class Files {
 		$limit = (int) apply_filters( 'cfprop_files_import_limit', $limit, is_array( $block ) ? $block : array() );
 
 		// show cli hint.
-		$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import files', max( 0, $total - $offset ) ) : false;
+		$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import files', (int) max( 0, $total - $offset ) ) : false;
 
 		// loop through the list of files to import until we reach our limit.
 		while ( $offset < $total ) {
