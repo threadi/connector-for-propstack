@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help
 - Show the reason why an object has not been imported
 - Added WP CLI command to check whether the Propstack API delivers a specific object
 - Added multiple hooks

@@ -21,6 +21,7 @@ use easySettingsForWordPress\Fields\TextInfo;
 use easySettingsForWordPress\Page;
 use easySettingsForWordPress\Section;
 use easySettingsForWordPress\Tab;
+use ConnectorForPropstack\Propstack\KnowledgeCenter\InsufficientPermissions;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 
 /**
@@ -173,7 +174,10 @@ class Settings {
 		$field = new Password( $settings_obj );
 		$field->set_title( __( 'API Key', 'connector-for-propstack' ) );
 		/* translators: %1$s will be replaced by a URL. */
-		$field->set_description( sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() ) );
+		$description = sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() );
+		/* translators: %1$s will be replaced by an anchor which opens the help. */
+		$description .= ' ' . sprintf( __( 'Please make sure that the permissions of the API key are set accordingly, as they differ between the API v1 and the API v2. <a href="%1$s" class="cfprop-open-help">Show the required permissions</a>.', 'connector-for-propstack' ), esc_attr( ( new InsufficientPermissions() )->get_help_tab_anchor() ) );
+		$field->set_description( $description );
 		if ( ! Setup::get_instance()->is_completed() ) {
 			$field->set_placeholder( __( 'Enter your API key', 'connector-for-propstack' ) );
 		}

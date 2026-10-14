@@ -21,6 +21,34 @@ jQuery(document).ready(function($) {
   });
 
   /**
+   * Open the WordPress help with a specific tab via links with the class "cfprop-open-help".
+   *
+   * The href of the link must be the anchor of the help tab panel, e.g. "#tab-panel-cfprop_object-insufficient_permissions".
+   */
+  $( document ).on( 'click', 'a.cfprop-open-help', function ( e ) {
+    let anchor = $( this ).attr( 'href' );
+    let tab_link = $( '.contextual-help-tabs a' ).filter( function () {
+      return $( this ).attr( 'href' ) === anchor;
+    } );
+
+    // bail if the help tab is not available on this page.
+    if ( ! tab_link.length ) {
+      return;
+    }
+
+    e.preventDefault();
+
+    // open the help if it is closed.
+    if ( ! $( '#contextual-help-wrap' ).is( ':visible' ) ) {
+      $( '#contextual-help-link' ).trigger( 'click' );
+    }
+
+    // show the requested tab and scroll to the help.
+    tab_link.trigger( 'click' );
+    $( 'html, body' ).animate( { scrollTop: 0 }, 200 );
+  } );
+
+  /**
    * Copy strings via click.
    */
   $("body.post-type-cfprop_object code, .etfw-transient code, body.settings_page_connector-for-propstack code").on("click", function() {

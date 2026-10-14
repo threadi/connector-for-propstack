@@ -197,6 +197,9 @@ class Import_Base {
 	 * @return array<string,mixed>
 	 */
 	protected function prepare_object( array $immo_object, string $language_code ): array {
+		if ( empty( $language_code ) ) {
+			$language_code = 'en';
+		}
 		return $immo_object;
 	}
 
@@ -210,6 +213,9 @@ class Import_Base {
 	 * @return string
 	 */
 	protected function get_single_object_url( string $object_id ): string {
+		if ( empty( $object_id ) ) {
+			$object_id = '';
+		}
 		return '';
 	}
 
@@ -218,7 +224,7 @@ class Import_Base {
 	 *
 	 * This uses the same request as the import, including every restriction which is sent to the API.
 	 * Nothing is imported or changed. The check looks at the raw answer of the API, so objects which
-	 * are removed afterwards via hook are still found.
+	 * are removed afterward via hook are still found.
 	 *
 	 * If the object is searched by its Propstack-ID, the API is asked for this single object first, which
 	 * needs one request only. All pages are requested like the import does it if the API does not
@@ -358,7 +364,7 @@ class Import_Base {
 					break 2;
 				}
 
-				// stop if the API did not limit its answer to the requested object, all pages are checked afterwards.
+				// stop if the API did not limit its answer to the requested object, all pages are checked afterward.
 				if ( $with_id_filter && $result['others'] ) {
 					break;
 				}
