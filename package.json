@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.29.6",
-    "@babel/runtime": "^7.28.4",
+    "@babel/runtime": "^8.0.7",
     "@wordpress/i18n": "^6.2.0",
     "concurrently": "^9.2.4",
     "driver.js": "^1.8.0",
