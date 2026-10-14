@@ -437,7 +437,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 1536](Propstack/Import_Base.php#L1536-L1543)
+Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 1542](Propstack/Import_Base.php#L1542-L1549)
 
 ### `cfprop_get_template_before`
 
@@ -2791,7 +2791,7 @@ Version | Description
 ------- | -----------
 `2.0.1` | Available since 2.0.1.
 
-Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 676](Propstack/Import_Base.php#L676-L684)
+Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 682](Propstack/Import_Base.php#L682-L690)
 
 ### `cfprop_import_chunk_lock_ttl`
 
@@ -2801,7 +2801,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$ttl` |  | 
 
-Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 877](Propstack/Import_Base.php#L877-L877)
+Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 883](Propstack/Import_Base.php#L883-L883)
 
 ### `cfprop_widget_filter_select_attributes`
 
