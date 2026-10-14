@@ -102,6 +102,9 @@ class Propstack {
 		// initialize the knowledge center.
 		KnowledgeCenter::get_instance()->init();
 
+		// initialize the hints for administrators in the frontend.
+		Frontend_Hints::get_instance()->init();
+
 		// initialize the ability-support.
 		Abilities::get_instance()->init();
 

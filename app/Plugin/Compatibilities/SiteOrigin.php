@@ -27,6 +27,20 @@ class SiteOrigin extends Compatibilities_Base {
 	protected string $name = 'cfprop_compatibility_siteorigin';
 
 	/**
+	 * Human-readable name of the checked product.
+	 *
+	 * @var string
+	 */
+	protected string $label = 'SiteOrigin';
+
+	/**
+	 * Whether the checked product is a page builder, which is not natively supported.
+	 *
+	 * @var bool
+	 */
+	protected bool $is_page_builder = true;
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?SiteOrigin

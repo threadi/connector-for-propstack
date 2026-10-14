@@ -27,6 +27,13 @@ class Contact_Form_7 extends Compatibilities_Base {
 	protected string $name = 'cfprop_compatibility_cf7';
 
 	/**
+	 * Human-readable name of the checked product.
+	 *
+	 * @var string
+	 */
+	protected string $label = 'Contact Form 7';
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Contact_Form_7

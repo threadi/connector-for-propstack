@@ -267,3 +267,37 @@ body.post-type-cfprop_object, .etfw-transient, body.settings_page_connector-for-
 }
 
 .esfw-field--propstack_connector_abilities_guide ol, .propstack_connector_abilities_guide ol { margin-left: 14px; }
+
+/**
+	Entries of the knowledge center in the help.
+ */
+.cfprop-knowledge-center-entry {
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	margin: 0 0 .5em;
+	background-color: #fff;
+	scroll-margin-top: 50px;
+	summary {
+		cursor: pointer;
+		font-weight: 600;
+		padding: .6em 1em;
+	}
+	&[open] summary {
+		border-bottom: 1px solid #dcdcde;
+	}
+	.cfprop-knowledge-center-entry-content {
+		padding: 0 1em .5em;
+	}
+	&.cfprop-highlight {
+		animation: cfprop-highlight 2s ease-out;
+	}
+}
+
+@keyframes cfprop-highlight {
+	0%, 30% {
+		box-shadow: 0 0 0 3px #2271b1;
+	}
+	100% {
+		box-shadow: 0 0 0 3px transparent;
+	}
+}

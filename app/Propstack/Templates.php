@@ -277,6 +277,11 @@ class Templates {
 		// get the thumbnail ID.
 		$attachment_id = absint( get_post_thumbnail_id( $immo_object->get_id() ) );
 
+		// use the fallback image if the object has no thumbnail (like the block templates do).
+		if ( 0 === $attachment_id ) {
+			$attachment_id = PostTypes\ImmoObject::get_instance()->get_example_image_id();
+		}
+
 		// bail if no attachment ID is set.
 		if ( 0 === $attachment_id ) {
 			return;

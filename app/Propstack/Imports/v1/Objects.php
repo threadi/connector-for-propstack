@@ -1148,7 +1148,7 @@ class Objects extends Import_Base {
 
 						// add the help text if it has a match.
 						if ( $knowledge_center_entry ) {
-							$error_entry .= $knowledge_center_entry->get_text();
+							$error_entry .= $knowledge_center_entry->get_content();
 						}
 
 						$this->add_error( 'propstack_object_import_http_status_details', $error_entry );
@@ -1231,6 +1231,7 @@ class Objects extends Import_Base {
 			'<p><strong>' . __( 'Your Propstack account did not deliver any object for the import.', 'connector-for-propstack' ) . '</strong></p>',
 			/* translators: %1$s will be replaced by a URL. */
 			'<p>' . sprintf( __( 'If you expected objects here, check <a href="%1$s">your import settings</a> - a restriction on marketing type or status can exclude all of them.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_import' ) ) ) . '</p>',
+			'<p>' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'object_not_imported' ) . '</p>',
 		);
 
 		// the account delivered objects, but every one is excluded by a restriction.
@@ -1239,7 +1240,8 @@ class Objects extends Import_Base {
 				array( '<p><strong>' . __( 'None of the objects from your Propstack account has been imported.', 'connector-for-propstack' ) . '</strong></p>' ),
 				$this->get_result_texts( 0, $prevented ),
 				/* translators: %1$s will be replaced by a URL. */
-				array( '<p>' . sprintf( __( 'If you expected objects here, check <a href="%1$s">the restrictions for the import</a>.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_objects' ) ) ) . '</p>' )
+				array( '<p>' . sprintf( __( 'If you expected objects here, check <a href="%1$s">the restrictions for the import</a>.', 'connector-for-propstack' ), esc_url( Settings::get_instance()->get_url( 'propstack_connector_objects' ) ) ) . '</p>' ),
+				array( '<p>' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'object_not_imported' ) . '</p>' )
 			);
 		}
 

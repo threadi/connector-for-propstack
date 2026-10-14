@@ -27,6 +27,20 @@ class Salient_WpBakery extends Compatibilities_Base {
 	protected string $name = 'cfprop_compatibility_salient_wpbakery';
 
 	/**
+	 * Human-readable name of the checked product.
+	 *
+	 * @var string
+	 */
+	protected string $label = 'Salient WPBakery';
+
+	/**
+	 * Whether the checked product is a page builder, which is not natively supported.
+	 *
+	 * @var bool
+	 */
+	protected bool $is_page_builder = true;
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Salient_WpBakery

@@ -248,7 +248,7 @@ class Options extends Import_Base {
 		// add a log entry if the API key is not allowed to read the options, as this must be changed in Propstack.
 		if ( in_array( $request_object->get_http_status(), array( 401, 403 ), true ) ) {
 			/* translators: %1$s will be replaced by the HTTP status, %2$s by a URL. */
-			Log::get_instance()->add( sprintf( __( 'Propstack does not allow your API key to read the options of object fields (HTTP status %1$s). They contain the texts for the values of selection fields (e.g. for the heating type) and are necessary to use the API v2. Please enable the permission to read these options for <a href="%2$s" target="_blank">your API key</a>.', 'connector-for-propstack' ), '<code>' . $request_object->get_http_status() . '</code>', esc_url( Helper::get_propstack_api_page_url() ) ), 'error', 'import' );
+			Log::get_instance()->add( sprintf( __( 'Propstack does not allow your API key to read the options of object fields (HTTP status %1$s). They contain the texts for the values of selection fields (e.g. for the heating type) and are necessary to use the API v2. Please enable the permission to read these options for <a href="%2$s" target="_blank">your API key</a>.', 'connector-for-propstack' ), '<code>' . $request_object->get_http_status() . '</code>', esc_url( Helper::get_propstack_api_page_url() ) ) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'api_v2_data' ), 'error', 'import' );
 		}
 
 		// bail on error.

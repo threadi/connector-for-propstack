@@ -74,6 +74,9 @@ class Gutenberg extends PageBuilder_Base {
 		// output the CSS for the templates of objects.
 		Gutenberg\Template_Styles::get_instance()->init();
 
+		// register our block patterns.
+		Gutenberg\Patterns::get_instance()->init();
+
 		// bail if the theme is not a FSE theme with block support.
 		if ( ! $this->theme_support_block_templates() ) {
 			return;

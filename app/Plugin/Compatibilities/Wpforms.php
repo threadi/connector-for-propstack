@@ -27,6 +27,13 @@ class Wpforms extends Compatibilities_Base {
 	protected string $name = 'cfprop_compatibility_wpforms';
 
 	/**
+	 * Human-readable name of the checked product.
+	 *
+	 * @var string
+	 */
+	protected string $label = 'WPForms';
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Wpforms

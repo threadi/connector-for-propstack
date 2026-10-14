@@ -27,6 +27,13 @@ class WpformsLite extends Compatibilities_Base {
 	protected string $name = 'cfprop_compatibility_wpforms_lite';
 
 	/**
+	 * Human-readable name of the checked product.
+	 *
+	 * @var string
+	 */
+	protected string $label = 'WPForms Lite';
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?WpformsLite

@@ -567,7 +567,7 @@ class Files {
 		if ( ! is_int( $attachment_id ) ) {
 			// add a log entry.
 			/* translators: %1$s: the given URL. */
-			Log::get_instance()->add( sprintf( __( 'Import of file %1$s failed:', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ) . ' <code>' . esc_html( Helper::get_json( $attachment_id ) ) . '</code>', 'error', 'import' );
+			Log::get_instance()->add( sprintf( __( 'Import of file %1$s failed:', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ) . ' <code>' . esc_html( Helper::get_json( $attachment_id ) ) . '</code> ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'missing_images' ), 'error', 'import' );
 
 			// return 0 as we could not import the file.
 			return 0;
@@ -791,7 +791,7 @@ class Files {
 		if ( is_wp_error( $response ) || 200 !== absint( wp_remote_retrieve_response_code( $response ) ) ) {
 			// add a log entry.
 			/* translators: %1$s: the given URL. */
-			Log::get_instance()->add( sprintf( __( 'Download of file %1$s failed:', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ) . ' <code>' . ( is_wp_error( $response ) ? esc_html( $response->get_error_message() ) : absint( wp_remote_retrieve_response_code( $response ) ) ) . '</code>', 'error', 'import' );
+			Log::get_instance()->add( sprintf( __( 'Download of file %1$s failed:', 'connector-for-propstack' ), '<em>' . esc_html( $url ) . '</em>' ) . ' <code>' . ( is_wp_error( $response ) ? esc_html( $response->get_error_message() ) : absint( wp_remote_retrieve_response_code( $response ) ) ) . '</code> ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'missing_images' ), 'error', 'import' );
 
 			// remove the temporary file.
 			if ( file_exists( $tmp_file ) ) {

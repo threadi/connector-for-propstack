@@ -597,6 +597,25 @@ class Helper {
 	}
 
 	/**
+	 * Return whether hints for the Pro plugin should be shown.
+	 *
+	 * @return bool
+	 */
+	public static function show_pro_hints(): bool {
+		$false = false;
+		/**
+		 * Hide the additional buttons for reviews or pro-version.
+		 *
+		 * @since 1.0.0 Available since 1.0.0
+		 *
+		 * @param bool $false Set true to hide the buttons.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		return ! apply_filters( 'cfprop_hide_pro_hints', $false );
+	}
+
+	/**
 	 * Checks whether a given plugin is active.
 	 *
 	 * Used because WP's own function is_plugin_active() is not accessible everywhere.
@@ -699,7 +718,7 @@ class Helper {
 				__( 'A previous process (%1$s) did not end properly and blocked further runs for %2$d seconds. The lock has been released automatically. Check the log for a preceding fatal error, e.g. memory limit or timeout.', 'connector-for-propstack' ),
 				'<code>' . $option_name . '</code>',
 				time() - $started
-			),
+			) . ' ' . \ConnectorForPropstack\Propstack\KnowledgeCenter::get_instance()->get_link( 'import_timeout' ),
 			'error',
 			'import'
 		);

@@ -150,6 +150,7 @@ class Admin {
 				'txt_error'               => __( 'The following error occurred:', 'connector-for-propstack' ),
 				'title_error'             => __( 'Error', 'connector-for-propstack' ),
 				'lbl_ok'                  => __( 'OK', 'connector-for-propstack' ),
+				'help_tab_prefix'         => ImmoObject::get_instance()->get_name() . '-',
 			)
 		);
 	}
