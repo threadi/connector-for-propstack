@@ -619,7 +619,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 468](Propstack/Queue.php#L468-L474)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 471](Propstack/Queue.php#L471-L477)
 
 ### `cfprop_file_is_assigned`
 
@@ -639,7 +639,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 572](Propstack/Queue.php#L572-L580)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 575](Propstack/Queue.php#L575-L583)
 
 ### `cfprop_queue_processing`
 
@@ -658,7 +658,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 595](Propstack/Queue.php#L595-L602)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 598](Propstack/Queue.php#L598-L605)
 
 ### `cfprop_queue_after_processing`
 
@@ -671,7 +671,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 609](Propstack/Queue.php#L609-L614)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 612](Propstack/Queue.php#L612-L617)
 
 ### `cfprop_restriction_value_changed`
 
@@ -684,7 +684,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Availability 1.0.0.
 
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2290](Propstack/ImmoObjects.php#L2290-L2295)
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2285](Propstack/ImmoObjects.php#L2285-L2290)
 
 ### `cfprop_file_imported`
 
@@ -3064,7 +3064,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 360](Propstack/Queue.php#L360-L365)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 363](Propstack/Queue.php#L363-L368)
 
 ### `cfprop_queue_failed_entries_lifetime`
 
@@ -3074,7 +3074,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$days` |  | 
 
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 717](Propstack/Queue.php#L717-L717)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 720](Propstack/Queue.php#L720-L720)
 
 ### `cfprop_queue_max_attempts`
 
@@ -3084,7 +3084,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$max_attempts` |  | 
 
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 1003](Propstack/Queue.php#L1003-L1003)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 1006](Propstack/Queue.php#L1006-L1006)
 
 ### `cfprop_prevent_file_import`
 
@@ -3106,7 +3106,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 1047](Propstack/Queue.php#L1047-L1059)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 1050](Propstack/Queue.php#L1050-L1062)
 
 ### `cfprop_field_categories`
 
@@ -3201,7 +3201,7 @@ Version | Description
 ------- | -----------
 `2.1.0` | Available since 2.1.0.
 
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1260](Propstack/ImmoObjects.php#L1260-L1266)
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1255](Propstack/ImmoObjects.php#L1255-L1261)
 
 ### `cfprop_prevent_import_of_object_reasons`
 
@@ -3222,7 +3222,7 @@ Version | Description
 ------- | -----------
 `2.0.1` | Available since 2.0.1.
 
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1539](Propstack/ImmoObjects.php#L1539-L1549)
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1534](Propstack/ImmoObjects.php#L1534-L1544)
 
 ### `cfprop_prevent_import_of_object`
 
@@ -3235,7 +3235,7 @@ Argument | Type | Description
 `false` |  | 
 `$result['object']` |  | 
 
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1954](Propstack/ImmoObjects.php#L1954-L1955)
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1949](Propstack/ImmoObjects.php#L1949-L1950)
 
 ### `cfprop_hide_pro_hints`
 
@@ -3253,7 +3253,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0
 
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2312](Propstack/ImmoObjects.php#L2312-L2320)
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2307](Propstack/ImmoObjects.php#L2307-L2315)
 
 ### `cfprop_filters`
 
