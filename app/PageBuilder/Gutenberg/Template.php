@@ -222,6 +222,9 @@ class Template {
 
 		// get the theme name.
 		$theme_name = wp_get_theme()->get( 'TextDomain' );
+		if ( ! is_string( $theme_name ) || empty( $theme_name ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			$theme_name = wp_get_theme()->get_stylesheet();
+		}
 
 		// create the Block Template object.
 		$template                 = new WP_Block_Template();
@@ -381,10 +384,16 @@ class Template {
 	 */
 	public function get_content(): string {
 		if ( empty( $this->content ) ) {
-			// get the template content.
-			ob_start();
-			include $this->get_file_path();
-			$content = ob_get_clean();
+			// get the path to the template file.
+			$file_path = $this->get_file_path();
+
+			// bail if the file is not readable.
+			if ( ! is_readable( $file_path ) ) {
+				return '';
+			}
+
+			// get the template content (it is HTML, so it must not be executed as PHP).
+			$content = file_get_contents( $file_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
 			if ( ! $content ) {
 				return '';
 			}
@@ -395,7 +404,7 @@ class Template {
 
 				// if a main object type could be loaded, use its pattern as the base for this template.
 				if ( ! empty( $main_object_type_slug ) ) {
-					$content = str_replace( '<!-- wp:post-title /-->', '<!-- wp:post-title /--><!-- wp:pattern {"slug":"connector-for-propstack/' . $main_object_type_slug . '"} /--><!-- wp:shortcode -->[propstack_connector_widget_gallery]<!-- /wp:shortcode -->', $content );
+					$content = str_replace( '<!-- wp:post-title /-->', '<!-- wp:post-title /--><!-- wp:pattern {"slug":"connector-for-propstack/' . $main_object_type_slug . '"} /--><!-- wp:shortcode -->[cfprop_widget_gallery]<!-- /wp:shortcode -->', $content );
 				}
 			}
 

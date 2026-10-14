@@ -12,9 +12,12 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Dependencies\easyTransientsForWordPress\Transient;
 use ConnectorForPropstack\Dependencies\easyTransientsForWordPress\Transients;
+use ConnectorForPropstack\Propstack\Abilities_Settings;
 use ConnectorForPropstack\Propstack\Fields;
 use ConnectorForPropstack\Propstack\Files;
+use ConnectorForPropstack\Propstack\Filters;
 use ConnectorForPropstack\Propstack\ImmoObjects;
+use ConnectorForPropstack\Propstack\Propstack;
 use ConnectorForPropstack\Propstack\Queue;
 use ConnectorForPropstack\Propstack\Taxonomies;
 
@@ -69,7 +72,7 @@ class Uninstaller {
 
 		if ( $network_wide && is_multisite() ) {
 			// loop through the blogs.
-			foreach ( Helper::get_blogs() as $blog ) {
+			foreach ( Helper::get_blogs( true ) as $blog ) {
 				// get the blog ID (the rows are returned as associative arrays).
 				$blog_id = absint( is_array( $blog ) ? ( $blog['blog_id'] ?? 0 ) : ( $blog->blog_id ?? 0 ) );
 
@@ -99,14 +102,21 @@ class Uninstaller {
 	 * @return void
 	 */
 	private function deinstallation_tasks(): void {
+		// check if the settings are already registered (e.g., if the plugin is reset while it is active).
+		$settings_registered = false !== Settings::get_instance()->get_settings_obj()->get_setting( 'propstack_connector_api_key' );
+
 		// init the plugin, just to get all settings.
 		Init::get_instance()->init();
 
-		// run the init hooks to set all settings.
-		Settings::get_instance()->add_main_settings();
-		Settings::get_instance()->add_additional_settings();
-		ImmoObjects::get_instance()->add_settings();
-		Fields::get_instance()->add_settings();
+		// register all settings, as their "init" hooks are not run during uninstallation.
+		if ( ! $settings_registered ) {
+			try {
+				$this->register_settings();
+			} catch ( \Throwable $e ) {
+				// ignore any error here, the uninstallation must continue with the settings registered so far.
+				unset( $e );
+			}
+		}
 
 		// remove the running-markers first, otherwise the deletion of objects and files would be skipped
 		// if an import has been running within the last hour.
@@ -138,6 +148,10 @@ class Uninstaller {
 		// remove the schedules.
 		Schedules::get_instance()->delete_all();
 
+		// remove single events used to continue running imports.
+		wp_clear_scheduled_hook( \ConnectorForPropstack\Propstack\Schedules\Objects::CONTINUATION_HOOK );
+		wp_clear_scheduled_hook( 'cfprop_run_import_by_ability' );
+
 		// remove transients.
 		foreach ( Transients::get_instance()->get_transients( false, true ) as $transient_obj ) {
 			// bail if the object is not ours.
@@ -153,6 +167,9 @@ class Uninstaller {
 		// remove the import states and work lists.
 		$this->delete_import_data();
 
+		// remove the other options and transients of this plugin.
+		$this->delete_options();
+
 		// remove the CSS for the templates of objects (the templates themselves belong to the theme and are kept).
 		delete_option( \ConnectorForPropstack\PageBuilder\Gutenberg\Template_Styles::OPTION );
 
@@ -161,6 +178,117 @@ class Uninstaller {
 
 		// clear the cache.
 		Cache::get_instance()->clear_cache();
+
+		// remove the setup hint, which could be set again by the initialization above.
+		delete_transient( 'propstack_connector_start_setup_hint' );
+	}
+
+	/**
+	 * Register all settings of this plugin in the order of their "init" hooks.
+	 *
+	 * This is necessary to delete them via the settings object.
+	 *
+	 * @return void
+	 */
+	private function register_settings(): void {
+		// priority 10.
+		Settings::get_instance()->add_main_settings();
+		Filters::get_instance()->add_settings();
+		Roles::get_instance()->add_permission_settings();
+
+		// priority 20.
+		Settings::get_instance()->add_additional_settings();
+		ImmoObjects::get_instance()->add_settings();
+		Fields::get_instance()->add_settings();
+		Files::get_instance()->add_settings();
+		Propstack::get_instance()->add_settings();
+		Queue::get_instance()->add_settings();
+		Schedules::get_instance()->add_the_settings();
+		Intro::get_instance()->add_the_settings();
+
+		// priority 30.
+		Abilities_Settings::get_instance()->add_settings();
+	}
+
+	/**
+	 * Delete the options and transients of this plugin which are not registered as setting.
+	 *
+	 * @return void
+	 */
+	private function delete_options(): void {
+		global $wpdb;
+
+		// list of single options.
+		$options = array(
+			'cfprop_version',
+			'cfprop_admin_id',
+			'cfprop_schedules',
+			'cfprop_schedules_lock',
+			'cfprop_update_lock',
+			'cfprop_process_values',
+			'cfprop_last_api_response',
+			'cfprop_archive_slug',
+			'cfprop_single_slug',
+			'cfprop_update_slugs',
+			'cfprop_has_objects',
+			'cfprop_main_object_type',
+			'cfprop_files_imported',
+			'cfprop_example_image_id',
+			'cfprop_intro',
+			'cfprop_log_error_count',
+			'cfprop_objects_import_offset',
+			'cfprop_prevented_objects',
+			'propstack_connector_pro_page_builder',
+			'propstack_connector_access_roles',
+			'propstack_connector_setting_view',
+			'propstack_connector_delete_running',
+			'propstack_connector_files_delete_running',
+			'propstack_connector_states_import_running',
+			'propstack_connector_states_delete_running',
+			'propstack_connector_broker_import_running',
+			'propstack_connector_broker_delete_running',
+			'cfprop_term_import_run',
+			'cfprop_ability_import_events',
+			'cfprop_files_to_import',
+			'cfprop_files_to_import_offset',
+			'cfprop_files_import_lock',
+			'cfprop_import_current_object',
+		);
+
+		// delete them.
+		foreach ( $options as $option ) {
+			delete_option( $option );
+		}
+
+		// get the options with the plugin-specific prefixes: md5 hashes, cache and dismissed hints.
+		$like_options = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s',
+				$wpdb->esc_like( 'cfprop_md5_' ) . '%',
+				$wpdb->esc_like( 'cfprop_example_' ) . '%',
+				$wpdb->esc_like( 'cfprop_files_to_import_block_' ) . '%',
+				$wpdb->esc_like( 'cfprop_cache_' ) . '%',
+				$wpdb->esc_like( 'connector-for-propstack-dismissed-' ) . '%'
+			)
+		);
+
+		// delete them via WordPress, so the object cache is cleaned, too.
+		foreach ( $like_options as $option ) {
+			delete_option( (string) $option );
+		}
+
+		// get our own transients.
+		$transients = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->prepare(
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+				$wpdb->esc_like( '_transient_cfprop_' ) . '%'
+			)
+		);
+
+		// delete them via WordPress, so the object cache and the timeouts are cleaned, too.
+		foreach ( $transients as $transient ) {
+			delete_transient( substr( (string) $transient, strlen( '_transient_' ) ) );
+		}
 	}
 
 	/**

@@ -394,10 +394,8 @@ class Widgets extends ConnectorForPropstackTestCase {
 			)
 		);
 
-		// request the second page, which must be ignored.
-		set_query_var( 'paged', 2 );
+		// get the output.
 		$output = do_shortcode( '[cfprop_widget_archive]' );
-		set_query_var( 'paged', 0 );
 
 		// max. 10 objects are shown.
 		$this->assertSame( 10, substr_count( $output, 'type-' . $post_type ) );

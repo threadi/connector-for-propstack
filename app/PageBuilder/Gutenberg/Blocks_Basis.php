@@ -103,8 +103,8 @@ class Blocks_Basis {
 			)
 		);
 
-		// If this is a classic theme, deregister the blocks CSS. We will use the concatenated blocks.css instead.
-		if ( ! Helper::theme_is_fse_theme() ) {
+		// If this is a classic theme, deregister the blocks CSS. We will use the concatenated blocks.css instead (if it exists, see Gutenberg::enqueue_blocks_css()).
+		if ( ! Helper::theme_is_fse_theme() && file_exists( Helper::get_plugin_path() . 'css/blocks.css' ) ) {
 			wp_deregister_style( 'connector-for-propstack-' . $this->get_name() . '-style' );
 		}
 
@@ -136,6 +136,14 @@ class Blocks_Basis {
 	protected function get_attributes(): array {
 		$name              = $this->get_name();
 		$single_attributes = $this->attributes;
+
+		// add the attribute which is used for the preview in the block inserter (see "example" in block.json).
+		if ( ! isset( $single_attributes['preview'] ) ) {
+			$single_attributes['preview'] = array(
+				'type'    => 'boolean',
+				'default' => false,
+			);
+		}
 		/**
 		 * Filter the attributes for a Block.
 		 *

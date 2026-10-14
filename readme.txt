@@ -1,7 +1,7 @@
 === Connector for Propstack ===
 Contributors: laolaweb, threadi
 Tags: propstack, real estate, immobilien, rental, property
-Requires at least: 6.0
+Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.2
 License: GPL-2.0-or-later
@@ -68,6 +68,10 @@ Connector for Propstack is developed by [laOlaWeb](https://laolaweb.com), a Word
 
 This plugin connects to the Propstack API at [www.propstack.de](https://www.propstack.de) to retrieve the objects of your personal account.
 
+* **What is sent:** the API key you entered is sent in the "X-API-KEY" header of every request to the Propstack API at api.propstack.de, together with the parameters of the request (e.g. language, page, filter for the objects to import). No data about the visitors of your website is sent.
+* **When it is sent:** when you validate the API key during the setup, when you start an import manually, during the automatic imports via WP-Cron (if enabled) and when you run an import via WP-CLI.
+* **Downloaded files:** images and files of your objects and brokers are downloaded from the URLs contained in the API response (usually images.propstack.de, but also other public HTTPS hosts referenced by Propstack). Only HTTPS-URLs are accepted. Developers can restrict the allowed hosts with the filter "cfprop_allowed_file_hosts".
+
 This API service is provided by Propstack: [terms of service](https://www.propstack.de/nutzungsbedingungen/), [privacy policy](https://www.propstack.de/datenschutz/).
 
 ### Repository, documentation and reliability
@@ -90,7 +94,7 @@ Every new release of this plugin is only published if it meets the following con
 
 1. Upload "connector-for-propstack" to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
-3. In Propstack, create an API key with read permissions for objects and object status.
+3. In Propstack, create an API key with read permissions for objects and object status. If you use the API v2, also grant read permissions for "Properties_options", "Properties_statuses" and "Brokers".
 4. Enter the API key in WordPress under "Settings > Connector for Propstack > API" and run the setup.
 5. Place your objects on your site using one of the blocks or shortcodes.
 
@@ -105,6 +109,8 @@ The Pro version displays your objects without any limit and adds all remaining o
 = How do I create an API key in Propstack? =
 
 Log in to your Propstack account and open the API key administration under Admin > API keys. Click "Add API key" and either choose the "WP ImmoMakler" template or set the permissions for "Objects" and "Object status" to "Read". Copy the key and paste it into WordPress under "Settings > Connector for Propstack > API".
+
+If you use the API v2, the key additionally needs read permissions for "Properties_options", "Properties_statuses" and "Brokers". Without them the import with the API v2 will fail or miss data. You can find the list of required permissions for both API versions in the help of the plugin settings ("Help" > "Insufficient Permissions for Propstack API").
 
 A read-only key is sufficient. The plugin never needs write access to your CRM.
 
@@ -155,6 +161,7 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
+- Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help
 - Added new widget for show the energy scale of a single object, usable as Block and via shortcode
 - Added new field type for energy efficiency classes with check against a whitelist for value A+ to H
 - Added new field type for geo coordinates to output them with 4 digits

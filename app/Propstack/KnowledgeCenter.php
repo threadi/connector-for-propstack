@@ -139,7 +139,7 @@ class KnowledgeCenter {
 	 * @return void
 	 */
 	public function add_help( WP_Screen $screen ): void {
-		$allowed = \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() === $screen->post_type || 'settings_page_connector-for-propstack' === $screen->base;
+		$allowed = \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() === $screen->post_type || in_array( $screen->base, array( 'settings_page_connector-for-propstack', 'settings_page_connector-for-propstack-setup' ), true );
 		/**
 		 * Prevent adding the WordPress-internal help for our plugin.
 		 *
@@ -245,7 +245,7 @@ class KnowledgeCenter {
 
 			// add help for the positions in general.
 			$help_list[] = array(
-				'id'      => \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() . '-' . $entry->get_name(),
+				'id'      => $entry->get_help_tab_id(),
 				'title'   => $entry->get_title(),
 				'content' => $content,
 			);

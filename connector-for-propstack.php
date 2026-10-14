@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Connector for Propstack
  * Description:       Allows you to present your objects from Propstack in your website.
- * Requires at least: 6.0
+ * Requires at least: 6.6
  * Requires PHP:      8.2
  * Version:           @@VersionNumber@@
  * Author:            laOlaWeb

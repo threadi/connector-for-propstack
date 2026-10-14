@@ -111,6 +111,9 @@ class Propstack {
 		add_filter( 'cfprop_log_categories', array( $this, 'add_categories' ) );
 		add_filter( 'cfprop_schedules', array( $this, 'add_schedules' ) );
 
+		// continue a scheduled import of objects which has not been completed in its request.
+		add_action( Schedules\Objects::CONTINUATION_HOOK, array( Schedules\Objects::class, 'continue_import' ), 10, 0 );
+
 		// add additional url support.
 		add_filter( 'post_link', array( $this, 'set_custom_permalink' ), 10, 2 );
 		add_filter( 'post_type_link', array( $this, 'set_custom_permalink' ), 10, 2 );

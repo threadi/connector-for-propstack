@@ -80,7 +80,7 @@ export default function Edit( object ) {
                         __nextHasNoMarginBottom
 						label={__('Select object', 'connector-for-propstack')}
 						options={ immoObjectsOptions }
-						value={object.attributes.id}
+						value={object.attributes.object_id}
 						onChange={(value) => onChange( 'object_id', parseInt(value), object )}
 					/>
 				</PanelBody>

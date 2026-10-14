@@ -53,10 +53,9 @@ elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
 elif [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
 	WP_TESTS_TAG="trunk"
 else
-	# http serves a single offer, whereas https serves multiple. we only want one
-	download http://api.wordpress.org/core/version-check/1.7/ /tmp/wp-latest.json
-	grep '[0-9]+\.[0-9]+(\.[0-9]+)?' /tmp/wp-latest.json
-	LATEST_VERSION=$(grep -o '"version":"[^"]*' /tmp/wp-latest.json | sed 's/"version":"//')
+	# https serves multiple offers (newest first), we only want the first one.
+	download https://api.wordpress.org/core/version-check/1.7/ /tmp/wp-latest.json
+	LATEST_VERSION=$(grep -o '"version":"[^"]*' /tmp/wp-latest.json | sed 's/"version":"//' | head -1)
 	if [[ -z "$LATEST_VERSION" ]]; then
 		echo "Latest WordPress version could not be found"
 		exit 1
@@ -105,7 +104,8 @@ install_wp() {
 		tar --strip-components=1 -zxmf $TMPDIR/wordpress.tar.gz -C $WP_CORE_DIR
 	fi
 
-	download https://raw.githubusercontent.com/markoheijnen/wp-mysqli/master/db.php $WP_CORE_DIR/wp-content/db.php
+	# pinned to a fixed commit of markoheijnen/wp-mysqli to prevent unreviewed changes.
+	download https://raw.githubusercontent.com/markoheijnen/wp-mysqli/e37c7bcbc44ecda77c044f4cf0765bb513d5d856/db.php $WP_CORE_DIR/wp-content/db.php
 }
 
 install_test_suite() {
@@ -182,7 +182,9 @@ install_db() {
 	# create database
   if [ $(mysql --user="$DB_USER" --password="$DB_PASS"$EXTRA --execute='show databases;' | grep ^$DB_NAME$) ]
   then
-    if [ ${DO_DB_RECREATE} = "false" ]; then
+    if [ "${DO_DB_RECREATE}" = "true" ]; then
+      DELETE_EXISTING_DB="y"
+    else
       echo "Reinstalling will delete the existing test database ($DB_NAME)"
       read -p 'Are you sure you want to proceed? [y/N]: ' DELETE_EXISTING_DB
     fi

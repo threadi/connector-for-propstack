@@ -1,2 +1,29 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
+
+# Exclude development files from exports (git archive, composer dist).
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/assets export-ignore
+/bin export-ignore
+/build export-ignore
+/dev-composer.json export-ignore
+/dev-composer.sh export-ignore
+/doc export-ignore
+/node_modules export-ignore
+/package.json export-ignore
+/package-lock.json export-ignore
+/phpcs.xml.dist export-ignore
+/phpstan.neon export-ignore
+/phpunit.xml.dist export-ignore
+/readme.md export-ignore
+/releases export-ignore
+/src export-ignore
+/svn export-ignore
+/tests export-ignore
+/blocks/*/src export-ignore
+/playwright.config.ts export-ignore
+/dist export-ignore
+/tmp export-ignore

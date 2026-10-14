@@ -16,14 +16,14 @@
             "archived": false,
             "token": "IOJJO7llHKULL7",
             "street": "Musterstraße 1",
-            "house_number": "128",
+            "house_number": "1",
             "apartment_number": null,
             "zip_code": "01234",
             "city": "Musterhausen",
             "address": "Musterstraße 1, 01234 Musterhausen, Deutschland",
             "short_address": "Musterstraße 2, 01234 Musterhausen",
-            "lat": 51.3069800,
-            "lng": 12.3266500,
+            "lat": 51.0000000,
+            "lng": 10.0000000,
             "country": "DEU",
             "custom_lp_address": null,
             "district": {
@@ -374,7 +374,7 @@
             },
             "note": {
                 "label": "Notiz",
-                "value": "BIC-2501 - Dieskaustraße 128"
+                "value": "MUSTER-0001 - Musterstraße 1"
             },
             "te_id": {
                 "label": "Teilungserklärungs-Nr.",
@@ -1082,14 +1082,14 @@
             "archived": false,
             "token": "IOJJO7llHKULL8",
             "street": "Musterstraße 1",
-            "house_number": "128",
+            "house_number": "1",
             "apartment_number": null,
             "zip_code": "01234",
             "city": "Musterhausen",
             "address": "Musterstraße 2, 01234 Musterhausen, Deutschland",
             "short_address": "Musterstraße 2, 01234 Musterhausen",
-            "lat": 51.3069800,
-            "lng": 12.3266500,
+            "lat": 51.0000000,
+            "lng": 10.0000000,
             "country": "DEU",
             "custom_lp_address": null,
             "district": {
@@ -1440,7 +1440,7 @@
             },
             "note": {
                 "label": "Notiz",
-                "value": "BIC-2501 - Dieskaustraße 128"
+                "value": "MUSTER-0001 - Musterstraße 1"
             },
             "te_id": {
                 "label": "Teilungserklärungs-Nr.",

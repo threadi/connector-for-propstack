@@ -36,11 +36,11 @@ class Object_Data extends Widget_Base {
 	protected string $setting_tab = '';
 
 	/**
-	 * Path to the Block object.
+	 * Path to the Block object (there is no block for this widget).
 	 *
 	 * @var string
 	 */
-	protected string $gutenberg = '\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Object_Data';
+	protected string $gutenberg = '';
 
 	/**
 	 * Instance of this object.
@@ -97,8 +97,8 @@ class Object_Data extends Widget_Base {
 				continue;
 			}
 
-			// bail if the field is hidden in frontend.
-			if ( $field_obj->hide() || $field_obj->hide_in_frontend() ) {
+			// bail if the field should not be visible in frontend for this object (checks hidden, disabled, hidden address and the filter "cfprop_show_field_in_frontend").
+			if ( ! Fields::get_instance()->is_field_visible_in_frontend( $field_obj, $immo_object ) ) {
 				continue;
 			}
 
@@ -120,14 +120,18 @@ class Object_Data extends Widget_Base {
 		/**
 		 * Filter the fields for the object data widget.
 		 *
-		 * @param array<int,array<string,mixed>> $fields The fields for the single widget.
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<int,array<string,mixed>> $fields The fields for the object data widget.
+		 * @param array<string,mixed> $attributes The attributes for the object data widget.
 		 */
-		$fields = apply_filters( 'cfprop_object_data_widget_attributes', $fields );
+		$fields = apply_filters( 'cfprop_object_data_widget_fields', $fields, $attributes );
 
 		/**
 		 * Filter the attributes for the object data widget.
 		 *
-		 * @param array<string,mixed> $attributes The attributes for the single widget.
+		 * Hint: until 2.0.x this filter was also used for the list of fields, use "cfprop_object_data_widget_fields" for them.
+		 *
+		 * @param array<string,mixed> $attributes The attributes for the object data widget.
 		 */
 		$attributes = apply_filters( 'cfprop_object_data_widget_attributes', $attributes );
 

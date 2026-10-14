@@ -34,7 +34,10 @@ class PriceField extends FieldType_Base {
 			return '';
 		}
 
-		// format the value.
-		return number_format( (float) $this->value, 0, '', '.' ) . ' &euro;';
+		// get the value as float.
+		$value = round( (float) $this->value, 2 );
+
+		// format the value: without decimals for integers, with 2 decimals otherwise.
+		return number_format( $value, ( (float) (int) $value === $value ) ? 0 : 2, ',', '.' ) . ' &euro;';
 	}
 }

@@ -129,11 +129,14 @@ class Log {
 				$log_categories = array();
 			}
 
+			// check if this is an error, they are logged in any case.
+			$is_error = 'error' === $state;
+
 			// check if this is a success import entry.
 			$is_import_success = ( 'import' === $category && 'success' === $state ) || ( 'system' === $category && 'info' === $state );
 
 			// check if we should log this entry.
-			$should_log = $is_import_success || empty( $log_categories ) || in_array( $category, $log_categories, true );
+			$should_log = $is_error || $is_import_success || empty( $log_categories ) || in_array( $category, $log_categories, true );
 
 			/**
 			 * Filter whether a log entry should be written when debug mode is enabled.
@@ -173,8 +176,11 @@ class Log {
 			)
 		);
 
-		// clean the log.
-		$this->clean_log();
+		// clean the log, but max. once per hour.
+		if ( ! get_transient( 'cfprop_log_cleanup' ) ) {
+			set_transient( 'cfprop_log_cleanup', 1, HOUR_IN_SECONDS );
+			$this->clean_log();
+		}
 	}
 
 	/**
@@ -205,10 +211,15 @@ class Log {
 		$is_running = true;
 
 		$table_name = (string) esc_sql( $wpdb->prefix . 'propstack_logs' ); // @phpstan-ignore cast.string
-		$max_age    = absint( get_option( 'propstack_connector_max_age_log_entries' ) );
+		$max_age    = absint( get_option( 'propstack_connector_max_age_log_entries', 20 ) );
+
+		// use the default if the setting is missing or invalid, otherwise every entry would be deleted.
+		if ( $max_age < 1 ) {
+			$max_age = 20;
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared -- Custom log table; fixed table name, esc_sql-escaped, %d via absint().
-		$wpdb->query( sprintf( 'DELETE FROM %s WHERE `time` < DATE_SUB(NOW(), INTERVAL %d DAY) LIMIT 10000', $table_name, $max_age ) );
+		$wpdb->query( sprintf( 'DELETE FROM %s WHERE `time` < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY) LIMIT 10000', $table_name, $max_age ) );
 
 		// log if any error occurred.
 		if ( ! empty( $wpdb->last_error ) ) {
@@ -242,11 +253,12 @@ class Log {
 	/**
 	 * Return log entries depending on some filters.
 	 *
-	 * Use for each possible condition own statements to match WCS.
+	 * @param int $limit  Max. number of entries to return (0 to use the default limit).
+	 * @param int $offset The offset for the first entry to return.
 	 *
 	 * @return array<int,mixed>
 	 */
-	public function get_entries(): array {
+	public function get_entries( int $limit = 0, int $offset = 0 ): array {
 		// bail if user has no capability.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
 			return array();
@@ -265,15 +277,73 @@ class Log {
 		$order = strtoupper( (string) filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 		$order = in_array( $order, array( 'ASC', 'DESC' ), true ) ? $order : 'DESC';
 
-		$limit = 10000;
-		/**
-		 * Filter limit to prevent possible errors on big tables.
-		 *
-		 * @since 1.0.0 Available since 1.0.0.
-		 * @param int $limit The actual limit.
-		 */
-		$limit = apply_filters( 'cfprop_log_limit', $limit );
+		// use the default limit, if none is given.
+		if ( $limit < 1 ) {
+			$limit = 10000;
+			/**
+			 * Filter limit to prevent possible errors on big tables.
+			 *
+			 * @since 1.0.0 Available since 1.0.0.
+			 * @param int $limit The actual limit.
+			 */
+			$limit = absint( apply_filters( 'cfprop_log_limit', $limit ) );
+		}
 
+		// get the conditions.
+		list( $where, $args ) = $this->get_where_conditions();
+
+		// add limit and offset.
+		$args[] = $limit;
+		$args[] = max( 0, $offset );
+
+		// get and return the entries.
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+		return Db::get_instance()->get_results(
+			$wpdb->prepare(
+				'SELECT `state`, `time` AS `date`, `log`, `category`
+                FROM `' . $wpdb->prefix . 'propstack_logs`
+                WHERE 1 = 1' . $where . '
+                ORDER BY ' . $order_by . ' ' . $order . ', `id` ' . $order . '
+                LIMIT %d OFFSET %d',
+				$args
+			),
+			ARRAY_A
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+	}
+
+	/**
+	 * Return the number of log entries depending on the actual filters.
+	 *
+	 * @return int
+	 */
+	public function get_entries_count(): int {
+		// bail if user has no capability.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return 0;
+		}
+
+		global $wpdb;
+
+		// get the conditions.
+		list( $where, $args ) = $this->get_where_conditions();
+
+		// create the statement.
+		$sql = 'SELECT COUNT(*) FROM `' . $wpdb->prefix . 'propstack_logs` WHERE 1 = 1' . $where;
+		if ( ! empty( $args ) ) {
+			$sql = (string) $wpdb->prepare( $sql, $args ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		}
+
+		// get and return the count.
+		return absint( $wpdb->get_var( $sql ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared -- Custom log table; statement is prepared above.
+	}
+
+	/**
+	 * Return the where-conditions for the log entries depending on the actual filters.
+	 *
+	 * @return array{0: string, 1: array<int,string>} The conditions with placeholders and the values for them.
+	 */
+	private function get_where_conditions(): array {
 		// get filter.
 		$category = (string) filter_input( INPUT_GET, 'category', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
@@ -286,7 +356,7 @@ class Log {
 		$category = (string) apply_filters( 'cfprop_log_category', $category );
 
 		// get errors.
-		$errors = absint( filter_input( INPUT_GET, 'errors', FILTER_SANITIZE_NUMBER_INT ) );
+		$errors = (int) filter_input( INPUT_GET, 'errors', FILTER_SANITIZE_NUMBER_INT );
 
 		/**
 		 * Filter for errors.
@@ -294,61 +364,25 @@ class Log {
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param int $errors Should be 1 to filter only for errors.
 		 */
-		$errors = apply_filters( 'cfprop_log_errors', $errors );
+		$errors = (int) apply_filters( 'cfprop_log_errors', $errors );
+
+		// collect the conditions.
+		$where = '';
+		$args  = array();
+
+		// add where-condition for the category.
+		if ( ! empty( $category ) ) {
+			$where .= ' AND `category` = %s';
+			$args[] = $category;
+		}
 
 		// add where-condition for errors.
-		$where = '';
 		if ( 1 === $errors ) {
-			$where .= ' AND `state` = "error"';
+			$where .= ' AND `state` = %s';
+			$args[] = 'error';
 		}
 
-		// if only category is set.
-		if ( ! empty( $category ) ) {
-			// get and return the entries.
-			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-			return Db::get_instance()->get_results(
-				$wpdb->prepare(
-					'SELECT `state`, `time` AS `date`, `log`, `category`
-                    FROM `' . $wpdb->prefix . 'propstack_logs`
-                    WHERE `category` = %s' . $where . '
-                    ORDER BY ' . $order_by . ' ' . $order . ', `id` ' . $order . '
-                    LIMIT %d',
-					array( $category, $limit )
-				),
-				ARRAY_A
-			);
-			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-		}
-
-		if ( 1 === $errors ) {
-			// return all.
-			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-			return Db::get_instance()->get_results(
-				$wpdb->prepare(
-					'SELECT `state`, `time` AS `date`, `log`, `category`
-                FROM `' . $wpdb->prefix . 'propstack_logs`
-                WHERE `state` = "error"
-                ORDER BY ' . $order_by . ' ' . $order . ', `id` ' . $order . '
-                LIMIT %d',
-					array( $limit )
-				),
-				ARRAY_A
-			);
-			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-		}
-
-		// return all.
-		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-		return Db::get_instance()->get_results(
-			$wpdb->prepare(
-				'SELECT `state`, `time` AS `date`, `log`, `category`
-                FROM `' . $wpdb->prefix . 'propstack_logs`
-                ORDER BY ' . $order_by . ' ' . $order . ', `id` ' . $order . '
-                LIMIT %d',
-				array( $limit )
-			),
-			ARRAY_A
-		);
-		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+		// return the conditions.
+		return array( $where, $args );
 	}
 }

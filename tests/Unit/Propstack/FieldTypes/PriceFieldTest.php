@@ -55,7 +55,9 @@ class PriceFieldTest extends TestCase {
 		return array(
 			'integer'        => array( 250000, '250.000 &euro;' ),
 			'numeric string' => array( '250000', '250.000 &euro;' ),
-			'float rounds'   => array( 1234.5, '1.235 &euro;' ),
+			'with cents'     => array( 1234.5, '1.234,50 &euro;' ),
+			'rent'           => array( '845.99', '845,99 &euro;' ),
+			'float as int'   => array( 1234.0, '1.234 &euro;' ),
 			'zero'           => array( 0, '' ),
 			'zero as string' => array( '0', '' ),
 			'empty string'   => array( '', '' ),

@@ -4,10 +4,55 @@
 
 ### Added
 
+- Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help
 - Show the reason why an object has not been imported
+- Added WP CLI command to check whether the Propstack API delivers a specific object
+- Added multiple hooks
+- Added option --network to the WP CLI command reset_plugin to reset all sites of a multisite network
+- Added Playwright tests as part of the release process
 
 ### Changed
 
+- Minimum required WordPress version is now 6.6
+- The "hide address" setting from Propstack is now respected: street, house number, address and geo coordinates are not shown for such objects
+- Renter, total commission and valuation prices are no longer shown in the frontend
+- The address of houses and garages is now hidden by default, like for apartments
+- Disabled fields are respected in all widgets, blocks, templates, the REST API and the abilities
+- Abilities only return published objects to users without the plugin settings capability and return field values as plain text
+- Form elements are no longer allowed globally in post content; only the filter output of this plugin may contain them (old behavior stays active if the Pro plugin or a theme override of the filter templates is detected)
+- HTML in descriptions from Propstack is filtered during import like regular post content
+- Numbers and prices show decimals if they have any and use the format of the site language
+- Date fields (e.g. "free from") are shown in the date format of the site
+- Scheduled imports now run within a time budget and continue automatically in a following run
+- Imports started via abilities run in limited steps per cron request
+- Images and queue entries of objects removed by the import are deleted, too (unless files should be preserved)
+- Queue entries which failed repeatedly are removed after 30 days
+- The queue list and the log view in the backend only load the entries of the current page
+- The log export now runs in chunks
+- Old log entries are cleaned up at most once per hour; the minimum age of log entries is 1 day
+- Email addresses and phone numbers in logged API responses are masked
+- Database errors and exception traces in the log no longer contain complete statements or server paths
+- Texts from the Propstack API are escaped in log entries, status texts and dialogs
+- The timeout for requests to the Propstack API is limited to 5–120 seconds
+- The API key is never returned via the REST API and is excluded from the settings export
+- If the API key could not be encrypted, the previous value is kept and an error is shown
+- Encryption and settings errors are logged at most once per day
+- Schedule and compatibility checks no longer run on AJAX requests; compatibility checks run at most every 12 hours or after plugin or theme changes
+- The check for outdated templates in child themes runs much less often and without remote filesystem access
+- Schedule checks and plugin updates are protected against parallel requests
+- The progress of processes is saved per process
+- The admin script of the plugin is only loaded for users with access to the plugin
+- The list of selectable authors is limited to users who can edit posts
+- The backend search for objects searches the title and the most important fields and is much faster
+- Faster object list in the backend
+- The saved debug API response is deleted when debug mode is disabled and is no longer autoloaded
+- The WP CLI commands `import_files` and `process_queue` wait for a running import of files and end with an error if it is still running
+- The uninstallation removes all options, transients and settings of the plugin, also on archived or deactivated sites of a multisite network
+- Completed the "Getting started" guide for abilities with example prompts
+- The description of external services in readme.txt now explains which data is sent and when
+- Hardened the GitHub release workflow (pinned actions, minimal permissions, tests and smoke test before the release)
+- Removed developer files from release packages and git exports
+- Updated the bundled library for notices (dismissing requires the capability to see the notice)
 - Changed the log category for changed field values from system to import
 - Now fully support Propstack API v2 as far as Propstack does deliver data atm
   -> over 120 fields are missing
@@ -16,6 +61,8 @@
   the database, they can no longer be decrypted there. Existing values are converted
   automatically during the update
 - Replaced custom TextInfo object with the new one from settings lib
+- The API key field is now a password field which restricts the visibility of your API key
+- Updated the process to check any changed and create the release on GitHub
 - Updated hints how to use MCP with our abilities
 - Updated dependencies
 - More PHP Unit Tests
@@ -25,6 +72,63 @@
 - Fixed import of images via API v2
 - Fixed wrong JS-function to import settings for the plugin
 - Remove our schedules on plugin deactivation
+- Fixed missing logging of errors if debug mode is enabled with restriction for one or more categories
+- Fixed REST API for objects returning all fields, including internal data, to every logged-in user
+- Fixed private email of a broker being used for the inquiry button in the classic single template
+- Fixed post meta of objects being registered for all post types
+- Fixed users without the needed capability being able to dismiss notices of this plugin
+- Fixed network activation on multisite running on all sites and ending on the wrong site
+- Fixed resetting the plugin via settings or WP CLI affecting all sites of a multisite network
+- Fixed duplicate images if the queue and the import of images ran at the same time
+- Fixed queue stopping forever if a single image crashed the request
+- Fixed scheduled imports of large accounts never finishing because of PHP time limits
+- Fixed import restarting from the beginning after a fatal error; the object which caused it is now skipped and the import is aborted after 3 fatal errors without progress
+- Fixed import of images never finishing on hosts with a size-limited object cache
+- Fixed import cleanup deleting objects which were not created by the import
+- Fixed import being blocked for an hour if a task before the start of the import reported an error
+- Fixed timeouts during the cleanup of obsolete objects
+- Fixed object states with the same name overwriting each other with API v2
+- Fixed file names containing the query string of the image URL
+- Fixed raw JSON output if the import of images was started without JavaScript
+- Fixed success messages for the import of files and the queue if another import was running
+- Fixed brokers no longer used by any object never being removed
+- Fixed custom fields from Propstack being able to overwrite fields of the plugin
+- Fixed object type restriction not working with API v1
+- Fixed scheduled and WP CLI imports not updating hidden internal fields (e.g. unit ID, exposé ID)
+- Fixed thumbnails not being assigned to remaining objects if one object had no usable image
+- Fixed "delete all objects" not removing drafts, private and trashed objects
+- Fixed filter block having no effect on the object archive in block themes
+- Fixed paginated object archive pages resulting in a 404 error
+- Fixed single object block template using the header and footer of a specific theme, a wrong distance field, a wrongly mapped "Hausgeld" row and a button without target
+- Fixed styles of blocks not being applied; they are now validated before use
+- Fixed invalid template names in shortcodes resulting in an error
+- Fixed unavailable listing template not falling back to the default listing
+- Fixed possible PHP errors with unexpected values in REST API requests and block attributes
+- Fixed hidden broker fields being offered in the block editor
+- Fixed resetting a template via abilities removing its CSS without the capability to edit CSS
+- Fixed CSS text appearing above galleries in classic themes without HTML5 support
+- Fixed object selection in the "Single Object" block not showing the selected object
+- Fixed filter block being labelled "Field" in the block inserter
+- Fixed block previews in the block inserter
+- Fixed missing block styles in classic themes
+- Fixed "Location" and "Features" templates for object fields not being available
+- Fixed boolean fields without value being shown as "no"
+- Fixed negative numbers losing their sign and room counts like 2.5 being shown as 2
+- Fixed email, phone and list fields not being escaped
+- Fixed invalid dates being shown as 01.01.1970
+- Fixed error when adding a term to a taxonomy of this plugin via AJAX
+- Fixed missing permalink and "View" link on the edit screen of objects
+- Fixed log entries being deleted completely if the max. age for log entries was 0
+- Fixed time zone used for deleting old log entries
+- Fixed "Every 20 minutes" interval running every 15 minutes
+- Fixed errors in settings never being written to the log
+- Fixed cached administrator used as fallback author not being updated after user or role changes
+- Fixed network-wide activated plugins not being detected by the compatibility checks
+- Fixed import dialog retrying endlessly or failing silently on server errors
+- Fixed possible error in the frontend if the plugin name is requested
+- Fixed possible fatal error in grouped notices
+- Fixed WPML configuration using wrong names for post types and taxonomies
+- Fixed release builds missing the energy scale block and the files for the intro
 
 ## [2.0.0] - 30.09.2026
 

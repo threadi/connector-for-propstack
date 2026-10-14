@@ -92,8 +92,6 @@ class Objects extends Import_Base {
 	 * @return void
 	 */
 	private function run_chunk(): void {
-		global $wpdb;
-
 		// get the work list of a paginated import which is already in progress.
 		$import_data  = get_option( $this->work_list_option, array() );
 		$is_first_run = empty( $import_data );
@@ -186,6 +184,9 @@ class Objects extends Import_Base {
 		// add a log entry.
 		Log::get_instance()->add( __( 'Import of objects has running.', 'connector-for-propstack' ), 'info', 'import' );
 
+		// register a shutdown handler to catch fatal errors during the import.
+		register_shutdown_function( array( $this, 'handle_fatal_shutdown' ) );
+
 		// if any error occurred during import of objects, collect and log it.
 		try {
 			// no limit on the command line, there is no timeout to avoid there.
@@ -213,6 +214,9 @@ class Objects extends Import_Base {
 
 				// remove blocks which are left behind by an import which has been aborted while its list was built.
 				$this->remove_blocks();
+
+				// forget the marker of the object processed last by a previous import (it could have the same run-ID, if it ran in the same second).
+				$this->clear_current_object();
 
 				// the block size is a storage decision and must not depend on the request limit.
 				$block_size = $limit > 0 ? $limit : 100;
@@ -251,10 +255,13 @@ class Objects extends Import_Base {
 						$page_objects = apply_filters( 'cfprop_object_import_response', $page_objects );
 
 						foreach ( $page_objects as $object ) {
-							// bring the object into the structure the API v1 delivers, which the import expects.
-							if ( is_array( $object ) ) {
-								$object = $this->prepare_object( $object, (string) $language_code );
+							// bail if this is not an object.
+							if ( ! is_array( $object ) ) {
+								continue;
 							}
+
+							// bring the object into the structure the API v1 delivers, which the import expects.
+							$object = $this->prepare_object( $object, (string) $language_code );
 
 							// skip objects which would be prevented anyway.
 							if ( apply_filters( 'cfprop_prevent_import_of_object', false, $object ) ) {
@@ -358,29 +365,37 @@ class Objects extends Import_Base {
 				// update the status.
 				$this->set_new_status( $process_handler, __( 'Get the objects in tip-top shape', 'connector-for-propstack' ) );
 
-				// get the objects which are not part of this import run.
+				// skip an object whose deletion aborted a previous run, so it does not block the cleanup.
+				$aborted_post_id = $this->get_marked_object( absint( $import_data['run_id'] ), 'cleanup' );
+				if ( $aborted_post_id > 0 ) {
+					$this->handle_aborted_cleanup( $aborted_post_id, absint( $import_data['run_id'] ) );
+				}
+
+				// get the objects which have been imported, but are not part of this import run.
 				$query = array(
 					'post_type'      => ImmoObject::get_instance()->get_name(),
 					'post_status'    => 'any',
 					'posts_per_page' => $limit > 0 ? $limit : -1,
-					'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; sync context.
-						'relation' => 'OR',
-						array(
-							'key'     => 'changed',
-							'compare' => 'NOT EXISTS',
-						),
-						array(
-							'key'     => 'changed',
-							'value'   => absint( $import_data['run_id'] ),
-							'compare' => '!=',
-						),
-					),
+					'meta_query'     => $this->get_obsolete_objects_meta_query( absint( $import_data['run_id'] ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; sync context.
 					'fields'         => 'ids',
 					'no_found_rows'  => true,
 				);
 
 				$results  = new WP_Query( $query );
 				$post_ids = $results->get_posts();
+
+				// count the deleted objects and remember whether this run stopped early.
+				$deleted       = 0;
+				$stopped_early = false;
+
+				// use the same time budget as the import, the deletion of objects with their images takes time, too.
+				$time_budget = ( Helper::is_cli() || wp_doing_cron() ) ? 0 : 20;
+
+				/** This filter is documented in app/Propstack/Imports/v2/Objects.php */
+				$time_budget = absint( apply_filters( 'cfprop_object_import_time_budget', $time_budget ) );
+
+				// remember the start of this chunk.
+				$chunk_start = microtime( true );
 
 				// delete them.
 				foreach ( $post_ids as $post_id ) {
@@ -392,6 +407,18 @@ class Objects extends Import_Base {
 						continue;
 					}
 
+					// stop this run if the time budget of a request (e.g. via AJAX) is used up, the next run continues.
+					if ( $time_budget > 0 && $deleted > 0 && ! Helper::is_cli() && ! wp_doing_cron() && ( microtime( true ) - $chunk_start ) > $time_budget ) {
+						$stopped_early = true;
+						break;
+					}
+
+					// stop this run if its time is used up, the next run continues.
+					if ( $deleted > 0 && $this->is_deadline_reached() ) {
+						$stopped_early = true;
+						break;
+					}
+
 					/**
 					 * Filter whether an obsolete object is deleted permanently.
 					 *
@@ -401,20 +428,23 @@ class Objects extends Import_Base {
 					 */
 					$force_delete = apply_filters( 'cfprop_force_delete_obsolete_object', true, $post_id );
 
-					// delete the metadata in one statement if the object is removed permanently.
-					if ( $force_delete ) {
-						$wpdb->delete( $wpdb->postmeta, array( 'post_id' => $post_id ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Bulk delete, see delete_all().
-						wp_cache_delete( $post_id, 'post_meta' );
-					}
+					// remember the object, so a run which is aborted during its deletion does not try it again.
+					$this->mark_current_object( absint( $import_data['run_id'] ), 'cleanup', $post_id );
 
-					wp_delete_post( $post_id, $force_delete );
+					// delete the object with its images and its entries in the queue.
+					$this->delete_obsolete_object( $post_id, (bool) $force_delete, absint( $import_data['run_id'] ) );
+
+					++$deleted;
 
 					// update the counter for the progress bar.
 					$process_handler->set_count( $process_handler->get_count() + 1 );
 				}
 
-				// another run is needed if this chunk was full.
-				if ( $limit > 0 && count( $post_ids ) >= $limit ) {
+				// the deletions of this run are completed.
+				$this->clear_current_object();
+
+				// another run is needed if this chunk was full or stopped early.
+				if ( $stopped_early || ( $limit > 0 && count( $post_ids ) >= $limit ) ) {
 					$this->set_load_more( true );
 
 					// save the state and stop here.
@@ -474,10 +504,16 @@ class Objects extends Import_Base {
 				// show cli hint.
 				$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Import objects', absint( $import_data['total'] ) ) : false;
 
+				// get the position of the object a previous run was processing as last.
+				$aborted_position = $this->get_marked_object( absint( $import_data['run_id'] ), 'import' );
+
 				// loop through this block, starting where the last run stopped.
 				foreach ( $block as $index_in_block => $entry ) {
+					// get the position of this entry in the work list.
+					$position = $block_index * $block_size + $index_in_block;
+
 					// skip what a previous run already processed inside this block.
-					if ( ( $block_index * $block_size + $index_in_block ) < $offset ) {
+					if ( $position < $offset ) {
 						continue;
 					}
 
@@ -490,11 +526,37 @@ class Objects extends Import_Base {
 						break;
 					}
 
+					// stop this run if the time of a limited run (e.g. via WP-Cron) is used up, the next run continues.
+					if ( $counter > 0 && $this->is_deadline_reached() ) {
+						$this->set_load_more( true );
+						break;
+					}
+
 					// get the data of this entry.
 					$language_code = $entry['language_code'];
-					$object        = $entry['object'];
+					$object        = isset( $entry['object'] ) && is_array( $entry['object'] ) ? $entry['object'] : array();
 
 					try {
+						// skip the object which aborted a previous run (e.g. by the memory or time limit), it would abort every run again.
+						if ( $position === $aborted_position ) {
+							// count this object as skipped for its language.
+							if ( isset( $import_data['skipped'][ $language_code ] ) ) {
+								++$import_data['skipped'][ $language_code ];
+							}
+
+							// log it and mark the import as faulty.
+							$this->handle_aborted_object( $object );
+
+							// update the counter.
+							$this->set_count( $process_handler, $process_handler->get_count() + 1 );
+
+							// do nothing more.
+							continue;
+						}
+
+						// remember this object, so the next run skips it if it aborts this run.
+						$this->mark_current_object( absint( $import_data['run_id'] ), 'import', $position );
+
 						$prevent_import = false;
 						/**
 						 * Prevent import of this object under custom conditions.
@@ -525,11 +587,11 @@ class Objects extends Import_Base {
 
 						// update the status.
 						/* translators: %1$s will be replaced by the object title. */
-						$this->set_new_status( $process_handler, sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ) );
+						$this->set_new_status( $process_handler, sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . esc_html( $this->get_object_title( $object ) ) . '</em>' ) );
 
 						// add a log entry.
 						/* translators: %1$s will be replaced by the object title. */
-						Log::get_instance()->add( sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+						Log::get_instance()->add( sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . esc_html( $this->get_object_title( $object ) ) . '</em>' ), 'info', 'import' );
 
 						// get the object with the given ID.
 						$propstack_immo_object = ImmoObjects::get_instance()->get_object_by_object_id( $object['id'], $language_code );
@@ -538,12 +600,12 @@ class Objects extends Import_Base {
 						if ( ! $propstack_immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
 							// add a log entry.
 							/* translators: %1$s will be replaced by the object title. */
-							Log::get_instance()->add( sprintf( __( 'Creating new entry for the object %1$s', 'connector-for-propstack' ), '<em>' . $object['title'] . '</em>' ), 'info', 'import' );
+							Log::get_instance()->add( sprintf( __( 'Creating new entry for the object %1$s', 'connector-for-propstack' ), '<em>' . esc_html( $this->get_object_title( $object ) ) . '</em>' ), 'info', 'import' );
 
 							// prepare the query to insert a new object.
 							$query = array(
 								'post_type'    => $post_type_name,
-								'post_title'   => (string) $object['title'],
+								'post_title'   => wp_strip_all_tags( $this->get_object_title( $object ) ),
 								'post_status'  => 'publish',
 								'post_author'  => Helper::get_author_during_object_creation(),
 								'post_content' => '',
@@ -620,7 +682,7 @@ class Objects extends Import_Base {
 							sprintf(
 							/* translators: %1$s will be replaced by the object title, %2$d by its Propstack-ID. */
 								__( 'Following error occurred during the import of object %1$s (Propstack-ID %2$d). The object has been skipped.', 'connector-for-propstack' ),
-								'<em>' . esc_html( $object['title'] ?? '' ) . '</em>',
+								'<em>' . esc_html( $this->get_object_title( $object ) ) . '</em>',
 								absint( $object['id'] ?? 0 )
 							) . '<br>' . Helper::get_throwable_as_log_text( $e ),
 							'error',
@@ -699,28 +761,23 @@ class Objects extends Import_Base {
 							'post_type'      => ImmoObject::get_instance()->get_name(),
 							'post_status'    => 'any',
 							'posts_per_page' => 1,
-							'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; sync context.
-								'relation' => 'OR',
-								array(
-									'key'     => 'changed',
-									'compare' => 'NOT EXISTS',
-								),
-								array(
-									'key'     => 'changed',
-									'value'   => absint( $import_data['run_id'] ),
-									'compare' => '!=',
-								),
-							),
+							'meta_query'     => $this->get_obsolete_objects_meta_query( absint( $import_data['run_id'] ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; sync context.
 							'fields'         => 'ids',
 						)
 					);
 
-					// count all existing objects.
+					// count all existing objects which have been imported.
 					$existing = new WP_Query(
 						array(
 							'post_type'      => ImmoObject::get_instance()->get_name(),
 							'post_status'    => 'any',
 							'posts_per_page' => 1,
+							'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; sync context.
+								array(
+									'key'     => 'object_id',
+									'compare' => 'EXISTS',
+								),
+							),
 							'fields'         => 'ids',
 						)
 					);
@@ -887,7 +944,7 @@ class Objects extends Import_Base {
 	 *
 	 * @return array<string,mixed>
 	 */
-	private function prepare_object( array $immo_object, string $language_code ): array {
+	protected function prepare_object( array $immo_object, string $language_code ): array {
 		// get the helper objects once per import, each of them requests the API only once.
 		if ( ! $this->options instanceof Options ) {
 			$this->options = new Options();
@@ -942,6 +999,17 @@ class Objects extends Import_Base {
 		 * @param string $url The URL.
 		 */
 		return apply_filters( 'cfprop_api_object_url', $url );
+	}
+
+	/**
+	 * Return the API URL to request a single object by its Propstack-ID.
+	 *
+	 * @param string $object_id The Propstack-ID of the object.
+	 *
+	 * @return string
+	 */
+	protected function get_single_object_url( string $object_id ): string {
+		return $this->url . '/' . rawurlencode( $object_id );
 	}
 
 	/**
@@ -1043,7 +1111,7 @@ class Objects extends Import_Base {
 	 *
 	 * @return \Generator<int,array<int,mixed>>
 	 */
-	private function get_object_pages( string $language_code ): \Generator {
+	protected function get_object_pages( string $language_code ): \Generator {
 		$max_per_value = 100;
 		/**
 		 * Filter the max. per page objects for every import from Propstack.

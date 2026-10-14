@@ -164,17 +164,30 @@ class FieldCategories {
 			'\ConnectorForPropstack\Propstack\FieldCategoryTypes\Broker',
 			'\ConnectorForPropstack\Propstack\FieldCategoryTypes\Descriptions',
 			'\ConnectorForPropstack\Propstack\FieldCategoryTypes\Energy',
-			'\ConnectorForPropstack\Propstack\FieldCategoryTypes\Locations',
+			'\ConnectorForPropstack\Propstack\FieldCategoryTypes\Features',
+			'\ConnectorForPropstack\Propstack\FieldCategoryTypes\Location',
 			'\ConnectorForPropstack\Propstack\FieldCategoryTypes\ObjectData',
 		);
 
 		/**
 		 * Filter the list of available field category types.
 		 *
+		 * Hint: this hook has been used for field categories and field category types in the past.
+		 * It is still used here for backward compatibility. Entries which are not field category types
+		 * are ignored. Use "cfprop_field_category_types" instead.
+		 *
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param array<int,string> $category_types List of field category types.
 		 */
-		return apply_filters( 'cfprop_field_categories', $category_types );
+		$category_types = apply_filters( 'cfprop_field_categories', $category_types );
+
+		/**
+		 * Filter the list of available field category types.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<int,string> $category_types List of field category types.
+		 */
+		return apply_filters( 'cfprop_field_category_types', $category_types );
 	}
 
 	/**

@@ -31,12 +31,15 @@ class Log_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Get the table data
+	 * Get the table data for the given page.
+	 *
+	 * @param int $per_page     Entries per page.
+	 * @param int $current_page The actual page.
 	 *
 	 * @return array<int,mixed>
 	 */
-	private function table_data(): array {
-		return Log::get_instance()->get_entries();
+	private function table_data( int $per_page, int $current_page ): array {
+		return Log::get_instance()->get_entries( $per_page, ( max( 1, $current_page ) - 1 ) * $per_page );
 	}
 
 	/**
@@ -49,11 +52,9 @@ class Log_Table extends WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 
-		$data = $this->table_data();
-
 		$per_page     = 100;
 		$current_page = $this->get_pagenum();
-		$total_items  = count( $data );
+		$total_items  = Log::get_instance()->get_entries_count();
 
 		$this->set_pagination_args(
 			array(
@@ -62,7 +63,8 @@ class Log_Table extends WP_List_Table {
 			)
 		);
 
-		$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
+		// get only the entries for the actual page.
+		$data = $this->table_data( $per_page, $current_page );
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 		$this->items           = $data;
@@ -267,7 +269,7 @@ class Log_Table extends WP_List_Table {
 
 			// show text.
 			/* translators: %1$s will be replaced by the category name. */
-			printf( esc_html__( 'No log entries for %1$s found.', 'connector-for-propstack' ), esc_html( $categories[ $category ] ) );
+			printf( esc_html__( 'No log entries for %1$s found.', 'connector-for-propstack' ), esc_html( $categories[ $category ] ?? $category ) );
 			return;
 		}
 
@@ -301,7 +303,7 @@ class Log_Table extends WP_List_Table {
 
 		// add a filter for errors.
 		$url            = add_query_arg( array( 'errors' => 1 ) );
-		$list['errors'] = '<a href="' . esc_url( $url ) . '"' . ( 1 === absint( filter_input( INPUT_GET, 'errors', FILTER_SANITIZE_NUMBER_INT ) ) ? ' class="current"' : '' ) . '>' . esc_html__( 'Errors', 'connector-for-propstack' ) . '</a>';
+		$list['errors'] = '<a href="' . esc_url( $url ) . '"' . ( 1 === (int) filter_input( INPUT_GET, 'errors', FILTER_SANITIZE_NUMBER_INT ) ? ' class="current"' : '' ) . '>' . esc_html__( 'Errors', 'connector-for-propstack' ) . '</a>';
 
 		/**
 		 * Filter the list before output.

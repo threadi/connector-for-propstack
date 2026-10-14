@@ -94,7 +94,7 @@ class Filter extends Blocks_Basis {
 			// get styles.
 			$styles = Helper::get_attribute_value_from_html( 'style', $block_html_attributes );
 			if ( ! empty( $styles ) ) {
-				$styles_array[] = '.entry-content.' . $classes . ' { ' . $styles . ' }';
+				$styles_array[] = \ConnectorForPropstack\Plugin\Templates::get_block_css_rule( $classes, $styles );
 			}
 		}
 
@@ -102,6 +102,6 @@ class Filter extends Blocks_Basis {
 		$attributes['styles'] = implode( PHP_EOL, $styles_array );
 		$attributes['classes'] = $classes . ' ' . Helper::get_attribute_value_from_html( 'class', $block_html_attributes );
 
-		return wp_kses_post( \ConnectorForPropstack\Propstack\Widgets\Filter::get_instance()->render( $attributes ) );
+		return wp_kses( \ConnectorForPropstack\Propstack\Widgets\Filter::get_instance()->render( $attributes ), \ConnectorForPropstack\Plugin\Templates::get_instance()->get_allowed_filter_html() );
 	}
 }

@@ -56,8 +56,12 @@ After checkout go through the following steps:
 6. `vendor/bin/phpstan analyse`
 7. `vendor/bin/phpcbf .`
 8. `vendor/bin/phpcs .`
-9. Set version nummer in _readme.txt_ and _connector-for-propstack.php_.
-10. Create the release ZIP with all necessary folders and files.
+9. `bash bin/build-release.sh nodev`
+10. `bash bin/build-release.sh collect 1.2.3` (with the new version number)
+11. `bash bin/build-release.sh zip releases/connector-for-propstack_1.2.3.zip`
+12. `composer install` to get the dev packages back.
+
+All steps of the release zip are in _bin/build-release.sh_. The ant build and the GitHub workflow use the same script, so they create identical zips.
 
 ### From a local environment with ant
 
@@ -65,10 +69,15 @@ After checkout go through the following steps:
 2. execute the following command in _build/_: `ant build`
 3. after that you will have a zip file in the release directory which could be used in WordPress to install it.
 
+`ant release-zip` creates the zip without the checks (e.g. to compare it with the zip from GitHub).
+
 ### On GitHub
 
-1. Create a new tag with the new version number.
-2. The release zip will be created by a GitHub action.
+1. Add a section for the new version to _changelog.md_ (it is used as text of the release).
+2. Create a new tag with the new version number, e.g. `2.1.0` or `2.2.0-beta.1` (creates a pre-release).
+3. The release zip will be created by a GitHub action, after the E2E tests and the smoke test have run successfully.
+
+A test build without release can be started by hand in the GitHub actions ("Build release zip" with a version number).
 
 ## Translations
 
@@ -161,3 +170,22 @@ Then: `composer test-install`
 ### Run
 
 `composer test`
+
+## E2E tests
+
+The E2E tests use [Playwright](https://playwright.dev/) and [WordPress Playground](https://wordpress.github.io/wordpress-playground/), which is started by Playwright itself. The Propstack API is replaced by a mock (_tests/e2e/mu-plugins_), which answers with the test data from _tests/Data_ - no Propstack account is needed.
+
+### Preparation
+
+1. `composer install`
+2. `npm ci`
+3. `npm run build`
+4. `npx playwright install chromium`
+
+### Run
+
+`npm run test:e2e`
+
+The tests are in _tests/e2e/specs_. The test data (objects, users, pages) is created by _tests/e2e/blueprint.json_. Optional environment variables are described in _playwright.config.ts_.
+
+Playground uses _tmp/e2e_ in the project as its home and temp folder (e.g. for the downloaded WordPress), nothing is written outside the project. Delete this folder to start with a fresh download.

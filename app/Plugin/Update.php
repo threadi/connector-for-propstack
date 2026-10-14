@@ -69,6 +69,18 @@ class Update {
 
 		// compare version if we are not in development-mode.
 		if ( ! Helper::is_development_mode() && version_compare( $installed_plugin_version, $db_plugin_version, '>' ) ) {
+			// bail if another request is running the update at the moment.
+			if ( ! Helper::acquire_lock( 'cfprop_update_lock', 5 * MINUTE_IN_SECONDS ) ) {
+				return;
+			}
+
+			// get the version again from the database, as another request could have run the update in the meantime.
+			$db_plugin_version = $this->get_db_version();
+			if ( ! version_compare( $installed_plugin_version, $db_plugin_version, '>' ) ) {
+				Helper::release_lock( 'cfprop_update_lock' );
+				return;
+			}
+
 			if ( ! defined( 'CFPROP_UPDATE_RUNNING' ) ) {
 				define( 'CFPROP_UPDATE_RUNNING', 1 );
 			}
@@ -91,7 +103,25 @@ class Update {
 
 			// save the new plugin-version in the DB.
 			update_option( 'cfprop_version', $installed_plugin_version );
+
+			// release the lock.
+			Helper::release_lock( 'cfprop_update_lock' );
 		}
+	}
+
+	/**
+	 * Return the version of the plugin, which was last installed, directly from the database.
+	 *
+	 * @return string
+	 */
+	private function get_db_version(): string {
+		global $wpdb;
+
+		// get the value directly from the database to bypass any cache.
+		$version = $wpdb->get_var( $wpdb->prepare( "SELECT `option_value` FROM `$wpdb->options` WHERE `option_name` = %s", 'cfprop_version' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Check after acquiring the update lock.
+
+		// return the version or the default.
+		return is_string( $version ) && '' !== $version ? $version : '1.0.0';
 	}
 
 	/**
@@ -167,10 +197,10 @@ class Update {
 			// take them out of the way, if they are hooked.
 			$read_priority = $read ? has_filter( 'option_' . $name, $read ) : false;
 			$save_priority = $save ? has_filter( 'pre_update_option_' . $name, $save ) : false;
-			if ( false !== $read_priority ) {
+			if ( null !== $read && false !== $read_priority ) {
 				remove_filter( 'option_' . $name, $read, $read_priority );
 			}
-			if ( false !== $save_priority ) {
+			if ( null !== $save && false !== $save_priority ) {
 				remove_filter( 'pre_update_option_' . $name, $save, $save_priority );
 			}
 
@@ -185,10 +215,10 @@ class Update {
 			}
 
 			// put the callbacks back.
-			if ( false !== $read_priority ) {
+			if ( null !== $read && false !== $read_priority ) {
 				add_filter( 'option_' . $name, $read, $read_priority );
 			}
-			if ( false !== $save_priority ) {
+			if ( null !== $save && false !== $save_priority ) {
 				add_filter( 'pre_update_option_' . $name, $save, $save_priority, 3 );
 			}
 		}

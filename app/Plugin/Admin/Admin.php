@@ -117,6 +117,11 @@ class Admin {
 			Helper::get_file_version( Helper::get_plugin_path() . 'admin/style.css' )
 		);
 
+		// bail if the user has neither the capability for the settings nor for the objects.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) && ! current_user_can( 'manage_' . ImmoObject::get_instance()->get_name() ) ) {
+			return;
+		}
+
 		// add the JS.
 		wp_enqueue_script(
 			'connector-for-propstack',
@@ -164,9 +169,10 @@ class Admin {
 			return;
 		}
 
-		// get entries.
-		$log     = Log::get_instance();
-		$entries = $log->get_entries();
+		// get the first entries.
+		$log        = Log::get_instance();
+		$chunk_size = 500;
+		$entries    = $log->get_entries( $chunk_size );
 
 		// bail if no entries could be read.
 		if ( empty( $entries ) ) {
@@ -202,10 +208,26 @@ class Admin {
 		// add the header.
 		fputcsv( $fp, array_map( array( $this, 'escape_csv_value' ), array_keys( $head_row ) ) );
 
-		// add the entries.
-		foreach ( $entries as $data ) {
-			fputcsv( $fp, array_map( array( $this, 'escape_csv_value' ), $data ) );
+		// add the entries chunk by chunk to prevent high memory usage.
+		$offset = 0;
+		while ( ! empty( $entries ) ) {
+			foreach ( $entries as $data ) {
+				fputcsv( $fp, array_map( array( $this, 'escape_csv_value' ), $data ) );
+			}
+
+			// bail if this was the last chunk.
+			if ( count( $entries ) < $chunk_size ) {
+				break;
+			}
+
+			// send the output to the browser and get the next chunk.
+			fflush( $fp );
+			$offset += $chunk_size;
+			$entries = $log->get_entries( $chunk_size, $offset );
 		}
+
+		// close the output.
+		fclose( $fp ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 		// do nothing more.
 		exit;
@@ -331,6 +353,11 @@ class Admin {
 			return;
 		}
 
+		// bail on AJAX- and cron-requests (e.g., the heartbeat).
+		if ( wp_doing_ajax() || wp_doing_cron() ) {
+			return;
+		}
+
 		// get crypt errors.
 		$crypt_errors = Crypt::get_instance()->get_crypt_obj()->get_errors();
 
@@ -361,8 +388,43 @@ class Admin {
 			$transient_obj->save();
 		}
 
+		// get the messages.
+		$messages = Helper::get_json( $crypt_errors->get_error_messages() );
+
+		// bail if these errors have already been logged within the last day.
+		if ( ! $this->is_new_log_entry( 'crypt', $messages ) ) {
+			return;
+		}
+
 		// add them in the log.
-		Log::get_instance()->add( __( 'Error in crypt support:', 'connector-for-propstack' ) . '<code>' . Helper::get_json( $crypt_errors->get_error_messages() ) . '</code>', 'error', 'system' );
+		Log::get_instance()->add( __( 'Error in crypt support:', 'connector-for-propstack' ) . '<code>' . esc_html( $messages ) . '</code>', 'error', 'system' );
+	}
+
+	/**
+	 * Return whether a log entry with the given text is new, which means it has not been logged within the last day.
+	 *
+	 * Used to prevent flooding the log with the same entry on each request.
+	 *
+	 * @param string $type The type of the entry, e.g., "crypt".
+	 * @param string $text The text of the entry.
+	 *
+	 * @return bool
+	 */
+	private function is_new_log_entry( string $type, string $text ): bool {
+		// get the name of the transient for this text.
+		$transient_name = 'cfprop_logged_' . $type;
+		$hash           = md5( $text );
+
+		// bail if this text has already been logged.
+		if ( get_transient( $transient_name ) === $hash ) {
+			return false;
+		}
+
+		// remember this text for one day.
+		set_transient( $transient_name, $hash, DAY_IN_SECONDS );
+
+		// return true as this is a new entry.
+		return true;
 	}
 
 	/**
@@ -375,7 +437,7 @@ class Admin {
 		$settings_obj = Settings::get_instance()->get_settings_obj();
 
 		// bail if no errors occurred.
-		if ( ! method_exists( $settings_obj, 'has_errors' ) || $settings_obj->has_errors() ) { // @phpstan-ignore function.alreadyNarrowedType
+		if ( ! method_exists( $settings_obj, 'has_errors' ) || ! $settings_obj->has_errors() ) { // @phpstan-ignore function.alreadyNarrowedType
 			return;
 		}
 
@@ -387,9 +449,23 @@ class Admin {
 			return;
 		}
 
+		// bail if these errors have already been logged within the last day.
+		if ( ! $this->is_new_log_entry( 'settings', Helper::get_json( $errors->errors ) ) ) {
+			return;
+		}
+
 		// log these errors.
-		foreach ( $errors->errors as $key => $errors ) {
-			Log::get_instance()->add( __( 'Error in plugin settings:', 'connector-for-propstack' ) . ' <em>' . esc_html( $key ) . '</em>: ' . esc_html( implode( ' ', $errors ) ), 'error', 'system' );
+		foreach ( $errors->errors as $key => $messages ) {
+			// collect the names of the affected settings, if given in the error data.
+			$setting_names = array();
+			foreach ( $errors->get_all_error_data( $key ) as $data ) {
+				if ( is_array( $data ) && ! empty( $data['setting'] ) && is_string( $data['setting'] ) ) {
+					$setting_names[] = $data['setting'];
+				}
+			}
+			$details = empty( $setting_names ) ? '' : ' (' . implode( ', ', array_unique( $setting_names ) ) . ')';
+
+			Log::get_instance()->add( __( 'Error in plugin settings:', 'connector-for-propstack' ) . ' <em>' . esc_html( (string) $key ) . '</em>: ' . esc_html( implode( ' ', array_unique( $messages ) ) . $details ), 'error', 'system' );
 		}
 	}
 

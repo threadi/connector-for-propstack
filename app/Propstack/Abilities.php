@@ -586,13 +586,18 @@ class Abilities {
 			return new WP_Error( 'cfprop_missing_post_id', __( 'No post ID has been given.', 'connector-for-propstack' ), array( 'status' => 400 ) );
 		}
 
-		// get the object.
-		$immo_object = ImmoObjects::get_instance()->get_object( $post_id );
-
 		// bail if this is not one of our objects.
 		if ( PostTypes\ImmoObject::get_instance()->get_name() !== get_post_type( $post_id ) ) {
 			return new WP_Error( 'cfprop_object_not_found', __( 'No object could be found for the given ID.', 'connector-for-propstack' ), array( 'status' => 404 ) );
 		}
+
+		// bail if this object is not published and the user is not allowed to manage the plugin settings.
+		if ( 'publish' !== get_post_status( $post_id ) && ! $this->has_permission() ) {
+			return new WP_Error( 'cfprop_object_not_found', __( 'No object could be found for the given ID.', 'connector-for-propstack' ), array( 'status' => 404 ) );
+		}
+
+		// get the object.
+		$immo_object = ImmoObjects::get_instance()->get_object( $post_id );
 
 		// get the base data.
 		$data = $this->get_object_data( $immo_object );
@@ -622,13 +627,6 @@ class Abilities {
 	}
 
 	/**
-	 * Return the fields of a single object, prepared for the output.
-	 *
-	 * @param ImmoObject $immo_object The object.
-	 *
-	 * @return array<string,string>
-	 */
-	/**
 	 * Return the fields of a single object which are visible in the frontend.
 	 *
 	 * Hint:
@@ -651,37 +649,57 @@ class Abilities {
 		// collect the fields which are visible in the frontend.
 		$fields = array();
 		foreach ( $object_type_object->get_fields() as $field ) {
-			// bail if this field is hidden.
-			if ( $field->hide() || $field->hide_in_frontend() || empty( $field->get_name() ) ) {
+			// bail if this field should not be visible in frontend (checks hidden, disabled, hidden address and the filter "cfprop_show_field_in_frontend").
+			if ( ! Fields::get_instance()->is_field_visible_in_frontend( $field, $immo_object ) ) {
 				continue;
 			}
 
-			$show_field = true;
-
-			/**
-			 * Filter whether a field is shown in the frontend.
-			 *
-			 * @since 1.0.0 Available since 1.0.0.
-			 *
-			 * @param bool       $show_field  The result.
-			 * @param Field_Base $field       The field.
-			 * @param ImmoObject $immo_object The object.
-			 *
-			 * @noinspection PhpConditionAlreadyCheckedInspection
-			 */
-			if ( ! apply_filters( 'cfprop_show_field_in_frontend', $show_field, $field, $immo_object ) ) {
-				continue;
-			}
-
-			// get the value of this field without HTML.
-			$value = Fields::get_instance()->get_field_value( $immo_object->get_id(), $field );
-
-			// add it to the list.
-			$fields[ $field->get_name() ] = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+			// add the value as plain text to the list.
+			$fields[ $field->get_name() ] = $this->get_object_field_value_as_text( $immo_object, $field );
 		}
 
 		// return the resulting list.
 		return $fields;
+	}
+
+	/**
+	 * Return the value of a field of an object as plain text for AI clients.
+	 *
+	 * Representation:
+	 * - boolean fields: "yes" or "no" (translated), an empty string if the value is not set.
+	 * - arrays: JSON-encoded list of the plain values.
+	 * - all other fields: the formatted value (e.g., with currency) without any HTML.
+	 *
+	 * @param ImmoObject $immo_object The object.
+	 * @param Field_Base $field       The field.
+	 *
+	 * @return string
+	 */
+	private function get_object_field_value_as_text( ImmoObject $immo_object, Field_Base $field ): string {
+		// use a clean representation for boolean fields (their formatted value is an icon).
+		if ( 'boolean' === $field->get_type() ) {
+			// get the plain value.
+			$value = Fields::get_instance()->get_field_value( $immo_object->get_id(), $field, true, true );
+
+			// return an empty string if the value is not set.
+			if ( null === $value || '' === $value ) {
+				return '';
+			}
+
+			// return the translated text for yes or no.
+			return is_scalar( $value ) && 1 === absint( $value ) ? __( 'yes', 'connector-for-propstack' ) : __( 'no', 'connector-for-propstack' );
+		}
+
+		// get the formatted value of this field without HTML.
+		$value = Fields::get_instance()->get_field_value( $immo_object->get_id(), $field );
+
+		// return arrays as JSON.
+		if ( ! is_scalar( $value ) ) {
+			return (string) wp_json_encode( $value );
+		}
+
+		// return the value without any HTML (some field types always return HTML).
+		return wp_strip_all_tags( (string) $value );
 	}
 
 	/**
@@ -828,6 +846,9 @@ class Abilities {
 			);
 		}
 
+		// reset the counter for the events of this import.
+		delete_option( 'cfprop_ability_import_events' );
+
 		// schedule the import to run in the background, it takes too long to wait for it.
 		wp_schedule_single_event( time(), 'cfprop_run_import_by_ability' );
 
@@ -842,25 +863,67 @@ class Abilities {
 	 * Run the import which has been scheduled by an ability.
 	 *
 	 * Hint:
-	 * The import runs in chunks, so it has to be called until it reports that it is done.
-	 * There is no request which could continue it here, so we loop ourselves.
+	 * The import runs in chunks. This event runs as many chunks as fit in a time budget and
+	 * a maximum number of chunks. If the import is not completed after that, a new single
+	 * event is scheduled to continue it, so a single cron request does not run endlessly.
 	 *
 	 * @return void
 	 */
 	public function run_scheduled_import(): void {
-		$runs = 0;
+		// get the start time.
+		$start = microtime( true );
 
+		$time_budget = 30;
+		/**
+		 * Filter the time budget in seconds for one cron event of an import started by an ability.
+		 *
+		 * After this time no further chunk will be started in this event, the import will be continued by a new event.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param int $time_budget The time budget in seconds.
+		 */
+		$time_budget = max( 1, absint( apply_filters( 'cfprop_ability_import_time_budget', $time_budget ) ) );
+
+		$max_chunks = 50;
+		/**
+		 * Filter the maximum number of chunks one cron event of an import started by an ability runs.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param int $max_chunks The max number of chunks.
+		 */
+		$max_chunks = max( 1, absint( apply_filters( 'cfprop_ability_import_max_chunks', $max_chunks ) ) );
+
+		// run the chunks.
+		$runs = 0;
 		do {
 			$import_obj = ImmoObjects::get_instance()->import( '' );
 
 			++$runs;
 
-			// bail if the import does not finish.
-			if ( $runs > 10000 ) {
-				Log::get_instance()->add( __( 'The import started by an ability did not finish and has been stopped.', 'connector-for-propstack' ), 'error', 'import' );
-
+			// stop this event if its budget is used.
+			if ( $runs >= $max_chunks || ( microtime( true ) - $start ) > $time_budget ) {
 				break;
 			}
 		} while ( $import_obj->has_load_more() );
+
+		// bail if the import is completed.
+		if ( ! $import_obj->has_load_more() ) {
+			delete_option( 'cfprop_ability_import_events' );
+			return;
+		}
+
+		// count the events of this import to prevent an endless chain of events on a broken state.
+		$events = absint( get_option( 'cfprop_ability_import_events', 0 ) ) + 1;
+		if ( $events > 1000 ) {
+			delete_option( 'cfprop_ability_import_events' );
+			Log::get_instance()->add( __( 'The import started by an ability did not finish and has been stopped.', 'connector-for-propstack' ), 'error', 'import' );
+			return;
+		}
+		update_option( 'cfprop_ability_import_events', $events, false );
+
+		// schedule a new event to continue the import, if not already scheduled.
+		if ( false === wp_next_scheduled( 'cfprop_run_import_by_ability' ) ) {
+			wp_schedule_single_event( time(), 'cfprop_run_import_by_ability' );
+		}
 	}
 }

@@ -18,6 +18,20 @@ use ConnectorForPropstack\Propstack\ImmoObjects;
  */
 class Cli {
 	/**
+	 * The amount of tries if another process imports files right now.
+	 *
+	 * @var int
+	 */
+	private const LOCKED_MAX_TRIES = 12;
+
+	/**
+	 * The seconds to wait between these tries.
+	 *
+	 * @var int
+	 */
+	private const LOCKED_WAIT_SECONDS = 5;
+
+	/**
 	 * Import all objects from Propstack to WordPress.
 	 *
 	 * Hint: run with "--user=xy".
@@ -121,8 +135,26 @@ class Cli {
 			}
 		);
 
-		// process the queue.
-		\ConnectorForPropstack\Propstack\Queue::get_instance()->process( '' );
+		// get the queue object.
+		$queue_obj = \ConnectorForPropstack\Propstack\Queue::get_instance();
+
+		// process the queue, wait and try again if another process imports files right now.
+		for ( $tries = 1; $tries <= self::LOCKED_MAX_TRIES; $tries++ ) {
+			$queue_obj->process( '' );
+
+			// bail if the queue has been processed.
+			if ( ! $queue_obj->was_locked() ) {
+				break;
+			}
+
+			// bail if the other process does not finish in time.
+			if ( $tries >= self::LOCKED_MAX_TRIES ) {
+				\WP_CLI::error( 'Another import of files is still running. The queue has not been processed. Please try again later.' );
+			}
+
+			\WP_CLI::log( 'Another import of files is running. Waiting ...' );
+			sleep( self::LOCKED_WAIT_SECONDS );
+		}
 
 		// output success-message.
 		\WP_CLI::success( 'Queue has been processed.' );
@@ -144,16 +176,31 @@ class Cli {
 	/**
 	 * Resets all settings of this plugin.
 	 *
+	 * Resets the current site only. In a multisite use "--url" to choose the site or
+	 * "--network" to reset the plugin on all sites of the network.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--network]
+	 * : Reset the plugin on all sites of the multisite network.
+	 *
 	 * @since        1.0.0
+	 *
+	 * @param array<int,string>    $args       The arguments.
+	 * @param array<string,string> $assoc_args The associative arguments.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-	public function reset_plugin(): void {
-		Uninstaller::get_instance()->run();
+	public function reset_plugin( array $args = array(), array $assoc_args = array() ): void {
+		// check if the reset should be run network-wide.
+		$network_wide = is_multisite() && isset( $assoc_args['network'] );
+
+		// remove all plugin data.
+		Uninstaller::get_instance()->run( $network_wide );
 
 		// run installer tasks.
-		Installer::get_instance()->activation();
+		Installer::get_instance()->activation( $network_wide );
 
 		// output success-message.
 		\WP_CLI::success( 'Plugin has been reset.' );
@@ -254,10 +301,174 @@ class Cli {
 			}
 		);
 
-		// import the files.
-		Files::get_instance()->import();
+		// get the files object.
+		$files_obj = Files::get_instance();
+
+		// import the files: repeat as long as the import needs another run, and wait if another process imports files right now.
+		$runs         = 0;
+		$locked_tries = 0;
+		while ( true ) {
+			$files_obj->import();
+			++$runs;
+
+			// wait and try again if another process imports files right now.
+			if ( $files_obj->is_locked_by_other_process() ) {
+				++$locked_tries;
+
+				// bail if the other process does not finish in time.
+				if ( $locked_tries >= self::LOCKED_MAX_TRIES ) {
+					\WP_CLI::error( 'Another import of files is still running. No files have been imported. Please try again later.' );
+				}
+
+				\WP_CLI::log( 'Another import of files is running. Waiting ...' );
+				sleep( self::LOCKED_WAIT_SECONDS );
+
+				// try it again.
+				continue;
+			}
+
+			// reset the counter for the next lock.
+			$locked_tries = 0;
+
+			// bail if the import is completed.
+			if ( ! $files_obj->has_load_more() ) {
+				break;
+			}
+
+			// bail if the import does not finish.
+			if ( $runs >= 1000 ) {
+				\WP_CLI::error( 'The import of files did not finish and has been stopped.' );
+			}
+		}
 
 		// output success-message.
 		\WP_CLI::success( 'Files have been imported.' );
+	}
+
+	/**
+	 * Check whether the Propstack API delivers a specific object for the import.
+	 *
+	 * Uses the same request as the import, including all restrictions which are sent to the
+	 * API (e.g. the states). Nothing is imported or changed. The command ends with an error
+	 * (exit code 1) if the object is not delivered.
+	 *
+	 * If the object is delivered, the command also shows whether one of your restrictions
+	 * would prevent its import and whether it already exists in WordPress.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <id>
+	 * : The ID of the object to check.
+	 *
+	 * [--field=<field>]
+	 * : The field of the API the ID belongs to. "id" is the internal Propstack-ID, which is also saved on each imported object.
+	 * ---
+	 * default: id
+	 * options:
+	 *   - id
+	 *   - unit_id
+	 *   - exposee_id
+	 * ---
+	 *
+	 * [--full-scan]
+	 * : Request all pages like the import does it, instead of asking the API for this single object. Slower, but also detects objects which get lost between two pages.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Check the object with the Propstack-ID 123456.
+	 *     $ wp cfprop check_object 123456
+	 *
+	 *     # Check the object by its unit ID.
+	 *     $ wp cfprop check_object A42 --field=unit_id
+	 *
+	 *     # Check with exactly the requests the import uses.
+	 *     $ wp cfprop check_object 123456 --full-scan
+	 *
+	 * @since 2.0.1
+	 *
+	 * @param array<int,string>    $args       The arguments.
+	 * @param array<string,string> $assoc_args The associative arguments.
+	 *
+	 * @return void
+	 * @noinspection PhpUnused
+	 */
+	public function check_object( array $args = array(), array $assoc_args = array() ): void {
+		// get the ID to search for.
+		$object_id = trim( (string) ( $args[0] ?? '' ) );
+
+		// bail if no ID is given.
+		if ( '' === $object_id ) {
+			\WP_CLI::error( 'Please specify the ID of the object.' );
+		}
+
+		// get the field the ID belongs to.
+		$field = (string) ( $assoc_args['field'] ?? 'id' );
+
+		// bail if the field is not supported.
+		if ( ! in_array( $field, array( 'id', 'unit_id', 'exposee_id' ), true ) ) {
+			\WP_CLI::error( 'The field must be one of: id, unit_id, exposee_id.' );
+		}
+
+		// bail if no API key is set.
+		if ( empty( get_option( 'propstack_connector_api_key' ) ) ) {
+			\WP_CLI::error( 'No API key is configured.' );
+		}
+
+		// run the check.
+		$check = ImmoObjects::get_instance()->get_object_check( $object_id, $field, isset( $assoc_args['full-scan'] ) );
+
+		// show the result for each language the import would request.
+		foreach ( $check['languages'] as $language_code => $result ) {
+			// show what has been requested.
+			\WP_CLI::log( 'Language: ' . $language_code );
+			\WP_CLI::log( 'Request: ' . $result['url'] . ( $result['full_scan'] ? ' (and all following pages)' : '' ) );
+
+			// show the errors, the result is not reliable then.
+			foreach ( $result['errors'] as $error ) {
+				\WP_CLI::warning( $error );
+			}
+
+			// bail if the object is not delivered in this language.
+			if ( ! $result['found'] ) {
+				\WP_CLI::log( 'Delivered: no (' . ( $result['full_scan'] ? $result['checked'] . ' objects checked' : 'the API has been asked for this object only, use --full-scan to check all pages' ) . ')' );
+				continue;
+			}
+
+			// show the object.
+			\WP_CLI::log( sprintf( 'Delivered: yes - "%1$s" (id: %2$s, unit_id: %3$s, state: %4$s)', $result['object']['title'], $result['object']['id'], $result['object']['unit_id'], $result['object']['state'] ) );
+
+			// show whether a restriction would prevent the import.
+			if ( $result['prevented'] ) {
+				\WP_CLI::warning( 'The import of this object is prevented: ' . implode( ' ', $result['reasons'] ) );
+			} else {
+				\WP_CLI::log( 'Import: not prevented by a restriction' );
+			}
+
+			// show whether the object exists in WordPress.
+			\WP_CLI::log( $result['post_id'] > 0 ? sprintf( 'WordPress: imported as post %1$d', $result['post_id'] ) : 'WordPress: not imported' );
+		}
+
+		// bail if the object is delivered.
+		if ( $check['delivered'] ) {
+			\WP_CLI::success( sprintf( 'The Propstack API delivers the object with %1$s "%2$s" for the import.', $field, $object_id ) );
+			return;
+		}
+
+		// bail if the check could not be completed.
+		if ( $check['has_errors'] ) {
+			\WP_CLI::error( 'The check could not be completed, see the warnings above.' );
+		}
+
+		// show whether Propstack knows the object at all.
+		if ( 200 === $check['direct']['http_status'] ) {
+			\WP_CLI::log( sprintf( 'Direct request: Propstack knows this object - "%1$s" (state: %2$s, marketing type: %3$s, object type: %4$s, archived: %5$s). It is excluded by the parameters of the request above.', $check['direct']['object']['title'], $check['direct']['object']['state'], $check['direct']['object']['marketing_type'], $check['direct']['object']['object_type'], $check['direct']['object']['archived'] ) );
+		} elseif ( 404 === $check['direct']['http_status'] ) {
+			\WP_CLI::log( 'Direct request: Propstack does not know an object with this ID, or the API key has no access to it (HTTP status 404).' );
+		} elseif ( 0 !== $check['direct']['http_status'] ) {
+			\WP_CLI::log( sprintf( 'Direct request: not possible (HTTP status %1$d).', $check['direct']['http_status'] ) );
+		}
+
+		// output error-message.
+		\WP_CLI::error( sprintf( 'The Propstack API does not deliver the object with %1$s "%2$s" for the import.', $field, $object_id ) );
 	}
 }

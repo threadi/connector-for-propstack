@@ -403,4 +403,134 @@ class QueueSafety extends ConnectorForPropstackTestCase {
 		add_filter( 'cfprop_queue_max_attempts', '__return_zero' );
 		$this->assertSame( 1, \ConnectorForPropstack\Propstack\Queue::get_instance()->get_max_attempts() );
 	}
+
+	/**
+	 * Throw an exception, used to simulate an error during the import of a file.
+	 *
+	 * @return array<string,mixed>
+	 * @throws \RuntimeException Always.
+	 */
+	public function throw_exception(): array {
+		throw new \RuntimeException( 'Simulated error' );
+	}
+
+	/**
+	 * Test that an entry whose object does not exist anymore is removed without any download.
+	 *
+	 * @return void
+	 */
+	public function test_entry_of_deleted_object_is_removed(): void {
+		$this->mock_status = 200;
+		$this->add_files( array( $this->get_file_data( 8201 ) ) );
+		$entry_id = $this->get_queue_entry( 8201 )->ID;
+
+		// delete the object.
+		wp_delete_post( $this->object_id, true );
+
+		\ConnectorForPropstack\Propstack\Queue::get_instance()->process( '' );
+
+		$this->assertNull( get_post( $entry_id ) );
+		$this->assertSame( 0, $this->download_count );
+	}
+
+	/**
+	 * Test that the attempt is counted before the import, so an error does not block the queue.
+	 *
+	 * @return void
+	 */
+	public function test_error_during_import_is_counted_as_attempt(): void {
+		$this->mock_status = 200;
+		$this->add_files( array( $this->get_file_data( 8211 ) ) );
+		$entry_id = $this->get_queue_entry( 8211 )->ID;
+
+		// let the import of the file fail with an exception.
+		add_filter( 'cfprop_file_import_array', array( $this, 'throw_exception' ) );
+		\ConnectorForPropstack\Propstack\Queue::get_instance()->process( '' );
+		remove_filter( 'cfprop_file_import_array', array( $this, 'throw_exception' ) );
+
+		// the entry still exists and the attempt has been counted.
+		$this->assertInstanceOf( WP_Post::class, get_post( $entry_id ) );
+		$this->assertSame( 1, absint( get_post_meta( $entry_id, 'failed_attempts', true ) ) );
+		$this->assertSame( 1, absint( get_post( $entry_id )->menu_order ) );
+	}
+
+	/**
+	 * Test that the queue is not processed while another process imports files.
+	 *
+	 * @return void
+	 */
+	public function test_queue_is_not_processed_while_locked(): void {
+		$this->mock_status = 200;
+		$this->add_files( array( $this->get_file_data( 8221 ) ) );
+		$entry_id = $this->get_queue_entry( 8221 )->ID;
+
+		// another process holds the lock.
+		$lock = \ConnectorForPropstack\Propstack\Files::get_instance()->get_import_lock();
+		$this->assertTrue( $lock->acquire() );
+
+		\ConnectorForPropstack\Propstack\Queue::get_instance()->process( '' );
+
+		$lock->release();
+
+		// nothing has been processed, and the caller could detect it.
+		$this->assertSame( 0, $this->download_count );
+		$this->assertInstanceOf( WP_Post::class, get_post( $entry_id ) );
+		$this->assertTrue( \ConnectorForPropstack\Propstack\Queue::get_instance()->was_locked() );
+
+		// the lock is free again, the queue is processed now.
+		\ConnectorForPropstack\Propstack\Queue::get_instance()->process( '' );
+		$this->assertFalse( \ConnectorForPropstack\Propstack\Queue::get_instance()->was_locked() );
+		$this->assertSame( 1, $this->download_count );
+		$this->assertNull( get_post( $entry_id ) );
+	}
+
+	/**
+	 * Test that entries which reached the max attempts a long time ago are purged.
+	 *
+	 * @return void
+	 */
+	public function test_old_failed_entries_are_purged(): void {
+		$this->add_files( array( $this->get_file_data( 8231 ), $this->get_file_data( 8232 ), $this->get_file_data( 8233 ) ) );
+		$old_entry_id    = $this->get_queue_entry( 8231 )->ID;
+		$recent_entry_id = $this->get_queue_entry( 8232 )->ID;
+		$open_entry_id   = $this->get_queue_entry( 8233 )->ID;
+
+		// the first one failed too often a long time ago.
+		update_post_meta( $old_entry_id, 'failed_attempts', 3 );
+		update_post_meta( $old_entry_id, 'failed', time() - 31 * DAY_IN_SECONDS );
+
+		// the second one failed too often recently.
+		update_post_meta( $recent_entry_id, 'failed_attempts', 3 );
+		update_post_meta( $recent_entry_id, 'failed', time() - DAY_IN_SECONDS );
+
+		$this->assertSame( 1, \ConnectorForPropstack\Propstack\Queue::get_instance()->purge_failed_entries() );
+
+		$this->assertNull( get_post( $old_entry_id ) );
+		$this->assertInstanceOf( WP_Post::class, get_post( $recent_entry_id ) );
+		$this->assertInstanceOf( WP_Post::class, get_post( $open_entry_id ) );
+	}
+
+	/**
+	 * Test that the entries of an object are deleted with delete_entries_of_object().
+	 *
+	 * @return void
+	 */
+	public function test_entries_of_object_are_deleted(): void {
+		$this->add_files( array( $this->get_file_data( 8241 ), $this->get_file_data( 8242 ) ) );
+
+		\ConnectorForPropstack\Propstack\Queue::get_instance()->delete_entries_of_object( $this->object_id );
+
+		$this->assertCount( 0, $this->get_queue_entries() );
+	}
+
+	/**
+	 * Test that the file name of a URL does not contain its query string.
+	 *
+	 * @return void
+	 */
+	public function test_file_name_without_query_string(): void {
+		$files = \ConnectorForPropstack\Propstack\Files::get_instance();
+		$this->assertSame( 'photo.jpg', $files->get_file_name_from_url( 'https://images.propstack.de/a/photo.jpg?token=abc&size=big' ) );
+		$this->assertSame( 'photo.jpg', $files->get_file_name_from_url( 'https://images.propstack.de/a/photo.jpg' ) );
+	}
 }

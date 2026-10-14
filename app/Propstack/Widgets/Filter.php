@@ -103,8 +103,8 @@ class Filter extends Widget_Base {
 		// set the current URL.
 		$attributes['current_url'] = Helper::get_current_url();
 
-		// prepare classes.
-		$attributes['classes'] = '';
+		// prepare classes (keep the classes of the block, if set).
+		$attributes['classes'] = isset( $attributes['classes'] ) && is_string( $attributes['classes'] ) && ! empty( $attributes['classes'] ) ? ' ' . trim( $attributes['classes'] ) : '';
 
 		// set classes depending on filter alignment.
 		if ( empty( $attributes['filter_alignment'] ) ) {
@@ -149,6 +149,15 @@ class Filter extends Widget_Base {
 			return '';
 		}
 		return $content;
+	}
+
+	/**
+	 * Return the allowed HTML for the output of this widget (including the form elements).
+	 *
+	 * @return array<string,mixed>
+	 */
+	protected function get_allowed_html(): array {
+		return Templates::get_instance()->get_allowed_filter_html();
 	}
 
 	/**

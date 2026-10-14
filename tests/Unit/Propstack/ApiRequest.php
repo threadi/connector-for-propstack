@@ -302,4 +302,62 @@ class ApiRequest extends ConnectorForPropstackTestCase {
 		$this->assertSame( 'propstack_api_request_error', $errors[0]->get_error_code() );
 		$this->assertNotEmpty( $errors[0]->get_error_message() );
 	}
+
+	/**
+	 * Test that the timeout of a request is limited, as 0 would mean "no timeout".
+	 *
+	 * @return void
+	 */
+	public function test_timeout_is_limited(): void {
+		$this->responses = array( array( 'status' => 200 ) );
+
+		// no timeout configured: the default is used.
+		update_option( 'propstack_connector_timeout', 0 );
+		$this->send_request();
+
+		// a too high timeout is limited.
+		update_option( 'propstack_connector_timeout', 1000 );
+		$this->send_request();
+
+		// a too low timeout is raised.
+		update_option( 'propstack_connector_timeout', 1 );
+		$this->send_request();
+
+		delete_option( 'propstack_connector_timeout' );
+
+		$this->assertSame( 30, $this->captured_args[0]['timeout'] );
+		$this->assertSame( 120, $this->captured_args[1]['timeout'] );
+		$this->assertSame( 5, $this->captured_args[2]['timeout'] );
+	}
+
+	/**
+	 * Test that e-mail addresses and phone numbers are masked for the log.
+	 *
+	 * @return void
+	 */
+	public function test_personal_data_is_masked(): void {
+		$request_object = new \ConnectorForPropstack\Propstack\ApiRequest();
+
+		$text = (string) wp_json_encode(
+			array(
+				'email'        => 'max.mustermann@example.com',
+				'phone'        => '030 123456',
+				'mobile_phone' => '0171/234567',
+				'other'        => '+49 30 1234567',
+				'date'         => '2024-01-01',
+				'price'        => 1234567,
+			)
+		);
+
+		$masked = $request_object->mask_personal_data( $text );
+
+		$this->assertStringNotContainsString( 'mustermann', $masked );
+		$this->assertStringNotContainsString( '030 123456', $masked );
+		$this->assertStringNotContainsString( '0171', $masked );
+		$this->assertStringNotContainsString( '+49', $masked );
+		$this->assertStringContainsString( '2024-01-01', $masked );
+		$this->assertStringContainsString( '1234567', $masked );
+		$this->assertStringContainsString( '[email]', $masked );
+		$this->assertStringContainsString( '[phone]', $masked );
+	}
 }

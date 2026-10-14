@@ -21,6 +21,7 @@ use easySettingsForWordPress\Fields\TextInfo;
 use easySettingsForWordPress\Page;
 use easySettingsForWordPress\Section;
 use easySettingsForWordPress\Tab;
+use ConnectorForPropstack\Propstack\KnowledgeCenter\InsufficientPermissions;
 use ConnectorForPropstack\Propstack\PostTypes\ImmoObject;
 
 /**
@@ -77,6 +78,9 @@ class Settings {
 
 		// use admin actions.
 		add_action( 'admin_action_cfprop_reset', array( $this, 'reset_plugin_by_request' ) );
+
+		// never return the API key via the REST API.
+		add_filter( 'rest_pre_get_setting', array( $this, 'hide_api_key_in_rest' ), 10, 3 );
 
 		// misc.
 		add_filter( 'admin_footer_text', array( $this, 'show_plugin_hint_in_footer' ), 0 );
@@ -162,14 +166,21 @@ class Settings {
 		$setting->set_section( $section );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
-		$setting->set_show_in_rest( current_user_can( $settings_obj->get_capability() ) );
+		// only use the REST API for the API key if the library hides the stored value there and keeps it on empty submit.
+		$setting->set_show_in_rest( current_user_can( $settings_obj->get_capability() ) && method_exists( Password::class, 'mask_rest_value' ) ); // @phpstan-ignore function.alreadyNarrowedType
+		$setting->prevent_export( true );
 		$setting->set_read_callback( Crypt::get_instance()->get_read_callback( $setting->get_name() ) );
 		$setting->set_save_callback( Crypt::get_instance()->get_save_callback( $setting->get_name() ) );
 		$field = new Password( $settings_obj );
 		$field->set_title( __( 'API Key', 'connector-for-propstack' ) );
 		/* translators: %1$s will be replaced by a URL. */
-		$field->set_description( sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() ) );
-		$field->set_placeholder( __( 'Enter your API key', 'connector-for-propstack' ) );
+		$description = sprintf( __( 'Get the API key in your Propstack account <a href="%1$s" target="_blank">here (open new window)</a>.', 'connector-for-propstack' ), Helper::get_propstack_api_page_url() );
+		/* translators: %1$s will be replaced by an anchor which opens the help. */
+		$description .= ' ' . sprintf( __( 'Please make sure that the permissions of the API key are set accordingly, as they differ between the API v1 and the API v2. <a href="%1$s" class="cfprop-open-help">Show the required permissions</a>.', 'connector-for-propstack' ), esc_attr( ( new InsufficientPermissions() )->get_help_tab_anchor() ) );
+		$field->set_description( $description );
+		if ( ! Setup::get_instance()->is_completed() ) {
+			$field->set_placeholder( __( 'Enter your API key', 'connector-for-propstack' ) );
+		}
 		$setting->set_field( $field );
 
 		// detect the default language depending on actual WordPress settings.
@@ -379,6 +390,8 @@ class Settings {
 		$setting->set_default( 20 );
 		$field = new Number( $this->get_settings_obj() );
 		$field->set_title( __( 'max. Age for log entries in days', 'connector-for-propstack' ) );
+		$field->set_min( 1 );
+		$field->set_sanitize_callback( array( $this, 'sanitize_max_age_log_entries' ) );
 		$setting->set_field( $field );
 
 		// add setting.
@@ -729,12 +742,42 @@ class Settings {
 		// uninstall all data of the current site only (not network-wide).
 		Uninstaller::get_instance()->run( false );
 
-		// run installer tasks.
-		Installer::get_instance()->activation();
+		// run installer tasks for the current site only.
+		Installer::get_instance()->activation( false );
 
 		// forward user to the dashboard.
 		wp_safe_redirect( Setup::get_instance()->get_setup_link() );
 		exit;
+	}
+
+	/**
+	 * Sanitize the max. age for log entries: it must be at least 1 day.
+	 *
+	 * @param mixed $value The value from the settings field.
+	 *
+	 * @return int
+	 */
+	public function sanitize_max_age_log_entries( mixed $value ): int {
+		return max( 1, abs( is_scalar( $value ) ? (int) $value : 0 ) );
+	}
+
+	/**
+	 * Hide the API key in GET-requests to the REST settings endpoint.
+	 *
+	 * @param mixed               $result The value to return, null to use the default handling.
+	 * @param string              $name   The REST name of the setting.
+	 * @param array<string,mixed> $args   The arguments of the setting.
+	 *
+	 * @return mixed
+	 */
+	public function hide_api_key_in_rest( mixed $result, string $name, array $args ): mixed {
+		// bail if this is not the API key.
+		if ( ! isset( $args['option_name'] ) || 'propstack_connector_api_key' !== $args['option_name'] ) {
+			return $result;
+		}
+
+		// return an empty string instead of the API key.
+		return '';
 	}
 
 	/**

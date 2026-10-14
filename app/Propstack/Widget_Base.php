@@ -107,7 +107,16 @@ class Widget_Base {
 		// remove attributes which are only allowed internally (e.g., via blocks) and not via shortcodes.
 		unset( $attributes['styles'], $attributes['object'] );
 
-		return wp_kses_post( $this->render( $attributes ) );
+		return wp_kses( $this->render( $attributes ), $this->get_allowed_html() );
+	}
+
+	/**
+	 * Return the allowed HTML for the output of this widget.
+	 *
+	 * @return array<string,mixed>
+	 */
+	protected function get_allowed_html(): array {
+		return wp_kses_allowed_html( 'post' );
 	}
 
 	/**

@@ -63,5 +63,8 @@ class Queue extends Schedules_Base {
 
 		// process the queue.
 		$queue_object->process( '' );
+
+		// remove entries which failed too often a long time ago.
+		$queue_object->purge_failed_entries();
 	}
 }

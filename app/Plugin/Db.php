@@ -129,10 +129,15 @@ class Db {
 	private function log_error( string $sql ): void {
 		global $wpdb;
 
+		// shorten the statement to prevent saving complete data (e.g., personal data) in the log.
+		if ( mb_strlen( $sql ) > 300 ) {
+			$sql = mb_substr( $sql, 0, 300 ) . '…';
+		}
+
 		// create the error text.
 		$text  = '<strong>' . __( 'Database-error occurred!', 'connector-for-propstack' ) . '</strong>';
-		$text .= '<br><br><em>' . __( 'Statement:', 'connector-for-propstack' ) . '</em> <code>' . $sql . '</code>';
-		$text .= '<br><br><em>' . __( 'Error:', 'connector-for-propstack' ) . '</em> <code>' . $wpdb->last_error . '</code>';
+		$text .= '<br><br><em>' . __( 'Statement:', 'connector-for-propstack' ) . '</em> <code>' . esc_html( $sql ) . '</code>';
+		$text .= '<br><br><em>' . __( 'Error:', 'connector-for-propstack' ) . '</em> <code>' . esc_html( $wpdb->last_error ) . '</code>';
 
 		// log this error.
 		Log::get_instance()->add( $text, 'error', 'system' );

@@ -157,7 +157,7 @@ class Cities extends Filter_Base {
 					'no_found_rows'  => true,
 				)
 			);
-			foreach ( $query->posts as $post_id ) {
+			foreach ( (array) $query->posts as $post_id ) {
 				// get the city.
 				$city = Fields::get_instance()->get_field_value( is_int( $post_id ) ? $post_id : $post_id->ID, $this->get_field() );
 

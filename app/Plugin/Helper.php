@@ -25,6 +25,13 @@ use WP_Rewrite;
  */
 class Helper {
 	/**
+	 * Cached name of this plugin.
+	 *
+	 * @var string|null
+	 */
+	private static ?string $plugin_name = null;
+
+	/**
 	 * Create JSON from the given array.
 	 *
 	 * @param array<string|int,mixed>|WP_Error $source The source array.
@@ -48,9 +55,13 @@ class Helper {
 	/**
 	 * Return the list of blogs in a multisite-installation.
 	 *
+	 * By default, archived, spammed and deleted sites are skipped.
+	 *
+	 * @param bool $include_inactive True to also return archived, spammed and deleted sites (e.g., for uninstallation).
+	 *
 	 * @return array<int,mixed>
 	 */
-	public static function get_blogs(): array {
+	public static function get_blogs( bool $include_inactive = false ): array {
 		// bail if this is not a multisite installation.
 		if ( false === is_multisite() ) {
 			return array();
@@ -58,6 +69,16 @@ class Helper {
 
 		// get the WordPress-own database object.
 		global $wpdb;
+
+		// return all blogs in this site-network, if requested.
+		if ( $include_inactive ) {
+			return Db::get_instance()->get_results(
+				$wpdb->prepare(
+					'SELECT blog_id FROM ' . $wpdb->blogs . ' WHERE site_id = %s',
+					$wpdb->siteid
+				)
+			);
+		}
 
 		// get blogs in this site-network.
 		return Db::get_instance()->get_results(
@@ -164,16 +185,27 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_plugin_name(): string {
-		// get the plugin data.
-		$plugin_data = get_plugin_data( CFPROP_PLUGIN );
+		// use the cached name, if it has already been loaded.
+		if ( is_string( self::$plugin_name ) ) {
+			return self::$plugin_name;
+		}
+
+		// get_plugin_data() is only loaded in backend by WordPress.
+		if ( ! function_exists( 'get_plugin_data' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
+		}
+
+		// get the plugin data (without translation to prevent too early loading of translations).
+		$plugin_data = get_plugin_data( CFPROP_PLUGIN, false, false );
 
 		// bail if no 'Name' is in the result.
 		if ( empty( $plugin_data['Name'] ) ) {
 			return '';
 		}
 
-		// return the plugin name.
-		return $plugin_data['Name'];
+		// cache and return the plugin name.
+		self::$plugin_name = $plugin_data['Name'];
+		return self::$plugin_name;
 	}
 
 	/**
@@ -415,13 +447,15 @@ class Helper {
 			// return the formatted date.
 			return date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $dt->getTimestamp() );
 		} catch ( \Exception $e ) {
-			Log::get_instance()->add( __( 'Error during date formatting:', 'connector-for-propstack' ) . ' <code>' . $e->getMessage() . '</code>', 'info', 'system' );
+			// log this event only once per day for each invalid value to prevent flooding the log during frontend rendering.
+			$transient_name = 'cfprop_invalid_date_' . md5( $date );
+			if ( ! get_transient( $transient_name ) ) {
+				set_transient( $transient_name, 1, DAY_IN_SECONDS );
+				Log::get_instance()->add( __( 'Error during date formatting:', 'connector-for-propstack' ) . ' <code>' . esc_html( $e->getMessage() ) . '</code>', 'info', 'system' );
+			}
 
-			// fallback on any error with DateTime.
-			$dt = get_date_from_gmt( $date );
-
-			// return the formatted date.
-			return date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $dt ) );
+			// return an empty string for invalid dates (instead of a misleading fallback like 01.01.1970).
+			return '';
 		}
 	}
 
@@ -571,7 +605,19 @@ class Helper {
 	 * @return bool
 	 */
 	public static function is_plugin_active( string $plugin ): bool {
-		return in_array( $plugin, (array) get_option( 'active_plugins', array() ), true );
+		// check the plugins activated on this site.
+		if ( in_array( $plugin, (array) get_option( 'active_plugins', array() ), true ) ) {
+			return true;
+		}
+
+		// bail if this is not a multisite.
+		if ( ! is_multisite() ) {
+			return false;
+		}
+
+		// check the network-wide activated plugins.
+		$network_plugins = (array) get_site_option( 'active_sitewide_plugins', array() );
+		return isset( $network_plugins[ $plugin ] );
 	}
 
 	/**
@@ -666,6 +712,66 @@ class Helper {
 	}
 
 	/**
+	 * Try to acquire an atomic lock with the given option name.
+	 *
+	 * Uses "INSERT IGNORE" like WP_Upgrader::create_lock(), so only one process gets the lock,
+	 * also if multiple requests try it at the same time. A lock older than the given TTL is
+	 * treated as stale and replaced.
+	 *
+	 * @param string $option_name The name of the option used as lock.
+	 * @param int    $ttl         Time in seconds after which an existing lock is treated as stale.
+	 *
+	 * @return bool True if the lock has been acquired by this process.
+	 */
+	public static function acquire_lock( string $option_name, int $ttl ): bool {
+		global $wpdb;
+
+		// try to create the lock (twice, if a stale lock has been removed).
+		for ( $attempt = 0; $attempt < 2; $attempt++ ) {
+			$result = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO `$wpdb->options` ( `option_name`, `option_value`, `autoload` ) VALUES ( %s, %s, 'no' )", $option_name, (string) time() ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Atomic lock, see WP_Upgrader::create_lock().
+
+			// the lock is ours.
+			if ( 1 === $result ) {
+				wp_cache_delete( $option_name, 'options' );
+				wp_cache_delete( 'notoptions', 'options' );
+				return true;
+			}
+
+			// get the existing lock directly from the database.
+			$existing = (string) $wpdb->get_var( $wpdb->prepare( "SELECT `option_value` FROM `$wpdb->options` WHERE `option_name` = %s", $option_name ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Atomic lock.
+
+			// bail if the existing lock is not stale.
+			if ( ( time() - (int) $existing ) <= $ttl ) {
+				return false;
+			}
+
+			// remove the stale lock, but only if it has not been replaced in the meantime.
+			$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic lock.
+				$wpdb->options,
+				array(
+					'option_name'  => $option_name,
+					'option_value' => $existing,
+				),
+				array( '%s', '%s' )
+			);
+		}
+
+		// the lock could not be acquired.
+		return false;
+	}
+
+	/**
+	 * Release a lock which has been acquired with Helper::acquire_lock().
+	 *
+	 * @param string $option_name The name of the option used as lock.
+	 *
+	 * @return void
+	 */
+	public static function release_lock( string $option_name ): void {
+		delete_option( $option_name );
+	}
+
+	/**
 	 * Return a Throwable as formatted text for the log, including its trace
 	 * and any chained previous exceptions.
 	 *
@@ -684,9 +790,9 @@ class Helper {
 				'<strong>%1$s</strong>: %2$s<br><code>%3$s:%4$d</code><pre>%5$s</pre>',
 				esc_html( $throwable::class ),
 				esc_html( $throwable->getMessage() ),
-				esc_html( $throwable->getFile() ),
+				esc_html( self::get_path_without_abspath( $throwable->getFile() ) ),
 				absint( $throwable->getLine() ),
-				esc_html( $throwable->getTraceAsString() )
+				esc_html( self::get_path_without_abspath( $throwable->getTraceAsString() ) )
 			);
 
 			++$depth;
@@ -695,6 +801,25 @@ class Helper {
 
 		// return the resulting list of errors.
 		return implode( '<hr>', $texts );
+	}
+
+	/**
+	 * Replace the absolute server path of this WordPress installation in the given text with a placeholder.
+	 *
+	 * Used to prevent saving full server paths in the log.
+	 *
+	 * @param string $text The text (e.g., a path or a stack trace).
+	 *
+	 * @return string
+	 */
+	private static function get_path_without_abspath( string $text ): string {
+		// bail if ABSPATH is not usable.
+		if ( ! defined( 'ABSPATH' ) || '' === ABSPATH || '/' === ABSPATH ) {
+			return $text;
+		}
+
+		// replace the path, also with normalized directory separators.
+		return str_replace( array( ABSPATH, wp_normalize_path( ABSPATH ) ), '[ABSPATH]/', $text );
 	}
 
 	/**

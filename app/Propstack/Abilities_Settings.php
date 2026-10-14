@@ -379,7 +379,18 @@ class Abilities_Settings {
 		$html .= '<li>' . sprintf( __( 'Set up the access for your application as described by your MCP plugin, e.g. with an <a href="%1$s">application password</a> for your user.', 'connector-for-propstack' ), esc_url( admin_url( 'profile.php#application-passwords-section' ) ) ) . '</li>';
 		$html .= '<li>' . esc_html__( 'Connect your application (e.g. an AI assistant with MCP support) with the endpoint of your MCP plugin and the access data.', 'connector-for-propstack' ) . '</li>';
 		$html .= '</ol>';
-		// … examples for prompts and the final note unchanged …
+
+		// add some examples for prompts.
+		$html .= '<p><strong>' . esc_html__( 'Examples for prompts:', 'connector-for-propstack' ) . '</strong></p>';
+		$html .= '<ul>';
+		$html .= '<li><em>' . esc_html__( 'Which objects from Propstack are currently on my website?', 'connector-for-propstack' ) . '</em></li>';
+		$html .= '<li><em>' . esc_html__( 'Show me all details of the object with the title "…".', 'connector-for-propstack' ) . '</em></li>';
+		$html .= '<li><em>' . esc_html__( 'Start an import of my objects from Propstack and tell me when it is finished.', 'connector-for-propstack' ) . '</em></li>';
+		$html .= '<li><em>' . esc_html__( 'Create a template for the detail page of my objects, which shows the price, the living space, the description and the gallery.', 'connector-for-propstack' ) . '</em></li>';
+		$html .= '</ul>';
+
+		// add the final note.
+		$html .= '<p>' . esc_html__( 'Note: The application uses the rights of the user whose access data it uses. Check the changes your application suggests before you allow them. Templates saved via abilities can be reset here at any time.', 'connector-for-propstack' ) . '</p>';
 		return $html;
 	}
 

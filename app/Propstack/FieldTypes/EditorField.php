@@ -53,7 +53,7 @@ class EditorField extends FieldType_Base {
 		}
 
 		// clean the value.
-		return preg_replace(
+		$cleaned_value = preg_replace(
 			array(
 				'/ style=("|\')(.*?)("|\')/',   // remove inline styles on HTML-elements.
 				'/ id=("|\')(.*?)("|\')/',      // remove the ID attribute on every HTML-element.
@@ -62,5 +62,8 @@ class EditorField extends FieldType_Base {
 			'',
 			(string) $this->value
 		);
+
+		// allow only HTML-code which is allowed in posts.
+		return wp_kses_post( (string) $cleaned_value );
 	}
 }

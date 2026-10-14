@@ -30,18 +30,21 @@
     "make-pot": "wp i18n make-pot . languages/connector-for-propstack.pot --exclude=blocks/single/src/,blocks/description/src/,blocks/field/src/,blocks/archive/src/,svn/",
     "make-json": "wp i18n make-json languages",
     "global-styles": "cat blocks/*/build/style-index.css > css/blocks.css",
-    "copy:driver": "mkdir -p admin/driver && cp node_modules/driver.js/dist/driver.js.iife.js node_modules/driver.js/dist/driver.css admin/driver/ && cp node_modules/driver.js/license admin/driver/"
+    "copy:driver": "mkdir -p admin/driver && cp node_modules/driver.js/dist/driver.js.iife.js node_modules/driver.js/dist/driver.css admin/driver/ && cp node_modules/driver.js/license admin/driver/",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.0",
     "@wordpress/scripts": "~36.0.0",
+    "@wp-playground/cli": "3.1.58",
     "npm-pack-zip": "^1.3.0"
   },
   "dependencies": {
     "@babel/core": "^7.29.6",
     "@babel/runtime": "^7.28.4",
     "@wordpress/i18n": "^6.2.0",
-    "concurrently": "^9.2.1",
-    "lightbox3": "^1.4.0",
-    "driver.js": "^1.8.0"
+    "concurrently": "^9.2.4",
+    "driver.js": "^1.8.0",
+    "lightbox3": "^1.4.0"
   }
 }

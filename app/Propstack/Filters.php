@@ -62,6 +62,9 @@ class Filters {
 		// use hooks.
 		add_action( 'init', array( $this, 'init_filter' ) );
 		add_action( 'init', array( $this, 'add_settings' ) );
+		add_action( 'pre_get_posts', array( $this, 'filter_main_query' ) );
+		add_action( 'pre_get_posts', array( $this, 'set_archive_posts_per_page' ) );
+		add_filter( 'query_loop_block_query_vars', array( $this, 'filter_query_loop_block' ) );
 
 		// use our own hooks.
 		add_filter( 'cfprop_archive_query_params', array( $this, 'add_query_params' ) );
@@ -213,6 +216,165 @@ class Filters {
 
 		// return the resulting query params.
 		return $query_params;
+	}
+
+	/**
+	 * Return the filter query params from the request, without params which must not be controlled by the filter.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function get_filter_query_params(): array {
+		// get the query params of all filters.
+		$query_params = $this->add_query_params( array() );
+
+		// remove params which must never be controlled by filters (e.g., to prevent loading of all objects at once).
+		foreach ( array( 'post_type', 'post_status', 'posts_per_page', 'posts_per_archive_page', 'nopaging', 'offset', 'paged', 'page', 'fields', 'perm', 'has_password', 'post_password' ) as $key ) {
+			unset( $query_params[ $key ] );
+		}
+
+		// return the resulting list.
+		return $query_params;
+	}
+
+	/**
+	 * Merge the given filter query params in the given query vars.
+	 *
+	 * Meta- and tax-queries are combined with existing ones via AND.
+	 *
+	 * @param array<string,mixed> $query_vars   The query vars.
+	 * @param array<string,mixed> $query_params The filter query params.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function merge_query_params( array $query_vars, array $query_params ): array {
+		foreach ( $query_params as $key => $value ) {
+			// combine meta- and tax-queries with existing ones.
+			if ( in_array( $key, array( 'meta_query', 'tax_query' ), true ) && is_array( $value ) ) {
+				if ( ! empty( $query_vars[ $key ] ) && is_array( $query_vars[ $key ] ) ) {
+					$value = array(
+						'relation' => 'AND',
+						$query_vars[ $key ],
+						$value,
+					);
+				}
+				$query_vars[ $key ] = $value;
+				continue;
+			}
+
+			// set any other value.
+			$query_vars[ $key ] = $value;
+		}
+
+		// return the resulting query vars.
+		return $query_vars;
+	}
+
+	/**
+	 * Apply the requested filters on the main query of the object archive (e.g., used in block themes via filter block and query loop with inherit).
+	 *
+	 * @param \WP_Query $query The query object.
+	 *
+	 * @return void
+	 */
+	public function filter_main_query( \WP_Query $query ): void {
+		// bail if this is the backend.
+		if ( is_admin() ) {
+			return;
+		}
+
+		// bail if this is not the main query.
+		if ( ! $query->is_main_query() ) {
+			return;
+		}
+
+		// bail if this is not the archive of our objects.
+		if ( ! $query->is_post_type_archive( PostTypes\ImmoObject::get_instance()->get_name() ) ) {
+			return;
+		}
+
+		// get the filter query params.
+		$query_params = $this->get_filter_query_params();
+
+		// bail if no filter is used.
+		if ( empty( $query_params ) ) {
+			return;
+		}
+
+		// merge them in the query.
+		$query_vars = $this->merge_query_params(
+			array(
+				'meta_query' => $query->get( 'meta_query' ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				'tax_query'  => $query->get( 'tax_query' ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+			),
+			$query_params
+		);
+		foreach ( $query_vars as $key => $value ) {
+			// bail on empty meta- or tax-queries which have not been changed.
+			if ( empty( $value ) ) {
+				continue;
+			}
+			$query->set( $key, $value );
+		}
+	}
+
+	/**
+	 * Set the number of objects per page of the main query for the archive of our objects.
+	 *
+	 * Uses the same value as the archive widget, so that the pages of a paginated archive
+	 * (e.g., /page/2/) are resolvable and do not result in a 404.
+	 *
+	 * @param \WP_Query $query The query object.
+	 *
+	 * @return void
+	 */
+	public function set_archive_posts_per_page( \WP_Query $query ): void {
+		// bail if this is the backend.
+		if ( is_admin() ) {
+			return;
+		}
+
+		// bail if this is not the main query.
+		if ( ! $query->is_main_query() ) {
+			return;
+		}
+
+		// bail if this is not the archive of our objects.
+		if ( ! $query->is_post_type_archive( PostTypes\ImmoObject::get_instance()->get_name() ) ) {
+			return;
+		}
+
+		// bail if the number of objects per page is already set by someone else.
+		if ( '' !== $query->get( 'posts_per_page' ) ) {
+			return;
+		}
+
+		// set the number of objects per page.
+		$query->set( 'posts_per_page', Widgets\Archive::get_instance()->get_posts_per_page() );
+	}
+
+	/**
+	 * Apply the requested filters on query loop blocks which list our objects and do not inherit the main query.
+	 *
+	 * @param array<string,mixed> $query_vars The query vars of the query loop block.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function filter_query_loop_block( array $query_vars ): array {
+		// bail if this query does not list our objects.
+		if ( empty( $query_vars['post_type'] ) || PostTypes\ImmoObject::get_instance()->get_name() !== $query_vars['post_type'] ) {
+			return $query_vars;
+		}
+
+		// get the filter query params.
+		$query_params = $this->get_filter_query_params();
+
+		// bail if no filter is used.
+		if ( empty( $query_params ) ) {
+			return $query_vars;
+		}
+
+		// return the merged query vars.
+		return $this->merge_query_params( $query_vars, $query_params );
 	}
 
 	/**

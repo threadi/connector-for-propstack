@@ -142,33 +142,34 @@ class States extends Import_Base {
 
 				// loop over the data and add the states.
 				foreach ( $data['data'] as $state ) {
+					// bail if this is not a usable state.
+					if ( ! is_array( $state ) || empty( $state['id'] ) || ! is_scalar( $state['id'] ) || ! isset( $state['name'] ) || ! is_scalar( $state['name'] ) || '' === (string) $state['name'] ) {
+						continue;
+					}
+
+					// get the ID and the name.
+					$state_id   = max( 0, (int) $state['id'] );
+					$state_name = (string) $state['name'];
+
 					// update the status.
 					/* translators: %1$s will be replaced by the object title. */
-					$process_handler->set_status( sprintf( __( 'Import of object state %1$s in language %2$s', 'connector-for-propstack' ), '<em>' . $state['name'] . '</em>', '<em>' . $language_code . '</em>' ) );
+					$process_handler->set_status( sprintf( __( 'Import of object state %1$s in language %2$s', 'connector-for-propstack' ), '<em>' . esc_html( $state_name ) . '</em>', '<em>' . esc_html( (string) $language_code ) . '</em>' ) );
 
 					// get the term by given state ID.
-					$term_id = \ConnectorForPropstack\Propstack\States::get_instance()->get_term_id_by_id( absint( $state['id'] ), $language_code );
+					$term_id = \ConnectorForPropstack\Propstack\States::get_instance()->get_term_id_by_id( $state_id, $language_code );
 
 					// if the state does not exist, create it.
 					if ( ! is_int( $term_id ) ) {
-						// add the term.
-						$term_data = wp_insert_term( $state['name'], Status::get_instance()->get_name() );
-
-						// use the existing term if a term with this name already exists.
-						if ( is_wp_error( $term_data ) && 'term_exists' === $term_data->get_error_code() ) {
-							$term_data = array( 'term_id' => absint( $term_data->get_error_data() ) );
-						}
+						// get the term for this state.
+						$term_id = $this->get_term_for_state( $state_id, $state_name );
 
 						// bail on error.
-						if ( is_wp_error( $term_data ) || empty( $term_data['term_id'] ) ) {
+						if ( 0 === $term_id ) {
 							continue;
 						}
 
-						// get the term ID.
-						$term_id = absint( $term_data['term_id'] );
-
 						// set the Propstack-ID of the state as metadata.
-						update_term_meta( $term_id, 'id', absint( $state['id'] ) );
+						update_term_meta( $term_id, 'id', $state_id );
 					}
 
 					// set the language code.
@@ -204,6 +205,58 @@ class States extends Import_Base {
 				$process_handler->set_message( $this->get_success_dialog_config() );
 			}
 		}
+	}
+
+	/**
+	 * Return the ID of a new or reusable term for the given state.
+	 *
+	 * A term with the same name is reused only if it belongs to the same Propstack-ID or to none.
+	 * Otherwise, a new term with a unique slug is created, so two states with the same name
+	 * do not use the same term.
+	 *
+	 * @param int    $state_id   The Propstack-ID of the state.
+	 * @param string $state_name The name of the state.
+	 *
+	 * @return int The term ID or 0 on error.
+	 */
+	private function get_term_for_state( int $state_id, string $state_name ): int {
+		// get the name of the taxonomy.
+		$taxonomy = Status::get_instance()->get_name();
+
+		// add the term.
+		$term_data = wp_insert_term( $state_name, $taxonomy );
+
+		// handle an existing term with this name.
+		if ( is_wp_error( $term_data ) && 'term_exists' === $term_data->get_error_code() ) {
+			// get the ID of the existing term.
+			$existing_term_id = absint( $term_data->get_error_data() );
+
+			// use it, if it belongs to this state or to no state.
+			$existing_state_id = absint( get_term_meta( $existing_term_id, 'id', true ) );
+			if ( $existing_term_id > 0 && ( 0 === $existing_state_id || $state_id === $existing_state_id ) ) {
+				return $existing_term_id;
+			}
+
+			// create a new term with a unique slug for this state.
+			$term_data = wp_insert_term( $state_name, $taxonomy, array( 'slug' => sanitize_title( $state_name . '-' . $state_id ) ) );
+
+			// use an existing term with this slug, if it belongs to this state.
+			if ( is_wp_error( $term_data ) && 'term_exists' === $term_data->get_error_code() ) {
+				$existing_term_id = absint( $term_data->get_error_data() );
+				if ( $existing_term_id > 0 && absint( get_term_meta( $existing_term_id, 'id', true ) ) === $state_id ) {
+					return $existing_term_id;
+				}
+				return 0;
+			}
+		}
+
+		// bail on error.
+		if ( is_wp_error( $term_data ) || empty( $term_data['term_id'] ) ) {
+			return 0;
+		}
+
+		// return the ID of the new term.
+		return absint( $term_data['term_id'] );
 	}
 
 	/**

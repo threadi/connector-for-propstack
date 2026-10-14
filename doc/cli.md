@@ -12,6 +12,9 @@ Display a list of available commands for this plugin:
 
 # Commands
 
+`wp cfprop check_object <ID>`
+=> checks whether the Propstack API delivers a specific object for the import, without importing anything. Shows also whether one of your restrictions would prevent its import. `<ID>` is the Propstack-ID of the object; use `--field=unit_id` or `--field=exposee_id` to search by another ID, and `--full-scan` to check with exactly the requests the import uses
+
 `wp cfprop clear_queue`
 => clears the queue without processing it
 

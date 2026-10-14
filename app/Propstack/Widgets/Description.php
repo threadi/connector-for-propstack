@@ -87,8 +87,8 @@ class Description extends Widget_Base {
 			return '';
 		}
 
-		// bail if the field is hidden in frontend.
-		if ( $field->hide() || $field->hide_in_frontend() ) {
+		// bail if the field should not be visible in frontend for this object (checks hidden, hidden address and the filter "cfprop_show_field_in_frontend"; the disabled-setting is only for lists of fields).
+		if ( ! Fields::get_instance()->is_field_visible_in_frontend( $field, $immo_object, false ) ) {
 			return '';
 		}
 

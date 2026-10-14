@@ -155,13 +155,17 @@ class ImmoObject extends Post_Type {
 			'publicly_queryable'  => true,
 			'show_in_rest'        => is_user_logged_in(),
 			'capability_type'     => 'post',
+			// do not map meta capabilities: the capabilities below are used as they are and objects could not be deleted by any user.
+			// Hint: "read_post" must be allowed for users who could edit the objects, otherwise the edit screen does not show the permalink and "View" link.
+			'map_meta_cap'        => false,
 			'capabilities'        => array(
 				'create_posts'       => 'do_not_allow',
+				'delete_post'        => 'do_not_allow',
 				'delete_posts'       => 'do_not_allow',
 				'edit_post'          => 'read_' . $this->get_name(),
 				'edit_posts'         => 'read_' . $this->get_name(),
 				'edit_others_posts'  => 'do_not_allow',
-				'read_post'          => 'do_not_allow',
+				'read_post'          => 'read_' . $this->get_name(),
 				'read_posts'         => 'do_not_allow',
 				'publish_posts'      => 'do_not_allow',
 				'read_private_posts' => 'do_not_allow',
@@ -173,18 +177,57 @@ class ImmoObject extends Post_Type {
 		);
 		register_post_type( $this->get_name(), $args ); // @phpstan-ignore argument.type
 
-		// register our fields in REST API.
+		// register our fields only for our own post type.
 		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
-			register_meta(
-				'post',
+			// bail if the field has no name.
+			if ( empty( $field->get_name() ) ) {
+				continue;
+			}
+
+			// get the REST API compatible type of this field.
+			$type = $this->get_meta_type( $field->get_type() );
+
+			// register it.
+			register_post_meta(
+				$this->get_name(),
 				$field->get_name(),
 				array(
-					'type'         => $field->get_type(),
-					'single'       => true,
-					'show_in_rest' => $field->show_in_rest(),
+					'type'          => $type,
+					'single'        => true,
+					'show_in_rest'  => $field->show_in_rest() && ! in_array( $type, array( 'array', 'object' ), true ),
+					'auth_callback' => array( $this, 'is_meta_change_allowed' ),
 				)
 			);
 		}
+	}
+
+	/**
+	 * Return the meta type supported by the REST API for the given field type.
+	 *
+	 * @param string $field_type The field type name.
+	 *
+	 * @return string
+	 */
+	private function get_meta_type( string $field_type ): string {
+		return match ( $field_type ) {
+			'integer' => 'integer',
+			'float', 'number', 'price', 'geo' => 'number',
+			'boolean' => 'boolean',
+			'array', 'code' => 'array',
+			default => 'string',
+		};
+	}
+
+	/**
+	 * Return whether the actual user is allowed to change meta-data of our objects.
+	 *
+	 * Only users with the capability to manage the plugin settings are allowed to do this.
+	 * The import itself does not use this check.
+	 *
+	 * @return bool
+	 */
+	public function is_meta_change_allowed(): bool {
+		return current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() );
 	}
 
 	/**
@@ -293,11 +336,22 @@ class ImmoObject extends Post_Type {
 		);
 		$data->data['content'] = array( 'rendered' => $content );
 
-		// add our fields as meta-fields.
-		$meta = array();
-		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
+		// add our fields as meta-fields, but only the ones which are also visible in frontend.
+		$meta   = array();
+		$fields = Fields::get_instance();
+		foreach ( $fields->get_fields_as_objects() as $field ) {
 			// get its name.
 			$field_name = $field->get_name();
+
+			// bail if the field has no name.
+			if ( empty( $field_name ) ) {
+				continue;
+			}
+
+			// bail if this field is not visible in frontend for this object.
+			if ( ! $fields->is_field_visible_in_frontend( $field, $immo_object ) ) {
+				continue;
+			}
 
 			// add it to the list.
 			$meta[ $field_name ] = get_post_meta( $immo_object->get_id(), $field_name, true );
@@ -552,7 +606,7 @@ class ImmoObject extends Post_Type {
 			'title'     => __( 'Import images from Propstack', 'connector-for-propstack' ),
 			'texts'     => array(
 				/* translators: %1$s will be replaced by the object title. */
-				'<p><strong>' . sprintf( __( 'Click on the button below to start the import of files for %1$s from Propstack.', 'connector-for-propstack' ), '<br><em>' . get_the_title( $post_id ) . '</em><br>' ) . '</strong></p>',
+				'<p><strong>' . sprintf( __( 'Click on the button below to start the import of files for %1$s from Propstack.', 'connector-for-propstack' ), '<br><em>' . esc_html( get_the_title( $post_id ) ) . '</em><br>' ) . '</strong></p>',
 				'<p>' . __( 'The import could take some time. Please be patient.', 'connector-for-propstack' ) . '</p>',
 			),
 			'buttons'   => array(

@@ -20,75 +20,36 @@
         </condition>
     </fail>
 
-    <!-- install npm -->
-    <target name="npm-install">
-        <delete file="${log.dir}/npm-install1.txt"/>
-        <delete file="${log.dir}/npm-install2.txt"/>
-        <delete file="${log.dir}/npm-install3.txt"/>
-		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install1.txt">
-			<arg line="install"/>
-		</exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install2.txt">
-            <arg line="install concurrently"/>
-        </exec>
-    </target>
+    <!--
+        Run a step of bin/build-release.sh.
 
-    <!-- build the Blocks via npm -->
-    <target name="npm-build" depends="npm-install">
-        <delete file="${log.dir}/npm-build1.txt"/>
-        <delete file="${log.dir}/npm-build2.txt"/>
-        <delete file="${log.dir}/npm-build3.txt"/>
-        <delete file="${log.dir}/npm-build4.txt"/>
-        <delete file="${log.dir}/npm-build5.txt"/>
-        <delete file="${log.dir}/npm-build6.txt"/>
-        <delete file="${log.dir}/npm-build7.txt"/>
-        <delete file="${log.dir}/npm-build8.txt"/>
-        <delete file="${log.dir}/npm-build9.txt"/>
-        <delete file="${log.dir}/npm-build10.txt"/>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build1.txt">
-            <arg line="run build:archive"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build2.txt">
-            <arg line="run build:broker-field"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
-            <arg line="run build:description"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
-            <arg line="run build:field"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build5.txt">
-            <arg line="run build:single"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build7.txt">
-            <arg line="run build:filter"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build8.txt">
-            <arg line="run build:gallery"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build9.txt">
-            <arg line="run build:lightbox"/>
-        </exec>
-    </target>
+        The script is also used by the GitHub workflow .github/workflows/build-zip.yml,
+        so both create identical release zips.
+    -->
+    <macrodef name="release-step">
+        <attribute name="args" />
+        <attribute name="log" />
+        <sequential>
+            <delete file="${log.dir}/release-@{log}.txt"/>
+            <exec dir="${src.dir}" failonerror="true" executable="bash" output="${log.dir}/release-@{log}.txt">
+                <env key="CFPROP_COMPOSER" value="${composer.path}"/>
+                <env key="CFPROP_NPM" value="${npm.path}"/>
+                <arg line="bin/build-release.sh @{args}"/>
+            </exec>
+        </sequential>
+    </macrodef>
 
-	<!-- install composer -->
+	<!-- install composer (with the dev packages) -->
 	<target name="composer-install">
 		<delete file="${log.dir}/composer-install.txt"/>
-		<delete file="${log.dir}/composer-update.txt"/>
 		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install.txt">
 			<arg line="install"/>
 		</exec>
-		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-update.txt">
-			<arg line="update"/>
-		</exec>
 	</target>
 
-	<!-- generate autoloader for release -->
-	<target name="autoloader-generation">
-		<delete file="${log.dir}/autoloader-generation.txt"/>
-		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/autoloader-generation.txt">
-			<arg line="dump-autoload -oa --no-dev"/>
-		</exec>
+	<!-- install composer and npm packages and build the Blocks -->
+	<target name="npm-build">
+		<release-step args="install" log="install" />
 	</target>
 
 	<!-- generate autoloader for dev -->
@@ -99,32 +60,15 @@
 		</exec>
 	</target>
 
-    <!-- set the version number in some plugin-files for the release -->
-    <target name="setVersionNumber">
-        <delete file="${build.dir}/${plugin.slug}-release.php"/>
-        <copy file="${src.dir}/${plugin.slug}.php" tofile="${src.dir}/${plugin.slug}-release.php"/>
-        <replace file="${src.dir}/${plugin.slug}-release.php">
-            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-        </replace>
-
-        <delete file="${src.dir}/uninstall-release.php"/>
-        <copy file="${src.dir}/uninstall.php" tofile="${src.dir}/uninstall-release.php"/>
-        <replace file="${src.dir}/uninstall-release.php">
-            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-        </replace>
-
-		<delete file="${build.dir}/readme-release.txt"/>
-		<copy file="${src.dir}/readme.txt" tofile="${src.dir}/readme-release.txt"/>
-		<replace file="${src.dir}/readme-release.txt">
-			<replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-		</replace>
-    </target>
-
-	<!-- check WCS compatibility -->
-	<target name="check-wcs" depends="composer-install">
+	<!-- fix WCS issues automatically (not part of the build, so the build does not change the code) -->
+	<target name="fix-wcs" depends="composer-install">
 		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/phpcbf">
 			<arg line="."/>
 		</exec>
+	</target>
+
+	<!-- check WCS compatibility -->
+	<target name="check-wcs" depends="composer-install">
 		<exec dir="${src.dir}" failonerror="true" executable="vendor/bin/phpcs">
 			<arg line="."/>
 		</exec>
@@ -139,7 +83,7 @@
 
 	<!-- check PHPStan -->
 	<target name="check-phpstan" depends="composer-install">
-		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/phpstan">
+		<exec dir="${src.dir}" failonerror="true" executable="vendor/bin/phpstan">
 			<arg line="analyse"/>
 		</exec>
 	</target>
@@ -157,44 +101,24 @@
 	</target>
 
 	<!-- prepare -->
-	<target name="prepare" description="Prepare the project" depends="composer-install,npm-build" />
+	<target name="prepare" description="Prepare the project" depends="npm-build" />
 
     <!-- init project -->
     <target name="init" description="Initialize the project" depends="prepare,autoloader-generation-dev" />
 
+    <!-- create the release zip only, without any checks (e.g. to compare it with the zip from GitHub) -->
+    <target name="release-zip" description="Creates the release zip with the actual state of the project">
+        <release-step args="nodev" log="nodev" />
+        <release-step args="collect ${plugin.version}" log="collect" />
+        <release-step args="zip ${build.dir}/${plugin.slug}_${plugin.version}.zip" log="zip" />
+
+        <!-- restore the dev packages for further development -->
+        <antcall target="composer-install" />
+    </target>
+
     <!-- create release-zip -->
-    <target name="build" description="Builds a new release" depends="prepare,generate-documentation,php-unit-tests,autoloader-generation,check-phpstan,check-wcs,setVersionNumber">
-        <delete file="${build.dir}/${plugin.slug}_${plugin.version}.zip"/>
-        <zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip">
-            <zipfileset dir="${src.dir}/admin" prefix="${plugin.slug}/admin" />
-			<zipfileset dir="${src.dir}/app" prefix="${plugin.slug}/app" />
-            <zipfileset dir="${src.dir}/blocks/" prefix="${plugin.slug}/blocks/">
-				<exclude name="**/**/src/**" />
-			</zipfileset>
-            <zipfileset dir="${src.dir}/css" prefix="${plugin.slug}/css" />
-            <zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
-            <zipfileset dir="${src.dir}/js" prefix="${plugin.slug}/js" />
-            <zipfileset dir="${src.dir}/lib" prefix="${plugin.slug}/lib" />
-			<zipfileset dir="${src.dir}/templates" prefix="${plugin.slug}/templates" />
-			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
-			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
-            <zipfileset dir="${src.dir}/vendor/threadi/crypt-for-wordpress/src/" prefix="${plugin.slug}/vendor/threadi/crypt-for-wordpress/src/" />
-            <zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/lib/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/lib/" />
-            <zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/build/" />
-            <zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/assets/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/assets/" />
-            <zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/build/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/src/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/src/" />
-            <zipfileset dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-dialog-for-wordpress/build/" />
-			<zipfileset dir="${src.dir}" includes="composer.json" fullpath="${plugin.slug}/composer.json" />
-            <zipfileset dir="${src.dir}" includes="wpml-config.xml" fullpath="${plugin.slug}/wpml-config.xml" />
-			<zipfileset dir="${src.dir}" includes="readme-release.txt" fullpath="${plugin.slug}/readme.txt" />
-            <zipfileset dir="${src.dir}" includes="uninstall-release.php" fullpath="${plugin.slug}/uninstall.php" />
-            <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
-        </zip>
-		<antcall target="autoloader-generation-dev" />
-        <delete file="${src.dir}/${plugin.slug}-release.php"/>
-		<delete file="${src.dir}/uninstall-release.php"/>
-		<delete file="${src.dir}/readme-release.txt"/>
+    <target name="build" description="Builds a new release" depends="prepare,generate-documentation,php-unit-tests,check-phpstan,check-wcs">
+        <antcall target="release-zip" />
     </target>
 
 	<!-- show help for ant commands -->

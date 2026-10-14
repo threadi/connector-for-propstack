@@ -138,7 +138,7 @@ class ApiRequest {
 			'method'      => $this->get_method(),
 			'headers'     => $headers,
 			'httpversion' => '1.1',
-			'timeout'     => get_option( 'propstack_connector_timeout', 30 ),
+			'timeout'     => $this->get_timeout(),
 			'redirection' => 0, // do not follow redirects, as they would forward the API key to the target.
 			'body'        => $this->get_post_data(),
 		);
@@ -182,15 +182,19 @@ class ApiRequest {
 			$this->add_error( __( 'The Propstack API answered with a redirect, which is not followed for security reasons.', 'connector-for-propstack' ) );
 		}
 
-		// clean arguments from sensitive data.
-		$args['headers']['X-API-KEY'] = 'anonymized';
+		// clean arguments from sensitive data, the name of the header is case-insensitive.
+		foreach ( array_keys( $args['headers'] ) as $header_name ) {
+			if ( 'x-api-key' === strtolower( (string) $header_name ) ) {
+				$args['headers'][ $header_name ] = 'anonymized';
+			}
+		}
 
 		$log_text  = __( 'URL:', 'connector-for-propstack' ) . ' <code>' . esc_url( $this->get_url() ) . '</code>';
 		$log_text .= '<br><br>' . __( 'Request:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $args ) . '</code>';
 		$log_text .= '<br><br>' . __( 'HTTP-Status:', 'connector-for-propstack' ) . ' <code>' . wp_json_encode( $this->get_http_status() ) . '</code>';
 
-		// get the raw response and limit its length for the log entry.
-		$response   = $this->get_response();
+		// get the raw response without personal data and limit its length for the log entry.
+		$response   = $this->mask_personal_data( $this->get_response() );
 		$max_length = absint( apply_filters( 'cfprop_log_max_response_length', 100000 ) );
 		if ( strlen( $response ) > $max_length ) {
 			/* translators: %1$d will be replaced by the total length in bytes. */
@@ -371,7 +375,7 @@ class ApiRequest {
 		}
 
 		// return the seconds to wait.
-		return absint( $retry_after );
+		return max( 0, (int) $retry_after );
 	}
 
 	/**
@@ -389,6 +393,58 @@ class ApiRequest {
 		}
 
 		// otherwise, use the code from the response array.
-		return absint( wp_remote_retrieve_response_code( $response ) );
+		return max( 0, (int) wp_remote_retrieve_response_code( $response ) );
+	}
+
+	/**
+	 * Return the timeout in seconds for the request.
+	 *
+	 * The configured value is limited, as 0 would mean "no timeout" and could block the request forever.
+	 *
+	 * @return int
+	 */
+	private function get_timeout(): int {
+		// get the configured timeout.
+		$timeout = absint( get_option( 'propstack_connector_timeout', 30 ) );
+
+		// use the default if no timeout is configured.
+		if ( 0 === $timeout ) {
+			$timeout = 30;
+		}
+
+		// return the limited value.
+		return max( 5, min( 120, $timeout ) );
+	}
+
+	/**
+	 * Mask personal data in the given text, e.g. a response of the API, before it is written to the log.
+	 *
+	 * Masks e-mail addresses, international phone numbers and the values of fields whose name
+	 * indicates a phone number.
+	 *
+	 * @param string $text The text.
+	 *
+	 * @return string
+	 */
+	public function mask_personal_data( string $text ): string {
+		$mask = true;
+		/**
+		 * Filter whether personal data in API responses is masked before they are written to the log.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param bool $mask True to mask personal data.
+		 */
+		if ( ! apply_filters( 'cfprop_log_mask_personal_data', $mask ) ) {
+			return $text;
+		}
+
+		// mask e-mail addresses (also with JSON-escaped slashes).
+		$text = (string) preg_replace( '/[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}/i', '[email]', $text );
+
+		// mask the values of fields whose name indicates a phone number.
+		$text = (string) preg_replace( '/("[^"]*(?:phone|mobile|fax)[^"]*"\s*:\s*)"[^"]*"/i', '$1"[phone]"', $text );
+
+		// mask international phone numbers in any other string.
+		return (string) preg_replace( '/"\+[0-9][0-9 \/\-().]{5,}[0-9]"/', '"[phone]"', $text );
 	}
 }

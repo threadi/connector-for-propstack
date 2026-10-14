@@ -33,8 +33,8 @@ class IntegerField extends FieldType_Base {
 			return '';
 		}
 
-		// get the value as integer.
-		$output = absint( $this->value );
+		// get the value as integer (negative values are kept).
+		$output = intval( $this->value );
 
 		// bail if the value is 0.
 		if ( 0 === $output ) {

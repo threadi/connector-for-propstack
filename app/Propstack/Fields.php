@@ -16,6 +16,7 @@ use easySettingsForWordPress\Fields\Value;
 use easySettingsForWordPress\Page;
 use ConnectorForPropstack\Plugin\Cache;
 use ConnectorForPropstack\Plugin\Helper;
+use ConnectorForPropstack\Plugin\Languages;
 use ConnectorForPropstack\Plugin\Log;
 use ConnectorForPropstack\Plugin\Settings;
 use ConnectorForPropstack\Propstack\Fields\Main\DescriptionNote;
@@ -62,6 +63,39 @@ class Fields {
 	 * @var array<string,bool>|null
 	 */
 	private ?array $api_v2_object_fields = null;
+
+	/**
+	 * Marker whether the fields for an object are actually requested for its import.
+	 *
+	 * @var bool
+	 */
+	private bool $importing_fields = false;
+
+	/**
+	 * Cache of object types per post-ID for the frontend visibility check during this request.
+	 *
+	 * @var array<int,Object_Type_Base|false>
+	 */
+	private array $object_types_by_post_id = array();
+
+	/**
+	 * The example values of fields from the last import, loaded on demand.
+	 *
+	 * @var array<string,mixed>|null
+	 */
+	private ?array $examples = null;
+
+	/**
+	 * Prefix for the options which hold the example values of fields.
+	 */
+	public const EXAMPLE_OPTION_PREFIX = 'cfprop_example_';
+
+	/**
+	 * List of custom field names already logged as not usable during this request.
+	 *
+	 * @var array<string,bool>
+	 */
+	private array $logged_custom_field_names = array();
 
 	/**
 	 * Variable for the instance of this Singleton object.
@@ -135,8 +169,8 @@ class Fields {
 		$fields_tab = $settings_page->add_tab( 'propstack_connector_fields', 50 );
 		$fields_tab->set_title( __( 'Fields', 'connector-for-propstack' ) );
 
-		// check if this tab is called.
-		$fields_tab_called = $fields_tab->get_name() === filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		// check if this tab is called (or the settings are loaded for the DataView, which loads all tabs at once).
+		$fields_tab_called = $fields_tab->get_name() === filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) || $this->is_settings_view_request();
 
 		// add a sub tab to show all fields from Propstack we support.
 		$all_fields_tab = $fields_tab->add_tab( 'propstack_connector_fields_all', 10 );
@@ -207,7 +241,7 @@ class Fields {
 			$name_setting->set_type( 'string' );
 			$name_setting->set_section( $hidden_section );
 			$name_setting_field = new Value( $settings_obj );
-			$name_setting_field->set_value( $fields_tab_called ? Cache::get( $immo_field->get_name() . '_example' ) : '' );
+			$name_setting_field->set_value( $fields_tab_called ? $this->get_example( $immo_field->get_name() ) : '' );
 			$name_setting->set_field( $name_setting_field );
 			$field->add_setting( $name_setting, $row, 2 );
 
@@ -290,13 +324,13 @@ class Fields {
 				$content_field_setting->set_field( $content_field_setting_field );
 				$field->add_setting( $content_field_setting, $row, 2 );
 
-				// add setting.
-				$name_setting = $settings_obj->add_setting( 'propstack_connector_fields_all_' . $immo_field->get_name() . '_example' );
+				// add setting (the name must be unique per object type, the setting "…_all_…_example" is already used in the tab for all fields).
+				$name_setting = $settings_obj->add_setting( 'propstack_connector_fields_' . $object_type->get_slug() . '_' . $immo_field->get_name() . '_example' );
 				$name_setting->prevent_export( true );
 				$name_setting->set_type( 'string' );
 				$name_setting->set_section( $hidden_section );
 				$name_setting_field = new Value( $settings_obj );
-				$name_setting_field->set_value( $fields_tab_called ? Cache::get( $immo_field->get_name() . '_example' ) : '' );
+				$name_setting_field->set_value( $fields_tab_called ? $this->get_example( $immo_field->get_name() ) : '' );
 				$name_setting->set_field( $name_setting_field );
 				$field->add_setting( $name_setting, $row, 3 );
 
@@ -832,7 +866,7 @@ class Fields {
 		 *
 		 * Fields of objects, which are not in this list, are hidden if the API v2 is used.
 		 *
-		 * @since 2.0.1 Available since 2.0.1.
+		 * @since 2.1.0 Available since 2.1.0.
 		 * @param array<int,string> $fields The names of the fields in the API.
 		 */
 		return apply_filters( 'cfprop_api_v2_object_fields', $fields );
@@ -910,7 +944,7 @@ class Fields {
 		 *
 		 * This filter is only used if the API v2 is used. Fields which are not delivered are hidden.
 		 *
-		 * @since 2.0.1 Available since 2.0.1.
+		 * @since 2.1.0 Available since 2.1.0.
 		 * @param bool       $available True if the field is delivered.
 		 * @param Field_Base $field     The field object.
 		 */
@@ -961,22 +995,32 @@ class Fields {
 		if ( ! $object_type_object instanceof Object_Type_Base ) {
 			// add a log entry.
 			/* translators: %1$s will be replaced by the object title. */
-			Log::get_instance()->add( sprintf( __( 'Unknown object type used by the object %1$s. The object type may only be supported by <a href="%2$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), '<em>' . $title . '</em>', Helper::get_pro_url() ), 'info', 'import' );
+			Log::get_instance()->add( sprintf( __( 'Unknown object type used by the object %1$s. The object type may only be supported by <a href="%2$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), '<em>' . esc_html( (string) $title ) . '</em>', Helper::get_pro_url() ), 'info', 'import' );
 			return;
 		}
 
 		// add a log entry.
 		/* translators: %1$s will be replaced by the object title. */
-		Log::get_instance()->add( sprintf( __( 'Import the fields for the object %1$s.', 'connector-for-propstack' ), '<em>' . $title . '</em>' ), 'info', 'import' );
+		Log::get_instance()->add( sprintf( __( 'Import the fields for the object %1$s.', 'connector-for-propstack' ), '<em>' . esc_html( (string) $title ) . '</em>' ), 'info', 'import' );
 
-		// get the list of fields.
-		$fields = $object_type_object->get_fields();
+		// get the list of fields, marked as import so no field is filtered out for the frontend.
+		$this->importing_fields = true;
+		try {
+			$fields = $object_type_object->get_fields();
+		} finally {
+			$this->importing_fields = false;
+		}
 
 		// collect the values first instead of writing each one on its own.
 		$values = array();
 
 		// update the object data in its fields.
 		foreach ( $fields as $field ) {
+			// bail if the field has no name, it could not be saved.
+			if ( empty( $field->get_name() ) ) {
+				continue;
+			}
+
 			// get the field value from API.
 			$value = $field->get_value_from_api_response( $post_id, $immo_object );
 
@@ -1002,7 +1046,15 @@ class Fields {
 		// get the custom fields.
 		$custom_fields_list = array();
 		if ( isset( $immo_object['custom_fields'] ) && is_array( $immo_object['custom_fields'] ) ) {
+			// get the names which could not be used by custom fields.
+			$reserved_names = $this->get_reserved_meta_keys();
+
 			foreach ( $immo_object['custom_fields'] as $field_name => $field ) {
+				// bail if this name could not be used as meta key.
+				if ( ! $this->is_custom_field_name_usable( (string) $field_name, $reserved_names, $values ) ) {
+					continue;
+				}
+
 				// add the field to the list.
 				$custom_fields_list[] = $field_name;
 
@@ -1024,7 +1076,12 @@ class Fields {
 			$this->save_field_values( $post_id, $values );
 		} else {
 			foreach ( $values as $meta_key => $meta_value ) {
-				$written = update_post_meta( $post_id, $meta_key, $meta_value );
+				// bail if the meta key is empty.
+				if ( '' === (string) $meta_key ) {
+					continue;
+				}
+
+				$written = update_post_meta( $post_id, (string) $meta_key, $meta_value );
 
 				if ( $written && Helper::is_development_mode() ) {
 					Log::get_instance()->add( sprintf( 'Changed: %1$s (%2$s)', $meta_key, get_debug_type( $meta_value ) ), 'info', 'import' );
@@ -1058,6 +1115,87 @@ class Fields {
 		 * @param array<string,mixed> $immo_object The data from API.
 		 */
 		do_action( 'cfprop_import_object_fields', $fields, $post_id, $object_type_object, $immo_object );
+	}
+
+	/**
+	 * Return whether the fields for an object are actually requested for its import.
+	 *
+	 * @return bool
+	 */
+	public function is_importing_fields(): bool {
+		return $this->importing_fields;
+	}
+
+	/**
+	 * Return the list of meta keys which could not be used by custom fields from Propstack.
+	 *
+	 * @return array<string,bool>
+	 */
+	private function get_reserved_meta_keys(): array {
+		// collect the names of all known fields.
+		$list = array();
+		foreach ( $this->get_fields_as_objects() as $field ) {
+			$list[ $field->get_name() ] = true;
+		}
+
+		// add the keys we use for our own purposes.
+		foreach ( array( 'object_id', 'language_code', 'images', 'changed', 'custom_fields', 'api_response' ) as $key ) {
+			$list[ $key ] = true;
+		}
+
+		/**
+		 * Filter the list of meta keys which could not be used by custom fields from Propstack.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<string,bool> $list List of meta keys as keys.
+		 */
+		return apply_filters( 'cfprop_reserved_meta_keys', $list );
+	}
+
+	/**
+	 * Return whether the given name of a custom field from Propstack could be used as meta key.
+	 *
+	 * Names which would overwrite fields of this plugin or of WordPress are not usable.
+	 * Each of them is logged once per request.
+	 *
+	 * @param string              $field_name     The name of the custom field.
+	 * @param array<string,bool>  $reserved_names List of reserved names as keys.
+	 * @param array<string,mixed> $values         The values collected for the object until now.
+	 *
+	 * @return bool
+	 */
+	private function is_custom_field_name_usable( string $field_name, array $reserved_names, array $values ): bool {
+		// bail if the name is empty.
+		if ( '' === trim( $field_name ) ) {
+			return false;
+		}
+
+		// check if the name is usable.
+		$usable = ! str_starts_with( $field_name, '_' ) && ! isset( $reserved_names[ $field_name ] ) && ! isset( $reserved_names[ $field_name . '_pretty_value' ] ) && ! array_key_exists( $field_name, $values );
+
+		// bail if it is usable.
+		if ( $usable ) {
+			return true;
+		}
+
+		// log each name only once per request.
+		if ( ! isset( $this->logged_custom_field_names[ $field_name ] ) ) {
+			$this->logged_custom_field_names[ $field_name ] = true;
+
+			// add the log entry.
+			Log::get_instance()->add(
+				sprintf(
+				/* translators: %1$s will be replaced by the name of the custom field. */
+					__( 'The custom field %1$s from Propstack has been ignored, as its name is already used by another field. Please rename it in Propstack.', 'connector-for-propstack' ),
+					'<code>' . esc_html( $field_name ) . '</code>'
+				),
+				'error',
+				'import'
+			);
+		}
+
+		// return false as the name is not usable.
+		return false;
 	}
 
 	/**
@@ -1143,16 +1281,14 @@ class Fields {
 		// get the field format.
 		$field_format = FieldFormats::get_instance()->get_field_format_by_name( $field->get_output_format() );
 
-		// bail if no field type could be found.
-		if ( ! $field_format ) {
-			return $value;
+		// use the format, if one could be found.
+		if ( $field_format ) {
+			// set the output on the format object.
+			$field_format->set_value( $output );
+
+			// get the output for this value.
+			$output = $field_format->get_value();
 		}
-
-		// set the output on the format object.
-		$field_format->set_value( $output );
-
-		// get the output for this value.
-		$output = $field_format->get_value();
 
 		// strip all tags if parameter is set.
 		$true = true;
@@ -1265,25 +1401,76 @@ class Fields {
 	 * @return void
 	 */
 	public function import_example( Field_Base $field, mixed $value ): void {
-		// bail if an example for this field has already been saved during this request.
-		static $saved = array();
-		if ( isset( $saved[ $field->get_name() ] ) ) {
-			return;
-		}
-		$saved[ $field->get_name() ] = true;
-
-		// bail if no value is given.
-		if ( empty( $value ) ) {
-			return;
-		}
-
 		// bail if fields name is empty.
 		if ( empty( $field->get_name() ) ) {
 			return;
 		}
 
-		// save in the cache.
-		Cache::set( $field->get_name() . '_example', $this->format_field( $field, $value, false ) );
+		// bail if an example for this field has already been saved during this request.
+		static $saved = array();
+		if ( isset( $saved[ $field->get_name() ] ) ) {
+			return;
+		}
+
+		// bail if no value is given (another object may deliver one).
+		if ( empty( $value ) ) {
+			return;
+		}
+
+		// mark the example for this field as saved.
+		$saved[ $field->get_name() ] = true;
+
+		// save it in its own option (not in the cache, which is cleared after each import).
+		update_option( self::EXAMPLE_OPTION_PREFIX . $field->get_name() . '_' . Languages::get_instance()->get_current_lang(), $this->format_field( $field, $value, false ), false );
+	}
+
+	/**
+	 * Return the example value of a field from the last import.
+	 *
+	 * All examples of the actual language are loaded with a single query on the first call.
+	 *
+	 * @param string $field_name The name of the field.
+	 *
+	 * @return string
+	 */
+	public function get_example( string $field_name ): string {
+		// load all examples of the actual language.
+		if ( null === $this->examples ) {
+			global $wpdb;
+
+			$this->examples = array();
+			$suffix         = '_' . Languages::get_instance()->get_current_lang();
+			$results        = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->prepare(
+					'SELECT option_name, option_value FROM ' . $wpdb->options . ' WHERE option_name LIKE %s',
+					$wpdb->esc_like( self::EXAMPLE_OPTION_PREFIX ) . '%' . $wpdb->esc_like( $suffix )
+				),
+				ARRAY_A
+			);
+			foreach ( (array) $results as $result ) {
+				$name                    = substr( (string) $result['option_name'], strlen( self::EXAMPLE_OPTION_PREFIX ), -strlen( $suffix ) );
+				$this->examples[ $name ] = maybe_unserialize( $result['option_value'] );
+			}
+		}
+
+		// return the example, if it is a string.
+		return isset( $this->examples[ $field_name ] ) && is_scalar( $this->examples[ $field_name ] ) ? (string) $this->examples[ $field_name ] : '';
+	}
+
+	/**
+	 * Return whether the actual request loads the plugin settings for its own settings page or the DataView.
+	 *
+	 * @return bool
+	 */
+	private function is_settings_view_request(): bool {
+		// the settings page in backend.
+		if ( is_admin() && 'connector-for-propstack' === filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ) {
+			return true;
+		}
+
+		// the REST request of the DataView to load its configuration.
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		return str_contains( $request_uri, 'dataview-config' );
 	}
 
 	/**
@@ -1302,15 +1489,15 @@ class Fields {
 			return;
 		}
 
-		// bail if value is empty.
-		if ( empty( $value ) ) {
+		// bail if value is empty or not a string.
+		if ( empty( $value ) || ! is_scalar( $value ) ) {
 			return;
 		}
 
-		// save it.
+		// save it, only with HTML-code allowed in posts.
 		$query = array(
 			'ID'           => $post_id,
-			'post_content' => $value,
+			'post_content' => wp_kses_post( (string) $value ),
 		);
 		wp_update_post( $query );
 	}
@@ -1392,6 +1579,138 @@ class Fields {
 	}
 
 	/**
+	 * Return whether the given field is disabled for the given object type.
+	 *
+	 * Reads the setting directly (not via cache) so the check can never fail open.
+	 *
+	 * @param Field_Base       $field       The field.
+	 * @param Object_Type_Base $object_type The object type.
+	 *
+	 * @return bool
+	 */
+	public function is_field_disabled_for_object_type( Field_Base $field, Object_Type_Base $object_type ): bool {
+		// fields which could not be configured are never disabled.
+		if ( $field->do_not_configure() ) {
+			return false;
+		}
+
+		// get the setting with the object type specific default.
+		$value = get_option( 'propstack_connector_fields_' . $object_type->get_slug() . '_' . $field->get_name() . '_disabled', $object_type->is_field_default_disabled( $field ) ? 1 : 0 );
+
+		// return the result.
+		return 1 === absint( is_scalar( $value ) ? $value : 0 );
+	}
+
+	/**
+	 * Return whether the address of the given object should be hidden (via "hide_address" from Propstack).
+	 *
+	 * @param ImmoObject $immo_object The object.
+	 *
+	 * @return bool
+	 */
+	public function is_address_hidden( ImmoObject $immo_object ): bool {
+		$respect = true;
+		/**
+		 * Filter whether the "hide address" flag from Propstack should be respected in the frontend.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param bool       $respect     True to respect the flag.
+		 * @param ImmoObject $immo_object The object.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		if ( ! apply_filters( 'cfprop_respect_hide_address', $respect, $immo_object ) ) {
+			return false;
+		}
+
+		// get the raw value.
+		$value = get_post_meta( $immo_object->get_id(), 'hide_address', true );
+
+		// return whether it is set.
+		return is_scalar( $value ) && filter_var( $value, FILTER_VALIDATE_BOOLEAN );
+	}
+
+	/**
+	 * Return the list of field names which contain the exact address of an object.
+	 *
+	 * @return array<int,string>
+	 */
+	public function get_exact_address_field_names(): array {
+		$list = array( 'street', 'house_number', 'address', 'short_address', 'latitude', 'longitude' );
+
+		/**
+		 * Filter the list of fields which are hidden if the address of an object should be hidden.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<int,string> $list List of field names.
+		 */
+		return apply_filters( 'cfprop_exact_address_fields', $list );
+	}
+
+	/**
+	 * Return whether a field of an object could be shown in the frontend.
+	 *
+	 * Central check used by all frontend outputs, the REST API and the abilities. It checks:
+	 * - the field flags (hide, hide_in_frontend, empty name),
+	 * - the disabled-setting of the object type of this object,
+	 * - the "hide address" flag of the object,
+	 * - the filter "cfprop_show_field_in_frontend".
+	 *
+	 * Widgets which show one explicitly chosen field on its own (e.g., the description or the energy scale)
+	 * do not use the disabled-setting, as it controls the lists of fields (and is set by default e.g. for the
+	 * description, which is used as content of the object).
+	 *
+	 * @param Field_Base $field          The field.
+	 * @param ImmoObject $immo_object    The object.
+	 * @param bool       $check_disabled Whether to check the disabled-setting of the object type.
+	 *
+	 * @return bool
+	 */
+	public function is_field_visible_in_frontend( Field_Base $field, ImmoObject $immo_object, bool $check_disabled = true ): bool {
+		// bail if the field is not usable in frontend.
+		if ( $field->hide() || $field->hide_in_frontend() || empty( $field->get_name() ) ) {
+			return false;
+		}
+
+		// description texts are placed explicitly in templates and are disabled by default only because one of them is
+		// used as content of the object, so the disabled-setting is not used for them.
+		if ( $field->get_category() instanceof FieldCategories\Descriptions ) {
+			$check_disabled = false;
+		}
+
+		// bail if the field is disabled for the object type of this object (object type is cached per request).
+		if ( $check_disabled ) {
+			$post_id = $immo_object->get_id();
+			if ( ! array_key_exists( $post_id, $this->object_types_by_post_id ) ) {
+				$this->object_types_by_post_id[ $post_id ] = ObjectType::get_instance()->get_object_type_by_object_post_id( $post_id );
+			}
+			$object_type = $this->object_types_by_post_id[ $post_id ];
+			if ( $object_type instanceof Object_Type_Base && $this->is_field_disabled_for_object_type( $field, $object_type ) ) {
+				return false;
+			}
+		}
+
+		// bail if the address of this object should be hidden and this is an address field.
+		if ( in_array( $field->get_name(), $this->get_exact_address_field_names(), true ) && $this->is_address_hidden( $immo_object ) ) {
+			return false;
+		}
+
+		$show_field = true;
+		/**
+		 * Filter whether a field is shown in the frontend.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 *
+		 * @param bool       $show_field  The result.
+		 * @param Field_Base $field       The field.
+		 * @param ImmoObject $immo_object The object.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		return (bool) apply_filters( 'cfprop_show_field_in_frontend', $show_field, $field, $immo_object );
+	}
+
+	/**
 	 * Save all disabled fields in the cache.
 	 *
 	 * @return void
@@ -1462,6 +1781,11 @@ class Fields {
 		// prepare the rows to insert.
 		$rows = array();
 		foreach ( $values as $meta_key => $meta_value ) {
+			// bail if the meta key is empty.
+			if ( '' === (string) $meta_key ) {
+				continue;
+			}
+
 			// run the same sanitizing the meta API would run.
 			$meta_value = sanitize_meta( (string) $meta_key, $meta_value, 'post' );
 

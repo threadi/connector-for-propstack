@@ -71,8 +71,59 @@ class Taxonomies {
 		add_filter( 'hidden_columns', array( $this, 'hide_columns' ), 10, 3 );
 
 		// use our own hooks.
+		add_action( 'cfprop_import_object_before_start', array( $this, 'start_import_run' ), 10, 0 );
 		add_action( 'cfprop_import_object', array( $this, 'assign_term_during_import' ), 10, 3 );
-		add_action( 'cfprop_import_object_after', array( $this, 'cleanup_after_import' ) );
+		add_action( 'cfprop_import_object_success', array( $this, 'cleanup_after_import' ) );
+	}
+
+	/**
+	 * Save a new marker for the import run which is starting.
+	 *
+	 * Every term which is used by an object during this run gets this marker.
+	 * Terms without it will be removed after the successful import.
+	 *
+	 * @return void
+	 */
+	public function start_import_run(): void {
+		update_option( 'cfprop_term_import_run', time(), false );
+	}
+
+	/**
+	 * Return the marker of the actual import run.
+	 *
+	 * @return int
+	 */
+	private function get_import_run(): int {
+		return absint( get_option( 'cfprop_term_import_run', 0 ) );
+	}
+
+	/**
+	 * Return the name of the taxonomy, which is requested in the backend.
+	 *
+	 * The name is used in GET-requests for the listing, in POST-requests (e.g. adding a term via AJAX)
+	 * or by the current screen.
+	 *
+	 * @return string
+	 */
+	private function get_requested_taxonomy_name(): string {
+		// get the taxonomy from GET-request.
+		$taxonomy = (string) filter_input( INPUT_GET, 'taxonomy', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		// get it from POST-request if not set.
+		if ( empty( $taxonomy ) ) {
+			$taxonomy = (string) filter_input( INPUT_POST, 'taxonomy', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		}
+
+		// get it from the current screen if not set.
+		if ( empty( $taxonomy ) && function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+			if ( $screen instanceof WP_Screen ) {
+				$taxonomy = $screen->taxonomy;
+			}
+		}
+
+		// return the resulting name.
+		return $taxonomy;
 	}
 
 	/**
@@ -214,7 +265,7 @@ class Taxonomies {
 	 */
 	public function change_taxonomy_columns( array $columns ): array {
 		// get the called taxonomy.
-		$taxonomy = filter_input( INPUT_GET, 'taxonomy', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$taxonomy = $this->get_requested_taxonomy_name();
 
 		// get the taxonomy object.
 		$taxonomy_obj = $this->get_taxonomy_by_name( $taxonomy );
@@ -363,8 +414,8 @@ class Taxonomies {
 			// assign the term to the object.
 			wp_set_object_terms( $post_id, $term_id, $taxonomy->get_name() );
 
-			// mark this term as changed.
-			update_term_meta( $term_id, 'changed', 1 );
+			// mark this term as used in the actual import run.
+			update_term_meta( $term_id, 'changed', $this->get_import_run() );
 		}
 	}
 
@@ -418,7 +469,7 @@ class Taxonomies {
 		}
 
 		// get the thumbnail ID.
-		$attachment_id = get_term_meta( $term_id, 'thumbnail_id', true );
+		$attachment_id = absint( get_term_meta( $term_id, 'thumbnail_id', true ) );
 
 		// bail if no attachment ID is set.
 		if ( 0 === $attachment_id ) {
@@ -445,7 +496,7 @@ class Taxonomies {
 		}
 
 		// show the image.
-		return '<a href="' . $url . '">' . $image . '</a>';
+		return '<a href="' . esc_url( $url ) . '">' . $image . '</a>';
 	}
 
 	/**
@@ -459,7 +510,7 @@ class Taxonomies {
 	 */
 	public function add_field_contents( string $output, string $column_name, int $term_id ): string {
 		// get the called taxonomy.
-		$taxonomy = filter_input( INPUT_GET, 'taxonomy', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$taxonomy = $this->get_requested_taxonomy_name();
 
 		// bail if this is an object type.
 		if ( ObjectType::get_instance()->get_name() === $taxonomy ) {
@@ -525,13 +576,24 @@ class Taxonomies {
 	}
 
 	/**
-	 * Clean up the terms after import of objects.
+	 * Clean up the terms after a complete and successful import of objects.
+	 *
+	 * Removes every term of the broker taxonomy which has not been used by any object during this import run
+	 * and which is not assigned to any object anymore.
 	 *
 	 * @param Import_Base $import_obj The import object.
 	 *
 	 * @return void
 	 */
 	public function cleanup_after_import( Import_Base $import_obj ): void {
+		// get the marker of this import run.
+		$import_run = $this->get_import_run();
+
+		// bail if no marker is set (e.g. no import has been started since the update of the plugin).
+		if ( 0 === $import_run ) {
+			return;
+		}
+
 		// get the process handler with this ID.
 		$process_handler = ProcessHandler::get_instance();
 		$process_handler->set_id( $import_obj->get_process_id() );
@@ -556,9 +618,15 @@ class Taxonomies {
 				'taxonomy'   => $taxonomy->get_name(),
 				'hide_empty' => false,
 				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; admin/sync context.
+					'relation' => 'OR',
 					array(
 						'key'     => 'changed',
 						'compare' => 'NOT EXISTS',
+					),
+					array(
+						'key'     => 'changed',
+						'value'   => $import_run,
+						'compare' => '!=',
 					),
 				),
 			);
@@ -574,11 +642,20 @@ class Taxonomies {
 				continue;
 			}
 
-			// delete these not updated terms.
+			// delete these not updated terms, but only if they are not used by any object.
 			foreach ( $results->get_terms() as $term ) {
 				if ( ! $term instanceof WP_Term ) {
 					continue;
 				}
+
+				// bail if this term is still assigned to any object (in any post status).
+				// This also prevents the deletion of all terms if the brokers could not be requested in this run.
+				$object_ids = get_objects_in_term( $term->term_id, $taxonomy->get_name() );
+				if ( ! is_array( $object_ids ) || ! empty( $object_ids ) ) {
+					continue;
+				}
+
+				// delete the unused term.
 				wp_delete_term( $term->term_id, $taxonomy->get_name() );
 			}
 		}

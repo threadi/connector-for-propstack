@@ -73,9 +73,10 @@ class Divi4 extends Compatibilities_Base {
 		// first check for the plugin.
 		if ( \ConnectorForPropstack\Plugin\Helper::is_plugin_active( 'divi-builder/divi-builder.php' ) ) {
 			// get the plugin version.
-			require_once ABSPATH . 'wp-admin/includes/admin.php';
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php' );
+			if ( ! function_exists( 'get_plugin_data' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php', false, false );
 			if ( version_compare( $plugin_data['Version'], '5.0.0', '<' ) ) {
 				return true;
 			}
@@ -84,13 +85,13 @@ class Divi4 extends Compatibilities_Base {
 		// check for the theme.
 		$theme = wp_get_theme();
 		if ( 'Divi' === $theme->get( 'Name' ) ) {
-			$version = substr( $theme->get( 'Version' ), 0, 5 );
+			$version = substr( (string) $theme->get( 'Version' ), 0, 5 );
 			return version_compare( $version, '5.0.0', '<' );
 		}
 
 		// check for the parent theme.
 		if ( $theme->parent() && 'Divi' === $theme->parent()->get( 'Name' ) ) {
-			$version = substr( $theme->parent()->get( 'Version' ), 0, 5 );
+			$version = substr( (string) $theme->parent()->get( 'Version' ), 0, 5 );
 			return version_compare( $version, '5.0.0', '<' );
 		}
 

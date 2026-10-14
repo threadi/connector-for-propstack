@@ -251,6 +251,7 @@ class Taxonomy {
 	public function get_fields_for_rest_api( WP_REST_Request $request ): array {
 		// get the query.
 		$query = $request->get_param( 'query' );
+		$query = is_string( $query ) ? sanitize_text_field( $query ) : '';
 
 		// prepare the list of fields.
 		$fields = array();
@@ -259,6 +260,11 @@ class Taxonomy {
 		foreach ( $this->get_fields() as $index => $field ) {
 			// bail on fields without name.
 			if ( empty( $field->get_name() ) ) {
+				continue;
+			}
+
+			// bail on fields which are not usable in frontend.
+			if ( $field->hide() || $field->hide_in_frontend() ) {
 				continue;
 			}
 

@@ -40,7 +40,7 @@ class Gallery extends Widget_Base {
 	 *
 	 * @var string
 	 */
-	protected string $gutenberg = '\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Field';
+	protected string $gutenberg = '\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Gallery';
 
 	/**
 	 * Instance of this object.
@@ -115,11 +115,15 @@ class Gallery extends Widget_Base {
 		// add the lightbox marker to the image link.
 		add_filter( 'wp_get_attachment_link', array( $this, 'add_lightbox_marker_to_image_link' ) );
 
+		// prevent the inline styles of the gallery (they would be removed by kses, leaving the CSS as visible text), we use our own styles.
+		add_filter( 'use_default_gallery_style', '__return_false', PHP_INT_MAX );
+
 		// get the gallery HTML code.
 		$gallery = do_shortcode( '[gallery ids="' . $ids . '" columns="' . $attributes['columns'] . '" size="' . $attributes['size'] . '" link="file"]' );
 
-		// remove the filter.
+		// remove the filters.
 		remove_filter( 'wp_get_attachment_link', array( $this, 'add_lightbox_marker_to_image_link' ) );
+		remove_filter( 'use_default_gallery_style', '__return_false', PHP_INT_MAX );
 
 		// bail if this is empty.
 		if ( empty( $gallery ) ) {
@@ -127,7 +131,7 @@ class Gallery extends Widget_Base {
 		}
 
 		// return the gallery.
-		return '<div class="cfprop-gallery">' . wp_kses_post( $gallery ) . '</div>';
+		return '<div class="cfprop-gallery' . ( isset( $attributes['classes'] ) && is_string( $attributes['classes'] ) ? ' ' . esc_attr( trim( $attributes['classes'] ) ) : '' ) . '">' . wp_kses_post( $gallery ) . '</div>';
 	}
 
 	/**
