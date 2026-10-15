@@ -253,6 +253,7 @@ class Uninstaller {
 			'cfprop_files_to_import_offset',
 			'cfprop_files_import_lock',
 			'cfprop_import_current_object',
+			\ConnectorForPropstack\Propstack\Custom_Fields::OPTION,
 		);
 
 		// delete them.
@@ -260,11 +261,12 @@ class Uninstaller {
 			delete_option( $option );
 		}
 
-		// get the options with the plugin-specific prefixes: md5 hashes, cache and dismissed hints.
+		// get the options with the plugin-specific prefixes: md5 hashes, settings of custom fields, cache and dismissed hints.
 		$like_options = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
-				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s',
+				'SELECT option_name FROM ' . $wpdb->options . ' WHERE option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s',
 				$wpdb->esc_like( 'cfprop_md5_' ) . '%',
+				$wpdb->esc_like( \ConnectorForPropstack\Propstack\Custom_Fields::SETTING_PREFIX ) . '%',
 				$wpdb->esc_like( 'cfprop_example_' ) . '%',
 				$wpdb->esc_like( 'cfprop_files_to_import_block_' ) . '%',
 				$wpdb->esc_like( 'cfprop_cache_' ) . '%',
@@ -276,6 +278,9 @@ class Uninstaller {
 		foreach ( $like_options as $option ) {
 			delete_option( (string) $option );
 		}
+
+		// delete the list of known custom field columns of each user.
+		delete_metadata( 'user', 0, 'cfprop_known_custom_field_columns', '', true );
 
 		// get our own transients.
 		$transients = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery

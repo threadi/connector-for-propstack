@@ -69,6 +69,9 @@ class Propstack {
 		// initialize the fields.
 		Fields::get_instance()->init();
 
+		// initialize the custom fields from Propstack.
+		Custom_Fields::get_instance()->init();
+
 		// initialize the broker.
 		Broker::get_instance()->init();
 

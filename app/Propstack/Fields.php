@@ -91,13 +91,6 @@ class Fields {
 	public const EXAMPLE_OPTION_PREFIX = 'cfprop_example_';
 
 	/**
-	 * List of custom field names already logged as not usable during this request.
-	 *
-	 * @var array<string,bool>
-	 */
-	private array $logged_custom_field_names = array();
-
-	/**
 	 * Variable for the instance of this Singleton object.
 	 *
 	 * @var ?Fields
@@ -421,6 +414,9 @@ class Fields {
 			$setting->set_field( $field );
 		}
 
+		// add a tab for the custom fields from Propstack.
+		Custom_Fields::get_instance()->add_settings( $settings_obj, $fields_tab );
+
 		// add a tab.
 		$fields_pro_tab = $fields_tab->add_tab( 'propstack_connector_fields_pro', 2000 );
 		$fields_pro_tab->set_title( __( 'Use more object types with Connector for Propstack Pro', 'connector-for-propstack' ) );
@@ -693,6 +689,11 @@ class Fields {
 
 			// add it to the list.
 			$list[] = $obj;
+		}
+
+		// add the custom fields from Propstack (only if their output is supported).
+		foreach ( Custom_Fields::get_instance()->get_fields_for_output() as $custom_field ) {
+			$list[] = $custom_field;
 		}
 
 		// return the resulting list.
@@ -1043,33 +1044,8 @@ class Fields {
 		// reset the collection for the next object.
 		$this->collected_field_meta = array();
 
-		// get the custom fields.
-		$custom_fields_list = array();
-		if ( isset( $immo_object['custom_fields'] ) && is_array( $immo_object['custom_fields'] ) ) {
-			// get the names which could not be used by custom fields.
-			$reserved_names = $this->get_reserved_meta_keys();
-
-			foreach ( $immo_object['custom_fields'] as $field_name => $field ) {
-				// bail if this name could not be used as meta key.
-				if ( ! $this->is_custom_field_name_usable( (string) $field_name, $reserved_names, $values ) ) {
-					continue;
-				}
-
-				// add the field to the list.
-				$custom_fields_list[] = $field_name;
-
-				// collect the pretty value.
-				$values[ $field_name . '_pretty_value' ] = is_array( $field ) ? ( $field['pretty_value'] ?? '' ) : $field;
-
-				// collect the value.
-				if ( is_array( $field ) ) {
-					$values[ $field_name ] = $field['value'] ?? '';
-				}
-			}
-		}
-
-		// collect the list of custom fields.
-		$values['custom_fields'] = $custom_fields_list;
+		// add the values of the custom fields of this object (values which are no longer used are removed there).
+		$values = array_merge( $values, Custom_Fields::get_instance()->get_values_for_import( $immo_object, $post_id, $is_new_object, $values ) );
 
 		// write the values of a new object in a single statement, update them one by one otherwise.
 		if ( $is_new_object ) {
@@ -1105,6 +1081,13 @@ class Fields {
 			do_action( 'cfprop_import_object_field', $field, $value, $post_id, $object_type_object, $immo_object );
 		}
 
+		// save example values of the custom fields, too (they are not part of the fields of the object type).
+		foreach ( Custom_Fields::get_instance()->get_fields() as $custom_field ) {
+			if ( isset( $values[ $custom_field->get_name() ] ) ) {
+				$this->import_example( $custom_field, $values[ $custom_field->get_name() ] );
+			}
+		}
+
 		/**
 		 * Run additional tasks for fields on an object during the import of them.
 		 *
@@ -1127,11 +1110,13 @@ class Fields {
 	}
 
 	/**
-	 * Return the list of meta keys which could not be used by custom fields from Propstack.
+	 * Return the list of meta keys which are used by the fields of this plugin.
+	 *
+	 * Used to never remove these meta keys with the values of custom fields in the format up to version 2.0.x.
 	 *
 	 * @return array<string,bool>
 	 */
-	private function get_reserved_meta_keys(): array {
+	public function get_reserved_meta_keys(): array {
 		// collect the names of all known fields.
 		$list = array();
 		foreach ( $this->get_fields_as_objects() as $field ) {
@@ -1144,58 +1129,14 @@ class Fields {
 		}
 
 		/**
-		 * Filter the list of meta keys which could not be used by custom fields from Propstack.
+		 * Filter the list of meta keys which are used by the fields of this plugin.
+		 *
+		 * These meta keys are never removed with the values of custom fields in the format up to version 2.0.x.
 		 *
 		 * @since 2.1.0 Available since 2.1.0.
 		 * @param array<string,bool> $list List of meta keys as keys.
 		 */
 		return apply_filters( 'cfprop_reserved_meta_keys', $list );
-	}
-
-	/**
-	 * Return whether the given name of a custom field from Propstack could be used as meta key.
-	 *
-	 * Names which would overwrite fields of this plugin or of WordPress are not usable.
-	 * Each of them is logged once per request.
-	 *
-	 * @param string              $field_name     The name of the custom field.
-	 * @param array<string,bool>  $reserved_names List of reserved names as keys.
-	 * @param array<string,mixed> $values         The values collected for the object until now.
-	 *
-	 * @return bool
-	 */
-	private function is_custom_field_name_usable( string $field_name, array $reserved_names, array $values ): bool {
-		// bail if the name is empty.
-		if ( '' === trim( $field_name ) ) {
-			return false;
-		}
-
-		// check if the name is usable.
-		$usable = ! str_starts_with( $field_name, '_' ) && ! isset( $reserved_names[ $field_name ] ) && ! isset( $reserved_names[ $field_name . '_pretty_value' ] ) && ! array_key_exists( $field_name, $values );
-
-		// bail if it is usable.
-		if ( $usable ) {
-			return true;
-		}
-
-		// log each name only once per request.
-		if ( ! isset( $this->logged_custom_field_names[ $field_name ] ) ) {
-			$this->logged_custom_field_names[ $field_name ] = true;
-
-			// add the log entry.
-			Log::get_instance()->add(
-				sprintf(
-				/* translators: %1$s will be replaced by the name of the custom field. */
-					__( 'The custom field %1$s from Propstack has been ignored, as its name is already used by another field. Please rename it in Propstack.', 'connector-for-propstack' ),
-					'<code>' . esc_html( $field_name ) . '</code>'
-				),
-				'error',
-				'import'
-			);
-		}
-
-		// return false as the name is not usable.
-		return false;
 	}
 
 	/**

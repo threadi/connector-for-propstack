@@ -1088,6 +1088,13 @@ class ImmoObjects {
 			return;
 		}
 
+		// show custom fields formatted depending on their type (e.g. checkboxes as icon, lists, dates).
+		if ( $fields[ $column_name ] instanceof Fields\Custom\Propstack_Custom_Field ) {
+			$value = Fields::get_instance()->get_field_value( $post_id, $fields[ $column_name ], false );
+			echo wp_kses_post( is_scalar( $value ) ? (string) $value : '' );
+			return;
+		}
+
 		// get the value.
 		$value = get_post_meta( $post_id, $column_name, true );
 
@@ -1139,15 +1146,18 @@ class ImmoObjects {
 	 * @return array<int,string>
 	 */
 	public function hide_columns( array $hidden, WP_Screen $screen, bool $use_defaults ): array {
-		// bail if we do not want to use the defaults.
-		if ( ! $use_defaults ) {
-			return $hidden;
-		}
-
 		// bail if this is not out own cpt.
 		if ( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() !== $screen->post_type ) {
 			return $hidden;
 		}
+
+		// hide new custom fields, if the user has already saved the visible columns.
+		if ( ! $use_defaults ) {
+			return $this->hide_new_custom_field_columns( $hidden, $screen );
+		}
+
+		// mark the actual custom fields as known for this user.
+		$this->get_new_custom_field_columns();
 
 		// add the configured taxonomies to the list to hide.
 		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
@@ -1162,6 +1172,76 @@ class ImmoObjects {
 
 		// return the resulting list.
 		return $hidden;
+	}
+
+	/**
+	 * Hide the columns of custom fields, which are new for the actual user.
+	 *
+	 * Custom fields are loaded from Propstack during each import. Their columns should only be visible
+	 * if the user enables them in the screen options. WordPress uses the saved list of hidden columns
+	 * if the user has ever changed the screen options, so new columns would be visible without this.
+	 *
+	 * @param array<int,string> $hidden List of columns to hide.
+	 * @param WP_Screen         $screen Actual screen-object.
+	 *
+	 * @return array<int,string>
+	 */
+	private function hide_new_custom_field_columns( array $hidden, WP_Screen $screen ): array {
+		// get the new custom field columns.
+		$new_columns = $this->get_new_custom_field_columns();
+
+		// bail if there are no new columns.
+		if ( empty( $new_columns ) ) {
+			return $hidden;
+		}
+
+		// hide them.
+		$hidden = array_values( array_unique( array_merge( $hidden, $new_columns ) ) );
+
+		// save the list for the user, so they will be visible after the user enables them.
+		$user_id = get_current_user_id();
+		if ( $user_id > 0 ) {
+			update_user_option( $user_id, 'manage' . $screen->id . 'columnshidden', $hidden, true );
+		}
+
+		// return the resulting list.
+		return $hidden;
+	}
+
+	/**
+	 * Return the columns of custom fields the actual user has not seen yet and mark all as known.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_new_custom_field_columns(): array {
+		// bail if no user is logged in.
+		$user_id = get_current_user_id();
+		if ( 0 === $user_id ) {
+			return array();
+		}
+
+		// get the names of all custom field columns.
+		$columns = array();
+		foreach ( Custom_Fields::get_instance()->get_fields_for_output() as $field ) {
+			$columns[] = $field->get_name();
+		}
+
+		// get the columns the user already knows.
+		$known_columns = get_user_option( 'cfprop_known_custom_field_columns', $user_id );
+		if ( ! is_array( $known_columns ) ) {
+			$known_columns = array();
+		}
+
+		// get the new columns.
+		$new_columns = array_values( array_diff( $columns, $known_columns ) );
+
+		// save the actual list as known, if it has been changed.
+		if ( ! empty( $new_columns ) || count( $columns ) !== count( $known_columns ) ) {
+			update_user_option( $user_id, 'cfprop_known_custom_field_columns', $columns, true );
+		}
+
+		// return the new columns.
+		return $new_columns;
 	}
 
 	/**

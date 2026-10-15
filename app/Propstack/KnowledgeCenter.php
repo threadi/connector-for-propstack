@@ -95,6 +95,7 @@ class KnowledgeCenter {
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\AutomaticImport',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\LimitedObjects',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\HiddenAddress',
+			'\ConnectorForPropstack\Propstack\KnowledgeCenter\CustomFields',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\SoldObjects',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\Languages',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\CheckObject',

@@ -159,15 +159,15 @@ class Field_Category_Base {
 	}
 
 	/**
-	* Return a value as string for the output in the meta box.
-	*
-	* Values could be arrays (e.g., custom fields with multiple values), which are shown as list.
-	* Other non-scalar values are not shown.
-	*
-	* @param mixed $value The value.
-	*
-	* @return string
-	*/
+	 * Return a value as string for the output in the meta box.
+	 *
+	 * Values could be arrays (e.g., custom fields with multiple values), which are shown as list.
+	 * Other non-scalar values are not shown.
+	 *
+	 * @param mixed $value The value.
+	 *
+	 * @return string
+	 */
 	protected function get_value_for_output( mixed $value ): string {
 		// return scalar values as string.
 		if ( is_scalar( $value ) ) {

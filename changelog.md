@@ -17,6 +17,14 @@
 - Added Playwright tests as part of the release process
 - Added setting for the max. percentage of objects which could be deleted after an import (Advanced settings > For objects)
 - Added setting to allow the import of objects without title (Advanced settings > For objects)
+- Added list of the custom fields of objects: their type is detected by their values, their label is created from their internal name (no additional permission of the API key needed); custom fields which are no longer used by any object are removed after a complete import
+- Added hook to load the labels, types, units and options of custom fields from Propstack before each import (used by Connector for Propstack Pro for API v2)
+- Added list of all custom fields in Settings > Fields > Custom fields
+- Added help entry for custom fields from Propstack
+- Added hooks for custom fields, e.g. to enable their output in the frontend (used by Connector for Propstack Pro)
+- Added the custom fields, which are enabled for the frontend, to the catalog of the template abilities
+- Added hooks to add own blocks to the catalog of the template abilities for block templates and to check them
+- Columns of custom fields in the list of objects are hidden until they are enabled in the screen options, also for new custom fields
 
 ### Changed
 
@@ -74,6 +82,10 @@
 - Updated hints how to use MCP with our abilities
 - Updated dependencies
 - More PHP Unit Tests
+- Custom fields are saved with the prefix "cfprop_cf_" to prevent collisions with other fields; the values in the previous format are converted during the next import of each object
+- Values of custom fields are now saved and shown in a uniform format (e.g. the names of chosen options instead of their IDs with API v1, dates and numbers in the format of the website)
+- Custom fields, which are no longer delivered by Propstack, are removed during the import
+- Country fields show the name of each country instead of its code
 
 ### Fixed
 
