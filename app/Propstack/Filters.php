@@ -133,6 +133,8 @@ class Filters {
 		// list the fields.
 		$row = 0;
 		foreach ( $this->get_filters_as_objects() as $filter_obj ) {
+			$filters  = $filter_obj->get();
+			$multiple = count( $filters ) > 1;
 			foreach ( $filter_obj->get() as $filter ) {
 				// get the allowed filter types for this filter.
 				$allowed_filter_types = array();
@@ -140,11 +142,13 @@ class Filters {
 					$allowed_filter_types[ $filter_type->get_name() ] = $filter_type->get_type_label();
 				}
 
+				$key = $multiple ? $filter->get_filter_name() : $filter_obj->get_name();
+
 				// add entry as a new row.
 				$field->add_row();
 
 				// add setting.
-				$name_setting = $settings_obj->add_setting( 'propstack_connector_filters_' . $filter_obj->get_name() . '_name' );
+				$name_setting = $settings_obj->add_setting( 'propstack_connector_filters_' . $key . '_name' );
 				$name_setting->prevent_export( true );
 				$name_setting->set_type( 'string' );
 				$name_setting->set_section( $hidden_section );
@@ -154,7 +158,7 @@ class Filters {
 				$field->add_setting( $name_setting, $row, 0 );
 
 				// add setting.
-				$type_setting = $settings_obj->add_setting( 'propstack_connector_filters_' . $filter_obj->get_name() . '_type' );
+				$type_setting = $settings_obj->add_setting( 'propstack_connector_filters_' . $key . '_type' );
 				$type_setting->set_type( 'string' );
 				$type_setting->set_default( $filter_obj->get_filter_type( $filter->get_name() )->get_filter_name() );
 				$type_setting->set_section( $hidden_section );
