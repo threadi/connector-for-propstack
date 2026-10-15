@@ -729,6 +729,18 @@ class ImmoObjects {
 		$setting->set_field( $field );
 
 		// add setting.
+		$setting = $settings_obj->add_setting( 'propstack_connector_max_cleanup_percent' );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 50 );
+		$setting->set_section( $section );
+		$field = new Number( $settings_obj );
+		$field->set_title( __( 'Max. percentage of objects to delete', 'connector-for-propstack' ) );
+		$field->set_description( __( 'Objects which are no longer delivered by Propstack are deleted after an import. If more than this share of the existing objects would be deleted at once, no object is deleted as a precaution against incomplete data from the API. This applies only if more than 5 objects exist. Use 100 to allow the deletion of all objects.', 'connector-for-propstack' ) );
+		$field->set_min( 0 );
+		$field->set_max( 100 );
+		$setting->set_field( $field );
+
+		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_preserve_files' );
 		$setting->set_default( 0 );
 		$setting->set_section( $section );

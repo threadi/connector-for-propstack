@@ -15,6 +15,7 @@
 - Added multiple hooks
 - Added option --network to the WP CLI command reset_plugin to reset all sites of a multisite network
 - Added Playwright tests as part of the release process
+- Added setting for the max. percentage of objects which could be deleted after an import (Advanced settings > For objects)
 
 ### Changed
 

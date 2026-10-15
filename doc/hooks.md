@@ -1975,6 +1975,7 @@ Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php)
 
 If more objects would be removed, the cleanup is skipped as a safeguard against incomplete
 data from the API. Use 1 to allow the removal of all objects.
+The default value comes from the setting "Max. percentage of objects to delete".
 
 **Arguments**
 
@@ -2174,6 +2175,7 @@ Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php)
 
 If more objects would be removed, the cleanup is skipped as a safeguard against incomplete
 data from the API. Use 1 to allow the removal of all objects.
+The default value comes from the setting "Max. percentage of objects to delete".
 
 **Arguments**
 
