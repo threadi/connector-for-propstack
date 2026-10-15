@@ -137,6 +137,7 @@
 - Fixed possible fatal error in grouped notices
 - Fixed WPML configuration using wrong names for post types and taxonomies
 - Fixed release builds missing the energy scale block and the files for the intro
+- Fixed a fatal error if custom fields are using an array
 
 ## [2.0.0] - 30.09.2026
 

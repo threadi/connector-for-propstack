@@ -52,7 +52,7 @@ class CustomFields extends Field_Category_Base {
 
 		foreach ( $custom_fields as $custom_field_name ) {
 			// get the label.
-			$label = get_post_meta( $post->ID, $custom_field_name, true );
+			$label = (string) $custom_field_name;
 
 			// get the value.
 			$value = get_post_meta( $post->ID, $custom_field_name . '_pretty_value', true );
@@ -65,7 +65,7 @@ class CustomFields extends Field_Category_Base {
 					<p>
 						<?php
 						// show the value.
-						echo wp_kses_post( $value );
+						echo wp_kses_post( $this->get_value_for_output( $value ) );
 						?>
 					</p>
 				</div>
