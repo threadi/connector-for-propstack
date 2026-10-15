@@ -184,6 +184,16 @@ class Template_Adapter extends Template_Adapter_Base {
 			);
 		}
 
+		/**
+		 * Filter the blocks, which could be used in block templates.
+		 *
+		 * E.g. used by Connector for Propstack Pro to add its own blocks.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<int,array<string,mixed>> $elements List of blocks.
+		 */
+		$elements = apply_filters( 'cfprop_gutenberg_template_elements', $elements );
+
 		// add useful core blocks.
 		$object_type = Taxonomies\ObjectType::get_instance()->get_name();
 		$core_blocks = array(
@@ -661,6 +671,18 @@ class Template_Adapter extends Template_Adapter_Base {
 					}
 					break;
 			}
+
+			/**
+			 * Filter the errors after the check of a block in a block template.
+			 *
+			 * E.g. used by Connector for Propstack Pro to check the attributes of its own blocks.
+			 *
+			 * @since 2.1.0 Available since 2.1.0.
+			 * @param array<int,string>   $errors     List of errors.
+			 * @param string              $block_name The name of the block.
+			 * @param array<string,mixed> $attributes The attributes of the block.
+			 */
+			$errors = apply_filters( 'cfprop_gutenberg_template_block_errors', $errors, $block_name, $attributes );
 
 			// check the inner blocks.
 			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {

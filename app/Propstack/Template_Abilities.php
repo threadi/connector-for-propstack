@@ -289,6 +289,11 @@ class Template_Abilities {
 							'description' => __( 'The allowed field names for elements showing a field of the broker.', 'connector-for-propstack' ),
 							'items'       => array( 'type' => 'object' ),
 						),
+						'custom_fields'     => array(
+							'type'        => 'array',
+							'description' => __( 'The allowed values for elements showing a custom field of an object.', 'connector-for-propstack' ),
+							'items'       => array( 'type' => 'object' ),
+						),
 						'taxonomies'        => array(
 							'type'  => 'array',
 							'items' => array( 'type' => 'object' ),
@@ -560,6 +565,7 @@ class Template_Abilities {
 			'field_names'       => $this->get_field_names(),
 			'description_types' => $this->get_description_types(),
 			'broker_fields'     => $this->get_broker_fields(),
+			'custom_fields'     => $this->get_custom_fields(),
 			'taxonomies'        => $this->get_taxonomies(),
 			'hints'             => $adapter->get_hints(),
 		);
@@ -914,6 +920,23 @@ class Template_Abilities {
 			$list[] = array(
 				'name'  => $field->get_name(),
 				'label' => $field->get_label(),
+			);
+		}
+		return $list;
+	}
+
+	/**
+	 * Return the custom fields, which are enabled for the output in the frontend.
+	 *
+	 * @return array<int,array<string,string>>
+	 */
+	public function get_custom_fields(): array {
+		$list = array();
+		foreach ( Custom_Fields::get_instance()->get_visible_fields() as $field ) {
+			$list[] = array(
+				'name'  => $field->get_name(),
+				'label' => $field->get_label(),
+				'type'  => Custom_Fields::get_instance()->get_type_label( $field->get_propstack_type() ),
 			);
 		}
 		return $list;

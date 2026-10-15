@@ -10,6 +10,7 @@ namespace ConnectorForPropstack\Propstack\FieldFormats;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use ConnectorForPropstack\Plugin\Countries;
 use ConnectorForPropstack\Propstack\FieldFormat_Base;
 
 /**
@@ -35,7 +36,7 @@ class Country extends FieldFormat_Base {
 			case 'CHL':
 				return __( 'Chile', 'connector-for-propstack' );
 			default:
-				return $this->value;
+				return is_scalar( $this->value ) ? Countries::get_name( (string) $this->value ) : '';
 		}
 	}
 }

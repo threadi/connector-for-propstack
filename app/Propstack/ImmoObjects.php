@@ -131,6 +131,7 @@ class ImmoObjects {
 		add_filter( 'cfprop_prevent_import_of_object', array( $this, 'prevent_import_by_object_type' ), 10, 2 );
 		add_filter( 'cfprop_prevent_import_of_object', array( $this, 'prevent_import_by_property_type' ), 10, 2 );
 		add_filter( 'cfprop_prevent_import_of_object', array( $this, 'prevent_import_by_missing_fields' ), 10, 2 );
+		add_filter( 'cfprop_prevent_import_of_object', array( $this, 'prevent_import_by_missing_title' ), 10, 2 );
 		add_action( 'cfprop_import_object_before_start', array( $this, 'import_object_states_before_objects' ), 10, 2 );
 		add_action( 'cfprop_import_object_after', array( $this, 'set_has_objects' ), 10, 0 );
 		add_action( 'cfprop_files_for_object_imported_via_ajax', array( $this, 'assign_feature_image' ) );
@@ -729,6 +730,29 @@ class ImmoObjects {
 		$setting->set_field( $field );
 
 		// add setting.
+		$setting = $settings_obj->add_setting( 'propstack_connector_max_cleanup_percent' );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 50 );
+		$setting->set_section( $section );
+		$field = new Number( $settings_obj );
+		$field->set_title( __( 'Max. percentage of objects to delete', 'connector-for-propstack' ) );
+		$field->set_description( __( 'Objects which are no longer delivered by Propstack are deleted after an import. If more than this share of the existing objects would be deleted at once, no object is deleted as a precaution against incomplete data from the API. This applies only if more than 5 objects exist. Use 100 to allow the deletion of all objects.', 'connector-for-propstack' ) );
+		$field->set_min( 0 );
+		$field->set_max( 100 );
+		$setting->set_field( $field );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'propstack_connector_prevent_import_without_title' );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 1 );
+		$setting->set_section( $section );
+		$setting->set_save_callback( array( $this, 'check_for_changed_restriction_value' ) );
+		$field = new Checkbox( $settings_obj );
+		$field->set_title( __( 'Prevent import of objects without title', 'connector-for-propstack' ) );
+		$field->set_description( __( 'If enabled, objects without a title in Propstack are not imported, as they could not be shown properly on your website. Each of these objects is noted in the log. If disabled, such objects are imported and their name is used as title.', 'connector-for-propstack' ) );
+		$setting->set_field( $field );
+
+		// add setting.
 		$setting = $settings_obj->add_setting( 'propstack_connector_preserve_files' );
 		$setting->set_default( 0 );
 		$setting->set_section( $section );
@@ -1064,6 +1088,13 @@ class ImmoObjects {
 			return;
 		}
 
+		// show custom fields formatted depending on their type (e.g. checkboxes as icon, lists, dates).
+		if ( $fields[ $column_name ] instanceof Fields\Custom\Propstack_Custom_Field ) {
+			$value = Fields::get_instance()->get_field_value( $post_id, $fields[ $column_name ], false );
+			echo wp_kses_post( is_scalar( $value ) ? (string) $value : '' );
+			return;
+		}
+
 		// get the value.
 		$value = get_post_meta( $post_id, $column_name, true );
 
@@ -1115,15 +1146,18 @@ class ImmoObjects {
 	 * @return array<int,string>
 	 */
 	public function hide_columns( array $hidden, WP_Screen $screen, bool $use_defaults ): array {
-		// bail if we do not want to use the defaults.
-		if ( ! $use_defaults ) {
-			return $hidden;
-		}
-
 		// bail if this is not out own cpt.
 		if ( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_name() !== $screen->post_type ) {
 			return $hidden;
 		}
+
+		// hide new custom fields, if the user has already saved the visible columns.
+		if ( ! $use_defaults ) {
+			return $this->hide_new_custom_field_columns( $hidden, $screen );
+		}
+
+		// mark the actual custom fields as known for this user.
+		$this->get_new_custom_field_columns();
 
 		// add the configured taxonomies to the list to hide.
 		foreach ( Fields::get_instance()->get_fields_as_objects() as $field ) {
@@ -1138,6 +1172,76 @@ class ImmoObjects {
 
 		// return the resulting list.
 		return $hidden;
+	}
+
+	/**
+	 * Hide the columns of custom fields, which are new for the actual user.
+	 *
+	 * Custom fields are loaded from Propstack during each import. Their columns should only be visible
+	 * if the user enables them in the screen options. WordPress uses the saved list of hidden columns
+	 * if the user has ever changed the screen options, so new columns would be visible without this.
+	 *
+	 * @param array<int,string> $hidden List of columns to hide.
+	 * @param WP_Screen         $screen Actual screen-object.
+	 *
+	 * @return array<int,string>
+	 */
+	private function hide_new_custom_field_columns( array $hidden, WP_Screen $screen ): array {
+		// get the new custom field columns.
+		$new_columns = $this->get_new_custom_field_columns();
+
+		// bail if there are no new columns.
+		if ( empty( $new_columns ) ) {
+			return $hidden;
+		}
+
+		// hide them.
+		$hidden = array_values( array_unique( array_merge( $hidden, $new_columns ) ) );
+
+		// save the list for the user, so they will be visible after the user enables them.
+		$user_id = get_current_user_id();
+		if ( $user_id > 0 ) {
+			update_user_option( $user_id, 'manage' . $screen->id . 'columnshidden', $hidden, true );
+		}
+
+		// return the resulting list.
+		return $hidden;
+	}
+
+	/**
+	 * Return the columns of custom fields the actual user has not seen yet and mark all as known.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_new_custom_field_columns(): array {
+		// bail if no user is logged in.
+		$user_id = get_current_user_id();
+		if ( 0 === $user_id ) {
+			return array();
+		}
+
+		// get the names of all custom field columns.
+		$columns = array();
+		foreach ( Custom_Fields::get_instance()->get_fields_for_output() as $field ) {
+			$columns[] = $field->get_name();
+		}
+
+		// get the columns the user already knows.
+		$known_columns = get_user_option( 'cfprop_known_custom_field_columns', $user_id );
+		if ( ! is_array( $known_columns ) ) {
+			$known_columns = array();
+		}
+
+		// get the new columns.
+		$new_columns = array_values( array_diff( $columns, $known_columns ) );
+
+		// save the actual list as known, if it has been changed.
+		if ( ! empty( $new_columns ) || count( $columns ) !== count( $known_columns ) ) {
+			update_user_option( $user_id, 'cfprop_known_custom_field_columns', $columns, true );
+		}
+
+		// return the new columns.
+		return $new_columns;
 	}
 
 	/**
@@ -1278,13 +1382,59 @@ class ImmoObjects {
 	 * @return bool
 	 */
 	public function prevent_import_by_missing_fields( bool $prevent_import, array $immo_object ): bool {
-		// bail if ID, name or title are missing.
-		if ( empty( $immo_object['id'] ) || empty( $immo_object['name'] ) || empty( $immo_object['title'] ) ) {
+		// bail if ID or name are missing.
+		if ( empty( $immo_object['id'] ) || empty( $immo_object['name'] ) ) {
 			return true;
 		}
 
 		// return the value.
 		return $prevent_import;
+	}
+
+	/**
+	 * Prevent import of objects without a title.
+	 *
+	 * Such objects could not be shown properly on the website. This check could be disabled
+	 * in the advanced settings for objects.
+	 *
+	 * @param bool                $prevent_import The marker to prevent import.
+	 * @param array<string,mixed> $immo_object The object data.
+	 *
+	 * @return bool
+	 */
+	public function prevent_import_by_missing_title( bool $prevent_import, array $immo_object ): bool {
+		// bail if this check is disabled.
+		if ( 1 !== absint( get_option( 'propstack_connector_prevent_import_without_title', 1 ) ) ) {
+			return $prevent_import;
+		}
+
+		// prevent the import if the title is missing.
+		if ( ! $this->has_title( $immo_object ) ) {
+			return true;
+		}
+
+		// return the value.
+		return $prevent_import;
+	}
+
+	/**
+	 * Return whether the given object has a title.
+	 *
+	 * API v1 delivers the title as field with label and value, API v2 as string.
+	 *
+	 * @param array<string,mixed> $immo_object The object data.
+	 *
+	 * @return bool
+	 */
+	private function has_title( array $immo_object ): bool {
+		// get the title.
+		$title = $immo_object['title'] ?? '';
+		if ( is_array( $title ) ) {
+			$title = $title['value'] ?? '';
+		}
+
+		// return whether the title contains any text.
+		return is_scalar( $title ) && '' !== trim( wp_strip_all_tags( (string) $title ) );
 	}
 
 	/**
@@ -1463,7 +1613,12 @@ class ImmoObjects {
 
 		// check for missing main fields.
 		if ( $this->is_prevent_import_check_used( array( $this, 'prevent_import_by_missing_fields' ) ) && $this->prevent_import_by_missing_fields( false, $immo_object ) ) {
-			$reasons[] = __( 'The ID, the name or the title of the object is missing.', 'connector-for-propstack' );
+			$reasons[] = __( 'The ID or the name of the object is missing.', 'connector-for-propstack' );
+		}
+
+		// check for a missing title.
+		if ( $this->is_prevent_import_check_used( array( $this, 'prevent_import_by_missing_title' ) ) && $this->prevent_import_by_missing_title( false, $immo_object ) ) {
+			$reasons[] = __( 'The object has no title. You can allow the import of objects without title in the advanced settings for objects.', 'connector-for-propstack' );
 		}
 
 		// check the state (API v1).

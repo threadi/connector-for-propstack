@@ -800,12 +800,14 @@ class Objects extends Import_Base {
 					$obsolete_count = absint( $obsolete->found_posts );
 					$existing_count = absint( $existing->found_posts );
 
-					$max_ratio = 0.5;
+					// get the max. ratio from the configured percentage.
+					$max_ratio = min( 100, absint( get_option( 'propstack_connector_max_cleanup_percent', 50 ) ) ) / 100;
 					/**
 					 * Filter the max. ratio of existing objects which could be removed by the cleanup after an import.
 					 *
 					 * If more objects would be removed, the cleanup is skipped as a safeguard against incomplete
 					 * data from the API. Use 1 to allow the removal of all objects.
+					 * The default value comes from the setting "Max. percentage of objects to delete".
 					 *
 					 * @since 2.0.0 Available since 2.0.0.
 					 * @param float $max_ratio      The ratio between 0 and 1.

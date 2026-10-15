@@ -139,6 +139,7 @@ class CleanupSafety extends ConnectorForPropstackTestCase {
 		remove_filter( 'cfprop_prevent_import_of_object', '__return_false', 999 );
 		remove_filter( 'cfprop_import_per_page', array( $this, 'set_per_page_to_two' ) );
 		remove_filter( 'cfprop_import_max_cleanup_ratio', array( $this, 'allow_full_cleanup' ) );
+		delete_option( 'propstack_connector_max_cleanup_percent' );
 		remove_filter( 'cfprop_object_import_limit', array( $this, 'set_limit_to_one' ) );
 		remove_action( 'cfprop_import_object', array( $this, 'save_object_id' ) );
 
@@ -528,6 +529,42 @@ class CleanupSafety extends ConnectorForPropstackTestCase {
 
 		// the API delivers only 3 of 10 objects, 7 would be removed.
 		$this->api_ids = array( 1, 2, 3 );
+
+		$import_obj = $this->run_complete_import();
+
+		$this->assertContains( 'propstack_object_import_cleanup_skipped', $this->get_error_codes( $import_obj ) );
+		$this->assertSame( range( 1, 10 ), $this->get_existing_propstack_ids() );
+	}
+
+	/**
+	 * Test that the cleanup removes the objects if the percentage setting allows it.
+	 *
+	 * @return void
+	 */
+	public function test_cleanup_runs_with_percentage_setting(): void {
+		update_option( 'propstack_connector_max_cleanup_percent', 70 );
+		$this->create_existing_objects( range( 1, 10 ) );
+
+		// the API delivers only 3 of 10 objects, 7 would be removed, which is exactly the allowed 70 %.
+		$this->api_ids = array( 1, 2, 3 );
+
+		$import_obj = $this->run_complete_import();
+
+		$this->assertNotContains( 'propstack_object_import_cleanup_skipped', $this->get_error_codes( $import_obj ) );
+		$this->assertSame( array( 1, 2, 3 ), $this->get_existing_propstack_ids() );
+	}
+
+	/**
+	 * Test that the cleanup is skipped if the percentage setting is lower than the share of objects to remove.
+	 *
+	 * @return void
+	 */
+	public function test_cleanup_is_skipped_with_lower_percentage_setting(): void {
+		update_option( 'propstack_connector_max_cleanup_percent', 20 );
+		$this->create_existing_objects( range( 1, 10 ) );
+
+		// the API delivers 7 of 10 objects, 3 would be removed, which is more than the allowed 20 %.
+		$this->api_ids = range( 1, 7 );
 
 		$import_obj = $this->run_complete_import();
 

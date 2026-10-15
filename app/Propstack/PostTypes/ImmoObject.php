@@ -437,9 +437,9 @@ class ImmoObject extends Post_Type {
 			return;
 		}
 
-		// add a link to view the object in the frontend if one is called in the backend.
+		// add a link to view the object in the frontend if one is called in the backend and the link does not already exist.
 		$post_id = absint( filter_input( INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT ) );
-		if ( $post_id > 0 && $this->get_name() === get_post_type( $post_id ) ) {
+		if ( $post_id > 0 && ! $admin_bar->get_node( 'view' ) && ! $admin_bar->get_node( 'preview' ) && $this->get_name() === get_post_type( $post_id ) ) {
 			$immo_obj = ImmoObjects::get_instance()->get_object( $post_id );
 			$admin_bar->add_menu(
 				array(

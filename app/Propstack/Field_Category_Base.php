@@ -122,7 +122,7 @@ class Field_Category_Base {
 					}
 
 					// show the value.
-					echo wp_kses_post( $value );
+					echo wp_kses_post( $this->get_value_for_output( $value ) );
 
 					/**
 					 * Run additional tasks during the view of a single field in a metabox in the backend.
@@ -156,5 +156,32 @@ class Field_Category_Base {
 	 */
 	public function hide_meta_box(): bool {
 		return false;
+	}
+
+	/**
+	 * Return a value as string for the output in the meta box.
+	 *
+	 * Values could be arrays (e.g., custom fields with multiple values), which are shown as list.
+	 * Other non-scalar values are not shown.
+	 *
+	 * @param mixed $value The value.
+	 *
+	 * @return string
+	 */
+	protected function get_value_for_output( mixed $value ): string {
+		// return scalar values as string.
+		if ( is_scalar( $value ) ) {
+			return (string) $value;
+		}
+
+		// bail if the value is not an array.
+		if ( ! is_array( $value ) ) {
+			return '';
+		}
+
+		// show the array as list.
+		$field_format = new FieldFormats\Listing();
+		$field_format->set_value( $value );
+		return $field_format->get_value();
 	}
 }

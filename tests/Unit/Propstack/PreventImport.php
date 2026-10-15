@@ -39,6 +39,7 @@ class PreventImport extends ConnectorForPropstackTestCase {
 		update_option( 'propstack_connector_import_marketing_type', array() );
 		update_option( 'propstack_connector_import_object_type', array() );
 		update_option( 'propstack_connector_import_property_type', array() );
+		delete_option( 'propstack_connector_prevent_import_without_title' );
 	}
 
 	/**
@@ -93,7 +94,29 @@ class PreventImport extends ConnectorForPropstackTestCase {
 	}
 
 	/**
-	 * Test that a missing title prevents the import.
+	 * Test that a missing title does not count as missing main field.
+	 *
+	 * @return void
+	 */
+	public function test_missing_title_is_no_missing_field(): void {
+		$immo_object = $this->get_object();
+		unset( $immo_object['title'] );
+
+		$this->assertFalse( $this->immo_objects->prevent_import_by_missing_fields( false, $immo_object ) );
+	}
+
+	/**
+	 * Test that an object with title is not prevented by the title check.
+	 *
+	 * @return void
+	 */
+	public function test_object_with_title_is_not_prevented(): void {
+		$this->assertFalse( $this->immo_objects->prevent_import_by_missing_title( false, $this->get_object() ) );
+		$this->assertFalse( $this->immo_objects->prevent_import_by_missing_title( false, $this->get_object( array( 'title' => array( 'value' => 'Musterhaus' ) ) ) ) );
+	}
+
+	/**
+	 * Test that a missing title prevents the import (API v2).
 	 *
 	 * @return void
 	 */
@@ -101,7 +124,51 @@ class PreventImport extends ConnectorForPropstackTestCase {
 		$immo_object = $this->get_object();
 		unset( $immo_object['title'] );
 
-		$this->assertTrue( $this->immo_objects->prevent_import_by_missing_fields( false, $immo_object ) );
+		$this->assertTrue( $this->immo_objects->prevent_import_by_missing_title( false, $immo_object ) );
+		$this->assertTrue( $this->immo_objects->prevent_import_by_missing_title( false, $this->get_object( array( 'title' => '  ' ) ) ) );
+	}
+
+	/**
+	 * Test that an empty title value prevents the import (API v1).
+	 *
+	 * @return void
+	 */
+	public function test_empty_title_value_prevents_import(): void {
+		$immo_object = $this->get_object(
+			array(
+				'title' => array(
+					'label' => 'Titel',
+					'value' => '',
+				),
+			)
+		);
+
+		$this->assertTrue( $this->immo_objects->prevent_import_by_missing_title( false, $immo_object ) );
+	}
+
+	/**
+	 * Test that a missing title does not prevent the import if the setting is disabled.
+	 *
+	 * @return void
+	 */
+	public function test_missing_title_is_imported_if_setting_is_disabled(): void {
+		$this->prepare_default_terms();
+		update_option( 'propstack_connector_prevent_import_without_title', 0 );
+
+		$immo_object = $this->get_object();
+		unset( $immo_object['title'] );
+
+		$this->assertFalse( $this->immo_objects->prevent_import_by_missing_title( false, $immo_object ) );
+		$this->assertSame( array(), $this->immo_objects->get_prevent_import_reasons( $this->get_importable_object( array( 'title' => '' ) ) ) );
+	}
+
+	/**
+	 * Test that the title check passes an already set prevent-marker through.
+	 *
+	 * @return void
+	 */
+	public function test_missing_title_passes_through_existing_marker(): void {
+		$this->assertTrue( $this->immo_objects->prevent_import_by_missing_title( true, $this->get_object() ) );
 	}
 
 	/**
@@ -464,9 +531,23 @@ class PreventImport extends ConnectorForPropstackTestCase {
 		$this->prepare_default_terms();
 
 		$immo_object = $this->get_importable_object();
+		unset( $immo_object['name'] );
+
+		$this->assertSame( array( 'The ID or the name of the object is missing.' ), $this->immo_objects->get_prevent_import_reasons( $immo_object ) );
+	}
+
+	/**
+	 * Test that a missing title is named as reason.
+	 *
+	 * @return void
+	 */
+	public function test_reasons_name_missing_title(): void {
+		$this->prepare_default_terms();
+
+		$immo_object = $this->get_importable_object();
 		unset( $immo_object['title'] );
 
-		$this->assertSame( array( 'The ID, the name or the title of the object is missing.' ), $this->immo_objects->get_prevent_import_reasons( $immo_object ) );
+		$this->assertSame( array( 'The object has no title. You can allow the import of objects without title in the advanced settings for objects.' ), $this->immo_objects->get_prevent_import_reasons( $immo_object ) );
 	}
 
 	/**
