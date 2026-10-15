@@ -16,9 +16,11 @@
 - Added option --network to the WP CLI command reset_plugin to reset all sites of a multisite network
 - Added Playwright tests as part of the release process
 - Added setting for the max. percentage of objects which could be deleted after an import (Advanced settings > For objects)
+- Added setting to allow the import of objects without title (Advanced settings > For objects)
 
 ### Changed
 
+- Objects without title are no longer imported by default; this is noted in the log (API v1 objects with an empty title have been imported before)
 - Minimum required WordPress version is now 6.6
 - The "hide address" setting from Propstack is now respected: street, house number, address and geo coordinates are not shown for such objects
 - Renter, total commission and valuation prices are no longer shown in the frontend

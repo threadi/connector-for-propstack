@@ -67,6 +67,8 @@ class ObjectNotImported extends KnowledgeCenter_Base {
 			/* translators: %1$s will be replaced by a link to the settings. */
 			sprintf( __( '<strong>A restriction of the import:</strong> under %1$s you can restrict the import to certain states, brokers, marketing types, object types and property types. If nothing is selected, all objects are imported.', 'connector-for-propstack' ), $this->get_settings_link( __( 'Objects > Restrictions', 'connector-for-propstack' ), 'propstack_connector_objects', 'propstack_connector_import_restrictions' ) ),
 			__( '<strong>The state of the object:</strong> without a restriction for the states only objects in the state <em>Vermarktung</em> are imported.', 'connector-for-propstack' ),
+			/* translators: %1$s will be replaced by a link to the settings. */
+			sprintf( __( '<strong>The object has no title:</strong> objects without a title in Propstack are not imported, as they could not be shown properly on your website. Add a title in Propstack or allow the import of such objects under %1$s.', 'connector-for-propstack' ), $this->get_settings_link( __( 'Advanced settings > For objects', 'connector-for-propstack' ), 'propstack_connector_advanced', 'propstack_connector_advanced_objects' ) ),
 		);
 		if ( $this->show_pro_hints() ) {
 			/* translators: %1$s will be replaced by a link to the Pro plugin. */
