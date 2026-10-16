@@ -29,6 +29,12 @@ Aufbau des Shortcodes:
   * values => Liste mit Werten des Objektes
   * detail_link => Link zur Single-Ansicht
 
+#### show_sorting
+
+* Mit "0" wird die Auswahl der Sortierung über dieser Liste ausgeblendet
+* Die Sortierung wird unter Einstellungen > Connector for Propstack > Sortierung verwaltet
+* Standard: 1
+
 ### Beispiel:
 
 `[cfprop_widget_archive listing_templates="default"]`
@@ -176,3 +182,42 @@ Aufbau des Shortcodes:
 Gibt die Galerie eines Objektes aus.
 
 Dieser Shortcode verfügt über keine weiteren Parameter.
+
+## Karte
+
+Zeigt den Standort eines Objekts auf einer Karte des Kartendienstes, der unter Einstellungen > Connector for Propstack > Karten gewählt ist (OpenStreetMap oder Google Maps). Die Karte wird erst nach Zustimmung des Besuchers geladen, sofern aktiviert.
+
+Aufbau des Shortcodes:
+
+`[cfprop_widget_map]`
+
+### Parameter
+
+#### object_id
+
+* Die Propstack-ID des anzuzeigenden Objekts
+* Nur außerhalb der Vorlage für die Detailansicht von Objekten nötig
+
+#### zoom
+
+* Zoomstufe von 1 (Welt) bis 19 (Straße)
+* Standard: die Zoomstufe aus den Einstellungen
+
+#### height
+
+* Höhe der Karte mit CSS-Einheit, z. B. 400px oder 50vh
+* Standard: die Höhe aus den Einstellungen
+
+#### source
+
+* "object" für das aktuelle Objekt, "list" für alle Objekte der Liste mit den aktiven Filtern (nur mit Connector for Propstack Pro)
+* Standard: object
+
+#### popup
+
+* "1" zeigt bei Karten mit der Liste den Titel und einen Link im Popup, "0" blendet ihn aus
+* Standard: 1
+
+### Beispiel
+
+`[cfprop_widget_map zoom="14" height="400px"]`

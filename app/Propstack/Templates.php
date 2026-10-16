@@ -377,13 +377,19 @@ class Templates {
 		// get the net floor space.
 		$net_floor_space = $this->get_visible_field_value( $immo_object, new NetFloorSpace() );
 
-		// output.
+		// output only the values, which are set (empty paragraphs would shift the others, e.g. with the spacing of block themes).
 		echo '<div class="cfprop-values"><div class="cfprop-costs">';
-		echo '<p>' . esc_html( $total_rent ) . '</p>';
-		echo '<p>' . esc_html( $price ) . '</p>';
+		foreach ( array( $total_rent, $price ) as $value ) {
+			if ( '' !== trim( (string) $value ) ) {
+				echo '<p>' . esc_html( (string) $value ) . '</p>';
+			}
+		}
 		echo '</div><div class="cfprop-spaces">';
-		echo '<p>' . esc_html( $living_space ) . '</p>';
-		echo '<p>' . esc_html( $net_floor_space ) . '</p>';
+		foreach ( array( $living_space, $net_floor_space ) as $value ) {
+			if ( '' !== trim( (string) $value ) ) {
+				echo '<p>' . esc_html( (string) $value ) . '</p>';
+			}
+		}
 		echo '</div>';
 		echo '</div>';
 	}

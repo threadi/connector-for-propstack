@@ -83,6 +83,9 @@ class Abilities {
 
 		// initialize the abilities for templates of page builders.
 		Template_Abilities::get_instance()->init();
+
+		// initialize the abilities for the settings of the sorting and the maps.
+		Display_Abilities::get_instance()->init();
 	}
 
 	/**
@@ -146,11 +149,20 @@ class Abilities {
 							'description' => __( 'Return the fields of every object as well. This makes the response much bigger, so use it only if the fields are needed.', 'connector-for-propstack' ),
 							'default'     => false,
 						),
+						'sort'        => array(
+							'type'        => 'string',
+							'description' => __( 'Sort the objects like the selection for the sorting above the list on the website, e.g. "price-asc". Use get-sorting-settings for the available values. Objects without a value are returned at the end. If objects to buy and to rent are mixed, sorting by price returns the objects to buy first (by purchase price), then the objects to rent (by rent).', 'connector-for-propstack' ),
+							'enum'        => array_merge( array( '' ), array_keys( Sortings::get_instance()->get_options_for_settings() ) ),
+						),
 					),
 				),
 				'output_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
+						'sort'    => array(
+							'type'        => 'string',
+							'description' => __( 'The used sorting or an empty string for the standard order (newest objects first).', 'connector-for-propstack' ),
+						),
 						'count'   => array(
 							'type'        => 'integer',
 							'description' => __( 'The amount of returned objects.', 'connector-for-propstack' ),
@@ -253,6 +265,15 @@ class Abilities {
 							'type'                 => 'object',
 							'description'          => __( 'The fields of this object, indexed by their internal name.', 'connector-for-propstack' ),
 							'additionalProperties' => array( 'type' => 'string' ),
+						),
+						'location'  => array(
+							'type'        => array( 'object', 'null' ),
+							'description' => __( 'The location of this object as shown on maps of the website, null if it is not shown. For objects with hidden address it is only approximate (rounded to about 1 km).', 'connector-for-propstack' ),
+							'properties'  => array(
+								'lat'         => array( 'type' => 'number' ),
+								'lng'         => array( 'type' => 'number' ),
+								'approximate' => array( 'type' => 'boolean' ),
+							),
 						),
 					),
 				),
@@ -547,6 +568,13 @@ class Abilities {
 			);
 		}
 
+		// sort the results, if requested.
+		$sort = isset( $input['sort'] ) && is_string( $input['sort'] ) ? sanitize_text_field( $input['sort'] ) : '';
+		if ( '' !== $sort && false !== Sortings::get_instance()->get_sorting_by_option( $sort ) ) {
+			$query = Sortings::get_instance()->add_option_to_query_params( $query, $sort, Sortings::get_instance()->get_context( $query ) );
+		}
+		$used_sort = isset( $query[ Sortings::QUERY_VAR ]['option'] ) && is_string( $query[ Sortings::QUERY_VAR ]['option'] ) ? $query[ Sortings::QUERY_VAR ]['option'] : '';
+
 		// check whether the fields should be returned as well.
 		$with_fields = ! empty( $input['with_fields'] );
 
@@ -565,6 +593,7 @@ class Abilities {
 
 		// return the resulting list.
 		return array(
+			'sort'    => $used_sort,
 			'count'   => count( $objects ),
 			'objects' => $objects,
 		);
@@ -604,6 +633,10 @@ class Abilities {
 
 		// add the fields of this object.
 		$data['fields'] = $this->get_object_fields( $immo_object );
+
+		// add the location as shown on maps (never the exact location of objects with hidden address).
+		$location         = Maps::get_instance()->get_location( $immo_object );
+		$data['location'] = false !== $location ? $location : null;
 
 		// return the resulting data.
 		return $data;

@@ -1,0 +1,19 @@
+.cfprop-sorting {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	gap: .5em;
+	margin-bottom: 1.5em;
+	max-width: 1200px !important;
+	label {
+		font-weight: bold;
+	}
+	select {
+		width: auto;
+		max-width: 100%;
+	}
+	&.cfprop-sorting-js .cfprop-sorting-button {
+		display: none;
+	}
+}

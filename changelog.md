@@ -4,6 +4,19 @@
 
 ### Added
 
+- Added hint for administrators on the page of an object, if its map could not be shown (e.g. without geo coordinates)
+- Added sorting of the list of objects: a selection above the list (archive widget, block and shortcode) offers only sortings which are useful for the objects of the actual list, works with filters and pagination, objects without value are shown at the end
+- Added sorting by price (purchase price for objects to buy, base rent for objects to rent; in mixed lists the objects to buy are shown first, then the objects to rent)
+- Added settings tab "Sorting" to enable the sorting and hide single sortings (the default sorting could be chosen with Connector for Propstack Pro)
+- Added attribute "show_sorting" to the shortcode [cfprop_widget_archive]
+- Added widget, block and shortcode "Map" to show the location of an object with OpenStreetMap (Leaflet) or Google Maps
+- Added settings tab "Maps" for the map service, the API key for Google Maps, the tile server, consent before loading, zoom level, height and the handling of objects with hidden address
+- Maps are loaded only after the consent of the visitor by default; the exact location of objects with hidden address is never sent to the browser
+- Added abilities to read and change the settings of the sorting and the maps (get-sorting-settings, update-sorting-settings, get-map-settings, update-map-settings)
+- Added parameter "sort" to the ability get-objects and the location of the object to the ability get-object
+- Added the map block and hints for the sorting to the catalog of the template abilities
+- Added help entries for the sorting and the maps
+- Added multiple hooks for sortings and maps
 - Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help
 - Added help entries for showing objects on the website, editing their views, import problems, missing images, API v2, automatic import, hidden addresses, sold objects, languages and support
 - Help entries for displaying objects adapt to the used theme and detected page builders
@@ -89,6 +102,8 @@
 
 ### Fixed
 
+- Fixed misaligned prices and areas in the list of objects, e.g. in block themes (empty values are no longer output and the styles of the costs on the detail page no longer apply to the list)
+- Fixed title of existing objects not being updated by the import if it has been changed in Propstack (the URL of the object stays the same)
 - Fixed import of images via API v2
 - Fixed wrong JS-function to import settings for the plugin
 - Remove our schedules on plugin deactivation

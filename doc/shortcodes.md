@@ -29,6 +29,12 @@ Shortcode structure:
   * values => List of property values
   * detail_link => Link to the single view
 
+#### show_sorting
+
+* Set to "0" to hide the selection for the sorting above this list
+* The sorting is managed under Settings > Connector for Propstack > Sorting
+* Default: 1
+
 ### Example:
 
 `[cfprop_widget_archive listing_templates="default"]`
@@ -168,3 +174,42 @@ Shortcode structure:
 Displays the gallery of a property.
 
 This shortcode has no additional parameters.
+
+## Map
+
+Shows the location of an object on a map of the map service chosen under Settings > Connector for Propstack > Maps (OpenStreetMap or Google Maps). The map is loaded only after the consent of the visitor, if enabled.
+
+Shortcode structure:
+
+`[cfprop_widget_map]`
+
+### Parameters
+
+#### object_id
+
+* The Propstack ID of the object to show
+* Only needed outside of the template for the detail view of objects
+
+#### zoom
+
+* Zoom level from 1 (world) to 19 (street)
+* Default: the zoom level from the settings
+
+#### height
+
+* Height of the map with a CSS unit, e.g. 400px or 50vh
+* Default: the height from the settings
+
+#### source
+
+* "object" for the actual object, "list" for all objects of the list with the active filters (only with Connector for Propstack Pro)
+* Default: object
+
+#### popup
+
+* "1" to show the title and a link in a popup for maps with the list of objects, "0" to hide it
+* Default: 1
+
+### Example
+
+`[cfprop_widget_map zoom="14" height="400px"]`

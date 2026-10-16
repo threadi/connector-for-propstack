@@ -41,15 +41,26 @@
 .cfprop-values {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: flex-start;
 	gap: .5em 1em;
 	justify-content: space-between;
 	margin-top: 1em;
 	padding: 0 1rem;
 	div {
 		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		gap: .5em;
+		flex-direction: column;
+		gap: .25em;
+	}
+	/* the class "cfprop-costs" is also used for the costs on the detail page, so reset its styles here. */
+	.cfprop-costs {
+		background-color: transparent;
+		padding: 0;
+	}
+	.cfprop-spaces {
+		text-align: right;
+	}
+	p {
+		margin: 0;
 	}
 }
 

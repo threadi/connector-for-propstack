@@ -137,6 +137,7 @@ class ImmoObjects {
 		add_action( 'cfprop_files_for_object_imported_via_ajax', array( $this, 'assign_feature_image' ) );
 		add_action( 'cfprop_queue_after_processing', array( $this, 'assign_feature_image_via_queue' ), 10, 0 );
 		add_action( 'cfprop_import_object', array( $this, 'assign_feature_image_during_import' ), 10, 2 );
+		add_action( 'cfprop_import_object', array( $this, 'update_title_during_import' ), 5, 4 );
 		add_action( 'cfprop_import_object_after', array( $this, 'set_main_object_type' ) );
 		add_filter( 'cfprop_object_type_fields', array( $this, 'hide_object_type_fields' ) );
 		add_filter( 'cfprop_object_import_response', array( $this, 'remove_document_from_response' ) );
@@ -2006,6 +2007,79 @@ class ImmoObjects {
 		}
 		$this->cache_cleared_after_deletion = true;
 		Cache::get_instance()->clear_cache();
+	}
+
+	/**
+	 * Update the title of an existing object during its import, if it has been changed in Propstack.
+	 *
+	 * New objects get their title when they are created. The slug (URL) of the object is not changed.
+	 *
+	 * @param array<string,mixed> $immo_object   The object data from API.
+	 * @param int                 $post_id       The post-ID of the object.
+	 * @param string              $language_code The used language.
+	 * @param bool                $is_new_object True if the object has just been created.
+	 *
+	 * @return void
+	 */
+	public function update_title_during_import( array $immo_object, int $post_id, string $language_code, bool $is_new_object ): void {
+		// bail on new objects, they got their title during their creation.
+		if ( $is_new_object ) {
+			return;
+		}
+
+		// get the title from Propstack (API v1 delivers it as a field with label and value).
+		$title = $immo_object['title'] ?? '';
+		if ( is_array( $title ) ) {
+			$title = $title['value'] ?? '';
+		}
+		if ( ! is_scalar( $title ) || '' === (string) $title ) {
+			$title = $immo_object['name'] ?? '';
+		}
+		$title = wp_strip_all_tags( is_scalar( $title ) ? (string) $title : '' );
+
+		// bail if no title is given.
+		if ( '' === trim( $title ) ) {
+			return;
+		}
+
+		// bail if the title has not been changed.
+		if ( get_post_field( 'post_title', $post_id, 'raw' ) === $title ) {
+			return;
+		}
+
+		$update = true;
+		/**
+		 * Filter whether the title of an existing object should be updated during its import.
+		 *
+		 * Return false to keep titles, which have been changed in WordPress.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param bool                $update        True to update the title.
+		 * @param int                 $post_id       The post-ID of the object.
+		 * @param string              $title         The new title from Propstack.
+		 * @param array<string,mixed> $immo_object   The object data from API.
+		 * @param string              $language_code The used language.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		if ( ! apply_filters( 'cfprop_update_object_title', $update, $post_id, $title, $immo_object, $language_code ) ) {
+			return;
+		}
+
+		// update the title (the slug stays unchanged, as it is already set).
+		$result = wp_update_post(
+			array(
+				'ID'         => $post_id,
+				'post_title' => $title,
+			),
+			true
+		);
+
+		// log errors.
+		if ( $result instanceof \WP_Error ) {
+			/* translators: %1$d will be replaced by the post-ID. */
+			Log::get_instance()->add( sprintf( __( 'The title of the object with the post-ID %1$d could not be updated:', 'connector-for-propstack' ), $post_id ) . ' <code>' . esc_html( $result->get_error_message() ) . '</code>', 'error', 'import' );
+		}
 	}
 
 	/**

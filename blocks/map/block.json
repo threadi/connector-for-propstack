@@ -1,0 +1,52 @@
+{
+	"$schema": "https://json.schemastore.org/block.json",
+	"apiVersion": 3,
+	"name": "connector-for-propstack/map",
+	"title": "Map",
+	"category": "connector-for-propstack",
+	"description": "Provides a block to show the location of an object from Propstack on a map.",
+	"keywords": ["Propstack", "Map", "OpenStreetMap", "Google Maps"],
+	"supports": {
+		"html": false
+	},
+	"textdomain": "connector-for-propstack",
+	"editorScript": "file:build/index.js",
+	"attributes": {
+		"id": {
+			"type": "integer",
+			"default": 0
+		},
+		"blockId": {
+			"type": "string"
+		},
+		"source": {
+			"type": "string",
+			"default": "object"
+		},
+		"object_id": {
+			"type": "string",
+			"default": ""
+		},
+		"zoom": {
+			"type": "string",
+			"default": ""
+		},
+		"popup": {
+			"type": "boolean",
+			"default": true
+		},
+		"height": {
+			"type": "string",
+			"default": ""
+		},
+		"preview": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	}
+}

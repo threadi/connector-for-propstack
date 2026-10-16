@@ -145,6 +145,7 @@ class Gutenberg extends PageBuilder_Base {
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Field',
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Filter',
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Gallery',
+			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Map',
 			'\ConnectorForPropstack\PageBuilder\Gutenberg\Blocks\Single',
 		);
 

@@ -1,0 +1,81 @@
+.cfprop-map-wrapper {
+	width: 100%;
+	margin: 0 0 1.5em;
+}
+
+.cfprop-map {
+	position: relative;
+	width: 100%;
+	min-height: 200px;
+	background-color: #e8ecef;
+	overflow: hidden;
+	z-index: 0;
+}
+
+.cfprop-map-preview,
+.cfprop-map-consent {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: .75em;
+	padding: 1.5em;
+	text-align: center;
+	box-sizing: border-box;
+}
+
+.cfprop-map-consent {
+	position: absolute;
+	inset: 0;
+	p {
+		max-width: 32em;
+		margin: 0;
+	}
+}
+
+.cfprop-map-consent-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: .5em;
+}
+
+.cfprop-map-consent button {
+	cursor: pointer;
+}
+
+.cfprop-map-consent .cfprop-map-load-always {
+	background: transparent;
+	border: 0;
+	color: inherit;
+	text-decoration: underline;
+}
+
+.cfprop-map-error {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5em;
+	text-align: center;
+}
+
+.cfprop-map-popup {
+	min-width: 160px;
+	max-width: 240px;
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+		margin-bottom: .5em;
+	}
+	strong {
+		display: block;
+		margin-bottom: .25em;
+	}
+}
+
+.cfprop-map-empty {
+	margin: 0 0 1.5em;
+}

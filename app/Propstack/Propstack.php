@@ -102,6 +102,12 @@ class Propstack {
 		// initialize the filter.
 		Filters::get_instance()->init();
 
+		// initialize the sortings.
+		Sortings::get_instance()->init();
+
+		// initialize the maps.
+		Maps::get_instance()->init();
+
 		// initialize the knowledge center.
 		KnowledgeCenter::get_instance()->init();
 

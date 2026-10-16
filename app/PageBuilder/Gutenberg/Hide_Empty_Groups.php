@@ -155,7 +155,7 @@ class Hide_Empty_Groups {
 		}
 
 		// media without text (e.g. the image of the broker or the gallery) counts as filled.
-		if ( preg_match( '/<(img|picture|video|audio|iframe|svg|canvas)\b/i', $block_content ) ) {
+		if ( preg_match( '/<(img|picture|video|audio|iframe|svg|canvas)\b|\sdata-cfprop-map=/i', $block_content ) ) {
 			return 'filled';
 		}
 
