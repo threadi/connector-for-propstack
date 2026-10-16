@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Propstack\Field_Category_Base;
 use ConnectorForPropstack\Propstack\Fields;
+use ConnectorForPropstack\Propstack\Files;
 use ConnectorForPropstack\Propstack\Fields\Main\ApiResponse;
 use ConnectorForPropstack\Propstack\ImmoObjects;
 use WP_Post;
@@ -112,5 +113,43 @@ class Images extends Field_Category_Base {
 			?>
 		</ul>
 		<?php
+
+		// get the API response for this object.
+		$api_response = Fields::get_instance()->get_field_value( $post_id, new ApiResponse(), true, true );
+
+		// bail if no images are in the API response.
+		if ( ! is_array( $api_response ) || empty( $api_response['images'] ) || ! is_array( $api_response['images'] ) ) {
+			return;
+		}
+
+		// count the images from Propstack which are not in the media library yet (e.g. new images or images which have been excluded before).
+		$missing = 0;
+		foreach ( $api_response['images'] as $file ) {
+			// bail if this is not a usable file entry.
+			if ( ! is_array( $file ) || ! isset( $file['id'] ) || ! is_scalar( $file['id'] ) ) {
+				continue;
+			}
+
+			// bail if the import of this image is prevented.
+			if ( Files::get_instance()->is_file_import_prevented( $file ) ) {
+				continue;
+			}
+
+			// bail if the image is already in the media library.
+			if ( Files::get_instance()->is_file_in_media_library( absint( $file['id'] ) ) > 0 ) {
+				continue;
+			}
+
+			++$missing;
+		}
+
+		// show hint for missing images.
+		if ( $missing > 0 ) {
+			/* translators: %1$d will be replaced by the amount of images. */
+			echo '<p><em>' . esc_html( sprintf( _n( '%1$d image from Propstack is not imported yet. It will be imported by the queue or you can import it now.', '%1$d images from Propstack are not imported yet. They will be imported by the queue or you can import them now.', $missing, 'connector-for-propstack' ), $missing ) ) . '</em></p>';
+		}
+
+		// show the button to import the images of this object now.
+		echo '<a href="#" class="easy-dialog-for-wordpress button" data-dialog="' . esc_attr( Helper::get_json( \ConnectorForPropstack\Propstack\PostTypes\ImmoObject::get_instance()->get_import_images_dialog( $post_id ) ) ) . '">' . esc_html__( 'Import images', 'connector-for-propstack' ) . '</a>';
 	}
 }

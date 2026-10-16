@@ -198,12 +198,21 @@ class Archive extends Widget_Base {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_params(): array {
-		return array(
+		$params = array(
 			'show_sorting' => array(
 				'label'    => __( 'Set to "0" to hide the selection for the sorting above this list.', 'connector-for-propstack' ),
 				'required' => false,
 			),
 		);
+
+		/**
+		 * Filter the params of the archive widget (for the shortcode description).
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 *
+		 * @param array<string,array<string,mixed>> $params The params.
+		 */
+		return apply_filters( 'cfprop_widget_archive_params', $params );
 	}
 
 	/**

@@ -24,6 +24,10 @@
 - Added entry "Edit object view" in the admin bar for administrators on the detail view and the list of objects, which shows the used template and links to it (can be disabled in the settings)
 - Added block patterns for a list of objects with filter, the newest objects and the contact with the broker
 - Show the reason why an object has not been imported
+- Show the reason why an image of an object has not been imported (e.g. as it is marked as private in Propstack) in the log, if debug mode for imports is enabled
+- Images which have already been imported and are marked as private or as not intended for the exposee in Propstack afterwards are removed from the object and the media library during the next import
+- Added button "Import images" to the images of an object in the backend, also if it already has images, with a hint if images from Propstack are not imported yet
+- Added hooks cfprop_prevent_file_import_reasons and cfprop_widget_archive_params
 - Added WP CLI command to check whether the Propstack API delivers a specific object
 - Added multiple hooks
 - Added option --network to the WP CLI command reset_plugin to reset all sites of a multisite network

@@ -120,6 +120,7 @@ class Files {
 		add_action( 'cfprop_queue_after_processing', array( $this, 'update_file_counter' ), 100, 0 );
 		add_filter( 'cfprop_prevent_file_import', array( $this, 'prevent_file_import' ), 10, 2 );
 		add_action( 'cfprop_import_object', array( $this, 'delete_unused_files' ), 10, 2 );
+		add_action( 'cfprop_import_object', array( $this, 'check_prevented_files_during_import' ), 10, 2 );
 
 		// use actions.
 		add_action( 'wp_ajax_cfprop_import_object_files', array( $this, 'import_by_ajax' ) );
@@ -479,21 +480,13 @@ class Files {
 	 * @return int
 	 */
 	public function import_file( int $post_id, int $id, string $url, string $filename, array $file_data, int $broker_id = 0 ): int {
-		// bail if the given URL is already in the media library.
-		// broker avatars are looked up by their broker, as their ID could collide with real file IDs.
-		$attachment_id = $broker_id > 0 ? $this->get_broker_avatar( $broker_id ) : $this->is_file_in_media_library( $id );
-		if ( $attachment_id > 0 ) {
-			// add a log entry.
-			/* translators: %1$s: the given URL. */
-			Log::get_instance()->add( sprintf( __( 'Given URL %1$s is already in the database.', 'connector-for-propstack' ), ' <em>' . esc_html( $url ) . '</em>' ), 'info', 'import' );
-
-			// return the attachment ID.
-			return $attachment_id;
-		}
-
 		$false = false;
 		/**
 		 * Filter whether a given file should not be imported.
+		 *
+		 * This is checked before the file is searched in the media library: a file which has been
+		 * imported before and is now prevented (e.g. as it is marked as private in Propstack) must
+		 * not be assigned to the object anymore, so it is removed by the cleanup of the import.
 		 *
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param bool $false Return true to prevent the import.
@@ -506,6 +499,18 @@ class Files {
 		 */
 		if ( apply_filters( 'cfprop_prevent_file_import', $false, $file_data, $id, $url, $filename ) ) {
 			return 0;
+		}
+
+		// bail if the given URL is already in the media library.
+		// broker avatars are looked up by their broker, as their ID could collide with real file IDs.
+		$attachment_id = $broker_id > 0 ? $this->get_broker_avatar( $broker_id ) : $this->is_file_in_media_library( $id );
+		if ( $attachment_id > 0 ) {
+			// add a log entry.
+			/* translators: %1$s: the given URL. */
+			Log::get_instance()->add( sprintf( __( 'Given URL %1$s is already in the database.', 'connector-for-propstack' ), ' <em>' . esc_html( $url ) . '</em>' ), 'info', 'import' );
+
+			// return the attachment ID.
+			return $attachment_id;
 		}
 
 		// require necessary files.
@@ -2003,6 +2008,250 @@ class Files {
 	}
 
 	/**
+	 * Return whether the import of the given file is prevented, e.g. as it is marked as private in Propstack.
+	 *
+	 * Uses the filter "cfprop_prevent_file_import" with the same parameters as the import of the file.
+	 *
+	 * @param array<string,mixed> $file_data The file data from Propstack.
+	 *
+	 * @return bool
+	 */
+	public function is_file_import_prevented( array $file_data ): bool {
+		// get the file ID.
+		$file_id = isset( $file_data['id'] ) && is_scalar( $file_data['id'] ) ? absint( $file_data['id'] ) : 0;
+
+		// get the URL and the file name.
+		$url      = $this->get_file_url( $file_data );
+		$filename = isset( $file_data['name'] ) && is_scalar( $file_data['name'] ) ? (string) $file_data['name'] : '';
+		if ( '' === $filename && '' !== $url ) {
+			$filename = $this->get_file_name_from_url( $url );
+		}
+
+		$false = false;
+		/**
+		 * Filter whether a given file should not be imported.
+		 *
+		 * @since 1.0.0 Available since 1.0.0.
+		 * @param bool $false Return true to prevent the import.
+		 * @param array<string,mixed> $file_data The file data from Propstack.
+		 * @param int  $id    The file ID.
+		 * @param string  $url   The URL to use for import.
+		 * @param string  $filename The file name.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		return (bool) apply_filters( 'cfprop_prevent_file_import', $false, $file_data, $file_id, $url, $filename );
+	}
+
+	/**
+	 * Return the reasons why the import of the given file is prevented.
+	 *
+	 * Only the checks of this plugin which are in use are asked. Own checks on the filter
+	 * "cfprop_prevent_file_import" could add their reasons via "cfprop_prevent_file_import_reasons".
+	 *
+	 * @param array<string,mixed> $file_data The file data from Propstack.
+	 *
+	 * @return array<int,string>
+	 */
+	public function get_prevent_file_import_reasons( array $file_data ): array {
+		// prepare the list of reasons.
+		$reasons = array();
+
+		// use the reasons of our own check, if it is in use.
+		if ( false !== has_filter( 'cfprop_prevent_file_import', array( $this, 'prevent_file_import' ) ) ) {
+			// check for private files.
+			if ( ! empty( $file_data['is_private'] ) ) {
+				$reasons[] = __( 'The image is marked as private in Propstack.', 'connector-for-propstack' );
+			}
+
+			// check for files which are not intended for the exposee.
+			if ( ! empty( $file_data['is_not_for_exposee'] ) ) {
+				$reasons[] = __( 'The image is marked as not intended for the exposee in Propstack.', 'connector-for-propstack' );
+			}
+		}
+
+		/**
+		 * Filter the reasons why the import of a file is prevented.
+		 *
+		 * Use this to add the reason for an own check on the filter "cfprop_prevent_file_import".
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 *
+		 * @param array<int,string>   $reasons   The reasons, each as a complete sentence.
+		 * @param array<string,mixed> $file_data The file data from Propstack.
+		 */
+		$reasons = apply_filters( 'cfprop_prevent_file_import_reasons', $reasons, $file_data );
+
+		// bail if the filter did not return a list.
+		if ( ! is_array( $reasons ) ) { // @phpstan-ignore function.alreadyNarrowedType
+			return array();
+		}
+
+		// return only usable reasons, each of them once.
+		return array_values( array_unique( array_filter( $reasons, static fn( $reason ) => is_string( $reason ) && '' !== $reason ) ) ); // @phpstan-ignore function.alreadyNarrowedType
+	}
+
+	/**
+	 * Check the images of an object during its import for images which will not be imported.
+	 *
+	 * Hint: the filter "cfprop_prevent_file_import" is used here for each image, in addition to its use
+	 * during the import of the files, so its callbacks should not have side effects.
+	 *
+	 * Each of these images is written with the reasons in the log (if debug mode is enabled for imports),
+	 * so it is visible why it is missing. They are also saved on the object for the list of images which
+	 * have not been imported.
+	 *
+	 * @param array<string,mixed> $immo_object The object data from API.
+	 * @param int                 $post_id     The post-ID of the object.
+	 *
+	 * @return void
+	 */
+	public function check_prevented_files_during_import( array $immo_object, int $post_id ): void {
+		// bail if no post-ID is given.
+		if ( $post_id <= 0 ) {
+			return;
+		}
+
+		// prepare the list of images which will not be imported.
+		$prevented_files = array();
+
+		// check each image of this object.
+		$images = isset( $immo_object['images'] ) && is_array( $immo_object['images'] ) ? $immo_object['images'] : array();
+		foreach ( $images as $file ) {
+			// bail if this is not a usable file entry.
+			if ( ! is_array( $file ) ) {
+				continue;
+			}
+
+			// get the file ID.
+			$file_id = isset( $file['id'] ) && is_scalar( $file['id'] ) ? absint( $file['id'] ) : 0;
+
+			// get the URL and the file name.
+			$url      = $this->get_file_url( $file );
+			$filename = isset( $file['name'] ) && is_scalar( $file['name'] ) ? (string) $file['name'] : '';
+			if ( '' === $filename && '' !== $url ) {
+				$filename = $this->get_file_name_from_url( $url );
+			}
+
+			// bail if the import of this image is not prevented.
+			if ( ! $this->is_file_import_prevented( $file ) ) {
+				continue;
+			}
+
+			// get the reasons.
+			$reasons = $this->get_prevent_file_import_reasons( $file );
+
+			// use a general hint if the import is prevented by an unknown check.
+			if ( empty( $reasons ) ) {
+				$reasons = array( __( 'A custom restriction prevents the import of the image.', 'connector-for-propstack' ) );
+			}
+
+			// use the ID as name if no name is known.
+			if ( '' === $filename ) {
+				/* translators: %1$d will be replaced by the Propstack-ID of the file. */
+				$filename = $file_id > 0 ? sprintf( __( 'File with ID %1$d', 'connector-for-propstack' ), $file_id ) : __( 'File without name', 'connector-for-propstack' );
+			}
+
+			// remember this image.
+			$prevented_files[] = array(
+				'id'       => $file_id,
+				'filename' => $filename,
+				'reasons'  => $reasons,
+			);
+
+			// add the log entry, it is only written if debug mode is enabled for imports.
+			Log::get_instance()->add(
+				sprintf(
+					/* translators: %1$s will be replaced by the file name, %2$s by the object title. */
+					__( 'Import of image %1$s for object %2$s prevented.', 'connector-for-propstack' ),
+					'<em>' . esc_html( $filename ) . '</em>',
+					'<em>' . esc_html( get_the_title( $post_id ) ) . '</em>'
+				) . ' ' . esc_html( implode( ' ', $reasons ) ),
+				'info',
+				'import'
+			);
+		}
+
+		// remove the list from the object if every image will be imported.
+		if ( empty( $prevented_files ) ) {
+			delete_post_meta( $post_id, 'cfprop_prevented_files' );
+			return;
+		}
+
+		// save the list on the object.
+		update_post_meta( $post_id, 'cfprop_prevented_files', $prevented_files );
+	}
+
+	/**
+	 * Return the images of all objects which have not been imported because of a restriction.
+	 *
+	 * The list is updated with each import of an object.
+	 *
+	 * Format of each entry:
+	 * - post_id => the post-ID of the object.
+	 * - object_id => the Propstack-ID of the object.
+	 * - title => the title of the object.
+	 * - id => the Propstack-ID of the image.
+	 * - filename => the file name of the image.
+	 * - reasons => the reasons, each as a complete sentence.
+	 *
+	 * @return array<int,array{post_id:int,object_id:string,title:string,id:int,filename:string,reasons:array<int,string>}>
+	 */
+	public function get_prevented_files(): array {
+		// get all objects with images which have not been imported.
+		$query = array(
+			'post_type'      => PostTypes\ImmoObject::get_instance()->get_name(),
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_key'       => 'cfprop_prevented_files', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		);
+		$post_ids = get_posts( $query );
+
+		// prepare the result.
+		$result = array();
+
+		// add the images of each object.
+		foreach ( $post_ids as $post_id ) {
+			$post_id = absint( $post_id );
+
+			// get the list of this object.
+			$files = get_post_meta( $post_id, 'cfprop_prevented_files', true );
+
+			// bail if the list is not usable.
+			if ( ! is_array( $files ) ) {
+				continue;
+			}
+
+			// get the data of the object.
+			$object_id = get_post_meta( $post_id, 'object_id', true );
+			$title     = get_the_title( $post_id );
+
+			// add each complete entry.
+			foreach ( $files as $file ) {
+				// bail if this is not an entry.
+				if ( ! is_array( $file ) || ! isset( $file['filename'], $file['reasons'] ) || ! is_array( $file['reasons'] ) ) {
+					continue;
+				}
+
+				$result[] = array(
+					'post_id'   => $post_id,
+					'object_id' => is_scalar( $object_id ) ? (string) $object_id : '',
+					'title'     => $title,
+					'id'        => absint( $file['id'] ?? 0 ),
+					'filename'  => is_scalar( $file['filename'] ) ? (string) $file['filename'] : '',
+					'reasons'   => array_values( array_filter( $file['reasons'], 'is_string' ) ),
+				);
+			}
+		}
+
+		// return the resulting list.
+		return $result;
+	}
+
+	/**
 	 * Delete files from immo object, which does not return from Propstack anymore.
 	 *
 	 * Hint: we compare them by the given "propstack_file_id".
@@ -2040,6 +2289,17 @@ class Files {
 
 		// loop through the images from the API and remove them from the local list, which are in the API list.
 		foreach ( $object_data['images'] as $image ) {
+			// bail if this is not a usable file entry.
+			if ( ! is_array( $image ) || ! isset( $image['id'] ) || ! is_scalar( $image['id'] ) ) {
+				continue;
+			}
+
+			// bail if the import of this image is prevented now (e.g. it has been marked as private in Propstack after its import),
+			// then it is removed from the object and the media library.
+			if ( $this->is_file_import_prevented( $image ) ) {
+				continue;
+			}
+
 			// get the given "propstack_file_id" from the list.
 			$attachment_id = array_search( (string) $image['id'], $list, true );
 
@@ -2064,5 +2324,8 @@ class Files {
 		foreach ( $list as $attachment_id => $id ) {
 			wp_delete_attachment( $attachment_id, true );
 		}
+
+		// re-calc the feature image, as it could have been one of the deleted files.
+		ImmoObjects::get_instance()->assign_feature_image( $post_id );
 	}
 }
