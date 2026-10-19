@@ -640,7 +640,7 @@ class Sortings {
 		// add the sorting for the SQL statement.
 		$query_params[ self::QUERY_VAR ] = array(
 			'option'        => $option,
-			'meta_key'      => $meta_key,
+			'meta_key'      => $meta_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			'fallback_key'  => $sorting['sorting']->get_fallback_meta_key( $context ),
 			'cast'          => $sorting['sorting']->get_cast(),
 			'direction'     => $sorting['direction'],
@@ -796,7 +796,7 @@ class Sortings {
 
 		// add the join for the value.
 		$clauses['join'] .= $wpdb->prepare( " LEFT JOIN ( SELECT `post_id`, MAX( `meta_value` ) AS `cfprop_value` FROM `$wpdb->postmeta` WHERE `meta_key` = %s GROUP BY `post_id` ) AS `cfprop_sort` ON ( `cfprop_sort`.`post_id` = `$wpdb->posts`.`ID` )", $sorting['meta_key'] ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$first = $this->get_sql_expressions( '`cfprop_sort`.`cfprop_value`', $cast, ! empty( $sorting['positive_only'] ) );
+		$first            = $this->get_sql_expressions( '`cfprop_sort`.`cfprop_value`', $cast, ! empty( $sorting['positive_only'] ) );
 
 		// use only the first value, if no second meta key is set.
 		if ( empty( $sorting['fallback_key'] ) || ! is_string( $sorting['fallback_key'] ) ) {
@@ -807,7 +807,7 @@ class Sortings {
 
 		// add the join for the second value.
 		$clauses['join'] .= $wpdb->prepare( " LEFT JOIN ( SELECT `post_id`, MAX( `meta_value` ) AS `cfprop_value` FROM `$wpdb->postmeta` WHERE `meta_key` = %s GROUP BY `post_id` ) AS `cfprop_sort2` ON ( `cfprop_sort2`.`post_id` = `$wpdb->posts`.`ID` )", $sorting['fallback_key'] ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$second = $this->get_sql_expressions( '`cfprop_sort2`.`cfprop_value`', $cast, ! empty( $sorting['positive_only'] ) );
+		$second           = $this->get_sql_expressions( '`cfprop_sort2`.`cfprop_value`', $cast, ! empty( $sorting['positive_only'] ) );
 
 		// set the order: first the objects with the first value, then the ones with the second value, then the others.
 		$group              = 'CASE WHEN NOT ( ' . $first['missing'] . ' ) THEN 0 WHEN NOT ( ' . $second['missing'] . ' ) THEN 1 ELSE 2 END';

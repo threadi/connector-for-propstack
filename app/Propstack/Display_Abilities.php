@@ -331,7 +331,7 @@ class Display_Abilities {
 
 		// check whether the sorting should be enabled.
 		if ( isset( $input['enabled'] ) ) {
-			$changes['enabled']                                 = (bool) $input['enabled'];
+			$changes['enabled']                             = (bool) $input['enabled'];
 			$options['propstack_connector_sorting_enabled'] = $changes['enabled'] ? 1 : 0;
 		}
 
@@ -405,7 +405,7 @@ class Display_Abilities {
 
 		// check the map ID for Google Maps.
 		if ( isset( $input['google_map_id'] ) ) {
-			$changes['google_map_id']                          = $maps->sanitize_key( $input['google_map_id'] );
+			$changes['google_map_id']                         = $maps->sanitize_key( $input['google_map_id'] );
 			$options['propstack_connector_map_google_map_id'] = $changes['google_map_id'];
 		}
 

@@ -2199,7 +2199,7 @@ class Files {
 	 */
 	public function get_prevented_files(): array {
 		// get all objects with images which have not been imported.
-		$query = array(
+		$query    = array(
 			'post_type'      => PostTypes\ImmoObject::get_instance()->get_name(),
 			'post_status'    => 'any',
 			'posts_per_page' => -1,
