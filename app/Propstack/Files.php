@@ -112,6 +112,7 @@ class Files {
 		// use our own hooks.
 		add_action( 'cfprop_files_before_import', array( $this, 'mark_files_as_not_updated' ), 10, 0 );
 		add_action( 'cfprop_file_is_assigned', array( $this, 'mark_file_as_updated' ) );
+		add_action( 'cfprop_file_is_assigned', array( $this, 'save_tags' ), 10, 2 );
 		add_action( 'cfprop_files_for_object_imported', array( $this, 'delete_not_updated_files' ), 10, 0 );
 		add_action( 'cfprop_files_for_object_imported_via_ajax', array( $this, 'delete_not_updated_files' ), 10, 0 );
 		add_action( 'cfprop_files_for_object_imported', array( $this, 'update_file_counter' ), 100, 0 );
@@ -1072,6 +1073,70 @@ class Files {
 	 */
 	public function mark_file_as_updated( int $attachment_id ): void {
 		update_post_meta( $attachment_id, 'propstack_file_updated', time() );
+	}
+
+	/**
+	 * Save the tags of a file from Propstack on its attachment.
+	 *
+	 * The tags are saved as they are delivered by Propstack. They are only shown in the media library,
+	 * the Pro plugin uses them to choose the images of a gallery. A file marked as floorplan gets the
+	 * tag "floorplan" in addition. The tags are only changed if Propstack delivers them (also if empty).
+	 *
+	 * @param int   $attachment_id The attachment ID.
+	 * @param mixed $file          The file data from Propstack API.
+	 *
+	 * @return void
+	 */
+	public function save_tags( int $attachment_id, mixed $file ): void {
+		// bail if no attachment is given.
+		if ( $attachment_id <= 0 ) {
+			return;
+		}
+
+		// bail if the tags are not delivered.
+		if ( ! is_array( $file ) || ! isset( $file['tags'] ) || ! is_array( $file['tags'] ) ) {
+			return;
+		}
+
+		// collect the tags.
+		$tags = array();
+		foreach ( $file['tags'] as $tag ) {
+			// bail if the tag is not usable.
+			if ( ! is_scalar( $tag ) || '' === trim( (string) $tag ) ) {
+				continue;
+			}
+
+			// add it to the list.
+			$tags[] = trim( (string) $tag );
+		}
+
+		// add the tag for floorplans.
+		if ( ! empty( $file['is_floorplan'] ) ) {
+			$tags[] = 'floorplan';
+		}
+
+		// save the list.
+		update_post_meta( $attachment_id, 'propstack_file_tags', array_values( array_unique( $tags ) ) );
+	}
+
+	/**
+	 * Return the tags from Propstack of the given attachment.
+	 *
+	 * @param int $attachment_id The attachment ID.
+	 *
+	 * @return array<int,string>
+	 */
+	public function get_tags( int $attachment_id ): array {
+		// get the saved list.
+		$tags = get_post_meta( $attachment_id, 'propstack_file_tags', true );
+
+		// bail if it is not a list.
+		if ( ! is_array( $tags ) ) {
+			return array();
+		}
+
+		// return the usable entries.
+		return array_values( array_map( 'strval', array_filter( $tags, 'is_scalar' ) ) );
 	}
 
 	/**

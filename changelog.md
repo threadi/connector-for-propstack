@@ -45,6 +45,8 @@
 - Added the custom fields, which are enabled for the frontend, to the catalog of the template abilities
 - Added hooks to add own blocks to the catalog of the template abilities for block templates and to check them
 - Columns of custom fields in the list of objects are hidden until they are enabled in the screen options, also for new custom fields
+- Tags of images from Propstack are saved on each image and shown in the media library, with a hint that they can be used with Connector for Propstack Pro
+- Added hook cfprop_gallery_images to filter the images of the gallery and hook cfprop_object_image_in_metabox for additional output below each image in the edit view of an object
 
 ### Changed
 

@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Propstack\Widget_Base;
+use WP_Post;
 
 /**
  * Object to handle the gallery widget.
@@ -96,8 +97,8 @@ class Gallery extends Widget_Base {
 			$attributes['size'] = 'thumbnail';
 		}
 
-		// get the assigned images.
-		$images = get_attached_media( array( 'image/jpeg', 'image/gif', 'image/png' ), $immo_object->get_id() ); // @phpstan-ignore argument.type
+		// get the images to show.
+		$images = $this->get_images( $immo_object, $attributes );
 
 		// bail if the list of images is empty.
 		if ( empty( $images ) ) {
@@ -132,6 +133,32 @@ class Gallery extends Widget_Base {
 
 		// return the gallery.
 		return '<div class="cfprop-gallery' . ( isset( $attributes['classes'] ) && is_string( $attributes['classes'] ) ? ' ' . esc_attr( trim( $attributes['classes'] ) ) : '' ) . '">' . wp_kses_post( $gallery ) . '</div>';
+	}
+
+	/**
+	 * Return the images of the given object, which should be shown in the gallery.
+	 *
+	 * @param \ConnectorForPropstack\Propstack\ImmoObject $immo_object The object.
+	 * @param array<string,mixed>                         $attributes  Attributes to configure the rendering.
+	 *
+	 * @return array<int|string,WP_Post>
+	 */
+	public function get_images( \ConnectorForPropstack\Propstack\ImmoObject $immo_object, array $attributes ): array {
+		// get the assigned images.
+		$images = get_attached_media( array( 'image/jpeg', 'image/gif', 'image/png' ), $immo_object->get_id() ); // @phpstan-ignore argument.type
+
+		/**
+		 * Filter the images of an object, which are shown in the gallery.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param array<int|string,WP_Post>                   $images      The images.
+		 * @param \ConnectorForPropstack\Propstack\ImmoObject $immo_object The object.
+		 * @param array<string,mixed>                         $attributes  Attributes to configure the rendering.
+		 */
+		$images = apply_filters( 'cfprop_gallery_images', $images, $immo_object, $attributes );
+
+		// return only usable entries.
+		return is_array( $images ) ? array_filter( $images, static fn( $image ): bool => $image instanceof WP_Post ) : array(); // @phpstan-ignore function.alreadyNarrowedType, instanceof.alwaysTrue
 	}
 
 	/**

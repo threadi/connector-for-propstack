@@ -107,7 +107,18 @@ class Images extends Field_Category_Base {
 						<?php
 						echo wp_kses_post( $thumbnail );
 						?>
-					</a></li>
+					</a>
+					<?php
+					/**
+					 * Run additional tasks after an image of the object in its edit view (e.g. to show its tags).
+					 *
+					 * @since 2.1.0 Available since 2.1.0.
+					 * @param int     $image_id The attachment ID of the image.
+					 * @param WP_Post $post     The object.
+					 */
+					do_action( 'cfprop_object_image_in_metabox', $image_id, $post );
+					?>
+				</li>
 				<?php
 			}
 			?>

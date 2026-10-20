@@ -173,7 +173,27 @@ Shortcode structure:
 
 Displays the gallery of a property.
 
-This shortcode has no additional parameters.
+### Parameters
+
+#### tags (Pro only)
+
+* Optional: show only images with at least one of these tags from Propstack, separated by commas
+* The values are listed under Settings > Connector for Propstack > Import > Tags
+* Default: empty (all images)
+
+#### columns
+
+* Optional: the number of columns
+* Default: 3
+
+#### size
+
+* Optional: the image size, e.g. thumbnail, medium, large or full
+* Default: thumbnail
+
+### Example
+
+`[cfprop_widget_gallery tags="innenansicht,floorplan" columns="4" size="medium"]`
 
 ## Map
 

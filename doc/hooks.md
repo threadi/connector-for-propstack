@@ -3027,6 +3027,26 @@ Version | Description
 
 Source: [app/Propstack/MediaLibrary.php](Propstack/MediaLibrary.php), [line 434](Propstack/MediaLibrary.php#L434-L442)
 
+### `cfprop_gallery_images`
+
+*Filter the images of an object, which are shown in the gallery.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$images` | `array<int\|string,\WP_Post>` | The images.
+`$immo_object` | `\ConnectorForPropstack\Propstack\ImmoObject` | The object.
+`$attributes` | `array<string,mixed>` | Attributes to configure the rendering.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Gallery.php](Propstack/Widgets/Gallery.php), [line 158](Propstack/Widgets/Gallery.php#L150-L158)
+
 ### `cfprop_import_object_languages`
 
 *This filter is documented in app/Propstack/Imports/v1/Objects.php*

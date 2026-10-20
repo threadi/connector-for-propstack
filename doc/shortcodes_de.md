@@ -181,7 +181,27 @@ Aufbau des Shortcodes:
 
 Gibt die Galerie eines Objektes aus.
 
-Dieser Shortcode verfügt über keine weiteren Parameter.
+### Parameter
+
+#### tags (nur Pro)
+
+* Optional: nur Bilder mit mindestens einem dieser Tags aus Propstack anzeigen, durch Kommas getrennt
+* Die Werte stehen unter Einstellungen > Connector für Propstack > Import > Tags
+* Standard: leer (alle Bilder)
+
+#### columns
+
+* Optional: die Anzahl der Spalten
+* Standard: 3
+
+#### size
+
+* Optional: die Bildgröße, z. B. thumbnail, medium, large oder full
+* Standard: thumbnail
+
+### Beispiel
+
+`[cfprop_widget_gallery tags="innenansicht,floorplan" columns="4" size="medium"]`
 
 ## Karte
 
