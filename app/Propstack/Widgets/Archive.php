@@ -167,7 +167,17 @@ class Archive extends Widget_Base {
 		if ( ! $content ) {
 			return '';
 		}
-		return $content;
+
+		/**
+		 * Filter the output of the archive widget.
+		 *
+		 * Used by Connector for Propstack Pro, e.g. to wrap the list so it could be updated via AJAX.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param string              $content    The output (sorting, list and pagination).
+		 * @param array<string,mixed> $attributes The attributes of the archive widget, incl. the query ("query").
+		 */
+		return (string) apply_filters( 'cfprop_widget_archive_output', $content, $attributes );
 	}
 
 	/**

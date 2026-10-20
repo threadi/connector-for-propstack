@@ -28,6 +28,9 @@
 - Images which have already been imported and are marked as private or as not intended for the exposee in Propstack afterwards are removed from the object and the media library during the next import
 - Added button "Import images" to the images of an object in the backend, also if it already has images, with a hint if images from Propstack are not imported yet
 - Added hooks cfprop_prevent_file_import_reasons and cfprop_widget_archive_params
+- Added hooks cfprop_widget_archive_output, cfprop_widget_map_output and cfprop_widget_filter_params (e.g. for the update of the list via AJAX in Connector for Propstack Pro)
+- Added the attributes of the shortcode [cfprop_widget_filter] to its description
+- The sorting above the list also works for lists which are loaded later, e.g. via AJAX
 - Added WP CLI command to check whether the Propstack API delivers a specific object
 - Added multiple hooks
 - Added option --network to the WP CLI command reset_plugin to reset all sites of a multisite network
@@ -106,6 +109,7 @@
 
 ### Fixed
 
+- The validation of the interval of the automatic import no longer requires functions of the backend (e.g. if saved via WP-CLI)
 - Fixed misaligned prices and areas in the list of objects, e.g. in block themes (empty values are no longer output and the styles of the costs on the detail page no longer apply to the list)
 - Fixed title of existing objects not being updated by the import if it has been changed in Propstack (the URL of the object stays the same)
 - Fixed import of images via API v2

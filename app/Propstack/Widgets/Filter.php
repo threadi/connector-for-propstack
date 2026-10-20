@@ -152,6 +152,33 @@ class Filter extends Widget_Base {
 	}
 
 	/**
+	 * Return the params this widget supports (for the shortcode description).
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public function get_params(): array {
+		$params = array(
+			'filters'          => array(
+				'label'    => __( 'The filters to show, separated by comma, e.g. "city,object_id". Leave empty to show all filters.', 'connector-for-propstack' ),
+				'required' => false,
+			),
+			'filter_alignment' => array(
+				'label'    => __( 'The alignment of the filters: "row" or "column".', 'connector-for-propstack' ),
+				'required' => false,
+			),
+		);
+
+		/**
+		 * Filter the params of the filter widget (for the shortcode description).
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 *
+		 * @param array<string,array<string,mixed>> $params The params.
+		 */
+		return apply_filters( 'cfprop_widget_filter_params', $params );
+	}
+
+	/**
 	 * Return the allowed HTML for the output of this widget (including the form elements).
 	 *
 	 * @return array<string,mixed>

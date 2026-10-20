@@ -259,6 +259,27 @@ class Map extends Widget_Base {
 	 * @return string
 	 */
 	public function render( array $attributes ): string {
+		/**
+		 * Filter the output of the map widget (also if it is empty).
+		 *
+		 * Used by Connector for Propstack Pro, e.g. to update a map with the objects of the list via AJAX.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param string              $content    The output.
+		 * @param array<string,mixed> $attributes The attributes of the map widget.
+		 * @param string              $source     The source of the locations ("object" or "list").
+		 */
+		return (string) apply_filters( 'cfprop_widget_map_output', $this->get_output( $attributes ), $attributes, $this->get_source( $attributes ) );
+	}
+
+	/**
+	 * Return the output of the widget.
+	 *
+	 * @param array<string,mixed> $attributes Attributes to configure the rendering.
+	 *
+	 * @return string
+	 */
+	private function get_output( array $attributes ): string {
 		// get the maps object.
 		$maps = Maps::get_instance();
 
