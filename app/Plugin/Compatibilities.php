@@ -185,8 +185,10 @@ class Compatibilities {
 	public function get_compatibility_checks(): array {
 		$list = array(
 			'ConnectorForPropstack\Plugin\Compatibilities\Avada',
+			'ConnectorForPropstack\Plugin\Compatibilities\Avada_Forms',
 			'ConnectorForPropstack\Plugin\Compatibilities\Avia',
 			'ConnectorForPropstack\Plugin\Compatibilities\Beaver',
+			'ConnectorForPropstack\Plugin\Compatibilities\BitForm',
 			'ConnectorForPropstack\Plugin\Compatibilities\Breakdance',
 			'ConnectorForPropstack\Plugin\Compatibilities\Bricks',
 			'ConnectorForPropstack\Plugin\Compatibilities\Brizy',
@@ -194,11 +196,19 @@ class Compatibilities {
 			'ConnectorForPropstack\Plugin\Compatibilities\Divi4',
 			'ConnectorForPropstack\Plugin\Compatibilities\Divi5',
 			'ConnectorForPropstack\Plugin\Compatibilities\Elementor',
+			'ConnectorForPropstack\Plugin\Compatibilities\Elementor_Forms',
+			'ConnectorForPropstack\Plugin\Compatibilities\EverestForms',
+			'ConnectorForPropstack\Plugin\Compatibilities\FluentForms',
+			'ConnectorForPropstack\Plugin\Compatibilities\Formidable',
+			'ConnectorForPropstack\Plugin\Compatibilities\GravityForms',
+			'ConnectorForPropstack\Plugin\Compatibilities\NinjaForms',
 			'ConnectorForPropstack\Plugin\Compatibilities\Salient_WpBakery',
 			'ConnectorForPropstack\Plugin\Compatibilities\SiteOrigin',
+			'ConnectorForPropstack\Plugin\Compatibilities\SureForms',
 			'ConnectorForPropstack\Plugin\Compatibilities\WpBakery',
 			'ConnectorForPropstack\Plugin\Compatibilities\Wpforms',
 			'ConnectorForPropstack\Plugin\Compatibilities\WpformsLite',
+			'ConnectorForPropstack\Plugin\Compatibilities\WsForm',
 		);
 
 		/**

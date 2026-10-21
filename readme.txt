@@ -166,6 +166,7 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
+- Added hints for the form plugins supported by Connector for Propstack Pro: Avada Forms, Bit Form, Elementor Forms, Everest Forms, Fluent Forms, Formidable Forms, Gravity Forms, Ninja Forms, SureForms and WS Form
 - Fixed: values in the list of objects (e.g. prices) no longer overlap in narrow columns
 - Fixed: the list of objects and the detail view in classic themes show the default image for objects without an image
 - Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help

@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added hints for the form plugins supported by Connector for Propstack Pro: Avada Forms, Bit Form, Elementor Forms, Everest Forms, Fluent Forms, Formidable Forms, Gravity Forms, Ninja Forms, SureForms and WS Form
 - Added hint for administrators on the page of an object, if its map could not be shown (e.g. without geo coordinates)
 - Added sorting of the list of objects: a selection above the list (archive widget, block and shortcode) offers only sortings which are useful for the objects of the actual list, works with filters and pagination, objects without value are shown at the end
 - Added sorting by price (purchase price for objects to buy, base rent for objects to rent; in mixed lists the objects to buy are shown first, then the objects to rent)
