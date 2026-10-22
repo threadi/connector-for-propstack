@@ -161,7 +161,7 @@ class Users {
 		/**
 		 * Filter the query to get the users for the settings (e.g., the author of imported objects).
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,mixed> $query The query for get_users().
 		 */
 		$query = apply_filters( 'cfprop_users_for_settings_query', $query );

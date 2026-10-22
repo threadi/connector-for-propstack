@@ -75,7 +75,7 @@ class Archive extends Widget_Base {
 		 *
 		 * Hint: changing "posts_per_page" via "cfprop_archive_query_params" only affects the widget, not the main query.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $posts_per_page The number of objects per page.
 		 */
 		return max( 1, absint( apply_filters( 'cfprop_archive_posts_per_page', $posts_per_page ) ) );
@@ -173,7 +173,7 @@ class Archive extends Widget_Base {
 		 *
 		 * Used by Connector for Propstack Pro, e.g. to wrap the list so it could be updated via AJAX.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param string              $content    The output (sorting, list and pagination).
 		 * @param array<string,mixed> $attributes The attributes of the archive widget, incl. the query ("query").
 		 */
@@ -195,7 +195,7 @@ class Archive extends Widget_Base {
 		/**
 		 * Filter whether the selection for the sorting is shown above the list of objects.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool                $show       True to show it (if the sorting is enabled and useful for the list).
 		 * @param array<string,mixed> $attributes The attributes of the archive widget.
 		 */
@@ -218,7 +218,7 @@ class Archive extends Widget_Base {
 		/**
 		 * Filter the params of the archive widget (for the shortcode description).
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 *
 		 * @param array<string,array<string,mixed>> $params The params.
 		 */

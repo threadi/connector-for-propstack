@@ -2,7 +2,7 @@
 /**
  * Template for output a list of objects as an archive of our custom post type.
  *
- * @version: 2.2.0
+ * @version: 3.0.0
  * @package connector-for-propstack
  */
 

@@ -361,7 +361,7 @@ class ProcessHandler {
 	 * @return void
 	 */
 	private function delete(): void {
-		// remove the list of all processes used before 2.1.0, if it still exists.
+		// remove the list of all processes used before 3.0.0, if it still exists.
 		if ( false !== get_option( 'cfprop_process_values' ) ) {
 			delete_option( 'cfprop_process_values' );
 		}

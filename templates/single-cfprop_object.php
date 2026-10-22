@@ -2,7 +2,7 @@
 /**
  * Template for the output of a single immo object.
  *
- * @version: 2.2.0
+ * @version: 3.0.0
  * @package connector-for-propstack
  */
 

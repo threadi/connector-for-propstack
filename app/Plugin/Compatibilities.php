@@ -114,7 +114,7 @@ class Compatibilities {
 		/**
 		 * Filter the interval in seconds in which the compatibility checks are run.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $interval The interval in seconds.
 		 */
 		set_transient( self::CHECK_TRANSIENT, 1, max( 1, absint( apply_filters( 'cfprop_compatibility_checks_interval', $interval ) ) ) );

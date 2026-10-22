@@ -7,7 +7,7 @@
  * @param array<string,mixed> $attributes List of attributes for displaying templates.
  *
  * @package connector-for-propstack
- * @version: 2.1.0
+ * @version: 3.0.0
  */
 
 // prevent direct access.

@@ -111,7 +111,7 @@ class Frontend_Hints {
 		/**
 		 * Filter whether the hints for administrators should be shown in the frontend.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool $true True to show the hints.
 		 */
 		return (bool) apply_filters( 'cfprop_show_frontend_hints', $true );
@@ -163,7 +163,7 @@ class Frontend_Hints {
 		 *
 		 * Used e.g. by page builders, which provide their own templates for objects.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,string> $info The information: "label" describes the used template, "edit_url" is the URL to edit it.
 		 * @param string               $type The view type ("single" or "archive").
 		 */

@@ -184,7 +184,7 @@ class Sorting_Base {
 		/**
 		 * Filter whether a sorting should be hidden.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool         $hidden   True if the sorting should be hidden.
 		 * @param Sorting_Base $instance The sorting object.
 		 */
@@ -235,7 +235,7 @@ class Sorting_Base {
 		/**
 		 * Filter whether a sorting could be used for the given list of objects.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool            $available True if the sorting is available.
 		 * @param Sorting_Base    $instance  The sorting object.
 		 * @param Sorting_Context $context   The objects of the list.

@@ -128,7 +128,7 @@ class Patterns {
 		/**
 		 * Filter the block patterns of this plugin.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,array<string,mixed>> $patterns List of patterns (name => settings for register_block_pattern()).
 		 */
 		return apply_filters( 'cfprop_block_patterns', $patterns );

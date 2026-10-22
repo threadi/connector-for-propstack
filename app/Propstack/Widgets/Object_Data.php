@@ -120,7 +120,7 @@ class Object_Data extends Widget_Base {
 		/**
 		 * Filter the fields for the object data widget.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,array<string,mixed>> $fields The fields for the object data widget.
 		 * @param array<string,mixed> $attributes The attributes for the object data widget.
 		 */

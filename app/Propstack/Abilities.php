@@ -912,7 +912,7 @@ class Abilities {
 		 *
 		 * After this time no further chunk will be started in this event, the import will be continued by a new event.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $time_budget The time budget in seconds.
 		 */
 		$time_budget = max( 1, absint( apply_filters( 'cfprop_ability_import_time_budget', $time_budget ) ) );
@@ -921,7 +921,7 @@ class Abilities {
 		/**
 		 * Filter the maximum number of chunks one cron event of an import started by an ability runs.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $max_chunks The max number of chunks.
 		 */
 		$max_chunks = max( 1, absint( apply_filters( 'cfprop_ability_import_max_chunks', $max_chunks ) ) );

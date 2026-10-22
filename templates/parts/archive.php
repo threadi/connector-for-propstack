@@ -4,7 +4,7 @@
  *
  * @param array<string,mixed> $attributes List of settings.
  *
- * @version: 2.1.0
+ * @version: 3.0.0
  * @package connector-for-propstack
  */
 
@@ -33,7 +33,7 @@ if ( ! empty( $attributes['listing_template'] ) && is_string( $attributes['listi
 		 *
 		 * Disabled by default.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool                $cfprop_show_pagination True to show the pagination.
 		 * @param array<string,mixed> $attributes             List of attributes.
 		 */

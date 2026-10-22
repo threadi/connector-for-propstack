@@ -192,7 +192,7 @@ class Templates {
 		 *
 		 * Each name is used to run the action "cfprop_template_<name>".
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,string> $list List of template names.
 		 */
 		$list = apply_filters( 'cfprop_template_names', $list );

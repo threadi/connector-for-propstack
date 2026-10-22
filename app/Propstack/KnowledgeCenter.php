@@ -178,7 +178,7 @@ class KnowledgeCenter {
 			/**
 			 * Filter whether a knowledge center entry is visible in the help.
 			 *
-			 * @since 2.1.0 Available since 2.1.0.
+			 * @since 3.0.0 Available since 3.0.0.
 			 * @param bool                 $visible True if the entry is visible.
 			 * @param KnowledgeCenter_Base $entry   The entry.
 			 * @param string               $screen_name The name of the screen ("settings", "setup" or "objects").
@@ -373,7 +373,7 @@ class KnowledgeCenter {
 		/**
 		 * Filter the groups of the knowledge center entries. Each group is shown as one tab in the help.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,string> $groups List of groups (internal name => title).
 		 */
 		return apply_filters( 'cfprop_knowledge_center_groups', $groups );

@@ -714,7 +714,7 @@ class Queue {
 		 *
 		 * Use 0 to keep these entries.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $days The amount of days.
 		 */
 		$days = absint( apply_filters( 'cfprop_queue_failed_entries_lifetime', $days ) );

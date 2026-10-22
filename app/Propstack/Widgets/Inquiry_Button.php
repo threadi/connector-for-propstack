@@ -78,7 +78,7 @@ class Inquiry_Button extends Widget_Base {
 		/**
 		 * Filter the content settings of the inquiry button widget, which are used in each page builder.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,array<string,mixed>> $settings List of settings.
 		 */
 		return apply_filters( 'cfprop_widget_inquiry_button_content_settings', $settings );
@@ -229,7 +229,7 @@ class Inquiry_Button extends Widget_Base {
 		/**
 		 * Filter the style settings of the inquiry button widget, which are used in each page builder.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,array<string,mixed>> $settings List of settings.
 		 */
 		return apply_filters( 'cfprop_widget_inquiry_button_style_settings', $settings );
@@ -638,7 +638,7 @@ class Inquiry_Button extends Widget_Base {
 		 *
 		 * The type is one of "custom", "broker_email", "broker_phone", "admin_email" or "none".
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array{url: string, label: string, type: string} $target      The target with URL, label and type.
 		 * @param ImmoObject                                      $immo_object The immo object.
 		 * @param array<string,mixed>                             $attributes  The attributes of the widget.

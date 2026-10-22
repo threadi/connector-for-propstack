@@ -184,7 +184,7 @@ class FieldCategories {
 		/**
 		 * Filter the list of available field category types.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,string> $category_types List of field category types.
 		 */
 		return apply_filters( 'cfprop_field_category_types', $category_types );

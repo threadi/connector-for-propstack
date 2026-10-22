@@ -1360,7 +1360,7 @@ class ImmoObjects {
 		/**
 		 * Filter the meta keys of objects which are used for the search in the backend.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,string> $meta_keys List of meta keys.
 		 */
 		$meta_keys = apply_filters( 'cfprop_object_search_meta_keys', $meta_keys );
@@ -2053,7 +2053,7 @@ class ImmoObjects {
 		 *
 		 * Return false to keep titles, which have been changed in WordPress.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool                $update        True to update the title.
 		 * @param int                 $post_id       The post-ID of the object.
 		 * @param string              $title         The new title from Propstack.

@@ -112,7 +112,7 @@ class Images extends Field_Category_Base {
 					/**
 					 * Run additional tasks after an image of the object in its edit view (e.g. to show its tags).
 					 *
-					 * @since 2.1.0 Available since 2.1.0.
+					 * @since 3.0.0 Available since 3.0.0.
 					 * @param int     $image_id The attachment ID of the image.
 					 * @param WP_Post $post     The object.
 					 */

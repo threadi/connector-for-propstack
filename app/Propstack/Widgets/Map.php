@@ -80,7 +80,7 @@ class Map extends Widget_Base {
 		 *
 		 * Connector for Propstack Pro adds "list" for all objects of the list (with the active filters).
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,string> $sources List of sources (internal name => label).
 		 */
 		return apply_filters( 'cfprop_widget_map_sources', $sources );
@@ -137,7 +137,7 @@ class Map extends Widget_Base {
 		/**
 		 * Filter the content settings of the map widget, which are used in each page builder.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,array<string,mixed>> $settings List of settings.
 		 */
 		return apply_filters( 'cfprop_widget_map_content_settings', $settings );
@@ -264,7 +264,7 @@ class Map extends Widget_Base {
 		 *
 		 * Used by Connector for Propstack Pro, e.g. to update a map with the objects of the list via AJAX.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param string              $content    The output.
 		 * @param array<string,mixed> $attributes The attributes of the map widget.
 		 * @param string              $source     The source of the locations ("object" or "list").
@@ -294,7 +294,7 @@ class Map extends Widget_Base {
 		 *
 		 * Never add the exact location of objects with hidden address.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,array<string,mixed>> $points     List of points with lat, lng, approximate, title, url and image.
 		 * @param array<string,mixed>            $attributes The attributes of the widget.
 		 */
@@ -342,7 +342,7 @@ class Map extends Widget_Base {
 		/**
 		 * Filter the attributes for the map widget.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,mixed> $attributes The attributes for the map widget.
 		 */
 		$attributes = apply_filters( 'cfprop_widget_map_attributes', $attributes );
@@ -383,7 +383,7 @@ class Map extends Widget_Base {
 		/**
 		 * Filter whether administrators see a hint in frontend, why the map of an object is not shown.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool                $show       True to show the hint.
 		 * @param array<string,mixed> $attributes The attributes of the widget.
 		 */
@@ -446,7 +446,7 @@ class Map extends Widget_Base {
 		/**
 		 * Filter the maximum number of objects on the map widget with the objects of the list.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $max The maximum number of objects.
 		 */
 		$max = max( 1, absint( apply_filters( 'cfprop_widget_map_max_objects', $max ) ) );

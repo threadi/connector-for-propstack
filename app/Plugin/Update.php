@@ -93,8 +93,8 @@ class Update {
 			if ( version_compare( $db_plugin_version, '2.0.0', '<' ) ) {
 				$this->version200();
 			}
-			if ( version_compare( $db_plugin_version, '2.1.0', '<' ) ) {
-				$this->version210();
+			if ( version_compare( $db_plugin_version, '3.0.0', '<' ) ) {
+				$this->version300();
 			}
 
 			// log that this update has been run.
@@ -177,11 +177,11 @@ class Update {
 	}
 
 	/**
-	 * Run on update to 2.1.0.
+	 * Run on update to 3.0.0.
 	 *
 	 * @return void
 	 */
-	private function version210(): void {
+	private function version300(): void {
 		// get our crypt object.
 		$crypt = Crypt::get_instance();
 
