@@ -166,40 +166,21 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added hints for the form plugins supported by Connector for Propstack Pro: Avada Forms, Bit Form, Elementor Forms, Everest Forms, Fluent Forms, Formidable Forms, Gravity Forms, Ninja Forms, SureForms and WS Form
-- Fixed: values in the list of objects (e.g. prices) no longer overlap in narrow columns
-- Fixed: the list of objects and the detail view in classic themes show the default image for objects without an image
-- Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help
-- Added help entries for showing objects on the website, editing their views, import problems, missing images, API v2, automatic import, hidden addresses, sold objects, languages and support, grouped by topic as expandable sections
-- Help entries for displaying objects adapt to the used theme and detected page builders
-- Added links from log entries and dialogs to the matching help entries
-- Added entry "Edit object view" in the admin bar for administrators on the detail view and the list of objects, which shows the used template and links to it (can be disabled in the settings)
-- Added block patterns for a list of objects with filter, the newest objects and the contact with the broker
-- Added new widget for show the energy scale of a single object, usable as Block and via shortcode
-- Added new field type for energy efficiency classes with check against a whitelist for value A+ to H
-- Added new field type for geo coordinates to output them with 4 digits
-- Added internal names for each supported page builder
-- Added multiple abilities to get object data, start imports or create templates for and with objects via AI or your preferred MCP plugin
-- Added the Propstack logo as icon in the new WordPress Icon API
-- Added compatibility check for Avia, Beaver Builder, Divi 5 and SiteOrigin
-- Added an intro after the setup to introduce the main functions of this plugin
-- Added a filter in both media library views to show only images for objects
-- Added an info box on every image from Propstack in media library
-- Added some new hooks
-- Optimized the setup to onboarding the plugin
-- Multiple optimizations for stability of the plugin
-- Use $throwable::class instead of get_class() for the modern way of PHP
-- Use configured language during the installation of default terms for our taxonomies
-- Do not show error marker if setup has not been completed
-- Resort some settings
-- Updated settings lib
-- Updated lightbox3 library
-- Fixed check for Elementor Pro and PRO Elements
-- Fixed missing DataView scripts in release build
-- Fixed faulty check for the singular template to display the thumbnail
-- Fixed faulty default value for daily import schedule
-- Fixed wrong handling of block templates from third parties
-- Fixed missing run of check for tasks to update after plugin update
-- Removed language files from repository
+* Added inquiry button to contact the broker about an object
+* Added map of the object location with OpenStreetMap or Google Maps, loaded only after consent
+* Added sorting of object lists, e.g. by price
+* Added support for custom fields from Propstack
+* Added block patterns for object lists and broker contact
+* Added many help entries, linked from the log and dialogs
+* Added quick link to edit the object view in the admin bar
+* The reason is now shown if an object or image could not be imported
+* The "hide address" setting from Propstack is now respected
+* Objects without title are no longer imported by default
+* Improved support for Propstack API v2
+* Imports of large accounts are now more reliable
+* Improved display of object lists and details in many themes
+* Improved security and performance
+* Requires WordPress 6.6 or newer
+* Many bug fixes
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)
