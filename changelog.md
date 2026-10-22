@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added widget, block and shortcode "Inquiry Button" for a button to request information about an object: it uses the public email of the broker (with title, ID and link of the object), otherwise the public phone number of the broker, otherwise the email of the website; an optional link target (e.g. #contact for a form on the same page) could be set
+- The inquiry button could be styled: in the block editor with its design tools (typography, colors, border, radius, padding and margin), in all other page builders and the shortcode with settings for colors (also on hover), font, border, radius and padding
+- The inquiry button is used in the contact box of the detail view of classic themes and block themes and in the block pattern "Contact with broker"
+- Added hook "cfprop_inquiry_button_target" to change the target of the inquiry button
 - Added hints for the form plugins supported by Connector for Propstack Pro: Avada Forms, Bit Form, Elementor Forms, Everest Forms, Fluent Forms, Formidable Forms, Gravity Forms, Ninja Forms, SureForms and WS Form
 - Added hint for administrators on the page of an object, if its map could not be shown (e.g. without geo coordinates)
 - Added sorting of the list of objects: a selection above the list (archive widget, block and shortcode) offers only sortings which are useful for the objects of the actual list, works with filters and pagination, objects without value are shown at the end
@@ -109,12 +113,12 @@
 - Values of custom fields are now saved and shown in a uniform format (e.g. the names of chosen options instead of their IDs with API v1, dates and numbers in the format of the website)
 - Custom fields, which are no longer delivered by Propstack, are removed during the import
 - Country fields show the name of each country instead of its code
-- The list of objects and the detail view are no longer left-aligned in classic themes without own container styles (e.g. Hello Elementor or themes used with a page builder); the list now also adapts its number of columns to the available width
-- Improved the list of objects and the detail view in classic themes: the number of columns no longer depends on the root font size of the theme (e.g. 5 columns in Twenty Twenty), the sorting has a distance to the filter above, words are no longer broken by theme styles and theme margins no longer stretch the rows of the detail view
-- The links and the button in the contact box of the detail view are now readable in every theme (customizable via the custom properties --cfprop-contact-button-background and --cfprop-contact-button-color)
 
 ### Fixed
 
+- The list of objects and the detail view are no longer left-aligned in classic themes without own container styles (e.g. Hello Elementor or themes used with a page builder); the list now also adapts its number of columns to the available width
+- Improved the list of objects and the detail view in classic themes: the number of columns no longer depends on the root font size of the theme (e.g. 5 columns in Twenty Twenty), the sorting has a distance to the filter above, words are no longer broken by theme styles and theme margins no longer stretch the rows of the detail view
+- The links and the button in the contact box of the detail view are now readable in every theme (customizable via the custom properties --cfprop-contact-button-background and --cfprop-contact-button-color)
 - The validation of the interval of the automatic import no longer requires functions of the backend (e.g. if saved via WP-CLI)
 - Fixed misaligned prices and areas in the list of objects, e.g. in block themes (empty values are no longer output and the styles of the costs on the detail page no longer apply to the list)
 - Fixed title of existing objects not being updated by the import if it has been changed in Propstack (the URL of the object stays the same)

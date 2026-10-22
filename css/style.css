@@ -117,6 +117,16 @@
 }
 
 /**
+	Styles for the inquiry button.
+ */
+.cfprop-inquiry-button a {
+	box-sizing: border-box;
+	display: block;
+	text-align: center;
+	width: 100%;
+}
+
+/**
 	Styles for single.
  */
 .cfprop-object.default-max-width {

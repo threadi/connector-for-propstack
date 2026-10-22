@@ -14,6 +14,7 @@ use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Propstack\Fields\Broker\Name;
 use ConnectorForPropstack\Propstack\Fields\Broker\Position;
 use ConnectorForPropstack\Propstack\Fields\Broker\PublicEmail;
+use ConnectorForPropstack\Propstack\Fields\Broker\PublicCell;
 use ConnectorForPropstack\Propstack\Fields\Broker\PublicPhone;
 use ConnectorForPropstack\Propstack\Fields\Broker\Thumbnail;
 use ConnectorForPropstack\Propstack\Fields\Main\AirConditioning;
@@ -94,6 +95,7 @@ use ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base;
 use ConnectorForPropstack\Propstack\Widgets\Broker_Field;
 use ConnectorForPropstack\Propstack\Widgets\Field;
 use ConnectorForPropstack\Propstack\Widgets\Gallery;
+use ConnectorForPropstack\Propstack\Widgets\Inquiry_Button;
 use ConnectorForPropstack\Propstack\Widgets\Object_Data;
 use WP_Error;
 
@@ -805,9 +807,6 @@ class Templates {
 			new PublicPhone(),
 		);
 
-		// get the public email of the broker (never use the private email of the broker in frontend).
-		$email = $this->get_broker_public_email( $immo_object );
-
 		?>
 			<div class="cfprop-2column-content">
 				<div class="cfprop-2column-content-left">
@@ -960,11 +959,8 @@ class Templates {
 							</div>
 						</div>
 						<?php
-						if ( ! empty( $email ) ) {
-							?>
-							<a href="<?php echo esc_url( 'mailto:' . antispambot( $email ) ); ?>" class="button"><?php echo esc_html__( 'Send inquiry', 'connector-for-propstack' ); ?></a>
-							<?php
-						}
+						// show the inquiry button (uses the email or phone of the broker or the email of this website).
+						echo wp_kses( Inquiry_Button::get_instance()->render( array( 'object' => $immo_object ) ), Inquiry_Button::get_instance()->get_allowed_html() );
 						?>
 					</div>
 				</div>
@@ -982,7 +978,51 @@ class Templates {
 	 *
 	 * @return string
 	 */
-	private function get_broker_public_email( ImmoObject $immo_object ): string {
+	public function get_broker_public_email( ImmoObject $immo_object ): string {
+		// get the value.
+		$email = $this->get_broker_public_value( $immo_object, new PublicEmail() );
+
+		// bail if the value is not a valid email.
+		if ( ! is_email( $email ) ) {
+			return '';
+		}
+
+		// return the email.
+		return $email;
+	}
+
+	/**
+	 * Return the public phone number of the broker of the given object.
+	 *
+	 * Uses the public phone and as fallback the public cell phone. Returns an empty string if no broker
+	 * is assigned, no public number is set or the fields should not be visible in frontend.
+	 *
+	 * @param ImmoObject $immo_object The immo object.
+	 *
+	 * @return string
+	 */
+	public function get_broker_public_phone( ImmoObject $immo_object ): string {
+		foreach ( array( new PublicPhone(), new PublicCell() ) as $field ) {
+			$phone = $this->get_broker_public_value( $immo_object, $field );
+			if ( '' !== $phone ) {
+				return $phone;
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Return the value of a public field of the broker of the given object.
+	 *
+	 * Returns an empty string if no broker is assigned, the value is not set or the field should not be
+	 * visible in frontend.
+	 *
+	 * @param ImmoObject $immo_object The immo object.
+	 * @param Field_Base $field       The field of the broker.
+	 *
+	 * @return string
+	 */
+	private function get_broker_public_value( ImmoObject $immo_object, Field_Base $field ): string {
 		// get the broker of this object.
 		$broker_terms = wp_get_object_terms( $immo_object->get_id(), Broker::get_instance()->get_name() );
 
@@ -990,9 +1030,6 @@ class Templates {
 		if ( ! is_array( $broker_terms ) || empty( $broker_terms ) ) {
 			return '';
 		}
-
-		// get the field.
-		$field = new PublicEmail();
 
 		// bail if the field should not be visible in frontend.
 		if ( $field->hide() || $field->hide_in_frontend() ) {
@@ -1005,15 +1042,15 @@ class Templates {
 		}
 
 		// get the value.
-		$email = Taxonomies::get_instance()->get_field_value( $broker_terms[0]->term_id, $field, true, true );
+		$value = Taxonomies::get_instance()->get_field_value( $broker_terms[0]->term_id, $field, true, true );
 
-		// bail if the value is not a valid email.
-		if ( ! is_string( $email ) || ! is_email( $email ) ) {
+		// bail if the value is not a string.
+		if ( ! is_string( $value ) ) {
 			return '';
 		}
 
-		// return the email.
-		return $email;
+		// return the value.
+		return trim( $value );
 	}
 
 	/**

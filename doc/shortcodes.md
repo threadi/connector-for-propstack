@@ -233,3 +233,36 @@ Shortcode structure:
 ### Example
 
 `[cfprop_widget_map zoom="14" height="400px"]`
+
+## Inquiry Button
+
+Shows a button for an inquiry about the actual object. Without a link target the button uses the public email of the broker (with the title, the ID and the link of the object in the email), otherwise the public phone number of the broker, otherwise the email of this website.
+
+Shortcode structure:
+
+`[cfprop_widget_inquiry_button]`
+
+### Parameters
+
+#### url
+
+* Optional link target, e.g. `#contact` for a form with this ID on the same page or the URL of your contact page
+* Default: empty (email or phone of the broker, otherwise the email of this website)
+
+#### Styles
+
+Optional, without value the button uses the styles of the theme:
+
+* `text_color`, `background_color`, `text_color_hover`, `background_color_hover`, `border_color`: colors, e.g. `#ffffff`, `rgb(0,0,0)` or `var(--my-color)`
+* `font_family`: e.g. `Georgia, serif`
+* `font_size`, `letter_spacing`, `padding`, `border_width`, `border_radius`: sizes, e.g. `16px`, `1em` or `10px 20px` (numbers without unit are pixels)
+* `line_height`: e.g. `1.4`
+* `font_weight`: `100` to `900`
+* `font_style`: `normal` or `italic`
+* `text_transform`: `none`, `uppercase`, `lowercase` or `capitalize`
+* `text_decoration`: `none`, `underline` or `line-through`
+* `border_style`: `none`, `solid`, `dashed`, `dotted` or `double`
+
+### Example
+
+`[cfprop_widget_inquiry_button url="#contact" background_color="#333333" text_color="#ffffff" border_radius="4px"]`

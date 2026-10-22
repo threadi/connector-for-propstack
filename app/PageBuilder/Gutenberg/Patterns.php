@@ -117,7 +117,7 @@ class Patterns {
 		if ( Helper::theme_is_fse_theme() ) {
 			$patterns['broker-contact'] = array(
 				'title'         => __( 'Contact with broker', 'connector-for-propstack' ),
-				'description'   => __( 'Image, name, position, email and phone of the broker of the object. For the template of the detail view.', 'connector-for-propstack' ),
+				'description'   => __( 'Image, name, position, email and phone of the broker of the object with a button for inquiries. For the template of the detail view.', 'connector-for-propstack' ),
 				'categories'    => array( $this->category ),
 				'keywords'      => array( 'propstack', __( 'broker', 'connector-for-propstack' ), __( 'contact', 'connector-for-propstack' ) ),
 				'templateTypes' => array( 'single-' . ImmoObject::get_instance()->get_name() ),
@@ -345,6 +345,7 @@ class Patterns {
 		$content .= '<!-- wp:connector-for-propstack/broker-field {"field_name":"public_phone"} /-->';
 		$content .= '</div><!-- /wp:group -->';
 		$content .= '</div><!-- /wp:group -->';
+		$content .= '<!-- wp:connector-for-propstack/inquiry-button /-->';
 		return $content . '</div><!-- /wp:group -->';
 	}
 }

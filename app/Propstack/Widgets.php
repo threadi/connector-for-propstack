@@ -80,6 +80,7 @@ class Widgets {
 			'\ConnectorForPropstack\Propstack\Widgets\Field',
 			'\ConnectorForPropstack\Propstack\Widgets\Filter',
 			'\ConnectorForPropstack\Propstack\Widgets\Gallery',
+			'\ConnectorForPropstack\Propstack\Widgets\Inquiry_Button',
 			'\ConnectorForPropstack\Propstack\Widgets\Map',
 			'\ConnectorForPropstack\Propstack\Widgets\Object_Data',
 			'\ConnectorForPropstack\Propstack\Widgets\Single',

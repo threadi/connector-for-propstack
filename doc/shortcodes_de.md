@@ -241,3 +241,36 @@ Aufbau des Shortcodes:
 ### Beispiel
 
 `[cfprop_widget_map zoom="14" height="400px"]`
+
+## Anfrage-Button
+
+Zeigt einen Button für eine Anfrage zum aktuellen Objekt. Ohne Link-Ziel nutzt der Button die öffentliche E-Mail-Adresse des Maklers (mit Titel, ID und Link des Objekts in der E-Mail), sonst die öffentliche Telefonnummer des Maklers, sonst die E-Mail-Adresse dieser Website.
+
+Aufbau des Shortcodes:
+
+`[cfprop_widget_inquiry_button]`
+
+### Parameter
+
+#### url
+
+* Optionales Link-Ziel, z. B. `#contact` für ein Formular mit dieser ID auf derselben Seite oder die URL deiner Kontaktseite
+* Standard: leer (E-Mail oder Telefon des Maklers, sonst die E-Mail-Adresse dieser Website)
+
+#### Gestaltung
+
+Optional, ohne Wert nutzt der Button die Gestaltung des Themes:
+
+* `text_color`, `background_color`, `text_color_hover`, `background_color_hover`, `border_color`: Farben, z. B. `#ffffff`, `rgb(0,0,0)` oder `var(--meine-farbe)`
+* `font_family`: z. B. `Georgia, serif`
+* `font_size`, `letter_spacing`, `padding`, `border_width`, `border_radius`: Größen, z. B. `16px`, `1em` oder `10px 20px` (Zahlen ohne Einheit sind Pixel)
+* `line_height`: z. B. `1.4`
+* `font_weight`: `100` bis `900`
+* `font_style`: `normal` oder `italic`
+* `text_transform`: `none`, `uppercase`, `lowercase` oder `capitalize`
+* `text_decoration`: `none`, `underline` oder `line-through`
+* `border_style`: `none`, `solid`, `dashed`, `dotted` oder `double`
+
+### Beispiel
+
+`[cfprop_widget_inquiry_button url="#contact" background_color="#333333" text_color="#ffffff" border_radius="4px"]`
