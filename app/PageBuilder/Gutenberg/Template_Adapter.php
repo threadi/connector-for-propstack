@@ -100,6 +100,10 @@ class Template_Adapter extends Template_Adapter_Base {
 			'filters'          => __( 'The filters to show, e.g. ["city"].', 'connector-for-propstack' ),
 			'filter_alignment' => __( 'The alignment of the filters: "row" or "column".', 'connector-for-propstack' ),
 			'object_id'        => __( 'The Propstack ID of the object to show (not the post-ID in WordPress, see object_id in the results of the object abilities). Only needed outside of templates for objects.', 'connector-for-propstack' ),
+			'source'           => __( 'Which objects the map shows: "object" for the actual object (detail view) or "list" for all objects of the list with the active filters (only with Connector for Propstack Pro).', 'connector-for-propstack' ),
+			'zoom'             => __( 'The zoom level of the map from 1 (world) to 19 (street) as string, e.g. "14". Empty to use the zoom level from the settings.', 'connector-for-propstack' ),
+			'popup'            => __( 'Whether markers on a map with the list of objects show a popup with the title and a link to the object.', 'connector-for-propstack' ),
+			'height'           => __( 'The height of the map with a CSS unit, e.g. "400px" or "50vh". Empty to use the height from the settings.', 'connector-for-propstack' ),
 		);
 	}
 
@@ -115,6 +119,7 @@ class Template_Adapter extends Template_Adapter_Base {
 			self::BLOCK_PREFIX . 'description'  => array( 'single' ),
 			self::BLOCK_PREFIX . 'gallery'      => array( 'single' ),
 			self::BLOCK_PREFIX . 'energy-scale' => array( 'single' ),
+			self::BLOCK_PREFIX . 'map'          => array( 'single' ),
 			self::BLOCK_PREFIX . 'archive'      => array( 'archive' ),
 			self::BLOCK_PREFIX . 'filter'       => array( 'archive' ),
 			self::BLOCK_PREFIX . 'single'       => array(),
@@ -139,6 +144,7 @@ class Template_Adapter extends Template_Adapter_Base {
 			self::BLOCK_PREFIX . 'description'  => '<!-- wp:connector-for-propstack/description {"description_type":"description_note"} /-->',
 			self::BLOCK_PREFIX . 'filter'       => '<!-- wp:connector-for-propstack/filter {"filters":["city"]} /-->',
 			self::BLOCK_PREFIX . 'single'       => '<!-- wp:connector-for-propstack/single {"object_id":123456} /-->',
+			self::BLOCK_PREFIX . 'map'          => '<!-- wp:connector-for-propstack/map {"zoom":"14","height":"400px"} /-->',
 		);
 
 		// return the example or a self-closing block without attributes.
@@ -274,6 +280,8 @@ class Template_Adapter extends Template_Adapter_Base {
 			__( 'Hiding empty values needs no own CSS: do not write CSS with :has() or :empty for this.', 'connector-for-propstack' ),
 			__( 'Yes/no fields are output as icon: <span class="dashicons dashicons-yes"></span> or <span class="dashicons dashicons-no"></span>. The icon font is loaded by this plugin on every page, so do not replace the icons via CSS.', 'connector-for-propstack' ),
 			__( 'Use the block connector-for-propstack/description for descriptions (see description_types), not the field block. It keeps the formatting of the texts.', 'connector-for-propstack' ),
+			__( 'Use the block connector-for-propstack/map for the location of the object. It respects the setting to hide the address and loads the map only after the consent of the visitor (see the settings under "Maps"). Do not embed maps via iframe or custom HTML.', 'connector-for-propstack' ),
+			__( 'The block connector-for-propstack/archive shows the selection for the sorting above the list automatically, if the sorting is enabled in the settings. Do not build an own sorting.', 'connector-for-propstack' ),
 			__( 'The blocks of this plugin support the usual block settings for typography, colors and spacing (e.g. "fontSize", "style"). Do not set the attribute "blockId", it is managed by the block editor.', 'connector-for-propstack' ),
 			__( 'CSS for the template belongs into the parameter "css" of save-template, not into the template. It is loaded only on the pages which use this template. Use own class names via "className" and prefix them to avoid conflicts with the theme.', 'connector-for-propstack' ),
 			__( 'Saving: call save-template first with "dry_run": true, show the result to the user and save with "dry_run": false only after the user agreed. reset-template restores the original template.', 'connector-for-propstack' ),

@@ -84,6 +84,8 @@ class KnowledgeCenter {
 		$fields = array(
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\ShowObjects',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\EditView',
+			'\ConnectorForPropstack\Propstack\KnowledgeCenter\Sorting',
+			'\ConnectorForPropstack\Propstack\KnowledgeCenter\Maps',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\PageBuilderLayout',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\NotFound',
 			'\ConnectorForPropstack\Propstack\KnowledgeCenter\ShortcodeAsText',

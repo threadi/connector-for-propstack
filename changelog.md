@@ -4,6 +4,24 @@
 
 ### Added
 
+- Added widget, block and shortcode "Inquiry Button" for a button to request information about an object: it uses the public email of the broker (with title, ID and link of the object), otherwise the public phone number of the broker, otherwise the email of the website; an optional link target (e.g. #contact for a form on the same page) could be set
+- The inquiry button could be styled: in the block editor with its design tools (typography, colors, border, radius, padding and margin), in all other page builders and the shortcode with settings for colors (also on hover), font, border, radius and padding
+- The inquiry button is used in the contact box of the detail view of classic themes and block themes and in the block pattern "Contact with broker"
+- Added hook "cfprop_inquiry_button_target" to change the target of the inquiry button
+- Added hints for the form plugins supported by Connector for Propstack Pro: Avada Forms, Bit Form, Elementor Forms, Everest Forms, Fluent Forms, Formidable Forms, Gravity Forms, Ninja Forms, SureForms and WS Form
+- Added hint for administrators on the page of an object, if its map could not be shown (e.g. without geo coordinates)
+- Added sorting of the list of objects: a selection above the list (archive widget, block and shortcode) offers only sortings which are useful for the objects of the actual list, works with filters and pagination, objects without value are shown at the end
+- Added sorting by price (purchase price for objects to buy, base rent for objects to rent; in mixed lists the objects to buy are shown first, then the objects to rent)
+- Added settings tab "Sorting" to enable the sorting and hide single sortings (the default sorting could be chosen with Connector for Propstack Pro)
+- Added attribute "show_sorting" to the shortcode [cfprop_widget_archive]
+- Added widget, block and shortcode "Map" to show the location of an object with OpenStreetMap (Leaflet) or Google Maps
+- Added settings tab "Maps" for the map service, the API key for Google Maps, the tile server, consent before loading, zoom level, height and the handling of objects with hidden address
+- Maps are loaded only after the consent of the visitor by default; the exact location of objects with hidden address is never sent to the browser
+- Added abilities to read and change the settings of the sorting and the maps (get-sorting-settings, update-sorting-settings, get-map-settings, update-map-settings)
+- Added parameter "sort" to the ability get-objects and the location of the object to the ability get-object
+- Added the map block and hints for the sorting to the catalog of the template abilities
+- Added help entries for the sorting and the maps
+- Added multiple hooks for sortings and maps
 - Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help
 - Added help entries for showing objects on the website, editing their views, import problems, missing images, API v2, automatic import, hidden addresses, sold objects, languages and support
 - Help entries for displaying objects adapt to the used theme and detected page builders
@@ -11,6 +29,13 @@
 - Added entry "Edit object view" in the admin bar for administrators on the detail view and the list of objects, which shows the used template and links to it (can be disabled in the settings)
 - Added block patterns for a list of objects with filter, the newest objects and the contact with the broker
 - Show the reason why an object has not been imported
+- Show the reason why an image of an object has not been imported (e.g. as it is marked as private in Propstack) in the log, if debug mode for imports is enabled
+- Images which have already been imported and are marked as private or as not intended for the exposee in Propstack afterwards are removed from the object and the media library during the next import
+- Added button "Import images" to the images of an object in the backend, also if it already has images, with a hint if images from Propstack are not imported yet
+- Added hooks cfprop_prevent_file_import_reasons and cfprop_widget_archive_params
+- Added hooks cfprop_widget_archive_output, cfprop_widget_map_output and cfprop_widget_filter_params (e.g. for the update of the list via AJAX in Connector for Propstack Pro)
+- Added the attributes of the shortcode [cfprop_widget_filter] to its description
+- The sorting above the list also works for lists which are loaded later, e.g. via AJAX
 - Added WP CLI command to check whether the Propstack API delivers a specific object
 - Added multiple hooks
 - Added option --network to the WP CLI command reset_plugin to reset all sites of a multisite network
@@ -25,6 +50,8 @@
 - Added the custom fields, which are enabled for the frontend, to the catalog of the template abilities
 - Added hooks to add own blocks to the catalog of the template abilities for block templates and to check them
 - Columns of custom fields in the list of objects are hidden until they are enabled in the screen options, also for new custom fields
+- Tags of images from Propstack are saved on each image and shown in the media library, with a hint that they can be used with Connector for Propstack Pro
+- Added hook cfprop_gallery_images to filter the images of the gallery and hook cfprop_object_image_in_metabox for additional output below each image in the edit view of an object
 
 ### Changed
 
@@ -89,6 +116,12 @@
 
 ### Fixed
 
+- The list of objects and the detail view are no longer left-aligned in classic themes without own container styles (e.g. Hello Elementor or themes used with a page builder); the list now also adapts its number of columns to the available width
+- Improved the list of objects and the detail view in classic themes: the number of columns no longer depends on the root font size of the theme (e.g. 5 columns in Twenty Twenty), the sorting has a distance to the filter above, words are no longer broken by theme styles and theme margins no longer stretch the rows of the detail view
+- The links and the button in the contact box of the detail view are now readable in every theme (customizable via the custom properties --cfprop-contact-button-background and --cfprop-contact-button-color)
+- The validation of the interval of the automatic import no longer requires functions of the backend (e.g. if saved via WP-CLI)
+- Fixed misaligned prices and areas in the list of objects, e.g. in block themes (empty values are no longer output and the styles of the costs on the detail page no longer apply to the list)
+- Fixed title of existing objects not being updated by the import if it has been changed in Propstack (the URL of the object stays the same)
 - Fixed import of images via API v2
 - Fixed wrong JS-function to import settings for the plugin
 - Remove our schedules on plugin deactivation

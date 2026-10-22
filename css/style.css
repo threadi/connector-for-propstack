@@ -3,11 +3,54 @@
 }
 
 /**
+	Fallback layout for the wrapper of our own classic templates (archive and single).
+
+	Used in classic themes without own container styles for these templates (e.g. Hello Elementor,
+	or any theme where a page builder handles the layout). Uses :where() to keep the specificity at 0,
+	so every theme or page builder rule overrides it. Width and gutter can be set via custom properties.
+ */
+:where(.cfprop-page) {
+	box-sizing: border-box;
+	margin-inline: auto;
+	max-width: var(--cfprop-page-max-width, 1200px);
+	padding-inline: var(--cfprop-page-gutter, 16px);
+	width: 100%;
+}
+
+/* center our limited elements in every container (also if used as widget, block or shortcode in a page builder). */
+:where(.cfprop-objects, .cfprop-filter, .cfprop-sorting, .cfprop-object.default-max-width) {
+	margin-inline: auto;
+}
+
+/**
+	Neutralize base styles of classic themes inside our own components.
+
+	Some themes set "word-break: break-word" on all elements (e.g. Twenty Twenty), which breaks short words
+	like "Apartment" or "Floor:" in narrow flex items. Long words still wrap via overflow-wrap.
+ */
+:is(.cfprop-objects, .cfprop-object) * {
+	overflow-wrap: break-word;
+	word-break: normal;
+}
+
+/* the groups in our rows of label and value get their spacing by the gap of the row, not by theme margins.
+   ":not(#cfprop-reset)" raises the specificity above theme rules like ".wp-block-group:not(.has-background):not(...)"
+   (Twenty Twenty) without !important, so spacing set in the block editor (inline styles) still wins. */
+:is(.cfprop-property-details, .cfprop-costs, .cfprop-features, .cfprop-building-conditions-energy, .cfprop-distances, .cfprop-broker) .wp-block-group:not(#cfprop-reset) {
+	margin-block: 0;
+	& > p {
+		margin-block: 0;
+	}
+}
+
+/**
 	Styles for archive.
  */
 .cfprop-objects {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	/* 3 columns at full width, fewer in narrow containers (depends on the container, not on the viewport).
+	   Uses px as some themes change the root font size (e.g. Twenty Twenty uses 1rem = 10px). */
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
 	gap: 1.2em;
 	max-width: 1200px !important;
 }
@@ -41,15 +84,26 @@
 .cfprop-values {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: flex-start;
 	gap: .5em 1em;
 	justify-content: space-between;
 	margin-top: 1em;
 	padding: 0 1rem;
 	div {
 		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		gap: .5em;
+		flex-direction: column;
+		gap: .25em;
+	}
+	/* the class "cfprop-costs" is also used for the costs on the detail page, so reset its styles here. */
+	.cfprop-costs {
+		background-color: transparent;
+		padding: 0;
+	}
+	.cfprop-spaces {
+		text-align: right;
+	}
+	p {
+		margin: 0;
 	}
 }
 
@@ -60,6 +114,16 @@
 
 .cfprop-field-type-price, .cfprop-field-format-square_meter {
 	white-space: nowrap;
+}
+
+/**
+	Styles for the inquiry button.
+ */
+.cfprop-inquiry-button a {
+	box-sizing: border-box;
+	display: block;
+	text-align: center;
+	width: 100%;
 }
 
 /**
@@ -169,17 +233,37 @@
 	position: sticky;
 	top: 1em;
 	z-index: 1;
+	h2 {
+		margin-top: 0;
+	}
 	.cfprop-contact {
 		display: flex;
 		flex-direction: row;
 		gap: 20px;
 		margin-top: 1em;
 	}
+	.cfprop-broker {
+		display: flex;
+		flex-direction: column;
+		gap: .5em;
+	}
+	/* the box has its own background, so the link color of the theme could be unreadable on it. */
+	a:not(.button) {
+		color: inherit;
+		text-decoration: underline;
+	}
+	/* use a neutral button with enough contrast on the background of the box (customizable via custom properties). */
 	.button {
+		background-color: var(--cfprop-contact-button-background, #fff);
+		border-color: var(--cfprop-contact-button-background, #fff);
+		color: var(--cfprop-contact-button-color, #333);
 		display: block;
 		margin-top: 1em;
 		text-align: center;
 		width: 100%;
+		&:hover, &:focus {
+			opacity: .85;
+		}
 	}
 }
 

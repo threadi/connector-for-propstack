@@ -32,6 +32,8 @@ There is nothing to prepare on your hosting. Install the plugin, enter your Prop
 ✅ Works with classic themes and block themes
 ✅ 7 blocks for the block editor plus [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
 ✅ Filter your object archive by city and object ID
+✅ Let visitors sort the list of objects by price
+✅ Show the location of an object on a map with OpenStreetMap or Google Maps, loaded only after consent
 ✅ Privacy friendly: Propstack never receives any data about your visitors
 ✅ Use AI to generate your object presentation in frontend
 
@@ -52,6 +54,9 @@ The Pro version removes the limits of the free version and adds everything you n
 ➕ Import and display of all object types Propstack offers, such as "Plot", "Office" or "Store"
 ➕ Considerably more data fields for your Propstack objects
 ➕ Ten widgets and ready-made templates for page builders such as Avada, Avia (Enfold), Beaver Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Elementor, GeneratePress Elements, Live Composer, Oxygen, Salient, SiteOrigin, Themify, WPBakery and Zion Builder
+➕ Update objects immediately via webhooks from Propstack
+➕ More sortings like newest objects, living space, rooms or plot area
+➕ Map with all objects of the list
 ➕ Send contact enquiries straight into Propstack using Avada Forms, Elementor Forms, Contact Form 7 or WPForms
 ➕ Additional blocks for the block editor, for example object status
 ➕ Personal support by the developers
@@ -161,6 +166,7 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
+- Added hints for the form plugins supported by Connector for Propstack Pro: Avada Forms, Bit Form, Elementor Forms, Everest Forms, Fluent Forms, Formidable Forms, Gravity Forms, Ninja Forms, SureForms and WS Form
 - Fixed: values in the list of objects (e.g. prices) no longer overlap in narrow columns
 - Fixed: the list of objects and the detail view in classic themes show the default image for objects without an image
 - Added hint for the required API key permissions of API v1 and API v2 in the settings with a link to the help

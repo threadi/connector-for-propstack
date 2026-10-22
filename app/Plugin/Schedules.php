@@ -409,6 +409,11 @@ class Schedules {
 	 * @return string
 	 */
 	public function validate_interval( ?string $value ): string {
+		// the functions for the notices of the settings are only loaded in the backend, but the value could also be saved elsewhere (e.g. via WP-CLI or WP-Cron).
+		if ( ! function_exists( 'add_settings_error' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/template.php';
+		}
+
 		// get option.
 		$option = str_replace( 'sanitize_option_', '', (string) current_filter() );
 

@@ -71,6 +71,8 @@ class MissingImages extends KnowledgeCenter_Base {
 				__( '<strong>Check the queue:</strong> it must be enabled. Each file is tried up to 3 times. Files which failed every time stay in the queue for 30 days, so you can see them there.', 'connector-for-propstack' ),
 				/* translators: %1$s will be replaced by a link to the log. */
 				sprintf( __( '<strong>Check %1$s:</strong> it names the reason for each file, e.g. a failed download, a file which is too large or missing write permissions in the upload directory of your WordPress.', 'connector-for-propstack' ), $this->get_settings_link( __( 'the log', 'connector-for-propstack' ), 'propstack_connector_logs' ) ),
+				/* translators: %1$s will be replaced by a link to the settings. */
+				sprintf( __( '<strong>Private images:</strong> images which are marked as private or as not intended for the exposee in Propstack are never imported. If you <a href="%1$s">enable debug mode for imports</a>, the log names each of these images with the reason after the next import.', 'connector-for-propstack' ), esc_url( \ConnectorForPropstack\Plugin\Settings::get_instance()->get_url( 'propstack_connector_advanced', 'propstack_connector_advanced_plugin_settings' ) ) ),
 			)
 		);
 

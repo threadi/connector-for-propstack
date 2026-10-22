@@ -429,6 +429,9 @@ class MediaLibrary {
 			$html .= '<p>' . implode( ' | ', $links ) . '</p>';
 		}
 
+		// add the tags from Propstack.
+		$html .= $this->get_tags_info( $attachment );
+
 		$html .= '</div>';
 
 		/**
@@ -440,6 +443,35 @@ class MediaLibrary {
 		 * @param WP_Post    $attachment  The attachment.
 		 */
 		return apply_filters( 'cfprop_media_object_info', $html, $immo_object, $attachment );
+	}
+
+	/**
+	 * Return the HTML with the tags from Propstack of the given attachment.
+	 *
+	 * The tags are only shown as text with a hint that they can be used with the Pro plugin.
+	 * They are not shown if the hints for Pro are hidden (e.g. as Pro is used, which shows the tags itself).
+	 *
+	 * @param WP_Post $attachment The attachment.
+	 *
+	 * @return string
+	 */
+	public function get_tags_info( WP_Post $attachment ): string {
+		// bail if hints for Pro should not be shown.
+		if ( ! Helper::show_pro_hints() ) {
+			return '';
+		}
+
+		// get the tags.
+		$tags = Files::get_instance()->get_tags( $attachment->ID );
+
+		// bail if the file does not have any tags.
+		if ( empty( $tags ) ) {
+			return '';
+		}
+
+		// return the tags with the hint.
+		/* translators: %1$s will be replaced by a list of tags. */
+		return '<p class="cfprop-media-tags">' . esc_html( sprintf( __( 'Tags in Propstack: %1$s', 'connector-for-propstack' ), implode( ', ', $tags ) ) ) . '<br><span class="cfprop-pro-hint">' . esc_html__( 'Can be used in Pro', 'connector-for-propstack' ) . '</span> ' . wp_kses_post( sprintf( /* translators: %1$s will be replaced by a URL. */ __( 'With <a href="%1$s" target="_blank">Connector for Propstack Pro</a> you can choose the images to show in a gallery by their tags.', 'connector-for-propstack' ), esc_url( Helper::get_pro_url() ) ) ) . '</p>';
 	}
 
 	/**

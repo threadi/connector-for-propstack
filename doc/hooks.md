@@ -18,590 +18,18 @@ Version | Description
 
 Source: [app/Plugin/Setup.php](Plugin/Setup.php), [line 562](Plugin/Setup.php#L562-L567)
 
-### `cfprop_import_object_before_start`
+### `cfprop_restriction_value_changed`
 
-*Run additional tasks before starting the import of objects.*
+*Run tasks if one restriction setting has been changed.*
 
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$process_handler` | `\ConnectorForPropstack\Plugin\ProcessHandler` | The process handler.
-`$instance` | `\ConnectorForPropstack\Propstack\Imports\v1\Objects` | The import object.
 
 **Changelog**
 
 Version | Description
 ------- | -----------
-`1.0.0` | Available since 1.0.0.
+`1.0.0` | Availability 1.0.0.
 
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 147](Propstack/Imports/v1/Objects.php#L147-L154)
-
-### `cfprop_import_object`
-
-*Run additional tasks for a single language-specific object import.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$object` | `array<string,mixed>` | The object data from API.
-`$post_id` | `int` | The post-ID of the object.
-`$language_code` | `string` | The used language.
-`$is_new_object` | `bool` | Marker for new objects.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 650](Propstack/Imports/v1/Objects.php#L650-L660)
-
-### `cfprop_import_language`
-
-*Run additional tasks for importing objects in a given language.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`(string) $language_code` |  | 
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 851](Propstack/Imports/v1/Objects.php#L851-L858)
-
-### `cfprop_import_object_errors`
-
-*Run additional tasks if any error occurred during import of objects.*
-
-…
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` |  | 
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 871](Propstack/Imports/v1/Objects.php#L871-L875)
-
-### `cfprop_import_object_empty`
-
-*Run additional tasks if the import did not deliver any object.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` | `\ConnectorForPropstack\Propstack\Imports\v1\Objects` | The import object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.1.0` | Available since 1.1.0.
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 880](Propstack/Imports/v1/Objects.php#L880-L887)
-
-### `cfprop_import_object_success`
-
-*Run additional tasks after successful import of objects.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` | `\ConnectorForPropstack\Propstack\Imports\v1\Objects` | The import object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 892](Propstack/Imports/v1/Objects.php#L892-L899)
-
-### `cfprop_import_object_after`
-
-*Run additional tasks after any import of objects.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` | `\ConnectorForPropstack\Propstack\Imports\v1\Objects` | The import object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 928](Propstack/Imports/v1/Objects.php#L928-L935)
-
-### `cfprop_import_object_set_max_count`
-
-*Run additional tasks after setting the max count.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$count` | `int` | The max count.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1033](Propstack/Imports/v1/Objects.php#L1033-L1039)
-
-### `cfprop_import_object_set_count`
-
-*Run additional tasks after setting the max count.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$count` | `int` | The max count.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1053](Propstack/Imports/v1/Objects.php#L1053-L1059)
-
-### `cfprop_import_object_set_status`
-
-*Run additional tasks after setting the new status.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$new_status` | `string` | The new status.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1073](Propstack/Imports/v1/Objects.php#L1073-L1079)
-
-### `cfprop_import_object_before_start`
-
-*Run additional tasks before starting the import of objects.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$process_handler` | `\ConnectorForPropstack\Plugin\ProcessHandler` | The process handler.
-`$instance` | `\ConnectorForPropstack\Propstack\Import_Base` | The import object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 147](Propstack/Imports/v2/Objects.php#L147-L154)
-
-### `cfprop_import_object`
-
-*Run additional tasks for a single language-specific object import.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$object` | `array<string,mixed>` | The object data from API.
-`$post_id` | `int` | The post-ID of the object.
-`$language_code` | `string` | The used language.
-`$is_new_object` | `bool` | Marker for new objects.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 644](Propstack/Imports/v2/Objects.php#L644-L654)
-
-### `cfprop_import_language`
-
-*Run additional tasks for importing objects in a given language.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`(string) $language_code` |  | 
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 836](Propstack/Imports/v2/Objects.php#L836-L843)
-
-### `cfprop_import_object_errors`
-
-*Run additional tasks if any error occurred during import of objects.*
-
-…
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` |  | 
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 856](Propstack/Imports/v2/Objects.php#L856-L860)
-
-### `cfprop_import_object_empty`
-
-*Run additional tasks if the import did not deliver any object.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` | `\ConnectorForPropstack\Propstack\Imports\v2\Objects` | The import object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.1.0` | Available since 1.1.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 865](Propstack/Imports/v2/Objects.php#L865-L872)
-
-### `cfprop_import_object_success`
-
-*Run additional tasks after successful import of objects.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` | `\ConnectorForPropstack\Propstack\Imports\v2\Objects` | The import object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 877](Propstack/Imports/v2/Objects.php#L877-L884)
-
-### `cfprop_import_object_after`
-
-*Run additional tasks after any import of objects.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` | `\ConnectorForPropstack\Propstack\Imports\v2\Objects` | The import object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 913](Propstack/Imports/v2/Objects.php#L913-L920)
-
-### `cfprop_import_object_set_max_count`
-
-*Run additional tasks after setting the max count.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$count` | `int` | The max count.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1055](Propstack/Imports/v2/Objects.php#L1055-L1061)
-
-### `cfprop_import_object_set_count`
-
-*Run additional tasks after setting the max count.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$count` | `int` | The max count.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1075](Propstack/Imports/v2/Objects.php#L1075-L1081)
-
-### `cfprop_import_object_set_status`
-
-*Run additional tasks after setting the new status.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$new_status` | `string` | The new status.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1095](Propstack/Imports/v2/Objects.php#L1095-L1101)
-
-### `cfprop_import_object_field`
-
-*Run additional tasks for a single field on an object during the import of them.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
-`$value` | `mixed` | The value.
-`$post_id` | `int` | The post-ID of the object.
-`$object_type_object` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type.
-`$immo_object` | `array<string,mixed>` | The data from API.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1095](Propstack/Fields.php#L1095-L1105)
-
-### `cfprop_import_object_fields`
-
-*Run additional tasks for fields on an object during the import of them.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | The list of fields.
-`$post_id` | `int` | The post-ID of the object.
-`$object_type_object` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type.
-`$immo_object` | `array<string,mixed>` | The data from API.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1108](Propstack/Fields.php#L1108-L1117)
-
-### `cfprop_import_object_after`
-
-*Run additional tasks after any import of objects.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$instance` | `\ConnectorForPropstack\Propstack\Import_Base` | The import object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 1542](Propstack/Import_Base.php#L1542-L1549)
-
-### `cfprop_get_template_before`
-
-*Run custom actions before the output of the archive listing.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array` | List of attributes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Widgets/Field.php](Propstack/Widgets/Field.php), [line 137](Propstack/Widgets/Field.php#L137-L143)
-
-### `cfprop_get_template_before`
-
-*Run custom actions before the output of the archive listing.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array` | List of attributes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Widgets/Description.php](Propstack/Widgets/Description.php), [line 106](Propstack/Widgets/Description.php#L106-L112)
-
-### `cfprop_get_template_before`
-
-*Run custom actions before the output of the archive listing.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array` | List of attributes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Widgets/Filter.php](Propstack/Widgets/Filter.php), [line 133](Propstack/Widgets/Filter.php#L133-L139)
-
-### `cfprop_get_template_before`
-
-*Run custom actions before the output of the archive listing.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array` | List of attributes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.0` | Available since 2.0.0.
-
-Source: [app/Propstack/Widgets/Energy_Scale.php](Propstack/Widgets/Energy_Scale.php), [line 107](Propstack/Widgets/Energy_Scale.php#L107-L113)
-
-### `cfprop_get_template_before`
-
-*Run custom actions before the output of the archive listing.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array` | List of attributes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Widgets/Object_Data.php](Propstack/Widgets/Object_Data.php), [line 141](Propstack/Widgets/Object_Data.php#L141-L147)
-
-### `cfprop_get_template_before`
-
-*Run custom actions before the output of the archive listing.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array` | List of attributes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Widgets/Single.php](Propstack/Widgets/Single.php), [line 124](Propstack/Widgets/Single.php#L124-L130)
-
-### `cfprop_get_template_before`
-
-*Run custom actions before the output of the archive listing.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array` | List of attributes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 145](Propstack/Widgets/Archive.php#L145-L151)
-
-### `cfprop_get_template_before`
-
-*Run custom actions before the output of the archive listing.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array` | List of attributes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Widgets/Broker_Field.php](Propstack/Widgets/Broker_Field.php), [line 125](Propstack/Widgets/Broker_Field.php#L125-L131)
-
-### `cfprop_object_field_metabox`
-
-*Run additional tasks during the view of a single field in a metabox in the backend.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$post` | `\WP_Post` | The post.
-`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
-`$value` | `mixed` | The value.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Field_Category_Base.php](Propstack/Field_Category_Base.php), [line 127](Propstack/Field_Category_Base.php#L127-L135)
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2514](Propstack/ImmoObjects.php#L2514-L2519)
 
 ### `cfprop_queue_before_processing`
 
@@ -673,18 +101,446 @@ Version | Description
 
 Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 612](Propstack/Queue.php#L612-L617)
 
-### `cfprop_restriction_value_changed`
+### `cfprop_import_object_after`
 
-*Run tasks if one restriction setting has been changed.*
+*Run additional tasks after any import of objects.*
 
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` | `\ConnectorForPropstack\Propstack\Import_Base` | The import object.
 
 **Changelog**
 
 Version | Description
 ------- | -----------
-`1.0.0` | Availability 1.0.0.
+`1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2285](Propstack/ImmoObjects.php#L2285-L2290)
+Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 1542](Propstack/Import_Base.php#L1542-L1549)
+
+### `cfprop_import_object_field`
+
+*Run additional tasks for a single field on an object during the import of them.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
+`$value` | `mixed` | The value.
+`$post_id` | `int` | The post-ID of the object.
+`$object_type_object` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type.
+`$immo_object` | `array<string,mixed>` | The data from API.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1071](Propstack/Fields.php#L1071-L1081)
+
+### `cfprop_import_object_fields`
+
+*Run additional tasks for fields on an object during the import of them.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | The list of fields.
+`$post_id` | `int` | The post-ID of the object.
+`$object_type_object` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type.
+`$immo_object` | `array<string,mixed>` | The data from API.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1091](Propstack/Fields.php#L1091-L1100)
+
+### `cfprop_import_object_before_start`
+
+*Run additional tasks before starting the import of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$process_handler` | `\ConnectorForPropstack\Plugin\ProcessHandler` | The process handler.
+`$instance` | `\ConnectorForPropstack\Propstack\Import_Base` | The import object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 147](Propstack/Imports/v2/Objects.php#L147-L154)
+
+### `cfprop_import_object`
+
+*Run additional tasks for a single language-specific object import.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$object` | `array<string,mixed>` | The object data from API.
+`$post_id` | `int` | The post-ID of the object.
+`$language_code` | `string` | The used language.
+`$is_new_object` | `bool` | Marker for new objects.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 644](Propstack/Imports/v2/Objects.php#L644-L654)
+
+### `cfprop_import_language`
+
+*Run additional tasks for importing objects in a given language.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`(string) $language_code` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 838](Propstack/Imports/v2/Objects.php#L838-L845)
+
+### `cfprop_import_object_errors`
+
+*Run additional tasks if any error occurred during import of objects.*
+
+…
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` |  | 
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 858](Propstack/Imports/v2/Objects.php#L858-L862)
+
+### `cfprop_import_object_empty`
+
+*Run additional tasks if the import did not deliver any object.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` | `\ConnectorForPropstack\Propstack\Imports\v2\Objects` | The import object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.1.0` | Available since 1.1.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 867](Propstack/Imports/v2/Objects.php#L867-L874)
+
+### `cfprop_import_object_success`
+
+*Run additional tasks after successful import of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` | `\ConnectorForPropstack\Propstack\Imports\v2\Objects` | The import object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 879](Propstack/Imports/v2/Objects.php#L879-L886)
+
+### `cfprop_import_object_after`
+
+*Run additional tasks after any import of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` | `\ConnectorForPropstack\Propstack\Imports\v2\Objects` | The import object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 915](Propstack/Imports/v2/Objects.php#L915-L922)
+
+### `cfprop_import_object_set_max_count`
+
+*Run additional tasks after setting the max count.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$count` | `int` | The max count.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1057](Propstack/Imports/v2/Objects.php#L1057-L1063)
+
+### `cfprop_import_object_set_count`
+
+*Run additional tasks after setting the max count.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$count` | `int` | The max count.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1077](Propstack/Imports/v2/Objects.php#L1077-L1083)
+
+### `cfprop_import_object_set_status`
+
+*Run additional tasks after setting the new status.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$new_status` | `string` | The new status.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1097](Propstack/Imports/v2/Objects.php#L1097-L1103)
+
+### `cfprop_import_object_before_start`
+
+*Run additional tasks before starting the import of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$process_handler` | `\ConnectorForPropstack\Plugin\ProcessHandler` | The process handler.
+`$instance` | `\ConnectorForPropstack\Propstack\Imports\v1\Objects` | The import object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 147](Propstack/Imports/v1/Objects.php#L147-L154)
+
+### `cfprop_import_object`
+
+*Run additional tasks for a single language-specific object import.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$object` | `array<string,mixed>` | The object data from API.
+`$post_id` | `int` | The post-ID of the object.
+`$language_code` | `string` | The used language.
+`$is_new_object` | `bool` | Marker for new objects.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 650](Propstack/Imports/v1/Objects.php#L650-L660)
+
+### `cfprop_import_language`
+
+*Run additional tasks for importing objects in a given language.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`(string) $language_code` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 853](Propstack/Imports/v1/Objects.php#L853-L860)
+
+### `cfprop_import_object_errors`
+
+*Run additional tasks if any error occurred during import of objects.*
+
+…
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` |  | 
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 873](Propstack/Imports/v1/Objects.php#L873-L877)
+
+### `cfprop_import_object_empty`
+
+*Run additional tasks if the import did not deliver any object.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` | `\ConnectorForPropstack\Propstack\Imports\v1\Objects` | The import object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.1.0` | Available since 1.1.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 882](Propstack/Imports/v1/Objects.php#L882-L889)
+
+### `cfprop_import_object_success`
+
+*Run additional tasks after successful import of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` | `\ConnectorForPropstack\Propstack\Imports\v1\Objects` | The import object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 894](Propstack/Imports/v1/Objects.php#L894-L901)
+
+### `cfprop_import_object_after`
+
+*Run additional tasks after any import of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$instance` | `\ConnectorForPropstack\Propstack\Imports\v1\Objects` | The import object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 930](Propstack/Imports/v1/Objects.php#L930-L937)
+
+### `cfprop_import_object_set_max_count`
+
+*Run additional tasks after setting the max count.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$count` | `int` | The max count.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1035](Propstack/Imports/v1/Objects.php#L1035-L1041)
+
+### `cfprop_import_object_set_count`
+
+*Run additional tasks after setting the max count.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$count` | `int` | The max count.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1055](Propstack/Imports/v1/Objects.php#L1055-L1061)
+
+### `cfprop_import_object_set_status`
+
+*Run additional tasks after setting the new status.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$new_status` | `string` | The new status.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1075](Propstack/Imports/v1/Objects.php#L1075-L1081)
+
+### `cfprop_object_field_metabox`
+
+*Run additional tasks during the view of a single field in a metabox in the backend.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$post` | `\WP_Post` | The post.
+`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
+`$value` | `mixed` | The value.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Field_Category_Base.php](Propstack/Field_Category_Base.php), [line 127](Propstack/Field_Category_Base.php#L127-L135)
 
 ### `cfprop_file_imported`
 
@@ -704,14 +560,14 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 606](Propstack/Files.php#L606-L614)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 612](Propstack/Files.php#L612-L620)
 
 ### `cfprop_files_deleted`
 
 *Run additional tasks after all files for objects have been deleted.*
 
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1021](Propstack/Files.php#L1021-L1024)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1027](Propstack/Files.php#L1027-L1030)
 
 ### `cfprop_files_for_object_imported_via_ajax`
 
@@ -729,7 +585,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1518](Propstack/Files.php#L1518-L1524)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1588](Propstack/Files.php#L1588-L1594)
 
 ### `cfprop_import_object_set_status`
 
@@ -747,7 +603,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1591](Propstack/Files.php#L1591-L1597)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1661](Propstack/Files.php#L1661-L1667)
 
 ### `cfprop_file_is_assigned`
 
@@ -767,7 +623,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1608](Propstack/Files.php#L1608-L1616)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1678](Propstack/Files.php#L1678-L1686)
 
 ### `cfprop_files_before_import`
 
@@ -785,7 +641,221 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1678](Propstack/Files.php#L1678-L1684)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1748](Propstack/Files.php#L1748-L1754)
+
+### `cfprop_get_template_before`
+
+*This action is documented in app/Propstack/Widgets/Archive.php*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` |  | 
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 355](Propstack/Widgets/Map.php#L355-L356)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the archive listing.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widgets/Object_Data.php](Propstack/Widgets/Object_Data.php), [line 141](Propstack/Widgets/Object_Data.php#L141-L147)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the archive listing.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 147](Propstack/Widgets/Archive.php#L147-L153)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the archive listing.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widgets/Broker_Field.php](Propstack/Widgets/Broker_Field.php), [line 125](Propstack/Widgets/Broker_Field.php#L125-L131)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the archive listing.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widgets/Single.php](Propstack/Widgets/Single.php), [line 124](Propstack/Widgets/Single.php#L124-L130)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the archive listing.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widgets/Field.php](Propstack/Widgets/Field.php), [line 137](Propstack/Widgets/Field.php#L137-L143)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the archive listing.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widgets/Description.php](Propstack/Widgets/Description.php), [line 106](Propstack/Widgets/Description.php#L106-L112)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the archive listing.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.0` | Available since 2.0.0.
+
+Source: [app/Propstack/Widgets/Energy_Scale.php](Propstack/Widgets/Energy_Scale.php), [line 107](Propstack/Widgets/Energy_Scale.php#L107-L113)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the archive listing.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widgets/Filter.php](Propstack/Widgets/Filter.php), [line 133](Propstack/Widgets/Filter.php#L133-L139)
+
+### `cfprop_get_template_before`
+
+*Run custom actions before the output of the widget.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array` | List of attributes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.0` | Available since 2.0.0.
+
+Source: [app/Propstack/Widgets/Inquiry_Button.php](Propstack/Widgets/Inquiry_Button.php), [line 333](Propstack/Widgets/Inquiry_Button.php#L333-L339)
+
+### `cfprop_map_enqueue_cluster_assets`
+
+*Enqueue the scripts and styles to group several markers on a map.*
+
+Used by Connector for Propstack Pro, which shows several objects on maps. Without them, all markers
+are shown on their own.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$this->get_provider()` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 670](Propstack/Maps.php#L670-L679)
+
+### `cfprop_object_image_in_metabox`
+
+*Run additional tasks after an image of the object in its edit view (e.g. to show its tags).*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$image_id` | `int` | The attachment ID of the image.
+`$post` | `\WP_Post` | The object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/FieldCategories/Images.php](Propstack/FieldCategories/Images.php), [line 112](Propstack/FieldCategories/Images.php#L112-L119)
 
 ## Filters
 
@@ -823,7 +893,103 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/PageBuilder/Gutenberg.php](PageBuilder/Gutenberg.php), [line 151](PageBuilder/Gutenberg.php#L151-L157)
+Source: [app/PageBuilder/Gutenberg.php](PageBuilder/Gutenberg.php), [line 153](PageBuilder/Gutenberg.php#L153-L159)
+
+### `cfprop_pagebuilder`
+
+*Filter the possible page builders.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `string[]` | List of the handler.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/PageBuilder/Page_Builders.php](PageBuilder/Page_Builders.php), [line 61](PageBuilder/Page_Builders.php#L61-L68)
+
+### `cfprop_block_patterns`
+
+*Filter the block patterns of this plugin.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$patterns` | `array<string,array<string,mixed>>` | List of patterns (name => settings for register_block_pattern()).
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/PageBuilder/Gutenberg/Patterns.php](PageBuilder/Gutenberg/Patterns.php), [line 128](PageBuilder/Gutenberg/Patterns.php#L128-L134)
+
+### `cfprop_block_templates`
+
+*Filter the list of available block templates.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$templates` | `array<string,array<string,string>>` | The list of templates.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/PageBuilder/Gutenberg/Templates.php](PageBuilder/Gutenberg/Templates.php), [line 222](PageBuilder/Gutenberg/Templates.php#L222-L229)
+
+### `cfprop_gutenberg_template_elements`
+
+*Filter the blocks, which could be used in block templates.*
+
+E.g. used by Connector for Propstack Pro to add its own blocks.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$elements` | `array<int,array<string,mixed>>` | List of blocks.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/PageBuilder/Gutenberg/Template_Adapter.php](PageBuilder/Gutenberg/Template_Adapter.php), [line 193](PageBuilder/Gutenberg/Template_Adapter.php#L193-L201)
+
+### `cfprop_gutenberg_template_block_errors`
+
+*Filter the errors after the check of a block in a block template.*
+
+E.g. used by Connector for Propstack Pro to check the attributes of its own blocks.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$errors` | `array<int,string>` | List of errors.
+`$block_name` | `string` | The name of the block.
+`$attributes` | `array<string,mixed>` | The attributes of the block.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/PageBuilder/Gutenberg/Template_Adapter.php](PageBuilder/Gutenberg/Template_Adapter.php), [line 683](PageBuilder/Gutenberg/Template_Adapter.php#L683-L693)
 
 ### `cfprop_block_help_url`
 
@@ -871,15 +1037,33 @@ Version | Description
 
 Source: [app/PageBuilder/Gutenberg/Blocks_Basis.php](PageBuilder/Gutenberg/Blocks_Basis.php), [line 165](PageBuilder/Gutenberg/Blocks_Basis.php#L165-L172)
 
-### `cfprop_block_templates`
+### `cfprop_hide_intro`
 
-*Filter the list of available block templates.*
+*Hide intro via hook.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$templates` | `array<string,array<string,string>>` | The list of templates.
+`$false` | `bool` | Return true to hide the intro.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`3.0.0` | Available since 3.0.0
+
+Source: [app/Plugin/Intro.php](Plugin/Intro.php), [line 76](Plugin/Intro.php#L76-L84)
+
+### `cfprop_schedule_our_events`
+
+*Filter the list of our own events, e.g., to check if all which are enabled in setting are active.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$our_events` | `array<string,array<string,mixed>>` | List of our own events in WP-cron.
 
 **Changelog**
 
@@ -887,17 +1071,91 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/PageBuilder/Gutenberg/Templates.php](PageBuilder/Gutenberg/Templates.php), [line 222](PageBuilder/Gutenberg/Templates.php#L222-L229)
+Source: [app/Plugin/Schedules.php](Plugin/Schedules.php), [line 132](Plugin/Schedules.php#L132-L139)
 
-### `cfprop_block_patterns`
+### `cfprop_disable_cron_check`
 
-*Filter the block patterns of this plugin.*
+*Disable the additional cron check.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$patterns` | `array<string,array<string,mixed>>` | List of patterns (name => settings for register_block_pattern()).
+`$false` | `bool` | True if the check should be disabled.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Schedules.php](Plugin/Schedules.php), [line 157](Plugin/Schedules.php#L157-L165)
+
+### `cfprop_schedules`
+
+*Add custom schedule-objects to use.*
+
+They must be objects based on \ConnectorForPropstack\Plugin\Schedules_Base.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list_of_schedules` | `array<int,string>` | List of additional schedules.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Schedules.php](Plugin/Schedules.php), [line 280](Plugin/Schedules.php#L280-L289)
+
+### `cfprop_log_table_filter`
+
+*Filter the list before output.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `array<string,string>` | List of filter.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Log_Table.php](Plugin/Log_Table.php), [line 308](Plugin/Log_Table.php#L308-L314)
+
+### `cfprop_status_list`
+
+*Filter the list of possible states in the log table.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Log_Table.php](Plugin/Log_Table.php), [line 349](Plugin/Log_Table.php#L349-L354)
+
+### `cfprop_users_for_settings_query`
+
+*Filter the query to get the users for the settings (e.g., the author of imported objects).*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query` | `array<string,mixed>` | The query for get_users().
 
 **Changelog**
 
@@ -905,17 +1163,100 @@ Version | Description
 ------- | -----------
 `2.1.0` | Available since 2.1.0.
 
-Source: [app/PageBuilder/Gutenberg/Patterns.php](PageBuilder/Gutenberg/Patterns.php), [line 128](PageBuilder/Gutenberg/Patterns.php#L128-L134)
+Source: [app/Plugin/Users.php](Plugin/Users.php), [line 161](Plugin/Users.php#L161-L167)
 
-### `cfprop_pagebuilder`
+### `cfprop_run_compatibility_checks`
 
-*Filter the possible page builders.*
+*Filter whether the compatibility-checks should be run (false) or not (true)*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$list` | `string[]` | List of the handler.
+`$false` | `bool` | True to prevent compatibility-checks.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.5` | Available since 1.0.5.
+
+Source: [app/Plugin/Compatibilities.php](Plugin/Compatibilities.php), [line 89](Plugin/Compatibilities.php#L89-L98)
+
+### `cfprop_compatibility_checks_interval`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$interval` |  | 
+
+Source: [app/Plugin/Compatibilities.php](Plugin/Compatibilities.php), [line 120](Plugin/Compatibilities.php#L120-L120)
+
+### `cfprop_compatibility_checks`
+
+*Filter the list of compatibilities.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `string[]` | List of compatibility-checks.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.5` | Available since 1.0.5.
+
+Source: [app/Plugin/Compatibilities.php](Plugin/Compatibilities.php), [line 214](Plugin/Compatibilities.php#L214-L221)
+
+### `cfprop_archive_slug`
+
+*Change the archive slug.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$slug` | `string` | The archive slug.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since first release.
+
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 137](Plugin/Helper.php#L137-L144)
+
+### `cfprop_single_slug`
+
+*Change the single slug.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$slug` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since first release.
+
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 158](Plugin/Helper.php#L158-L165)
+
+### `cfprop_file_version`
+
+*Filter the used file version (for JS- and CSS-files, which get enqueued).*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$plugin_version` | `string` | The plugin-version.
+`$filepath` | `string` | The absolute path to the requested file.
 
 **Changelog**
 
@@ -923,7 +1264,46 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/PageBuilder/Page_Builders.php](PageBuilder/Page_Builders.php), [line 61](PageBuilder/Page_Builders.php#L61-L68)
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 234](Plugin/Helper.php#L234-L242)
+
+### `cfprop_current_url`
+
+*Filter the resulting current URL.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$page_url` | `string` | The resulting current URL.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 489](Plugin/Helper.php#L489-L495)
+
+### `cfprop_hide_pro_hints`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$false` |  | 
+
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 615](Plugin/Helper.php#L615-L615)
+
+### `cfprop_process_lock_timeout`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$hour` |  | 
+`$option_name` |  | 
+
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 706](Plugin/Helper.php#L706-L706)
 
 ### `cfprop_supported_languages`
 
@@ -1014,6 +1394,80 @@ Version | Description
 `1.0.0` | Available since 1.0.0.
 
 Source: [app/Plugin/Languages.php](Plugin/Languages.php), [line 311](Plugin/Languages.php#L311-L318)
+
+### `cfprop_objects_with_db_tables`
+
+*Add additional objects for this plugin, which use custom tables.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$objects` | `array<int,string>` | List of objects.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Init.php](Plugin/Init.php), [line 127](Plugin/Init.php#L127-L133)
+
+### `cfprop_objects_with_db_tables`
+
+*Add additional objects for this plugin, which use custom tables.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$objects` | `array<int,string>` | List of objects.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Init.php](Plugin/Init.php), [line 173](Plugin/Init.php#L173-L179)
+
+### `cfprop_schedule_interval`
+
+*Filter the interval to a single schedule.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$interval` | `string` | The interval.
+`$instance` | `\ConnectorForPropstack\Plugin\Schedules_Base` | The schedule-object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Schedules_Base.php](Plugin/Schedules_Base.php), [line 94](Plugin/Schedules_Base.php#L94-L101)
+
+### `cfprop_schedule_enabling`
+
+*Filter whether to activate this schedule.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$false` | `bool` | True if this object should NOT be enabled.
+`$instance` | `\ConnectorForPropstack\Plugin\Schedules_Base` | Actual object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Plugin/Schedules_Base.php](Plugin/Schedules_Base.php), [line 232](Plugin/Schedules_Base.php#L232-L242)
 
 ### `cfprop_templates_archive`
 
@@ -1224,52 +1678,15 @@ Argument | Type | Description
 
 Source: [app/Plugin/Setup.php](Plugin/Setup.php), [line 695](Plugin/Setup.php#L695-L695)
 
-### `cfprop_archive_slug`
+### `cfprop_intervals`
 
-*Change the archive slug.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$slug` | `string` | The archive slug.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since first release.
-
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 137](Plugin/Helper.php#L137-L144)
-
-### `cfprop_single_slug`
-
-*Change the single slug.*
+*Filter the list of possible intervals.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$slug` |  | 
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since first release.
-
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 158](Plugin/Helper.php#L158-L165)
-
-### `cfprop_file_version`
-
-*Filter the used file version (for JS- and CSS-files, which get enqueued).*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$plugin_version` | `string` | The plugin-version.
-`$filepath` | `string` | The absolute path to the requested file.
+`$list` | `array<int,string>` | List of our interval objects.
 
 **Changelog**
 
@@ -1277,138 +1694,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 234](Plugin/Helper.php#L234-L242)
-
-### `cfprop_current_url`
-
-*Filter the resulting current URL.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$page_url` | `string` | The resulting current URL.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 489](Plugin/Helper.php#L489-L495)
-
-### `cfprop_hide_pro_hints`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` |  | 
-
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 615](Plugin/Helper.php#L615-L615)
-
-### `cfprop_process_lock_timeout`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$hour` |  | 
-`$option_name` |  | 
-
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 706](Plugin/Helper.php#L706-L706)
-
-### `cfprop_schedule_our_events`
-
-*Filter the list of our own events, e.g., to check if all which are enabled in setting are active.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$our_events` | `array<string,array<string,mixed>>` | List of our own events in WP-cron.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Schedules.php](Plugin/Schedules.php), [line 132](Plugin/Schedules.php#L132-L139)
-
-### `cfprop_disable_cron_check`
-
-*Disable the additional cron check.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` | `bool` | True if the check should be disabled.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Schedules.php](Plugin/Schedules.php), [line 157](Plugin/Schedules.php#L157-L165)
-
-### `cfprop_schedules`
-
-*Add custom schedule-objects to use.*
-
-They must be objects based on \ConnectorForPropstack\Plugin\Schedules_Base.
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list_of_schedules` | `array<int,string>` | List of additional schedules.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Schedules.php](Plugin/Schedules.php), [line 280](Plugin/Schedules.php#L280-L289)
-
-### `cfprop_objects_with_db_tables`
-
-*Add additional objects for this plugin, which use custom tables.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$objects` | `array<int,string>` | List of objects.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Init.php](Plugin/Init.php), [line 127](Plugin/Init.php#L127-L133)
-
-### `cfprop_objects_with_db_tables`
-
-*Add additional objects for this plugin, which use custom tables.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$objects` | `array<int,string>` | List of objects.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Init.php](Plugin/Init.php), [line 173](Plugin/Init.php#L173-L179)
+Source: [app/Plugin/Intervals.php](Plugin/Intervals.php), [line 78](Plugin/Intervals.php#L78-L84)
 
 ### `cfprop_log_without_debug`
 
@@ -1518,190 +1804,6 @@ Version | Description
 
 Source: [app/Plugin/Log.php](Plugin/Log.php), [line 361](Plugin/Log.php#L361-L367)
 
-### `cfprop_intervals`
-
-*Filter the list of possible intervals.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` | `array<int,string>` | List of our interval objects.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Intervals.php](Plugin/Intervals.php), [line 78](Plugin/Intervals.php#L78-L84)
-
-### `cfprop_hide_intro`
-
-*Hide intro via hook.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` | `bool` | Return true to hide the intro.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`3.0.0` | Available since 3.0.0
-
-Source: [app/Plugin/Intro.php](Plugin/Intro.php), [line 76](Plugin/Intro.php#L76-L84)
-
-### `cfprop_schedule_interval`
-
-*Filter the interval to a single schedule.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$interval` | `string` | The interval.
-`$instance` | `\ConnectorForPropstack\Plugin\Schedules_Base` | The schedule-object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Schedules_Base.php](Plugin/Schedules_Base.php), [line 94](Plugin/Schedules_Base.php#L94-L101)
-
-### `cfprop_schedule_enabling`
-
-*Filter whether to activate this schedule.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` | `bool` | True if this object should NOT be enabled.
-`$instance` | `\ConnectorForPropstack\Plugin\Schedules_Base` | Actual object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Schedules_Base.php](Plugin/Schedules_Base.php), [line 232](Plugin/Schedules_Base.php#L232-L242)
-
-### `cfprop_run_compatibility_checks`
-
-*Filter whether the compatibility-checks should be run (false) or not (true)*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` | `bool` | True to prevent compatibility-checks.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.5` | Available since 1.0.5.
-
-Source: [app/Plugin/Compatibilities.php](Plugin/Compatibilities.php), [line 89](Plugin/Compatibilities.php#L89-L98)
-
-### `cfprop_compatibility_checks_interval`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$interval` |  | 
-
-Source: [app/Plugin/Compatibilities.php](Plugin/Compatibilities.php), [line 120](Plugin/Compatibilities.php#L120-L120)
-
-### `cfprop_compatibility_checks`
-
-*Filter the list of compatibilities.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` | `string[]` | List of compatibility-checks.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.5` | Available since 1.0.5.
-
-Source: [app/Plugin/Compatibilities.php](Plugin/Compatibilities.php), [line 204](Plugin/Compatibilities.php#L204-L211)
-
-### `cfprop_users_for_settings_query`
-
-*Filter the query to get the users for the settings (e.g., the author of imported objects).*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$query` | `array<string,mixed>` | The query for get_users().
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Plugin/Users.php](Plugin/Users.php), [line 161](Plugin/Users.php#L161-L167)
-
-### `cfprop_process_values_max_age`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$max_age` |  | 
-
-Source: [app/Plugin/ProcessHandler.php](Plugin/ProcessHandler.php), [line 218](Plugin/ProcessHandler.php#L218-L218)
-
-### `cfprop_log_table_filter`
-
-*Filter the list before output.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` | `array<string,string>` | List of filter.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Log_Table.php](Plugin/Log_Table.php), [line 308](Plugin/Log_Table.php#L308-L314)
-
-### `cfprop_status_list`
-
-*Filter the list of possible states in the log table.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` |  | 
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Plugin/Log_Table.php](Plugin/Log_Table.php), [line 349](Plugin/Log_Table.php#L349-L354)
-
 ### `cfprop_log_export_filename`
 
 *Filter the filename for CSV-download.*
@@ -1738,16 +1840,25 @@ Version | Description
 
 Source: [app/Plugin/Admin/Admin.php](Plugin/Admin/Admin.php), [line 311](Plugin/Admin/Admin.php#L311-L320)
 
-### `cfprop_knowledge_center_entry_text`
-
-*Filter the text of a knowledge center entry.*
+### `cfprop_process_values_max_age`
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$text` | `string` | The text.
-`$this` |  | 
+`$max_age` |  | 
+
+Source: [app/Plugin/ProcessHandler.php](Plugin/ProcessHandler.php), [line 218](Plugin/ProcessHandler.php#L218-L218)
+
+### `cfprop_countries`
+
+*Filter the list of countries with their 3-letter code, their 2-letter code and their English name.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$countries` | `array<string,array<int,string>>` | The list of countries.
 
 **Changelog**
 
@@ -1755,37 +1866,56 @@ Version | Description
 ------- | -----------
 `2.1.0` | Available since 2.1.0.
 
-Source: [app/Propstack/KnowledgeCenter_Base.php](Propstack/KnowledgeCenter_Base.php), [line 150](Propstack/KnowledgeCenter_Base.php#L150-L157)
+Source: [app/Plugin/Countries.php](Plugin/Countries.php), [line 279](Plugin/Countries.php#L279-L285)
 
-### `cfprop_ability_import_time_budget`
+### `cfprop_sorting_is_hidden`
 
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$time_budget` |  | 
-
-Source: [app/Propstack/Abilities.php](Propstack/Abilities.php), [line 885](Propstack/Abilities.php#L885-L885)
-
-### `cfprop_ability_import_max_chunks`
+*Filter whether a sorting should be hidden.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$max_chunks` |  | 
+`$hidden` | `bool` | True if the sorting should be hidden.
+`$instance` | `\ConnectorForPropstack\Propstack\Sorting_Base` | The sorting object.
 
-Source: [app/Propstack/Abilities.php](Propstack/Abilities.php), [line 894](Propstack/Abilities.php#L894-L894)
+**Changelog**
 
-### `cfprop_widgets`
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
 
-*Filter the list of available widgets.*
+Source: [app/Propstack/Sorting_Base.php](Propstack/Sorting_Base.php), [line 184](Propstack/Sorting_Base.php#L184-L191)
+
+### `cfprop_sorting_is_available`
+
+*Filter whether a sorting could be used for the given list of objects.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$widgets` | `array<int,string>` | List of widgets.
+`$available` | `bool` | True if the sorting is available.
+`$instance` | `\ConnectorForPropstack\Propstack\Sorting_Base` | The sorting object.
+`$context` | `\ConnectorForPropstack\Propstack\Sorting_Context` | The objects of the list.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Sorting_Base.php](Propstack/Sorting_Base.php), [line 235](Propstack/Sorting_Base.php#L235-L243)
+
+### `cfprop_register_post_type`
+
+*Filter the post-types.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$post_types` | `array<int,string>` | List of post-types.
 
 **Changelog**
 
@@ -1793,7 +1923,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Widgets.php](Propstack/Widgets.php), [line 87](Propstack/Widgets.php#L87-L93)
+Source: [app/Propstack/Post_Types.php](Propstack/Post_Types.php), [line 95](Propstack/Post_Types.php#L95-L102)
 
 ### `cfprop_filter_is_hidden`
 
@@ -1814,15 +1944,16 @@ Version | Description
 
 Source: [app/Propstack/Filter_Base.php](Propstack/Filter_Base.php), [line 121](Propstack/Filter_Base.php#L121-L130)
 
-### `cfprop_register_post_type`
+### `cfprop_get_immo_obj`
 
-*Filter the post-types.*
+*Filter the requested immo object.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$post_types` | `array<int,string>` | List of post-types.
+`$immo_object` | `\ConnectorForPropstack\Propstack\ImmoObject` | The object of the object.
+`$language_code` | `string` | The requested language.
 
 **Changelog**
 
@@ -1830,17 +1961,101 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Post_Types.php](Propstack/Post_Types.php), [line 95](Propstack/Post_Types.php#L95-L102)
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 165](Propstack/ImmoObjects.php#L165-L173)
 
-### `cfprop_register_taxonomies`
+### `cfprop_object_search_meta_keys`
 
-*Filter the taxonomies.*
+*Filter the meta keys of objects which are used for the search in the backend.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$taxonomies` | `array<int,string>` | List of taxonomies.
+`$meta_keys` | `array<int,string>` | List of meta keys.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1360](Propstack/ImmoObjects.php#L1360-L1366)
+
+### `cfprop_prevent_import_of_object_reasons`
+
+*Filter the reasons why the import of an object is prevented.*
+
+Use this to add the reason for an own check on the filter "cfprop_prevent_import_of_object".
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$reasons` | `array<int,string>` | The reasons, each as a complete sentence.
+`$immo_object` | `array<string,mixed>` | The object data from API.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.1` | Available since 2.0.1.
+
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1690](Propstack/ImmoObjects.php#L1690-L1700)
+
+### `cfprop_update_object_title`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$update` |  | 
+`$post_id` |  | 
+`$title` |  | 
+`$immo_object` |  | 
+`$language_code` |  | 
+
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2065](Propstack/ImmoObjects.php#L2065-L2065)
+
+### `cfprop_prevent_import_of_object`
+
+*This filter is documented in app/Propstack/Imports/v1/Objects.php*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`false` |  | 
+`$result['object']` |  | 
+
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2178](Propstack/ImmoObjects.php#L2178-L2179)
+
+### `cfprop_hide_pro_hints`
+
+*Hide the additional buttons for reviews or pro-version.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$false` | `bool` | Set true to hide the buttons.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0
+
+Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2536](Propstack/ImmoObjects.php#L2536-L2544)
+
+### `cfprop_queue_query`
+
+*Filter the query to get the next entries for the processing of the queue.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query` |  | 
 
 **Changelog**
 
@@ -1848,7 +2063,613 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Taxonomies.php](Propstack/Taxonomies.php), [line 221](Propstack/Taxonomies.php#L221-L228)
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 363](Propstack/Queue.php#L363-L368)
+
+### `cfprop_queue_failed_entries_lifetime`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$days` |  | 
+
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 720](Propstack/Queue.php#L720-L720)
+
+### `cfprop_queue_max_attempts`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$max_attempts` |  | 
+
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 1006](Propstack/Queue.php#L1006-L1006)
+
+### `cfprop_prevent_file_import`
+
+*Filter whether a given file should not be imported.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$false` | `bool` | Return true to prevent the import.
+`$file` |  | 
+`absint($file['id'] ?? 0)` |  | 
+`$url` | `string` | The URL to use for import.
+`!empty($file['name']) && is_scalar($file['name']) ? (string) $file['name'] : Files::get_instance()->get_file_name_from_url($url)` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 1050](Propstack/Queue.php#L1050-L1062)
+
+### `cfprop_object_types`
+
+*Filter the list of available object types.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$object_types` | `array<int,string>` | List of object types.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectType.php](Propstack/Taxonomies/ObjectType.php), [line 96](Propstack/Taxonomies/ObjectType.php#L96-L102)
+
+### `cfprop_object_typ_default_terms`
+
+*Filter the default terms of object types.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$terms` | `array<int,mixed>` | List of terms.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectType.php](Propstack/Taxonomies/ObjectType.php), [line 255](Propstack/Taxonomies/ObjectType.php#L255-L261)
+
+### `cfprop_taxonomy_terms_query`
+
+*Filter the query for terms on a single taxonomy.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query` | `array<string,mixed>` | The query.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomy` | The taxonomy object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectType.php](Propstack/Taxonomies/ObjectType.php), [line 277](Propstack/Taxonomies/ObjectType.php#L277-L284)
+
+### `cfprop_object_type_fields`
+
+*Filter the list of files in this object type.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectTypes/House.php](Propstack/Taxonomies/ObjectTypes/House.php), [line 459](Propstack/Taxonomies/ObjectTypes/House.php#L459-L466)
+
+### `cfprop_object_type_default_disabled_fields`
+
+*Filter the list of files in this object type.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectTypes/House.php](Propstack/Taxonomies/ObjectTypes/House.php), [line 480](Propstack/Taxonomies/ObjectTypes/House.php#L480-L487)
+
+### `cfprop_object_type_fields`
+
+*Filter the list of files in this object type.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectTypes/Apartment.php](Propstack/Taxonomies/ObjectTypes/Apartment.php), [line 489](Propstack/Taxonomies/ObjectTypes/Apartment.php#L489-L496)
+
+### `cfprop_object_type_default_disabled_fields`
+
+*Filter the list of files in this object type.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectTypes/Apartment.php](Propstack/Taxonomies/ObjectTypes/Apartment.php), [line 512](Propstack/Taxonomies/ObjectTypes/Apartment.php#L512-L519)
+
+### `cfprop_object_type_fields`
+
+*Filter the list of files in this object type.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectTypes/Garage.php](Propstack/Taxonomies/ObjectTypes/Garage.php), [line 411](Propstack/Taxonomies/ObjectTypes/Garage.php#L411-L419)
+
+### `cfprop_object_type_default_disabled_fields`
+
+*Filter the list of files in this object type.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/ObjectTypes/Garage.php](Propstack/Taxonomies/ObjectTypes/Garage.php), [line 433](Propstack/Taxonomies/ObjectTypes/Garage.php#L433-L440)
+
+### `cfprop_category_default_terms`
+
+*Filter the default terms of categories.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$terms` | `array<int,mixed>` | List of terms.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/Category.php](Propstack/Taxonomies/Category.php), [line 109](Propstack/Taxonomies/Category.php#L109-L115)
+
+### `cfprop_taxonomy_broker_fields`
+
+*Filter the list of available broker fields.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of field categories.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/Broker.php](Propstack/Taxonomies/Broker.php), [line 134](Propstack/Taxonomies/Broker.php#L134-L140)
+
+### `cfprop_property_type_default_terms`
+
+*Filter the default terms of categories.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$terms` | `array<int,mixed>` | List of terms.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/PropertyType.php](Propstack/Taxonomies/PropertyType.php), [line 664](Propstack/Taxonomies/PropertyType.php#L664-L670)
+
+### `cfprop_marketing_type_default_terms`
+
+*Filter the default terms of marketing types.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$terms` | `array<int,mixed>` | List of terms.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomies/MarketingType.php](Propstack/Taxonomies/MarketingType.php), [line 104](Propstack/Taxonomies/MarketingType.php#L104-L110)
+
+### `cfprop_media_object_info`
+
+*Filter the information about the object of an image in the media library.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$html` | `string` | The HTML output.
+`$immo_object` | `\ConnectorForPropstack\Propstack\ImmoObject` | The object.
+`$attachment` | `\WP_Post` | The attachment.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.0` | Available since 2.0.0.
+
+Source: [app/Propstack/MediaLibrary.php](Propstack/MediaLibrary.php), [line 437](Propstack/MediaLibrary.php#L437-L445)
+
+### `cfprop_knowledge_center_entries`
+
+*Filter the list of available knowledge center entries.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,string>` | List of field categories.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 107](Propstack/KnowledgeCenter.php#L107-L113)
+
+### `cfprop_knowledge_center_entry_visible`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$visible` |  | 
+`$entry` |  | 
+`$screen_name` |  | 
+
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 186](Propstack/KnowledgeCenter.php#L186-L186)
+
+### `cfprop_show_help`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$allowed` |  | 
+`$screen` |  | 
+
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 276](Propstack/KnowledgeCenter.php#L276-L276)
+
+### `cfprop_help_tabs`
+
+*Filter the list of help tabs with its contents.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `array<string,mixed>` | List of help tabs.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 305](Propstack/KnowledgeCenter.php#L305-L311)
+
+### `cfprop_help_sidebar_content`
+
+*Filter the sidebar content.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$sidebar_content` | `string` | The content.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 325](Propstack/KnowledgeCenter.php#L325-L331)
+
+### `cfprop_knowledge_center_groups`
+
+*Filter the groups of the knowledge center entries. Each group is shown as one tab in the help.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$groups` | `array<string,string>` | List of groups (internal name => title).
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 373](Propstack/KnowledgeCenter.php#L373-L379)
+
+### `cfprop_sorting_enabled`
+
+*Filter whether the visitors could sort the list of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$enabled` | `bool` | True if the sorting is enabled.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 117](Propstack/Sortings.php#L117-L123)
+
+### `cfprop_sorting_min_share`
+
+*Filter the minimal share of objects in a list, which must have a value for a sorting to offer it.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$min_share` | `float` | The share between 0 and 1 (default 0.5 for the half of the objects).
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 134](Propstack/Sortings.php#L134-L140)
+
+### `cfprop_sorting_default_selectable`
+
+*Filter whether the default sorting of the list of objects could be chosen.*
+
+Used by Connector for Propstack Pro.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$selectable` | `bool` | True if it could be chosen.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 313](Propstack/Sortings.php#L313-L323)
+
+### `cfprop_sortings`
+
+*Filter the list of available sortings for the list of objects.*
+
+Each entry must be the name of a class based on \ConnectorForPropstack\Propstack\Sorting_Base
+with a static get_instance() method.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `array<int,string>` | List of sortings.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 403](Propstack/Sortings.php#L403-L412)
+
+### `cfprop_sorting_default`
+
+*Filter the default sorting of the list of objects (e.g. "price-asc"). An empty string uses the standard order.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`is_string($option) ? $option : ''` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 491](Propstack/Sortings.php#L491-L497)
+
+### `cfprop_sorting_attributes`
+
+*Filter the attributes for the output of the sorting.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array<string,mixed>` | The attributes.
+`$context` | `\ConnectorForPropstack\Propstack\Sorting_Context` | The objects of the list.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 920](Propstack/Sortings.php#L920-L927)
+
+### `cfprop_show_empty_placeholders`
+
+*Filter whether placeholders for empty values are shown in widgets.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`Helper::is_rest_request()` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widget_Base.php](Propstack/Widget_Base.php), [line 201](Propstack/Widget_Base.php#L201-L207)
+
+### `cfprop_taxonomy_{$taxonomy_slug}`
+
+*Filter the settings for this taxonomy.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$taxonomy_array` | `array<string,mixed>` | The taxonomy settings.
+`$taxonomy_slug` | `string` | The slug of the taxonomy.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 114](Propstack/Taxonomy.php#L114-L121)
+
+### `cfprop_rest_taxonomy_fields`
+
+*Filter the available details-templates for REST API.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,array<string,mixed>>` | The fields.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomy` | The taxonomy object.
+`$request` | `\WP_REST_Request` | The REST API request object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0
+
+Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 286](Propstack/Taxonomy.php#L286-L295)
+
+### `cfprop_taxonomy_terms_query`
+
+*Filter the query for terms on a single taxonomy.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query` | `array<string,mixed>` | The query.
+`$instance` | `\ConnectorForPropstack\Propstack\Taxonomy` | The taxonomy object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 450](Propstack/Taxonomy.php#L450-L457)
+
+### `cfprop_taxonomy_terms_query`
+
+*Filter the query to delete terms of one taxonomy.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query` | `array<string,mixed>` | The query parameter.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 542](Propstack/Taxonomy.php#L542-L548)
 
 ### `cfprop_schedule_import_time_budget`
 
@@ -1859,6 +2680,703 @@ Argument | Type | Description
 `$time_budget` |  | 
 
 Source: [app/Propstack/Schedules/Objects.php](Propstack/Schedules/Objects.php), [line 158](Propstack/Schedules/Objects.php#L158-L158)
+
+### `cfprop_widgets`
+
+*Filter the list of available widgets.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$widgets` | `array<int,string>` | List of widgets.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Widgets.php](Propstack/Widgets.php), [line 89](Propstack/Widgets.php#L89-L95)
+
+### `cfprop_request_header`
+
+*Filter the headers for the request.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$headers` | `array<string,string>` | List of headers.
+`$instance` | `\ConnectorForPropstack\Propstack\ApiRequest` | The ApiRequest-object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/ApiRequest.php](Propstack/ApiRequest.php), [line 126](Propstack/ApiRequest.php#L126-L134)
+
+### `cfprop_log_max_response_length`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`100000` |  | 
+
+Source: [app/Propstack/ApiRequest.php](Propstack/ApiRequest.php), [line 198](Propstack/ApiRequest.php#L198-L198)
+
+### `cfprop_log_mask_personal_data`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$mask` |  | 
+
+Source: [app/Propstack/ApiRequest.php](Propstack/ApiRequest.php), [line 437](Propstack/ApiRequest.php#L437-L437)
+
+### `cfprop_import_object_languages`
+
+*This filter is documented in app/Propstack/Imports/v1/Objects.php*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$languages` |  | 
+
+Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 164](Propstack/Import_Base.php#L164-L165)
+
+### `cfprop_import_prevented_hint`
+
+*Filter the hint where the reasons for objects which have not been imported can be found.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$hint` | `string` | The hint, HTML is allowed.
+`$prevented` | `int` | The amount of objects which have not been imported.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.1` | Available since 2.0.1.
+
+Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 682](Propstack/Import_Base.php#L682-L690)
+
+### `cfprop_import_chunk_lock_ttl`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$ttl` |  | 
+
+Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 883](Propstack/Import_Base.php#L883-L883)
+
+### `cfprop_fields`
+
+*Filter the list of available fields.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,string>` | List of field categories.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 657](Propstack/Fields.php#L657-L663)
+
+### `cfprop_api_v2_object_fields`
+
+*Filter the names of the fields the API v2 delivers for an object.*
+
+Fields of objects, which are not in this list, are hidden if the API v2 is used.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,string>` | The names of the fields in the API.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 865](Propstack/Fields.php#L865-L873)
+
+### `cfprop_field_available_in_api`
+
+*Filter whether the used API version delivers a field of an object.*
+
+This filter is only used if the API v2 is used. Fields which are not delivered are hidden.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$available` | `bool` | True if the field is delivered.
+`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 943](Propstack/Fields.php#L943-L952)
+
+### `cfprop_import_object_field_value`
+
+*Filter the value of a single field on an immo object during import.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$value` | `mixed` | The value.
+`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
+`$post_id` | `int` | The post-ID of the object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1028](Propstack/Fields.php#L1028-L1036)
+
+### `cfprop_reserved_meta_keys`
+
+*Filter the list of meta keys which are used by the fields of this plugin.*
+
+These meta keys are never removed with the values of custom fields in the format up to version 2.0.x.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `array<string,bool>` | List of meta keys as keys.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1131](Propstack/Fields.php#L1131-L1139)
+
+### `cfprop_field_type`
+
+*Filter the detected field-type of a single field.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$field_type` | `\ConnectorForPropstack\Propstack\FieldType_Base\|false` | The field type.
+`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1197](Propstack/Fields.php#L1197-L1204)
+
+### `cfprop_show_not_set_hint`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$true` |  | 
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1245](Propstack/Fields.php#L1245-L1245)
+
+### `cfprop_show_not_set_hint`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$true` |  | 
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1260](Propstack/Fields.php#L1260-L1260)
+
+### `cfprop_rest_fields`
+
+*Filter the available details-templates for REST API.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,mixed>` | The fields.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1326](Propstack/Fields.php#L1326-L1333)
+
+### `cfprop_respect_hide_address`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$respect` |  | 
+`$immo_object` |  | 
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1563](Propstack/Fields.php#L1563-L1563)
+
+### `cfprop_exact_address_fields`
+
+*Filter the list of fields which are hidden if the address of an object should be hidden.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `array<int,string>` | List of field names.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1582](Propstack/Fields.php#L1582-L1588)
+
+### `cfprop_show_field_in_frontend`
+
+*Filter whether a field is shown in the frontend.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$show_field` | `bool` | The result.
+`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
+`$immo_object` | `\ConnectorForPropstack\Propstack\ImmoObject` | The object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1640](Propstack/Fields.php#L1640-L1651)
+
+### `cfprop_field_values_batch_size`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$batch_size` |  | 
+
+Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1750](Propstack/Fields.php#L1750-L1750)
+
+### `cfprop_template_names`
+
+*Filter the list of allowed template names for the archive and single widgets.*
+
+Each name is used to run the action "cfprop_template_<name>".
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `array<int,string>` | List of template names.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Templates.php](Propstack/Templates.php), [line 190](Propstack/Templates.php#L190-L198)
+
+### `cfprop_field_types`
+
+*Filter the list of available field types.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$field_types` | `array<int,string>` | List of field types.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/FieldTypes.php](Propstack/FieldTypes.php), [line 68](Propstack/FieldTypes.php#L68-L74)
+
+### `cfprop_object_import_limit`
+
+*Filter the limit of objects to import per request.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$limit` | `int` | The limit.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 195](Propstack/Imports/v2/Objects.php#L195-L201)
+
+### `cfprop_object_import_block_size`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$block_size` |  | 
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 230](Propstack/Imports/v2/Objects.php#L230-L230)
+
+### `cfprop_object_import_response`
+
+*Filter the response data from Propstack.*
+
+Hint: this filter now receives a single page instead of all objects.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$page_objects` | `array<int,mixed>` | The objects of this page.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 247](Propstack/Imports/v2/Objects.php#L247-L255)
+
+### `cfprop_prevent_import_of_object`
+
+*Process a single chunk of the import of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`false` |  | 
+`$object` |  | 
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 89](Propstack/Imports/v2/Objects.php#L89-L267)
+
+### `cfprop_object_import_time_budget`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$time_budget` |  | 
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 395](Propstack/Imports/v2/Objects.php#L395-L395)
+
+### `cfprop_force_delete_obsolete_object`
+
+*Filter whether an obsolete object is deleted permanently.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`true` |  | 
+`$post_id` | `int` | The post-ID of the object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 422](Propstack/Imports/v2/Objects.php#L422-L429)
+
+### `cfprop_object_import_time_budget`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$time_budget` |  | 
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 498](Propstack/Imports/v2/Objects.php#L498-L498)
+
+### `cfprop_prevent_import_of_object`
+
+*Prevent import of this object under custom conditions.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$prevent_import` | `bool` | True to prevent the import.
+`$object` | `array` | The object data from API.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 561](Propstack/Imports/v2/Objects.php#L561-L571)
+
+### `cfprop_new_object_query`
+
+*Filter the query to add a new object during import.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query` | `array<string,mixed>` | The query.
+`$object` | `array<string,mixed>` | The object data from API.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 614](Propstack/Imports/v2/Objects.php#L614-L622)
+
+### `cfprop_import_max_cleanup_ratio`
+
+*Filter the max. ratio of existing objects which could be removed by the cleanup after an import.*
+
+If more objects would be removed, the cleanup is skipped as a safeguard against incomplete
+data from the API. Use 1 to allow the removal of all objects.
+The default value comes from the setting "Max. percentage of objects to delete".
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$max_ratio` | `float` | The ratio between 0 and 1.
+`$obsolete_count` | `int` | The amount of objects which would be removed.
+`$existing_count` | `int` | The amount of existing objects.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.0` | Available since 2.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 790](Propstack/Imports/v2/Objects.php#L790-L802)
+
+### `cfprop_api_v2_prepared_object`
+
+*Filter a single object from Propstack API v2 after it has been prepared for the import.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$immo_object` | `array<string,mixed>` | The object data.
+`$language_code` | `string` | The used language.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.1` | Available since 2.0.1.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 964](Propstack/Imports/v2/Objects.php#L964-L971)
+
+### `cfprop_api_object_url`
+
+*Filter the URL of the API to import objects from Propstack.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$url` | `string` | The URL.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 997](Propstack/Imports/v2/Objects.php#L997-L1003)
+
+### `cfprop_import_per_page`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$max_per_value` |  | 
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1124](Propstack/Imports/v2/Objects.php#L1124-L1124)
+
+### `cfprop_import_max_pages`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$max_pages` |  | 
+
+Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1133](Propstack/Imports/v2/Objects.php#L1133-L1133)
+
+### `cfprop_api_v2_options`
+
+*Filter the options of object fields from Propstack API v2.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$options` | `array<string,mixed>` | The options: the name of the field in the API => list of codes with their texts.
+`$language_code` | `string` | The used language.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.1` | Available since 2.0.1.
+
+Source: [app/Propstack/Imports/v2/Options.php](Propstack/Imports/v2/Options.php), [line 103](Propstack/Imports/v2/Options.php#L103-L110)
+
+### `cfprop_api_v2_untranslated_fields`
+
+*Filter the names of the fields in the API v2 whose codes must not be replaced by their texts.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,string>` | The names of the fields in the API.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.1` | Available since 2.0.1.
+
+Source: [app/Propstack/Imports/v2/Options.php](Propstack/Imports/v2/Options.php), [line 171](Propstack/Imports/v2/Options.php#L171-L177)
+
+### `cfprop_api_object_options_url`
+
+*Filter the URL of the API to get the options of object fields from Propstack.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$url` | `string` | The URL.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.1` | Available since 2.0.1.
+
+Source: [app/Propstack/Imports/v2/Options.php](Propstack/Imports/v2/Options.php), [line 352](Propstack/Imports/v2/Options.php#L352-L358)
+
+### `cfprop_api_v2_brokers`
+
+*Filter the brokers from Propstack API v2.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$brokers` | `array<int,array<string,mixed>>` | The brokers, indexed by their ID.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.1` | Available since 2.0.1.
+
+Source: [app/Propstack/Imports/v2/Brokers.php](Propstack/Imports/v2/Brokers.php), [line 188](Propstack/Imports/v2/Brokers.php#L188-L194)
+
+### `cfprop_api_v2_broker_url`
+
+*Filter the URL of the API to get the brokers from Propstack via API v2.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$url` | `string` | The URL.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.1` | Available since 2.0.1.
+
+Source: [app/Propstack/Imports/v2/Brokers.php](Propstack/Imports/v2/Brokers.php), [line 256](Propstack/Imports/v2/Brokers.php#L256-L262)
+
+### `cfprop_import_object_states_languages`
+
+*Filter the languages to import object states from Propstack.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$languages` | `array<string,int>` | The languages to import.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/States.php](Propstack/Imports/v2/States.php), [line 93](Propstack/Imports/v2/States.php#L93-L99)
+
+### `cfprop_api_object_states_url`
+
+*Filter the URL of the API to import object states from Propstack.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$url` | `string` | The URL.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Imports/v2/States.php](Propstack/Imports/v2/States.php), [line 278](Propstack/Imports/v2/States.php#L278-L284)
 
 ### `cfprop_import_object_languages`
 
@@ -2038,7 +3556,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 804](Propstack/Imports/v1/Objects.php#L804-L815)
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 805](Propstack/Imports/v1/Objects.php#L805-L817)
 
 ### `cfprop_api_object_url`
 
@@ -2056,7 +3574,7 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 973](Propstack/Imports/v1/Objects.php#L973-L979)
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 975](Propstack/Imports/v1/Objects.php#L975-L981)
 
 ### `cfprop_import_per_page`
 
@@ -2066,7 +3584,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$max_per_value` |  | 
 
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1100](Propstack/Imports/v1/Objects.php#L1100-L1100)
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1102](Propstack/Imports/v1/Objects.php#L1102-L1102)
 
 ### `cfprop_import_max_pages`
 
@@ -2076,17 +3594,17 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$max_pages` |  | 
 
-Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1109](Propstack/Imports/v1/Objects.php#L1109-L1109)
+Source: [app/Propstack/Imports/v1/Objects.php](Propstack/Imports/v1/Objects.php), [line 1111](Propstack/Imports/v1/Objects.php#L1111-L1111)
 
-### `cfprop_object_import_limit`
+### `cfprop_field_categories`
 
-*Filter the limit of objects to import per request.*
+*Filter the list of available field categories.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$limit` | `int` | The limit.
+`$categories` | `array<int,string>` | List of field categories.
 
 **Changelog**
 
@@ -2094,29 +3612,21 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 195](Propstack/Imports/v2/Objects.php#L195-L201)
+Source: [app/Propstack/FieldCategories.php](Propstack/FieldCategories.php), [line 84](Propstack/FieldCategories.php#L84-L90)
 
-### `cfprop_object_import_block_size`
+### `cfprop_field_categories`
 
-**Arguments**
+*Filter the list of available field category types.*
 
-Argument | Type | Description
--------- | ---- | -----------
-`$block_size` |  | 
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 230](Propstack/Imports/v2/Objects.php#L230-L230)
-
-### `cfprop_object_import_response`
-
-*Filter the response data from Propstack.*
-
-Hint: this filter now receives a single page instead of all objects.
+Hint: this hook has been used for field categories and field category types in the past.
+It is still used here for backward compatibility. Entries which are not field category types
+are ignored. Use "cfprop_field_category_types" instead.
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$page_objects` | `array<int,mixed>` | The objects of this page.
+`$category_types` | `array<int,string>` | List of field category types.
 
 **Changelog**
 
@@ -2124,317 +3634,17 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 247](Propstack/Imports/v2/Objects.php#L247-L255)
+Source: [app/Propstack/FieldCategories.php](Propstack/FieldCategories.php), [line 172](Propstack/FieldCategories.php#L172-L182)
 
-### `cfprop_prevent_import_of_object`
+### `cfprop_field_category_types`
 
-*Process a single chunk of the import of objects.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`false` |  | 
-`$object` |  | 
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 89](Propstack/Imports/v2/Objects.php#L89-L267)
-
-### `cfprop_object_import_time_budget`
+*Filter the list of available field category types.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$time_budget` |  | 
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 395](Propstack/Imports/v2/Objects.php#L395-L395)
-
-### `cfprop_force_delete_obsolete_object`
-
-*Filter whether an obsolete object is deleted permanently.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`true` |  | 
-`$post_id` | `int` | The post-ID of the object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 422](Propstack/Imports/v2/Objects.php#L422-L429)
-
-### `cfprop_object_import_time_budget`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$time_budget` |  | 
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 498](Propstack/Imports/v2/Objects.php#L498-L498)
-
-### `cfprop_prevent_import_of_object`
-
-*Prevent import of this object under custom conditions.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$prevent_import` | `bool` | True to prevent the import.
-`$object` | `array` | The object data from API.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 561](Propstack/Imports/v2/Objects.php#L561-L571)
-
-### `cfprop_new_object_query`
-
-*Filter the query to add a new object during import.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$query` | `array<string,mixed>` | The query.
-`$object` | `array<string,mixed>` | The object data from API.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 614](Propstack/Imports/v2/Objects.php#L614-L622)
-
-### `cfprop_import_max_cleanup_ratio`
-
-*Filter the max. ratio of existing objects which could be removed by the cleanup after an import.*
-
-If more objects would be removed, the cleanup is skipped as a safeguard against incomplete
-data from the API. Use 1 to allow the removal of all objects.
-The default value comes from the setting "Max. percentage of objects to delete".
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$max_ratio` | `float` | The ratio between 0 and 1.
-`$obsolete_count` | `int` | The amount of objects which would be removed.
-`$existing_count` | `int` | The amount of existing objects.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.0` | Available since 2.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 789](Propstack/Imports/v2/Objects.php#L789-L800)
-
-### `cfprop_api_v2_prepared_object`
-
-*Filter a single object from Propstack API v2 after it has been prepared for the import.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$immo_object` | `array<string,mixed>` | The object data.
-`$language_code` | `string` | The used language.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.1` | Available since 2.0.1.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 962](Propstack/Imports/v2/Objects.php#L962-L969)
-
-### `cfprop_api_object_url`
-
-*Filter the URL of the API to import objects from Propstack.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$url` | `string` | The URL.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 995](Propstack/Imports/v2/Objects.php#L995-L1001)
-
-### `cfprop_import_per_page`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$max_per_value` |  | 
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1122](Propstack/Imports/v2/Objects.php#L1122-L1122)
-
-### `cfprop_import_max_pages`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$max_pages` |  | 
-
-Source: [app/Propstack/Imports/v2/Objects.php](Propstack/Imports/v2/Objects.php), [line 1131](Propstack/Imports/v2/Objects.php#L1131-L1131)
-
-### `cfprop_api_v2_options`
-
-*Filter the options of object fields from Propstack API v2.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$options` | `array<string,mixed>` | The options: the name of the field in the API => list of codes with their texts.
-`$language_code` | `string` | The used language.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.1` | Available since 2.0.1.
-
-Source: [app/Propstack/Imports/v2/Options.php](Propstack/Imports/v2/Options.php), [line 103](Propstack/Imports/v2/Options.php#L103-L110)
-
-### `cfprop_api_v2_untranslated_fields`
-
-*Filter the names of the fields in the API v2 whose codes must not be replaced by their texts.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,string>` | The names of the fields in the API.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.1` | Available since 2.0.1.
-
-Source: [app/Propstack/Imports/v2/Options.php](Propstack/Imports/v2/Options.php), [line 171](Propstack/Imports/v2/Options.php#L171-L177)
-
-### `cfprop_api_object_options_url`
-
-*Filter the URL of the API to get the options of object fields from Propstack.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$url` | `string` | The URL.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.1` | Available since 2.0.1.
-
-Source: [app/Propstack/Imports/v2/Options.php](Propstack/Imports/v2/Options.php), [line 352](Propstack/Imports/v2/Options.php#L352-L358)
-
-### `cfprop_api_v2_brokers`
-
-*Filter the brokers from Propstack API v2.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$brokers` | `array<int,array<string,mixed>>` | The brokers, indexed by their ID.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.1` | Available since 2.0.1.
-
-Source: [app/Propstack/Imports/v2/Brokers.php](Propstack/Imports/v2/Brokers.php), [line 188](Propstack/Imports/v2/Brokers.php#L188-L194)
-
-### `cfprop_api_v2_broker_url`
-
-*Filter the URL of the API to get the brokers from Propstack via API v2.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$url` | `string` | The URL.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.1` | Available since 2.0.1.
-
-Source: [app/Propstack/Imports/v2/Brokers.php](Propstack/Imports/v2/Brokers.php), [line 256](Propstack/Imports/v2/Brokers.php#L256-L262)
-
-### `cfprop_import_object_states_languages`
-
-*Filter the languages to import object states from Propstack.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$languages` | `array<string,int>` | The languages to import.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/States.php](Propstack/Imports/v2/States.php), [line 93](Propstack/Imports/v2/States.php#L93-L99)
-
-### `cfprop_api_object_states_url`
-
-*Filter the URL of the API to import object states from Propstack.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$url` | `string` | The URL.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Imports/v2/States.php](Propstack/Imports/v2/States.php), [line 278](Propstack/Imports/v2/States.php#L278-L284)
-
-### `cfprop_template_names`
-
-*Filter the list of allowed template names for the archive and single widgets.*
-
-Each name is used to run the action "cfprop_template_<name>".
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` | `array<int,string>` | List of template names.
+`$category_types` | `array<int,string>` | List of field category types.
 
 **Changelog**
 
@@ -2442,25 +3652,161 @@ Version | Description
 ------- | -----------
 `2.1.0` | Available since 2.1.0.
 
-Source: [app/Propstack/Templates.php](Propstack/Templates.php), [line 188](Propstack/Templates.php#L188-L196)
+Source: [app/Propstack/FieldCategories.php](Propstack/FieldCategories.php), [line 184](Propstack/FieldCategories.php#L184-L190)
 
-### `cfprop_show_empty_placeholders`
+### `cfprop_custom_field_types`
 
-*Filter whether placeholders for empty values are shown in widgets.*
+*Filter the types of custom fields in Propstack with their labels.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`Helper::is_rest_request()` |  | 
+`$types` | `array<string,string>` | The types.
 
 **Changelog**
 
 Version | Description
 ------- | -----------
-`1.0.0` | Available since 1.0.0.
+`2.1.0` | Available since 2.1.0.
 
-Source: [app/Propstack/Widget_Base.php](Propstack/Widget_Base.php), [line 201](Propstack/Widget_Base.php#L201-L207)
+Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 186](Propstack/Custom_Fields.php#L186-L192)
+
+### `cfprop_custom_fields_output`
+
+*Filter whether the output of custom fields in the frontend is supported.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$supported` | `bool` | True if the output is supported.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 361](Propstack/Custom_Fields.php#L361-L369)
+
+### `cfprop_custom_fields_load_definitions`
+
+*Filter whether the definitions of custom fields (labels, types, units and options) are loaded from Propstack before each import.*
+
+The API key needs the permission to read custom fields for this.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$enabled` | `bool` | True to load them.
+`$api_version` | `string` | The used API version ("v1" or "v2").
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 574](Propstack/Custom_Fields.php#L574-L585)
+
+### `cfprop_api_custom_fields_url`
+
+*Filter the URL of the API to get the definitions of custom fields from Propstack.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$url` | `string` | The URL.
+`$api_version` | `string` | The used API version ("v1" or "v2").
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 735](Propstack/Custom_Fields.php#L735-L742)
+
+### `cfprop_custom_field_definitions`
+
+*Filter the definitions of custom fields loaded from Propstack.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$definitions` | `array<string,array<string,mixed>>` | The definitions.
+`$api_version` | `string` | The used API version.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 834](Propstack/Custom_Fields.php#L834-L841)
+
+### `cfprop_custom_fields_import_values`
+
+*Filter the values of the custom fields of an object during its import.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$result` | `array<string,mixed>` | The values: the meta key => the value.
+`$immo_object` | `array<string,mixed>` | The object data from API.
+`$post_id` | `int` | The post-ID of the object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 952](Propstack/Custom_Fields.php#L952-L960)
+
+### `cfprop_custom_field_formatted_value`
+
+*Filter the formatted value of a custom field.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$output` | `string` | The formatted value (HTML).
+`$value` | `mixed` | The saved value.
+`$definition` | `array<string,mixed>` | The definition of the custom field.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 1435](Propstack/Custom_Fields.php#L1435-L1443)
+
+### `cfprop_custom_field_link`
+
+*Filter the link for a custom field, which contains a single URL.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`'<a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . esc_html($url) . '</a>'` |  | 
+`$url` | `string` | The URL.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 1527](Propstack/Custom_Fields.php#L1527-L1534)
 
 ### `cfprop_queue_table_columns`
 
@@ -2518,15 +3864,16 @@ Version | Description
 
 Source: [app/Propstack/Tables/Queue.php](Propstack/Tables/Queue.php), [line 256](Propstack/Tables/Queue.php#L256-L262)
 
-### `cfprop_fields`
+### `cfprop_filter_hide_field_by_value`
 
-*Filter the list of available fields.*
+*Prevent the usage of this filter value.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$fields` | `array<int,string>` | List of field categories.
+`$false` | `bool` | Whether the filter value should be hidden.
+`$md5` | `string` | The md5 hash of the field name and the value.
 
 **Changelog**
 
@@ -2534,60 +3881,18 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 661](Propstack/Fields.php#L661-L667)
+Source: [app/Propstack/Filters/Cities.php](Propstack/Filters/Cities.php), [line 171](Propstack/Filters/Cities.php#L171-L181)
 
-### `cfprop_api_v2_object_fields`
+### `cfprop_filter_hide_field_by_value`
 
-*Filter the names of the fields the API v2 delivers for an object.*
-
-Fields of objects, which are not in this list, are hidden if the API v2 is used.
+*Prevent the usage of this filter value.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$fields` | `array<int,string>` | The names of the fields in the API.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 864](Propstack/Fields.php#L864-L872)
-
-### `cfprop_field_available_in_api`
-
-*Filter whether the used API version delivers a field of an object.*
-
-This filter is only used if the API v2 is used. Fields which are not delivered are hidden.
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$available` | `bool` | True if the field is delivered.
-`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 942](Propstack/Fields.php#L942-L951)
-
-### `cfprop_import_object_field_value`
-
-*Filter the value of a single field on an immo object during import.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$value` | `mixed` | The value.
-`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
-`$post_id` | `int` | The post-ID of the object.
+`$false` | `bool` | Whether the filter value should be hidden.
+`$md5` | `string` | The md5 hash of the field name and the value.
 
 **Changelog**
 
@@ -2595,36 +3900,25 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1027](Propstack/Fields.php#L1027-L1035)
+Source: [app/Propstack/Filters/Cities.php](Propstack/Filters/Cities.php), [line 248](Propstack/Filters/Cities.php#L248-L257)
 
-### `cfprop_reserved_meta_keys`
+### `cfprop_prevent_file_import`
 
-*Filter the list of meta keys which could not be used by custom fields from Propstack.*
+*Filter whether a given file should not be imported.*
 
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` | `array<string,bool>` | List of meta keys as keys.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1146](Propstack/Fields.php#L1146-L1152)
-
-### `cfprop_field_type`
-
-*Filter the detected field-type of a single field.*
+This is checked before the file is searched in the media library: a file which has been
+imported before and is now prevented (e.g. as it is marked as private in Propstack) must
+not be assigned to the object anymore, so it is removed by the cleanup of the import.
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$field_type` | `\ConnectorForPropstack\Propstack\FieldType_Base\|false` | The field type.
-`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
+`$false` | `bool` | Return true to prevent the import.
+`$file_data` | `array<string,mixed>` | The file data from Propstack.
+`$id` | `int` | The file ID.
+`$url` | `string` | The URL to use for import.
+`$filename` | `string` | The file name.
 
 **Changelog**
 
@@ -2632,66 +3926,190 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1256](Propstack/Fields.php#L1256-L1263)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 485](Propstack/Files.php#L485-L501)
 
-### `cfprop_show_not_set_hint`
+### `cfprop_file_import_array`
 
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$true` |  | 
-
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1304](Propstack/Fields.php#L1304-L1304)
-
-### `cfprop_show_not_set_hint`
+*Filter the query to upload a file in the media library.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$true` |  | 
-
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1319](Propstack/Fields.php#L1319-L1319)
-
-### `cfprop_rest_fields`
-
-*Filter the available details-templates for REST API.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,mixed>` | The fields.
+`$array` | `array<string,mixed>` | The parameter to use.
 
 **Changelog**
 
 Version | Description
 ------- | -----------
-`1.0.0` | Available since 1.0.0
+`1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1385](Propstack/Fields.php#L1385-L1392)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 543](Propstack/Files.php#L543-L549)
 
-### `cfprop_respect_hide_address`
+### `cfprop_file_import_post_array`
 
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$respect` |  | 
-`$immo_object` |  | 
-
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1622](Propstack/Fields.php#L1622-L1622)
-
-### `cfprop_exact_address_fields`
-
-*Filter the list of fields which are hidden if the address of an object should be hidden.*
+*Filter the post-query to upload a file in the media library.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$list` | `array<int,string>` | List of field names.
+`$post_array` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 555](Propstack/Files.php#L555-L561)
+
+### `cfprop_files_import_lock_ttl`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$ttl` |  | 
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 725](Propstack/Files.php#L725-L725)
+
+### `cfprop_file_download_timeout`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$timeout` |  | 
+`$url` |  | 
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 761](Propstack/Files.php#L761-L761)
+
+### `cfprop_max_file_size`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$max_size` |  | 
+`$url` |  | 
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 771](Propstack/Files.php#L771-L771)
+
+### `cfprop_allowed_file_hosts`
+
+*Filter the list of hosts from which files may be downloaded.*
+
+An empty list allows any public host. Subdomains of listed hosts are allowed, too.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$allowed_hosts` | `array<int,string>` | The list of allowed hosts.
+`$url` | `string` | The URL to check.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.0` | Available since 2.0.0.
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 860](Propstack/Files.php#L860-L869)
+
+### `cfprop_files_query`
+
+*Filter the query to get the list of files we imported from Propstack.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query` | `array` | The query array.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1160](Propstack/Files.php#L1160-L1166)
+
+### `cfprop_files_import_limit`
+
+*Filter the limit of files to import during object import.*
+
+Hint: since 2.1.0 the list contains the files of the actual block of the list only.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$limit` | `int` | The limit.
+`is_array($block) ? $block : array()` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1469](Propstack/Files.php#L1469-L1478)
+
+### `cfprop_files_import_block_size`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$block_size` |  | 
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1766](Propstack/Files.php#L1766-L1766)
+
+### `cfprop_files_import_takeover_time`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$time` |  | 
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1873](Propstack/Files.php#L1873-L1873)
+
+### `cfprop_prevent_file_import`
+
+*Filter whether a given file should not be imported.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$false` | `bool` | Return true to prevent the import.
+`$file_data` | `array<string,mixed>` | The file data from Propstack.
+`$file_id` |  | 
+`$url` | `string` | The URL to use for import.
+`$filename` | `string` | The file name.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 2096](Propstack/Files.php#L2096-L2108)
+
+### `cfprop_prevent_file_import_reasons`
+
+*Filter the reasons why the import of a file is prevented.*
+
+Use this to add the reason for an own check on the filter "cfprop_prevent_file_import".
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$reasons` | `array<int,string>` | The reasons, each as a complete sentence.
+`$file_data` | `array<string,mixed>` | The file data from Propstack.
 
 **Changelog**
 
@@ -2699,19 +4117,435 @@ Version | Description
 ------- | -----------
 `2.1.0` | Available since 2.1.0.
 
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1641](Propstack/Fields.php#L1641-L1647)
+Source: [app/Propstack/Files.php](Propstack/Files.php), [line 2138](Propstack/Files.php#L2138-L2148)
 
-### `cfprop_show_field_in_frontend`
+### `cfprop_widget_map_sources`
 
-*Filter whether a field is shown in the frontend.*
+*Filter the sources of the locations, which could be shown on the map widget.*
+
+Connector for Propstack Pro adds "list" for all objects of the list (with the active filters).
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$show_field` | `bool` | The result.
-`$field` | `\ConnectorForPropstack\Propstack\Field_Base` | The field.
+`$sources` | `array<string,string>` | List of sources (internal name => label).
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 78](Propstack/Widgets/Map.php#L78-L86)
+
+### `cfprop_widget_map_content_settings`
+
+*Filter the content settings of the map widget, which are used in each page builder.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$settings` | `array<string,array<string,mixed>>` | List of settings.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 137](Propstack/Widgets/Map.php#L137-L143)
+
+### `cfprop_widget_map_output`
+
+*Filter the output of the map widget (also if it is empty).*
+
+Used by Connector for Propstack Pro, e.g. to update a map with the objects of the list via AJAX.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$this->get_output($attributes)` |  | 
+`$attributes` | `array<string,mixed>` | The attributes of the map widget.
+`$this->get_source($attributes)` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 262](Propstack/Widgets/Map.php#L262-L272)
+
+### `cfprop_widget_map_points`
+
+*Filter the points (locations of objects), which are shown on the map widget.*
+
+Never add the exact location of objects with hidden address.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$points` | `array<int,array<string,mixed>>` | List of points with lat, lng, approximate, title, url and image.
+`$attributes` | `array<string,mixed>` | The attributes of the widget.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 292](Propstack/Widgets/Map.php#L292-L301)
+
+### `cfprop_widget_map_attributes`
+
+*Filter the attributes for the map widget.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array<string,mixed>` | The attributes for the map widget.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 342](Propstack/Widgets/Map.php#L342-L348)
+
+### `cfprop_widget_map_show_admin_hint`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`true` |  | 
+`$attributes` |  | 
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 390](Propstack/Widgets/Map.php#L390-L390)
+
+### `cfprop_widget_map_max_objects`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$max` |  | 
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 452](Propstack/Widgets/Map.php#L452-L452)
+
+### `cfprop_archive_query_params`
+
+*This filter is documented in app/Propstack/Widgets/Archive.php*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query_params` |  | 
+`$attributes` |  | 
+
+Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 459](Propstack/Widgets/Map.php#L459-L460)
+
+### `cfprop_object_data_widget_fields`
+
+*Filter the fields for the object data widget.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$fields` | `array<int,array<string,mixed>>` | The fields for the object data widget.
+`$attributes` | `array<string,mixed>` | The attributes for the object data widget.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Object_Data.php](Propstack/Widgets/Object_Data.php), [line 120](Propstack/Widgets/Object_Data.php#L120-L127)
+
+### `cfprop_object_data_widget_attributes`
+
+*Filter the attributes for the object data widget.*
+
+Hint: until 2.0.x this filter was also used for the list of fields, use "cfprop_object_data_widget_fields" for them.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array<string,mixed>` | The attributes for the object data widget.
+
+Source: [app/Propstack/Widgets/Object_Data.php](Propstack/Widgets/Object_Data.php), [line 129](Propstack/Widgets/Object_Data.php#L129-L136)
+
+### `cfprop_gallery_images`
+
+*Filter the images of an object, which are shown in the gallery.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$images` | `array<int\|string,\WP_Post>` | The images.
 `$immo_object` | `\ConnectorForPropstack\Propstack\ImmoObject` | The object.
+`$attributes` | `array<string,mixed>` | Attributes to configure the rendering.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Gallery.php](Propstack/Widgets/Gallery.php), [line 150](Propstack/Widgets/Gallery.php#L150-L158)
+
+### `cfprop_archive_posts_per_page`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$posts_per_page` |  | 
+
+Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 81](Propstack/Widgets/Archive.php#L81-L81)
+
+### `cfprop_archive_query_params`
+
+*Filter the archive query params, e.g., to filter the list.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$query_params` | `array<string,mixed>` | The additional query parameters for "WP_Query".
+`$attributes` | `array<string,mixed>` | The attributes.
+
+Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 100](Propstack/Widgets/Archive.php#L100-L106)
+
+### `cfprop_widget_archive_attributes`
+
+*Filter the attributes for the archive widget.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array<string,mixed>` | The attributes for the archive widget.
+
+Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 134](Propstack/Widgets/Archive.php#L134-L139)
+
+### `cfprop_widget_archive_output`
+
+*Filter the output of the archive widget.*
+
+Used by Connector for Propstack Pro, e.g. to wrap the list so it could be updated via AJAX.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$content` | `string` | The output (sorting, list and pagination).
+`$attributes` | `array<string,mixed>` | The attributes of the archive widget, incl. the query ("query").
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 171](Propstack/Widgets/Archive.php#L171-L180)
+
+### `cfprop_archive_show_sorting`
+
+*Filter whether the selection for the sorting is shown above the list of objects.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$show` | `bool` | True to show it (if the sorting is enabled and useful for the list).
+`$attributes` | `array<string,mixed>` | The attributes of the archive widget.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 195](Propstack/Widgets/Archive.php#L195-L202)
+
+### `cfprop_widget_archive_params`
+
+*Filter the params of the archive widget (for the shortcode description).*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$params` | `array<string,array<string,mixed>>` | The params.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 218](Propstack/Widgets/Archive.php#L218-L225)
+
+### `cfprop_widget_single_attributes`
+
+*Filter the attributes for the single widget.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array<string,mixed>` | The attributes for the single widget.
+
+Source: [app/Propstack/Widgets/Single.php](Propstack/Widgets/Single.php), [line 99](Propstack/Widgets/Single.php#L99-L104)
+
+### `cfprop_widget_filter_select_attributes`
+
+*Filter the attributes for the select filter widget.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attributes` | `array<string,mixed>` | The attributes for the archive widget.
+
+Source: [app/Propstack/Widgets/Filter.php](Propstack/Widgets/Filter.php), [line 115](Propstack/Widgets/Filter.php#L115-L120)
+
+### `cfprop_widget_filter_params`
+
+*Filter the params of the filter widget (for the shortcode description).*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$params` | `array<string,array<string,mixed>>` | The params.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Filter.php](Propstack/Widgets/Filter.php), [line 171](Propstack/Widgets/Filter.php#L171-L178)
+
+### `cfprop_widget_inquiry_button_content_settings`
+
+*Filter the content settings of the inquiry button widget, which are used in each page builder.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$settings` | `array<string,array<string,mixed>>` | List of settings.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Inquiry_Button.php](Propstack/Widgets/Inquiry_Button.php), [line 78](Propstack/Widgets/Inquiry_Button.php#L78-L84)
+
+### `cfprop_widget_inquiry_button_style_settings`
+
+*Filter the style settings of the inquiry button widget, which are used in each page builder.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$settings` | `array<string,array<string,mixed>>` | List of settings.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Inquiry_Button.php](Propstack/Widgets/Inquiry_Button.php), [line 229](Propstack/Widgets/Inquiry_Button.php#L229-L235)
+
+### `cfprop_inquiry_button_target`
+
+*Filter the target of the inquiry button.*
+
+The type is one of "custom", "broker_email", "broker_phone", "admin_email" or "none".
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$target` | `array{url: string, label: string, type: string}` | The target with URL, label and type.
+`$immo_object` | `\ConnectorForPropstack\Propstack\ImmoObject` | The immo object.
+`$attributes` | `array<string,mixed>` | The attributes of the widget.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Widgets/Inquiry_Button.php](Propstack/Widgets/Inquiry_Button.php), [line 636](Propstack/Widgets/Inquiry_Button.php#L636-L646)
+
+### `cfprop_show_frontend_hints`
+
+*Filter whether the hints for administrators should be shown in the frontend.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$true` | `bool` | True to show the hints.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Frontend_Hints.php](Propstack/Frontend_Hints.php), [line 111](Propstack/Frontend_Hints.php#L111-L117)
+
+### `cfprop_frontend_template_info`
+
+*Filter the information about the template which is used for the actual view of objects.*
+
+Used e.g. by page builders, which provide their own templates for objects.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$info` | `array<string,string>` | The information: "label" describes the used template, "edit_url" is the URL to edit it.
+`$type` | `string` | The view type ("single" or "archive").
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/Frontend_Hints.php](Propstack/Frontend_Hints.php), [line 161](Propstack/Frontend_Hints.php#L161-L170)
+
+### `cfprop_filters`
+
+*Filter the list of available immo object filters.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` | `array<int,string>` | List of filters.
 
 **Changelog**
 
@@ -2719,17 +4553,63 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1699](Propstack/Fields.php#L1699-L1710)
+Source: [app/Propstack/Filters.php](Propstack/Filters.php), [line 430](Propstack/Filters.php#L430-L436)
 
-### `cfprop_field_values_batch_size`
+### `cfprop_filter_types`
+
+*Filter the list of available immo object filter types.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$batch_size` |  | 
+`$list` | `array<int,string>` | List of filter types.
 
-Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1809](Propstack/Fields.php#L1809-L1809)
+**Changelog**
+
+Version | Description
+------- | -----------
+`1.0.0` | Available since 1.0.0.
+
+Source: [app/Propstack/Filters.php](Propstack/Filters.php), [line 482](Propstack/Filters.php#L482-L488)
+
+### `cfprop_ability_import_time_budget`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$time_budget` |  | 
+
+Source: [app/Propstack/Abilities.php](Propstack/Abilities.php), [line 918](Propstack/Abilities.php#L918-L918)
+
+### `cfprop_ability_import_max_chunks`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$max_chunks` |  | 
+
+Source: [app/Propstack/Abilities.php](Propstack/Abilities.php), [line 927](Propstack/Abilities.php#L927-L927)
+
+### `cfprop_energy_efficiency_clases`
+
+*Filter the allowed energy efficiency classes.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$allowed_classes` | `array<int,string>` | List of allowed classes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.0.0` | Available since 2.0.0.
+
+Source: [app/Propstack/Energy_Efficiency_Classes.php](Propstack/Energy_Efficiency_Classes.php), [line 66](Propstack/Energy_Efficiency_Classes.php#L66-L72)
 
 ### `cfprop_field_types`
 
@@ -2791,966 +4671,6 @@ Version | Description
 
 Source: [app/Propstack/Template_Abilities.php](Propstack/Template_Abilities.php), [line 80](Propstack/Template_Abilities.php#L80-L88)
 
-### `cfprop_media_object_info`
-
-*Filter the information about the object of an image in the media library.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$html` | `string` | The HTML output.
-`$immo_object` | `\ConnectorForPropstack\Propstack\ImmoObject` | The object.
-`$attachment` | `\WP_Post` | The attachment.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.0` | Available since 2.0.0.
-
-Source: [app/Propstack/MediaLibrary.php](Propstack/MediaLibrary.php), [line 434](Propstack/MediaLibrary.php#L434-L442)
-
-### `cfprop_import_object_languages`
-
-*This filter is documented in app/Propstack/Imports/v1/Objects.php*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$languages` |  | 
-
-Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 164](Propstack/Import_Base.php#L164-L165)
-
-### `cfprop_import_prevented_hint`
-
-*Filter the hint where the reasons for objects which have not been imported can be found.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$hint` | `string` | The hint, HTML is allowed.
-`$prevented` | `int` | The amount of objects which have not been imported.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.1` | Available since 2.0.1.
-
-Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 682](Propstack/Import_Base.php#L682-L690)
-
-### `cfprop_import_chunk_lock_ttl`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$ttl` |  | 
-
-Source: [app/Propstack/Import_Base.php](Propstack/Import_Base.php), [line 883](Propstack/Import_Base.php#L883-L883)
-
-### `cfprop_widget_filter_select_attributes`
-
-*Filter the attributes for the select filter widget.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array<string,mixed>` | The attributes for the archive widget.
-
-Source: [app/Propstack/Widgets/Filter.php](Propstack/Widgets/Filter.php), [line 115](Propstack/Widgets/Filter.php#L115-L120)
-
-### `cfprop_object_data_widget_fields`
-
-*Filter the fields for the object data widget.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,array<string,mixed>>` | The fields for the object data widget.
-`$attributes` | `array<string,mixed>` | The attributes for the object data widget.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/Widgets/Object_Data.php](Propstack/Widgets/Object_Data.php), [line 120](Propstack/Widgets/Object_Data.php#L120-L127)
-
-### `cfprop_object_data_widget_attributes`
-
-*Filter the attributes for the object data widget.*
-
-Hint: until 2.0.x this filter was also used for the list of fields, use "cfprop_object_data_widget_fields" for them.
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array<string,mixed>` | The attributes for the object data widget.
-
-Source: [app/Propstack/Widgets/Object_Data.php](Propstack/Widgets/Object_Data.php), [line 129](Propstack/Widgets/Object_Data.php#L129-L136)
-
-### `cfprop_widget_single_attributes`
-
-*Filter the attributes for the single widget.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array<string,mixed>` | The attributes for the single widget.
-
-Source: [app/Propstack/Widgets/Single.php](Propstack/Widgets/Single.php), [line 99](Propstack/Widgets/Single.php#L99-L104)
-
-### `cfprop_archive_posts_per_page`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$posts_per_page` |  | 
-
-Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 80](Propstack/Widgets/Archive.php#L80-L80)
-
-### `cfprop_archive_query_params`
-
-*Filter the archive query params, e.g., to filter the list.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$query_params` | `array<string,mixed>` | The additional query parameters for "WP_Query".
-`$attributes` | `array<string,mixed>` | The attributes.
-
-Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 99](Propstack/Widgets/Archive.php#L99-L105)
-
-### `cfprop_widget_archive_attributes`
-
-*Filter the attributes for the archive widget.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$attributes` | `array<string,mixed>` | The attributes for the archive widget.
-
-Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 132](Propstack/Widgets/Archive.php#L132-L137)
-
-### `cfprop_taxonomy_{$taxonomy_slug}`
-
-*Filter the settings for this taxonomy.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$taxonomy_array` | `array<string,mixed>` | The taxonomy settings.
-`$taxonomy_slug` | `string` | The slug of the taxonomy.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 114](Propstack/Taxonomy.php#L114-L121)
-
-### `cfprop_rest_taxonomy_fields`
-
-*Filter the available details-templates for REST API.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,array<string,mixed>>` | The fields.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomy` | The taxonomy object.
-`$request` | `\WP_REST_Request` | The REST API request object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0
-
-Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 286](Propstack/Taxonomy.php#L286-L295)
-
-### `cfprop_taxonomy_terms_query`
-
-*Filter the query for terms on a single taxonomy.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$query` | `array<string,mixed>` | The query.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomy` | The taxonomy object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 450](Propstack/Taxonomy.php#L450-L457)
-
-### `cfprop_taxonomy_terms_query`
-
-*Filter the query to delete terms of one taxonomy.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$query` | `array<string,mixed>` | The query parameter.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomy.php](Propstack/Taxonomy.php), [line 542](Propstack/Taxonomy.php#L542-L548)
-
-### `cfprop_show_frontend_hints`
-
-*Filter whether the hints for administrators should be shown in the frontend.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$true` | `bool` | True to show the hints.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/Frontend_Hints.php](Propstack/Frontend_Hints.php), [line 111](Propstack/Frontend_Hints.php#L111-L117)
-
-### `cfprop_frontend_template_info`
-
-*Filter the information about the template which is used for the actual view of objects.*
-
-Used e.g. by page builders, which provide their own templates for objects.
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$info` | `array<string,string>` | The information: "label" describes the used template, "edit_url" is the URL to edit it.
-`$type` | `string` | The view type ("single" or "archive").
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/Frontend_Hints.php](Propstack/Frontend_Hints.php), [line 161](Propstack/Frontend_Hints.php#L161-L170)
-
-### `cfprop_filter_hide_field_by_value`
-
-*Prevent the usage of this filter value.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` | `bool` | Whether the filter value should be hidden.
-`$md5` | `string` | The md5 hash of the field name and the value.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Filters/Cities.php](Propstack/Filters/Cities.php), [line 171](Propstack/Filters/Cities.php#L171-L181)
-
-### `cfprop_filter_hide_field_by_value`
-
-*Prevent the usage of this filter value.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` | `bool` | Whether the filter value should be hidden.
-`$md5` | `string` | The md5 hash of the field name and the value.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Filters/Cities.php](Propstack/Filters/Cities.php), [line 248](Propstack/Filters/Cities.php#L248-L257)
-
-### `cfprop_request_header`
-
-*Filter the headers for the request.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$headers` | `array<string,string>` | List of headers.
-`$instance` | `\ConnectorForPropstack\Propstack\ApiRequest` | The ApiRequest-object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/ApiRequest.php](Propstack/ApiRequest.php), [line 126](Propstack/ApiRequest.php#L126-L134)
-
-### `cfprop_log_max_response_length`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`100000` |  | 
-
-Source: [app/Propstack/ApiRequest.php](Propstack/ApiRequest.php), [line 198](Propstack/ApiRequest.php#L198-L198)
-
-### `cfprop_log_mask_personal_data`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$mask` |  | 
-
-Source: [app/Propstack/ApiRequest.php](Propstack/ApiRequest.php), [line 437](Propstack/ApiRequest.php#L437-L437)
-
-### `cfprop_queue_query`
-
-*Filter the query to get the next entries for the processing of the queue.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$query` |  | 
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 363](Propstack/Queue.php#L363-L368)
-
-### `cfprop_queue_failed_entries_lifetime`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$days` |  | 
-
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 720](Propstack/Queue.php#L720-L720)
-
-### `cfprop_queue_max_attempts`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$max_attempts` |  | 
-
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 1006](Propstack/Queue.php#L1006-L1006)
-
-### `cfprop_prevent_file_import`
-
-*Filter whether a given file should not be imported.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` | `bool` | Return true to prevent the import.
-`$file` |  | 
-`absint($file['id'] ?? 0)` |  | 
-`$url` | `string` | The URL to use for import.
-`!empty($file['name']) && is_scalar($file['name']) ? (string) $file['name'] : Files::get_instance()->get_file_name_from_url($url)` |  | 
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Queue.php](Propstack/Queue.php), [line 1050](Propstack/Queue.php#L1050-L1062)
-
-### `cfprop_field_categories`
-
-*Filter the list of available field categories.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$categories` | `array<int,string>` | List of field categories.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/FieldCategories.php](Propstack/FieldCategories.php), [line 84](Propstack/FieldCategories.php#L84-L90)
-
-### `cfprop_field_categories`
-
-*Filter the list of available field category types.*
-
-Hint: this hook has been used for field categories and field category types in the past.
-It is still used here for backward compatibility. Entries which are not field category types
-are ignored. Use "cfprop_field_category_types" instead.
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$category_types` | `array<int,string>` | List of field category types.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/FieldCategories.php](Propstack/FieldCategories.php), [line 172](Propstack/FieldCategories.php#L172-L182)
-
-### `cfprop_field_category_types`
-
-*Filter the list of available field category types.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$category_types` | `array<int,string>` | List of field category types.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/FieldCategories.php](Propstack/FieldCategories.php), [line 184](Propstack/FieldCategories.php#L184-L190)
-
-### `cfprop_get_immo_obj`
-
-*Filter the requested immo object.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$immo_object` | `\ConnectorForPropstack\Propstack\ImmoObject` | The object of the object.
-`$language_code` | `string` | The requested language.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 163](Propstack/ImmoObjects.php#L163-L171)
-
-### `cfprop_object_search_meta_keys`
-
-*Filter the meta keys of objects which are used for the search in the backend.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$meta_keys` | `array<int,string>` | List of meta keys.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1255](Propstack/ImmoObjects.php#L1255-L1261)
-
-### `cfprop_prevent_import_of_object_reasons`
-
-*Filter the reasons why the import of an object is prevented.*
-
-Use this to add the reason for an own check on the filter "cfprop_prevent_import_of_object".
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$reasons` | `array<int,string>` | The reasons, each as a complete sentence.
-`$immo_object` | `array<string,mixed>` | The object data from API.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.1` | Available since 2.0.1.
-
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1534](Propstack/ImmoObjects.php#L1534-L1544)
-
-### `cfprop_prevent_import_of_object`
-
-*This filter is documented in app/Propstack/Imports/v1/Objects.php*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`false` |  | 
-`$result['object']` |  | 
-
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1949](Propstack/ImmoObjects.php#L1949-L1950)
-
-### `cfprop_hide_pro_hints`
-
-*Hide the additional buttons for reviews or pro-version.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$false` | `bool` | Set true to hide the buttons.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0
-
-Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 2307](Propstack/ImmoObjects.php#L2307-L2315)
-
-### `cfprop_filters`
-
-*Filter the list of available immo object filters.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` | `array<int,string>` | List of filters.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Filters.php](Propstack/Filters.php), [line 426](Propstack/Filters.php#L426-L432)
-
-### `cfprop_filter_types`
-
-*Filter the list of available immo object filter types.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` | `array<int,string>` | List of filter types.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Filters.php](Propstack/Filters.php), [line 478](Propstack/Filters.php#L478-L484)
-
-### `cfprop_field_types`
-
-*Filter the list of available field types.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$field_types` | `array<int,string>` | List of field types.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/FieldTypes.php](Propstack/FieldTypes.php), [line 68](Propstack/FieldTypes.php#L68-L74)
-
-### `cfprop_energy_efficiency_clases`
-
-*Filter the allowed energy efficiency classes.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$allowed_classes` | `array<int,string>` | List of allowed classes.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.0` | Available since 2.0.0.
-
-Source: [app/Propstack/Energy_Efficiency_Classes.php](Propstack/Energy_Efficiency_Classes.php), [line 66](Propstack/Energy_Efficiency_Classes.php#L66-L72)
-
-### `cfprop_knowledge_center_entries`
-
-*Filter the list of available knowledge center entries.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,string>` | List of field categories.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 104](Propstack/KnowledgeCenter.php#L104-L110)
-
-### `cfprop_knowledge_center_entry_visible`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$visible` |  | 
-`$entry` |  | 
-`$screen_name` |  | 
-
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 183](Propstack/KnowledgeCenter.php#L183-L183)
-
-### `cfprop_show_help`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$allowed` |  | 
-`$screen` |  | 
-
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 273](Propstack/KnowledgeCenter.php#L273-L273)
-
-### `cfprop_help_tabs`
-
-*Filter the list of help tabs with its contents.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$list` | `array<string,mixed>` | List of help tabs.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 302](Propstack/KnowledgeCenter.php#L302-L308)
-
-### `cfprop_help_sidebar_content`
-
-*Filter the sidebar content.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$sidebar_content` | `string` | The content.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 322](Propstack/KnowledgeCenter.php#L322-L328)
-
-### `cfprop_knowledge_center_groups`
-
-*Filter the groups of the knowledge center entries. Each group is shown as one tab in the help.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$groups` | `array<string,string>` | List of groups (internal name => title).
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.1.0` | Available since 2.1.0.
-
-Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 370](Propstack/KnowledgeCenter.php#L370-L376)
-
-### `cfprop_category_default_terms`
-
-*Filter the default terms of categories.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$terms` | `array<int,mixed>` | List of terms.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/Category.php](Propstack/Taxonomies/Category.php), [line 109](Propstack/Taxonomies/Category.php#L109-L115)
-
-### `cfprop_object_types`
-
-*Filter the list of available object types.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$object_types` | `array<int,string>` | List of object types.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectType.php](Propstack/Taxonomies/ObjectType.php), [line 96](Propstack/Taxonomies/ObjectType.php#L96-L102)
-
-### `cfprop_object_typ_default_terms`
-
-*Filter the default terms of object types.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$terms` | `array<int,mixed>` | List of terms.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectType.php](Propstack/Taxonomies/ObjectType.php), [line 255](Propstack/Taxonomies/ObjectType.php#L255-L261)
-
-### `cfprop_taxonomy_terms_query`
-
-*Filter the query for terms on a single taxonomy.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$query` | `array<string,mixed>` | The query.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomy` | The taxonomy object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectType.php](Propstack/Taxonomies/ObjectType.php), [line 277](Propstack/Taxonomies/ObjectType.php#L277-L284)
-
-### `cfprop_object_type_fields`
-
-*Filter the list of files in this object type.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectTypes/Garage.php](Propstack/Taxonomies/ObjectTypes/Garage.php), [line 411](Propstack/Taxonomies/ObjectTypes/Garage.php#L411-L419)
-
-### `cfprop_object_type_default_disabled_fields`
-
-*Filter the list of files in this object type.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectTypes/Garage.php](Propstack/Taxonomies/ObjectTypes/Garage.php), [line 433](Propstack/Taxonomies/ObjectTypes/Garage.php#L433-L440)
-
-### `cfprop_object_type_fields`
-
-*Filter the list of files in this object type.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectTypes/Apartment.php](Propstack/Taxonomies/ObjectTypes/Apartment.php), [line 489](Propstack/Taxonomies/ObjectTypes/Apartment.php#L489-L496)
-
-### `cfprop_object_type_default_disabled_fields`
-
-*Filter the list of files in this object type.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectTypes/Apartment.php](Propstack/Taxonomies/ObjectTypes/Apartment.php), [line 512](Propstack/Taxonomies/ObjectTypes/Apartment.php#L512-L519)
-
-### `cfprop_object_type_fields`
-
-*Filter the list of files in this object type.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectTypes/House.php](Propstack/Taxonomies/ObjectTypes/House.php), [line 459](Propstack/Taxonomies/ObjectTypes/House.php#L459-L466)
-
-### `cfprop_object_type_default_disabled_fields`
-
-*Filter the list of files in this object type.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of fields.
-`$instance` | `\ConnectorForPropstack\Propstack\Taxonomies\ObjectTypes\Object_Type_Base` | The object type object.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/ObjectTypes/House.php](Propstack/Taxonomies/ObjectTypes/House.php), [line 480](Propstack/Taxonomies/ObjectTypes/House.php#L480-L487)
-
-### `cfprop_property_type_default_terms`
-
-*Filter the default terms of categories.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$terms` | `array<int,mixed>` | List of terms.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/PropertyType.php](Propstack/Taxonomies/PropertyType.php), [line 664](Propstack/Taxonomies/PropertyType.php#L664-L670)
-
-### `cfprop_taxonomy_broker_fields`
-
-*Filter the list of available broker fields.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$fields` | `array<int,\ConnectorForPropstack\Propstack\Field_Base>` | List of field categories.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/Broker.php](Propstack/Taxonomies/Broker.php), [line 134](Propstack/Taxonomies/Broker.php#L134-L140)
-
-### `cfprop_marketing_type_default_terms`
-
-*Filter the default terms of marketing types.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$terms` | `array<int,mixed>` | List of terms.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Taxonomies/MarketingType.php](Propstack/Taxonomies/MarketingType.php), [line 104](Propstack/Taxonomies/MarketingType.php#L104-L110)
-
 ### `cfprop_queue_fields`
 
 *Filter the list of fields for the Propstack queue.*
@@ -3808,19 +4728,34 @@ Version | Description
 
 Source: [app/Propstack/PostTypes/ImmoObject.php](Propstack/PostTypes/ImmoObject.php), [line 530](Propstack/PostTypes/ImmoObject.php#L530-L540)
 
-### `cfprop_prevent_file_import`
+### `cfprop_knowledge_center_entry_text`
 
-*Filter whether a given file should not be imported.*
+*Filter the text of a knowledge center entry.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$false` | `bool` | Return true to prevent the import.
-`$file_data` | `array<string,mixed>` | The file data from Propstack.
-`$id` | `int` | The file ID.
-`$url` | `string` | The URL to use for import.
-`$filename` | `string` | The file name.
+`$text` | `string` | The text.
+`$this` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.1.0` | Available since 2.1.0.
+
+Source: [app/Propstack/KnowledgeCenter_Base.php](Propstack/KnowledgeCenter_Base.php), [line 150](Propstack/KnowledgeCenter_Base.php#L150-L157)
+
+### `cfprop_register_taxonomies`
+
+*Filter the taxonomies.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$taxonomies` | `array<int,string>` | List of taxonomies.
 
 **Changelog**
 
@@ -3828,155 +4763,76 @@ Version | Description
 ------- | -----------
 `1.0.0` | Available since 1.0.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 495](Propstack/Files.php#L495-L507)
+Source: [app/Propstack/Taxonomies.php](Propstack/Taxonomies.php), [line 221](Propstack/Taxonomies.php#L221-L228)
 
-### `cfprop_file_import_array`
+### `cfprop_map_providers`
 
-*Filter the query to upload a file in the media library.*
+*Filter the list of supported map services.*
+
+A new map service needs its own handling in the JavaScript of the maps (see js/map.js).
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$array` | `array<string,mixed>` | The parameter to use.
+`$providers` | `array<string,string>` | List of map services (internal name => label).
 
 **Changelog**
 
 Version | Description
 ------- | -----------
-`1.0.0` | Available since 1.0.0.
+`2.1.0` | Available since 2.1.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 537](Propstack/Files.php#L537-L543)
+Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 308](Propstack/Maps.php#L308-L316)
 
-### `cfprop_file_import_post_array`
+### `cfprop_map_requires_consent`
 
-*Filter the post-query to upload a file in the media library.*
+*Filter whether maps are loaded only after the consent of the visitor.*
+
+Return false if a consent tool blocks the map service on its own.
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$post_array` |  | 
+`$requires_consent` | `bool` | True if the visitor has to agree first.
 
 **Changelog**
 
 Version | Description
 ------- | -----------
-`1.0.0` | Available since 1.0.0.
+`2.1.0` | Available since 2.1.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 549](Propstack/Files.php#L549-L555)
+Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 412](Propstack/Maps.php#L412-L420)
 
-### `cfprop_files_import_lock_ttl`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$ttl` |  | 
-
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 719](Propstack/Files.php#L719-L719)
-
-### `cfprop_file_download_timeout`
+### `cfprop_map_location`
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$timeout` |  | 
-`$url` |  | 
+`$location` |  | 
+`$immo_object` |  | 
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 755](Propstack/Files.php#L755-L755)
+Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 565](Propstack/Maps.php#L565-L565)
 
-### `cfprop_max_file_size`
+### `cfprop_map_config`
 
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$max_size` |  | 
-`$url` |  | 
-
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 765](Propstack/Files.php#L765-L765)
-
-### `cfprop_allowed_file_hosts`
-
-*Filter the list of hosts from which files may be downloaded.*
-
-An empty list allows any public host. Subdomains of listed hosts are allowed, too.
+*Filter the configuration of the map service for the JavaScript of the maps.*
 
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$allowed_hosts` | `array<int,string>` | The list of allowed hosts.
-`$url` | `string` | The URL to check.
+`$config` | `array<string,mixed>` | The configuration.
 
 **Changelog**
 
 Version | Description
 ------- | -----------
-`2.0.0` | Available since 2.0.0.
+`2.1.0` | Available since 2.1.0.
 
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 854](Propstack/Files.php#L854-L863)
-
-### `cfprop_files_query`
-
-*Filter the query to get the list of files we imported from Propstack.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$query` | `array` | The query array.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1090](Propstack/Files.php#L1090-L1096)
-
-### `cfprop_files_import_limit`
-
-*Filter the limit of files to import during object import.*
-
-Hint: since 2.1.0 the list contains the files of the actual block of the list only.
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$limit` | `int` | The limit.
-`is_array($block) ? $block : array()` |  | 
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`1.0.0` | Available since 1.0.0.
-
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1399](Propstack/Files.php#L1399-L1408)
-
-### `cfprop_files_import_block_size`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$block_size` |  | 
-
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1696](Propstack/Files.php#L1696-L1696)
-
-### `cfprop_files_import_takeover_time`
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$time` |  | 
-
-Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1803](Propstack/Files.php#L1803-L1803)
+Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 622](Propstack/Maps.php#L622-L628)
 
 
 <p align="center"><a href="https://github.com/pronamic/wp-documentor"><img src="https://cdn.jsdelivr.net/gh/pronamic/wp-documentor@main/logos/pronamic-wp-documentor.svgo-min.svg" alt="Pronamic WordPress Documentor" width="32" height="32"></a><br><em>Generated by <a href="https://github.com/pronamic/wp-documentor">Pronamic WordPress Documentor</a> <code>1.2.0</code></em><p>

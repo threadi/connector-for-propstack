@@ -29,6 +29,12 @@ Aufbau des Shortcodes:
   * values => Liste mit Werten des Objektes
   * detail_link => Link zur Single-Ansicht
 
+#### show_sorting
+
+* Mit "0" wird die Auswahl der Sortierung über dieser Liste ausgeblendet
+* Die Sortierung wird unter Einstellungen > Connector for Propstack > Sortierung verwaltet
+* Standard: 1
+
 ### Beispiel:
 
 `[cfprop_widget_archive listing_templates="default"]`
@@ -175,4 +181,96 @@ Aufbau des Shortcodes:
 
 Gibt die Galerie eines Objektes aus.
 
-Dieser Shortcode verfügt über keine weiteren Parameter.
+### Parameter
+
+#### tags (nur Pro)
+
+* Optional: nur Bilder mit mindestens einem dieser Tags aus Propstack anzeigen, durch Kommas getrennt
+* Die Werte stehen unter Einstellungen > Connector für Propstack > Import > Tags
+* Standard: leer (alle Bilder)
+
+#### columns
+
+* Optional: die Anzahl der Spalten
+* Standard: 3
+
+#### size
+
+* Optional: die Bildgröße, z. B. thumbnail, medium, large oder full
+* Standard: thumbnail
+
+### Beispiel
+
+`[cfprop_widget_gallery tags="innenansicht,floorplan" columns="4" size="medium"]`
+
+## Karte
+
+Zeigt den Standort eines Objekts auf einer Karte des Kartendienstes, der unter Einstellungen > Connector for Propstack > Karten gewählt ist (OpenStreetMap oder Google Maps). Die Karte wird erst nach Zustimmung des Besuchers geladen, sofern aktiviert.
+
+Aufbau des Shortcodes:
+
+`[cfprop_widget_map]`
+
+### Parameter
+
+#### object_id
+
+* Die Propstack-ID des anzuzeigenden Objekts
+* Nur außerhalb der Vorlage für die Detailansicht von Objekten nötig
+
+#### zoom
+
+* Zoomstufe von 1 (Welt) bis 19 (Straße)
+* Standard: die Zoomstufe aus den Einstellungen
+
+#### height
+
+* Höhe der Karte mit CSS-Einheit, z. B. 400px oder 50vh
+* Standard: die Höhe aus den Einstellungen
+
+#### source
+
+* "object" für das aktuelle Objekt, "list" für alle Objekte der Liste mit den aktiven Filtern (nur mit Connector for Propstack Pro)
+* Standard: object
+
+#### popup
+
+* "1" zeigt bei Karten mit der Liste den Titel und einen Link im Popup, "0" blendet ihn aus
+* Standard: 1
+
+### Beispiel
+
+`[cfprop_widget_map zoom="14" height="400px"]`
+
+## Anfrage-Button
+
+Zeigt einen Button für eine Anfrage zum aktuellen Objekt. Ohne Link-Ziel nutzt der Button die öffentliche E-Mail-Adresse des Maklers (mit Titel, ID und Link des Objekts in der E-Mail), sonst die öffentliche Telefonnummer des Maklers, sonst die E-Mail-Adresse dieser Website.
+
+Aufbau des Shortcodes:
+
+`[cfprop_widget_inquiry_button]`
+
+### Parameter
+
+#### url
+
+* Optionales Link-Ziel, z. B. `#contact` für ein Formular mit dieser ID auf derselben Seite oder die URL deiner Kontaktseite
+* Standard: leer (E-Mail oder Telefon des Maklers, sonst die E-Mail-Adresse dieser Website)
+
+#### Gestaltung
+
+Optional, ohne Wert nutzt der Button die Gestaltung des Themes:
+
+* `text_color`, `background_color`, `text_color_hover`, `background_color_hover`, `border_color`: Farben, z. B. `#ffffff`, `rgb(0,0,0)` oder `var(--meine-farbe)`
+* `font_family`: z. B. `Georgia, serif`
+* `font_size`, `letter_spacing`, `padding`, `border_width`, `border_radius`: Größen, z. B. `16px`, `1em` oder `10px 20px` (Zahlen ohne Einheit sind Pixel)
+* `line_height`: z. B. `1.4`
+* `font_weight`: `100` bis `900`
+* `font_style`: `normal` oder `italic`
+* `text_transform`: `none`, `uppercase`, `lowercase` oder `capitalize`
+* `text_decoration`: `none`, `underline` oder `line-through`
+* `border_style`: `none`, `solid`, `dashed`, `dotted` oder `double`
+
+### Beispiel
+
+`[cfprop_widget_inquiry_button url="#contact" background_color="#333333" text_color="#ffffff" border_radius="4px"]`

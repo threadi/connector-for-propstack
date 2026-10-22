@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 use ConnectorForPropstack\Plugin\Languages;
 use ConnectorForPropstack\Plugin\Templates;
 use ConnectorForPropstack\Propstack\ImmoObjects;
+use ConnectorForPropstack\Propstack\Sortings;
 use ConnectorForPropstack\Propstack\Widget_Base;
 
 /**
@@ -116,6 +117,7 @@ class Archive extends Widget_Base {
 		);
 		$attributes['query']            = ImmoObjects::get_instance()->get_objects_query( $query_params );
 		$attributes['lang']             = Languages::get_instance()->get_current_lang();
+		$attributes['sorting']          = $this->show_sorting( $attributes ) ? Sortings::get_instance()->get_output( $query_params, array( 'classes' => '' ) ) : '';
 
 		// get pagination.
 		$query                    = array(
@@ -150,6 +152,11 @@ class Archive extends Widget_Base {
 		 */
 		do_action( 'cfprop_get_template_before', $attributes );
 
+		// show the selection for the sorting above the list.
+		if ( ! empty( $attributes['sorting'] ) && is_string( $attributes['sorting'] ) ) {
+			echo wp_kses( $attributes['sorting'], Sortings::get_instance()->get_allowed_html() );
+		}
+
 		// use the template to generate the output.
 		include Templates::get_instance()->get_template( 'parts/archive.php' );
 
@@ -160,6 +167,70 @@ class Archive extends Widget_Base {
 		if ( ! $content ) {
 			return '';
 		}
-		return $content;
+
+		/**
+		 * Filter the output of the archive widget.
+		 *
+		 * Used by Connector for Propstack Pro, e.g. to wrap the list so it could be updated via AJAX.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param string              $content    The output (sorting, list and pagination).
+		 * @param array<string,mixed> $attributes The attributes of the archive widget, incl. the query ("query").
+		 */
+		return (string) apply_filters( 'cfprop_widget_archive_output', $content, $attributes );
+	}
+
+	/**
+	 * Return whether the selection for the sorting should be shown above the list.
+	 *
+	 * It could be disabled per widget via the attribute "show_sorting" (e.g. "0" in the shortcode).
+	 *
+	 * @param array<string,mixed> $attributes The attributes of the widget.
+	 *
+	 * @return bool
+	 */
+	private function show_sorting( array $attributes ): bool {
+		$show = ! isset( $attributes['show_sorting'] ) || ! in_array( $attributes['show_sorting'], array( false, 0, '0', 'no', 'false' ), true );
+
+		/**
+		 * Filter whether the selection for the sorting is shown above the list of objects.
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 * @param bool                $show       True to show it (if the sorting is enabled and useful for the list).
+		 * @param array<string,mixed> $attributes The attributes of the archive widget.
+		 */
+		return (bool) apply_filters( 'cfprop_archive_show_sorting', $show, $attributes );
+	}
+
+	/**
+	 * Return the params this widget supports (for the shortcode description).
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public function get_params(): array {
+		$params = array(
+			'show_sorting' => array(
+				'label'    => __( 'Set to "0" to hide the selection for the sorting above this list.', 'connector-for-propstack' ),
+				'required' => false,
+			),
+		);
+
+		/**
+		 * Filter the params of the archive widget (for the shortcode description).
+		 *
+		 * @since 2.1.0 Available since 2.1.0.
+		 *
+		 * @param array<string,array<string,mixed>> $params The params.
+		 */
+		return apply_filters( 'cfprop_widget_archive_params', $params );
+	}
+
+	/**
+	 * Return the allowed HTML for the output of this widget (including the form elements of the sorting).
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function get_allowed_html(): array {
+		return Sortings::get_instance()->get_allowed_html();
 	}
 }

@@ -1,0 +1,91 @@
+{
+	"$schema": "https://json.schemastore.org/block.json",
+	"apiVersion": 3,
+	"name": "connector-for-propstack/inquiry-button",
+	"title": "Inquiry Button",
+	"category": "connector-for-propstack",
+	"description": "Provides a button for an inquiry about a single object from Propstack.",
+	"keywords": [
+		"Propstack",
+		"Inquiry",
+		"Contact",
+		"Button"
+	],
+	"supports": {
+		"html": false,
+		"color": {
+			"text": true,
+			"background": true,
+			"gradients": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": [
+				"horizontal",
+				"vertical"
+			],
+			"__experimentalSkipSerialization": [
+				"padding"
+			],
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		}
+	},
+	"textdomain": "connector-for-propstack",
+	"editorScript": "file:build/index.js",
+	"attributes": {
+		"id": {
+			"type": "integer",
+			"default": 0
+		},
+		"blockId": {
+			"type": "string"
+		},
+		"url": {
+			"type": "string",
+			"default": ""
+		},
+		"preview": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	}
+}
