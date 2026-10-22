@@ -152,7 +152,7 @@ class Objects extends Schedules_Base {
 		 *
 		 * If the import is not completed in this time, it is continued in a following request.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $time_budget The time in seconds.
 		 */
 		return max( 1, absint( apply_filters( 'cfprop_schedule_import_time_budget', $time_budget ) ) );

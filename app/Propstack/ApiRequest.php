@@ -431,7 +431,7 @@ class ApiRequest {
 		/**
 		 * Filter whether personal data in API responses is masked before they are written to the log.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool $mask True to mask personal data.
 		 */
 		if ( ! apply_filters( 'cfprop_log_mask_personal_data', $mask ) ) {

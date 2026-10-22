@@ -150,7 +150,7 @@ class KnowledgeCenter_Base {
 		/**
 		 * Filter the text of a knowledge center entry.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param string               $text  The text.
 		 * @param KnowledgeCenter_Base $entry The knowledge center entry.
 		 */

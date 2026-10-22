@@ -195,7 +195,7 @@ class Template_Adapter extends Template_Adapter_Base {
 		 *
 		 * E.g. used by Connector for Propstack Pro to add its own blocks.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,array<string,mixed>> $elements List of blocks.
 		 */
 		$elements = apply_filters( 'cfprop_gutenberg_template_elements', $elements );
@@ -685,7 +685,7 @@ class Template_Adapter extends Template_Adapter_Base {
 			 *
 			 * E.g. used by Connector for Propstack Pro to check the attributes of its own blocks.
 			 *
-			 * @since 2.1.0 Available since 2.1.0.
+			 * @since 3.0.0 Available since 3.0.0.
 			 * @param array<int,string>   $errors     List of errors.
 			 * @param string              $block_name The name of the block.
 			 * @param array<string,mixed> $attributes The attributes of the block.

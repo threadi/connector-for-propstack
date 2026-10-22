@@ -186,7 +186,7 @@ class Custom_Fields {
 		/**
 		 * Filter the types of custom fields in Propstack with their labels.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,string> $types The types.
 		 */
 		return apply_filters( 'cfprop_custom_field_types', $types );
@@ -361,7 +361,7 @@ class Custom_Fields {
 		/**
 		 * Filter whether the output of custom fields in the frontend is supported.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool $supported True if the output is supported.
 		 *
 		 * @noinspection PhpConditionAlreadyCheckedInspection
@@ -576,7 +576,7 @@ class Custom_Fields {
 		 *
 		 * The API key needs the permission to read custom fields for this.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool   $enabled     True to load them.
 		 * @param string $api_version The used API version ("v1" or "v2").
 		 *
@@ -735,7 +735,7 @@ class Custom_Fields {
 		/**
 		 * Filter the URL of the API to get the definitions of custom fields from Propstack.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param string $url         The URL.
 		 * @param string $api_version The used API version ("v1" or "v2").
 		 */
@@ -834,7 +834,7 @@ class Custom_Fields {
 		/**
 		 * Filter the definitions of custom fields loaded from Propstack.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,array<string,mixed>> $definitions The definitions.
 		 * @param string                            $api_version The used API version.
 		 */
@@ -952,7 +952,7 @@ class Custom_Fields {
 		/**
 		 * Filter the values of the custom fields of an object during its import.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,mixed> $result      The values: the meta key => the value.
 		 * @param array<string,mixed> $immo_object The object data from API.
 		 * @param int                 $post_id     The post-ID of the object.
@@ -1435,7 +1435,7 @@ class Custom_Fields {
 		/**
 		 * Filter the formatted value of a custom field.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param string              $output     The formatted value (HTML).
 		 * @param mixed               $value      The saved value.
 		 * @param array<string,mixed> $definition The definition of the custom field.
@@ -1527,7 +1527,7 @@ class Custom_Fields {
 		/**
 		 * Filter the link for a custom field, which contains a single URL.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param string $link The link.
 		 * @param string $url  The URL.
 		 */

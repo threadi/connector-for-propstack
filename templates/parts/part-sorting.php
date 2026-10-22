@@ -5,7 +5,7 @@
  * @param array<string,mixed> $attributes List of attributes for displaying templates.
  *
  * @package connector-for-propstack
- * @version: 2.1.0
+ * @version: 3.0.0
  */
 
 // prevent direct access.
@@ -33,7 +33,7 @@ $cfprop_sorting_id = wp_unique_id( 'cfprop-sorting-' );
 	/**
 	 * Run action before the output of the sorting selection.
 	 *
-	 * @since 2.1.0 Available since 2.1.0.
+	 * @since 3.0.0 Available since 3.0.0.
 	 * @param array<string,mixed> $attributes List of attributes for displaying templates.
 	 */
 	do_action( 'cfprop_sorting_before', $attributes );
@@ -52,7 +52,7 @@ $cfprop_sorting_id = wp_unique_id( 'cfprop-sorting-' );
 	/**
 	 * Run action after the output of the sorting selection.
 	 *
-	 * @since 2.1.0 Available since 2.1.0.
+	 * @since 3.0.0 Available since 3.0.0.
 	 * @param array<string,mixed> $attributes List of attributes for displaying templates.
 	 */
 	do_action( 'cfprop_sorting_after', $attributes );

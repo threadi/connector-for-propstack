@@ -502,7 +502,7 @@ class Templates {
 		 * Defaults to true if the Pro plugin seems to be active or if the theme overrides the archive
 		 * template or the filter template part, otherwise false.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool $extend_post_kses True to extend the "post" context globally.
 		 */
 		if ( ! apply_filters( 'cfprop_extend_post_kses_globally', $extend_post_kses ) ) {
@@ -622,7 +622,7 @@ class Templates {
 		/**
 		 * Filter the allowed HTML for the output of the filter form.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,mixed> $allowed_tags List of allowed tags and their attributes.
 		 */
 		return apply_filters( 'cfprop_allowed_filter_html', $allowed_tags );

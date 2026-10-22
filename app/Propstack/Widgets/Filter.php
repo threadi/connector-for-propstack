@@ -171,7 +171,7 @@ class Filter extends Widget_Base {
 		/**
 		 * Filter the params of the filter widget (for the shortcode description).
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 *
 		 * @param array<string,array<string,mixed>> $params The params.
 		 */

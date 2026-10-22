@@ -867,7 +867,7 @@ class Fields {
 		 *
 		 * Fields of objects, which are not in this list, are hidden if the API v2 is used.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,string> $fields The names of the fields in the API.
 		 */
 		return apply_filters( 'cfprop_api_v2_object_fields', $fields );
@@ -945,7 +945,7 @@ class Fields {
 		 *
 		 * This filter is only used if the API v2 is used. Fields which are not delivered are hidden.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool       $available True if the field is delivered.
 		 * @param Field_Base $field     The field object.
 		 */
@@ -1133,7 +1133,7 @@ class Fields {
 		 *
 		 * These meta keys are never removed with the values of custom fields in the format up to version 2.0.x.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,bool> $list List of meta keys as keys.
 		 */
 		return apply_filters( 'cfprop_reserved_meta_keys', $list );
@@ -1554,7 +1554,7 @@ class Fields {
 		/**
 		 * Filter whether the "hide address" flag from Propstack should be respected in the frontend.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool       $respect     True to respect the flag.
 		 * @param ImmoObject $immo_object The object.
 		 *
@@ -1582,7 +1582,7 @@ class Fields {
 		/**
 		 * Filter the list of fields which are hidden if the address of an object should be hidden.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,string> $list List of field names.
 		 */
 		return apply_filters( 'cfprop_exact_address_fields', $list );

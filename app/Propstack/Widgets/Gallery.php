@@ -150,7 +150,7 @@ class Gallery extends Widget_Base {
 		/**
 		 * Filter the images of an object, which are shown in the gallery.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int|string,WP_Post>                   $images      The images.
 		 * @param \ConnectorForPropstack\Propstack\ImmoObject $immo_object The object.
 		 * @param array<string,mixed>                         $attributes  Attributes to configure the rendering.

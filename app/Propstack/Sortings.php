@@ -117,7 +117,7 @@ class Sortings {
 		/**
 		 * Filter whether the visitors could sort the list of objects.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool $enabled True if the sorting is enabled.
 		 */
 		return (bool) apply_filters( 'cfprop_sorting_enabled', $enabled );
@@ -134,7 +134,7 @@ class Sortings {
 		/**
 		 * Filter the minimal share of objects in a list, which must have a value for a sorting to offer it.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param float $min_share The share between 0 and 1 (default 0.5 for the half of the objects).
 		 */
 		$min_share = (float) apply_filters( 'cfprop_sorting_min_share', $min_share );
@@ -315,7 +315,7 @@ class Sortings {
 		 *
 		 * Used by Connector for Propstack Pro.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool $selectable True if it could be chosen.
 		 *
 		 * @noinspection PhpConditionAlreadyCheckedInspection
@@ -406,7 +406,7 @@ class Sortings {
 		 * Each entry must be the name of a class based on \ConnectorForPropstack\Propstack\Sorting_Base
 		 * with a static get_instance() method.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,string> $list List of sortings.
 		 */
 		return apply_filters( 'cfprop_sortings', $list );
@@ -491,7 +491,7 @@ class Sortings {
 		/**
 		 * Filter the default sorting of the list of objects (e.g. "price-asc"). An empty string uses the standard order.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param string $option The default sorting.
 		 */
 		$option = apply_filters( 'cfprop_sorting_default', is_string( $option ) ? $option : '' );
@@ -920,7 +920,7 @@ class Sortings {
 		/**
 		 * Filter the attributes for the output of the sorting.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,mixed> $attributes The attributes.
 		 * @param Sorting_Context     $context    The objects of the list.
 		 */

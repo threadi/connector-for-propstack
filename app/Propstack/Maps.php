@@ -310,7 +310,7 @@ class Maps {
 		 *
 		 * A new map service needs its own handling in the JavaScript of the maps (see js/map.js).
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,string> $providers List of map services (internal name => label).
 		 */
 		return apply_filters( 'cfprop_map_providers', $providers );
@@ -414,7 +414,7 @@ class Maps {
 		 *
 		 * Return false if a consent tool blocks the map service on its own.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param bool $requires_consent True if the visitor has to agree first.
 		 */
 		return (bool) apply_filters( 'cfprop_map_requires_consent', $requires_consent );
@@ -558,7 +558,7 @@ class Maps {
 		 *
 		 * Return false to hide the object on maps. Never return the exact location of objects with hidden address.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array{lat:float,lng:float,approximate:bool}|false $location    The location.
 		 * @param ImmoObject                                        $immo_object The object.
 		 */
@@ -622,7 +622,7 @@ class Maps {
 		/**
 		 * Filter the configuration of the map service for the JavaScript of the maps.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,mixed> $config The configuration.
 		 */
 		return apply_filters( 'cfprop_map_config', $config );
@@ -673,7 +673,7 @@ class Maps {
 			 * Used by Connector for Propstack Pro, which shows several objects on maps. Without them, all markers
 			 * are shown on their own.
 			 *
-			 * @since 2.1.0 Available since 2.1.0.
+			 * @since 3.0.0 Available since 3.0.0.
 			 * @param string $provider The map service ("openstreetmap" or "google").
 			 */
 			do_action( 'cfprop_map_enqueue_cluster_assets', $this->get_provider() );

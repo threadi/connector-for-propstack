@@ -279,7 +279,7 @@ class Countries {
 		/**
 		 * Filter the list of countries with their 3-letter code, their 2-letter code and their English name.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<string,array<int,string>> $countries The list of countries.
 		 */
 		return apply_filters( 'cfprop_countries', $countries );

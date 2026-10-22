@@ -79,7 +79,7 @@ class FieldFormats {
 		/**
 		 * Filter the list of available field formats.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param array<int,string> $field_formats List of field formats.
 		 */
 		return apply_filters( 'cfprop_field_formats', $field_formats );

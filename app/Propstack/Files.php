@@ -719,7 +719,7 @@ class Files {
 		/**
 		 * Filter the time in seconds after which the lock for the import of files is treated as stale.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $ttl The time in seconds.
 		 */
 		$ttl = absint( apply_filters( 'cfprop_files_import_lock_ttl', $ttl ) );
@@ -1469,7 +1469,7 @@ class Files {
 		/**
 		 * Filter the limit of files to import during object import.
 		 *
-		 * Hint: since 2.1.0 the list contains the files of the actual block of the list only.
+		 * Hint: since 3.0.0 the list contains the files of the actual block of the list only.
 		 *
 		 * @since 1.0.0 Available since 1.0.0.
 		 * @param int $limit The limit.
@@ -1760,7 +1760,7 @@ class Files {
 		/**
 		 * Filter the amount of files stored in a single block of the list of files to import.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $block_size The block size.
 		 */
 		$block_size = max( 1, absint( apply_filters( 'cfprop_files_import_block_size', $block_size ) ) );
@@ -1851,7 +1851,7 @@ class Files {
 		delete_option( $this->files_work_list_option );
 		delete_option( $this->files_offset_option );
 
-		// delete the list of versions before 2.1.0.
+		// delete the list of versions before 3.0.0.
 		delete_transient( 'propstack_object_files_to_import' );
 		delete_transient( 'propstack_object_files_to_import_owner' );
 	}
@@ -1867,7 +1867,7 @@ class Files {
 		 * Filter the time in seconds after which the list of files of another import is replaced,
 		 * if this import did not continue in the meantime.
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 * @param int $time The time in seconds.
 		 */
 		return absint( apply_filters( 'cfprop_files_import_takeover_time', $time ) );
@@ -2140,7 +2140,7 @@ class Files {
 		 *
 		 * Use this to add the reason for an own check on the filter "cfprop_prevent_file_import".
 		 *
-		 * @since 2.1.0 Available since 2.1.0.
+		 * @since 3.0.0 Available since 3.0.0.
 		 *
 		 * @param array<int,string>   $reasons   The reasons, each as a complete sentence.
 		 * @param array<string,mixed> $file_data The file data from Propstack.
