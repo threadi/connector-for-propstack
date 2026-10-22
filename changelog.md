@@ -109,6 +109,9 @@
 - Values of custom fields are now saved and shown in a uniform format (e.g. the names of chosen options instead of their IDs with API v1, dates and numbers in the format of the website)
 - Custom fields, which are no longer delivered by Propstack, are removed during the import
 - Country fields show the name of each country instead of its code
+- The list of objects and the detail view are no longer left-aligned in classic themes without own container styles (e.g. Hello Elementor or themes used with a page builder); the list now also adapts its number of columns to the available width
+- Improved the list of objects and the detail view in classic themes: the number of columns no longer depends on the root font size of the theme (e.g. 5 columns in Twenty Twenty), the sorting has a distance to the filter above, words are no longer broken by theme styles and theme margins no longer stretch the rows of the detail view
+- The links and the button in the contact box of the detail view are now readable in every theme (customizable via the custom properties --cfprop-contact-button-background and --cfprop-contact-button-color)
 
 ### Fixed
 
