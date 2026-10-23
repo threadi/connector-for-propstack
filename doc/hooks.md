@@ -834,7 +834,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 670](Propstack/Maps.php#L670-L679)
 
@@ -853,7 +853,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/FieldCategories/Images.php](Propstack/FieldCategories/Images.php), [line 112](Propstack/FieldCategories/Images.php#L112-L119)
 
@@ -927,7 +927,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/PageBuilder/Gutenberg/Patterns.php](PageBuilder/Gutenberg/Patterns.php), [line 128](PageBuilder/Gutenberg/Patterns.php#L128-L134)
 
@@ -965,7 +965,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/PageBuilder/Gutenberg/Template_Adapter.php](PageBuilder/Gutenberg/Template_Adapter.php), [line 193](PageBuilder/Gutenberg/Template_Adapter.php#L193-L201)
 
@@ -987,7 +987,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/PageBuilder/Gutenberg/Template_Adapter.php](PageBuilder/Gutenberg/Template_Adapter.php), [line 683](PageBuilder/Gutenberg/Template_Adapter.php#L683-L693)
 
@@ -1161,7 +1161,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Plugin/Users.php](Plugin/Users.php), [line 161](Plugin/Users.php#L161-L167)
 
@@ -1589,7 +1589,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Plugin/Templates.php](Plugin/Templates.php), [line 622](Plugin/Templates.php#L622-L628)
 
@@ -1864,7 +1864,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Plugin/Countries.php](Plugin/Countries.php), [line 279](Plugin/Countries.php#L279-L285)
 
@@ -1883,7 +1883,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Sorting_Base.php](Propstack/Sorting_Base.php), [line 184](Propstack/Sorting_Base.php#L184-L191)
 
@@ -1903,7 +1903,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Sorting_Base.php](Propstack/Sorting_Base.php), [line 235](Propstack/Sorting_Base.php#L235-L243)
 
@@ -1977,7 +1977,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/ImmoObjects.php](Propstack/ImmoObjects.php), [line 1360](Propstack/ImmoObjects.php#L1360-L1366)
 
@@ -2459,7 +2459,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/KnowledgeCenter.php](Propstack/KnowledgeCenter.php), [line 373](Propstack/KnowledgeCenter.php#L373-L379)
 
@@ -2477,7 +2477,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 117](Propstack/Sortings.php#L117-L123)
 
@@ -2495,7 +2495,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 134](Propstack/Sortings.php#L134-L140)
 
@@ -2515,7 +2515,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 313](Propstack/Sortings.php#L313-L323)
 
@@ -2536,7 +2536,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 403](Propstack/Sortings.php#L403-L412)
 
@@ -2554,7 +2554,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 491](Propstack/Sortings.php#L491-L497)
 
@@ -2573,7 +2573,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Sortings.php](Propstack/Sortings.php), [line 920](Propstack/Sortings.php#L920-L927)
 
@@ -2813,7 +2813,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 865](Propstack/Fields.php#L865-L873)
 
@@ -2834,7 +2834,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 943](Propstack/Fields.php#L943-L952)
 
@@ -2874,7 +2874,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1131](Propstack/Fields.php#L1131-L1139)
 
@@ -2960,7 +2960,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Fields.php](Propstack/Fields.php), [line 1582](Propstack/Fields.php#L1582-L1588)
 
@@ -3010,7 +3010,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Templates.php](Propstack/Templates.php), [line 190](Propstack/Templates.php#L190-L198)
 
@@ -3650,7 +3650,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/FieldCategories.php](Propstack/FieldCategories.php), [line 184](Propstack/FieldCategories.php#L184-L190)
 
@@ -3668,7 +3668,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 186](Propstack/Custom_Fields.php#L186-L192)
 
@@ -3686,7 +3686,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 361](Propstack/Custom_Fields.php#L361-L369)
 
@@ -3707,7 +3707,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 574](Propstack/Custom_Fields.php#L574-L585)
 
@@ -3726,7 +3726,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 735](Propstack/Custom_Fields.php#L735-L742)
 
@@ -3745,7 +3745,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 834](Propstack/Custom_Fields.php#L834-L841)
 
@@ -3765,7 +3765,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 952](Propstack/Custom_Fields.php#L952-L960)
 
@@ -3785,7 +3785,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 1435](Propstack/Custom_Fields.php#L1435-L1443)
 
@@ -3804,7 +3804,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Custom_Fields.php](Propstack/Custom_Fields.php), [line 1527](Propstack/Custom_Fields.php#L1527-L1534)
 
@@ -4039,7 +4039,7 @@ Source: [app/Propstack/Files.php](Propstack/Files.php), [line 1160](Propstack/Fi
 
 *Filter the limit of files to import during object import.*
 
-Hint: since 2.1.0 the list contains the files of the actual block of the list only.
+Hint: since 3.0.0 the list contains the files of the actual block of the list only.
 
 **Arguments**
 
@@ -4115,7 +4115,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Files.php](Propstack/Files.php), [line 2138](Propstack/Files.php#L2138-L2148)
 
@@ -4135,7 +4135,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 78](Propstack/Widgets/Map.php#L78-L86)
 
@@ -4153,7 +4153,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 137](Propstack/Widgets/Map.php#L137-L143)
 
@@ -4175,7 +4175,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 262](Propstack/Widgets/Map.php#L262-L272)
 
@@ -4196,7 +4196,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 292](Propstack/Widgets/Map.php#L292-L301)
 
@@ -4214,7 +4214,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Map.php](Propstack/Widgets/Map.php), [line 342](Propstack/Widgets/Map.php#L342-L348)
 
@@ -4267,7 +4267,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Object_Data.php](Propstack/Widgets/Object_Data.php), [line 120](Propstack/Widgets/Object_Data.php#L120-L127)
 
@@ -4301,7 +4301,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Gallery.php](Propstack/Widgets/Gallery.php), [line 150](Propstack/Widgets/Gallery.php#L150-L158)
 
@@ -4357,7 +4357,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 171](Propstack/Widgets/Archive.php#L171-L180)
 
@@ -4376,7 +4376,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 195](Propstack/Widgets/Archive.php#L195-L202)
 
@@ -4394,7 +4394,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Archive.php](Propstack/Widgets/Archive.php), [line 218](Propstack/Widgets/Archive.php#L218-L225)
 
@@ -4436,7 +4436,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Filter.php](Propstack/Widgets/Filter.php), [line 171](Propstack/Widgets/Filter.php#L171-L178)
 
@@ -4454,7 +4454,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Inquiry_Button.php](Propstack/Widgets/Inquiry_Button.php), [line 78](Propstack/Widgets/Inquiry_Button.php#L78-L84)
 
@@ -4472,7 +4472,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Inquiry_Button.php](Propstack/Widgets/Inquiry_Button.php), [line 229](Propstack/Widgets/Inquiry_Button.php#L229-L235)
 
@@ -4494,7 +4494,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Widgets/Inquiry_Button.php](Propstack/Widgets/Inquiry_Button.php), [line 636](Propstack/Widgets/Inquiry_Button.php#L636-L646)
 
@@ -4512,7 +4512,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Frontend_Hints.php](Propstack/Frontend_Hints.php), [line 111](Propstack/Frontend_Hints.php#L111-L117)
 
@@ -4533,7 +4533,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Frontend_Hints.php](Propstack/Frontend_Hints.php), [line 161](Propstack/Frontend_Hints.php#L161-L170)
 
@@ -4647,7 +4647,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/FieldFormats.php](Propstack/FieldFormats.php), [line 79](Propstack/FieldFormats.php#L79-L85)
 
@@ -4743,7 +4743,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/KnowledgeCenter_Base.php](Propstack/KnowledgeCenter_Base.php), [line 150](Propstack/KnowledgeCenter_Base.php#L150-L157)
 
@@ -4781,7 +4781,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 308](Propstack/Maps.php#L308-L316)
 
@@ -4801,7 +4801,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 412](Propstack/Maps.php#L412-L420)
 
@@ -4830,7 +4830,7 @@ Argument | Type | Description
 
 Version | Description
 ------- | -----------
-`2.1.0` | Available since 2.1.0.
+`3.0.0` | Available since 3.0.0.
 
 Source: [app/Propstack/Maps.php](Propstack/Maps.php), [line 622](Propstack/Maps.php#L622-L628)
 
