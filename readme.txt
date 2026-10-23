@@ -30,7 +30,7 @@ There is nothing to prepare on your hosting. Install the plugin, enter your Prop
 ✅ Object types "Apartment", "House" and "Garage" with their respective fields
 ✅ Every object gets its own URL on your website — indexable by search engines
 ✅ Works with classic themes and block themes
-✅ 7 blocks for the block editor plus [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
+✅ 10 blocks for the block editor plus [shortcodes](https://github.com/threadi/connector-for-propstack/blob/master/doc/shortcodes.md)
 ✅ Filter your object archive by city and object ID
 ✅ Let visitors sort the list of objects by price
 ✅ Show the location of an object on a map with OpenStreetMap or Google Maps, loaded only after consent
@@ -53,12 +53,19 @@ The Pro version removes the limits of the free version and adds everything you n
 
 ➕ Import and display of all object types Propstack offers, such as "Plot", "Office" or "Store"
 ➕ Considerably more data fields for your Propstack objects
-➕ Ten widgets and ready-made templates for page builders such as Avada, Avia (Enfold), Beaver Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Elementor, GeneratePress Elements, Live Composer, Oxygen, Salient, SiteOrigin, Themify, WPBakery and Zion Builder
+➕ Seventeen widgets and ready-made templates for page builders such as Avada, Avia (Enfold), Beaver Builder, Bold Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Elementor, Fusion Builder, GeneratePress Elements, Live Composer, Oxygen, Salient, SiteOrigin, Themify, WPBakery and Zion Builder
 ➕ Update objects immediately via webhooks from Propstack
 ➕ More sortings like newest objects, living space, rooms or plot area
 ➕ Map with all objects of the list
-➕ Send contact enquiries straight into Propstack using Avada Forms, Elementor Forms, Contact Form 7 or WPForms
-➕ Additional blocks for the block editor, for example object status
+➕ Send contact enquiries straight into Propstack using Avada Forms, BitForm, Contact Form 7, Elementor Forms, EverestForms, FluentForms, Formidable, GravityForms, NinjaForms, SureForms or WPForms
+➕ Six additional blocks for the block editor, for example object status
+➕ More filters like living space, rooms or ZIP code, with live results without reloading the page and the number of hits on the button
+➕ Exposé download with optional lead capture: visitors enter their contact details, the broker receives the inquiry
+➕ Import and display of videos, floor plans, energy certificates and other documents
+➕ Output of your custom fields from Propstack
+➕ Galleries filtered by image tags from Propstack
+➕ Restrict lists to object types or marketing types, e.g. only houses for sale
+➕ Structured data (schema.org) for search engines
 ➕ Personal support by the developers
 ➕ Up to 3 hours of setup service with the annual license
 ➕ Money-back guarantee: try it for 7 days without risk
