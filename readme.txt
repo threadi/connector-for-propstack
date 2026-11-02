@@ -65,6 +65,7 @@ The Pro version removes the limits of the free version and adds everything you n
 ➕ Output of your custom fields from Propstack
 ➕ Galleries filtered by image tags from Propstack
 ➕ Restrict lists to object types or marketing types, e.g. only houses for sale
+➕ Use the property groups ("Merkmale") from Propstack, e.g. to show only selected highlights on your homepage
 ➕ Structured data (schema.org) for search engines
 ➕ Personal support by the developers
 ➕ Up to 3 hours of setup service with the annual license

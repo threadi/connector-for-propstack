@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added hint for the property groups ("Merkmale") of Propstack, which could be used with Connector for Propstack Pro, in the restrictions of the import of objects and in the description of the plugin
+
 ## [3.0.0] - 26.10.2026
 
 ### Added

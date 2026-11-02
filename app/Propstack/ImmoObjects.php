@@ -568,6 +568,18 @@ class ImmoObjects {
 		$field->set_value( __( 'Vermarktung', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
 
+		// add a hint for the property groups ("Merkmale"), which are supported by the Pro plugin.
+		if ( Helper::show_pro_hints() ) {
+			$setting = $settings_obj->add_setting( 'propstack_connector_import_groups_pro_hint' );
+			$setting->set_section( $import_restrictions_section );
+			$setting->prevent_export( true );
+			$field = new TextInfo( $settings_obj );
+			$field->set_title( __( 'Property groups to import', 'connector-for-propstack' ) );
+			/* translators: %1$s: Connector for Propstack Pro URL */
+			$field->set_description( '<span class="cfprop-pro-hint">' . sprintf( __( 'Use property groups from Propstack, e.g. to show selected highlights, with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
+			$setting->set_field( $field );
+		}
+
 		// get the available brokers.
 		$broker = Cache::get( Taxonomies\Broker::get_instance()->get_name() . '_non_empty_terms_for_settings' );
 		if ( empty( $broker ) ) {

@@ -185,6 +185,17 @@ body.post-type-cfprop_object, body.settings_page_connector-for-propstack {
 	background-color: var(--cfprop-pro-hint-bg);
 	color: var(--cfprop-pro-hint-font);
 	padding: 4px 8px;
+	/* keep the padding on each line, if a long hint wraps. */
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
+	line-height: 2;
+}
+
+/* show hints in the settings as one box with a readable width. */
+.form-table .cfprop-pro-hint {
+	display: inline-block;
+	max-width: 40em;
+	line-height: 1.5;
 }
 
 .easy-dialog-for-wordpress-text p .cfprop-pro-hint { padding: 0 }
