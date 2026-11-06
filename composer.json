@@ -80,6 +80,6 @@
         "phpcompatibility/phpcompatibility-wp": "^2.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
         "yoast/phpunit-polyfills": "^1.0",
-        "wp-phpunit/wp-phpunit": "^6.3"
+        "wp-phpunit/wp-phpunit": "^7.1"
     }
 }
