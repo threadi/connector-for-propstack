@@ -65,6 +65,7 @@ The Pro version removes the limits of the free version and adds everything you n
 ➕ Output of your custom fields from Propstack
 ➕ Galleries filtered by image tags from Propstack
 ➕ Restrict lists to object types or marketing types, e.g. only houses for sale
+➕ Use the property groups ("Merkmale") from Propstack, e.g. to show only selected highlights on your homepage
 ➕ Structured data (schema.org) for search engines
 ➕ Personal support by the developers
 ➕ Up to 3 hours of setup service with the annual license
@@ -173,21 +174,10 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
-* Added inquiry button to contact the broker about an object
-* Added map of the object location with OpenStreetMap or Google Maps, loaded only after consent
-* Added sorting of object lists, e.g. by price
-* Added support for custom fields from Propstack
-* Added block patterns for object lists and broker contact
-* Added many help entries, linked from the log and dialogs
-* Added quick link to edit the object view in the admin bar
-* The reason is now shown if an object or image could not be imported
-* The "hide address" setting from Propstack is now respected
-* Objects without title are no longer imported by default
-* Improved support for Propstack API v2
-* Imports of large accounts are now more reliable
-* Improved display of object lists and details in many themes
-* Improved security and performance
-* Requires WordPress 6.6 or newer
-* Many bug fixes
+- Added hint for the property groups ("Merkmale") of Propstack, which could be used with Connector for Propstack Pro, in the restrictions of the import of objects and in the description of the plugin
+- Added methods ImmoObjects::get_object_for_import() and Import_Base::get_chunk_lock_option() for other processes which create objects
+- Fixed duplicate objects if two processes (e.g. the import and a webhook, or two imports) handled the same new object at the same time: the Propstack-ID and the language are now saved together with the creation of the post, not after all images have been downloaded
+- Fixed duplicate objects for objects which are not published (e.g. drafts or private objects): the import now finds existing objects in any status (except trash)
+- A scheduled import which could not start because another process held the lock is now retried a minute later instead of being skipped
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)

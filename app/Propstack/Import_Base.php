@@ -964,6 +964,29 @@ class Import_Base {
 	}
 
 	/**
+	 * Return the name of the option which holds the lock for a single chunk of the import.
+	 *
+	 * Other processes which create or change objects (e.g. the webhooks of the Pro-plugin) use the same lock,
+	 * so they never run at the same time as a chunk of the import.
+	 *
+	 * @return string
+	 */
+	public function get_chunk_lock_option(): string {
+		return $this->chunk_lock_option;
+	}
+
+	/**
+	 * Return the time in seconds after which the lock of a single chunk is treated as stale.
+	 *
+	 * @return int
+	 */
+	public function get_chunk_lock_ttl(): int {
+		$ttl = 10 * MINUTE_IN_SECONDS;
+		/** This filter is documented in app/Propstack/Import_Base.php */
+		return max( 1, absint( apply_filters( 'cfprop_import_chunk_lock_ttl', $ttl ) ) );
+	}
+
+	/**
 	 * Release the lock for a single chunk of a paginated import, but only if this instance holds it.
 	 *
 	 * @return void

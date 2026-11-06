@@ -594,7 +594,7 @@ class Objects extends Import_Base {
 						Log::get_instance()->add( sprintf( __( 'Import of object %1$s', 'connector-for-propstack' ), '<em>' . esc_html( $this->get_object_title( $object ) ) . '</em>' ), 'info', 'import' );
 
 						// get the object with the given ID.
-						$propstack_immo_object = ImmoObjects::get_instance()->get_object_by_object_id( $object['id'], $language_code );
+						$propstack_immo_object = ImmoObjects::get_instance()->get_object_for_import( (string) $object['id'], $language_code );
 
 						// if the object does not exist, create it.
 						if ( ! $propstack_immo_object instanceof \ConnectorForPropstack\Propstack\ImmoObject ) {
@@ -620,6 +620,12 @@ class Objects extends Import_Base {
 							 * @param array<string,mixed> $object The object data from API.
 							 */
 							$query = apply_filters( 'cfprop_new_object_query', $query, $object );
+
+							// save the Propstack-ID and the language together with the post, so other processes find it immediately.
+							$query['meta_input'] = array_merge(
+								isset( $query['meta_input'] ) && is_array( $query['meta_input'] ) ? $query['meta_input'] : array(),
+								ImmoObjects::get_instance()->get_identifying_meta( (string) $object['id'], $language_code )
+							);
 
 							// add the object.
 							$post_id = wp_insert_post( $query, true );

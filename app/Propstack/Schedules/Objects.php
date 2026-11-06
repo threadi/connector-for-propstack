@@ -117,7 +117,13 @@ class Objects extends Schedules_Base {
 
 			++$runs;
 
-			// bail if the import is completed or another process is working on it.
+			// try it again later if another process (e.g. a webhook) holds the lock, otherwise this run would be lost.
+			if ( $import_obj->is_locked() ) {
+				$this->schedule_retry( $import_obj );
+				return false;
+			}
+
+			// bail if the import is completed.
 			if ( ! $import_obj->has_load_more() ) {
 				return true;
 			}
@@ -135,6 +141,33 @@ class Objects extends Schedules_Base {
 				return true;
 			}
 		}
+	}
+
+	/**
+	 * Schedule a new attempt after a run could not get the lock, as another process holds it.
+	 *
+	 * A running import is continued via the continuation event. If no import is in progress,
+	 * the event of this schedule runs again a minute later and starts the import.
+	 *
+	 * @param \ConnectorForPropstack\Propstack\Import_Base $import_obj The import object.
+	 *
+	 * @return void
+	 */
+	private function schedule_retry( \ConnectorForPropstack\Propstack\Import_Base $import_obj ): void {
+		// continue a running import.
+		if ( ! empty( get_option( $import_obj->get_work_list_option(), array() ) ) ) {
+			self::schedule_continuation();
+			return;
+		}
+
+		// bail if a retry is already scheduled.
+		$next = wp_next_scheduled( $this->get_name() );
+		if ( false !== $next && $next <= time() + 5 * MINUTE_IN_SECONDS ) {
+			return;
+		}
+
+		// start the import again in a minute.
+		wp_schedule_single_event( time() + MINUTE_IN_SECONDS, $this->get_name() );
 	}
 
 	/**

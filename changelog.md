@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.1.0] - 09.10.2026
+
+### Added
+
+- Added hint for the property groups ("Merkmale") of Propstack, which could be used with Connector for Propstack Pro, in the restrictions of the import of objects and in the description of the plugin
+- Added methods ImmoObjects::get_object_for_import() and Import_Base::get_chunk_lock_option() for other processes which create objects
+- Added Taskfile as third method to compile plugin releases
+
+### Fixed
+
+- Fixed duplicate objects if two processes (e.g. the import and a webhook, or two imports) handled the same new object at the same time: the Propstack-ID and the language are now saved together with the creation of the post, not after all images have been downloaded
+- Fixed duplicate objects for objects which are not published (e.g. drafts or private objects): the import now finds existing objects in any status (except trash)
+- A scheduled import which could not start because another process held the lock is now retried a minute later instead of being skipped
+
 ## [3.0.0] - 26.10.2026
 
 ### Added
