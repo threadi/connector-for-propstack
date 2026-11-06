@@ -939,6 +939,14 @@ class Abilities {
 			}
 		} while ( $import_obj->has_load_more() );
 
+		// try it again in a minute if another process (e.g. a webhook) holds the lock, otherwise this import would be lost.
+		if ( $import_obj->is_locked() ) {
+			if ( false === wp_next_scheduled( 'cfprop_run_import_by_ability' ) ) {
+				wp_schedule_single_event( time() + MINUTE_IN_SECONDS, 'cfprop_run_import_by_ability' );
+			}
+			return;
+		}
+
 		// bail if the import is completed.
 		if ( ! $import_obj->has_load_more() ) {
 			delete_option( 'cfprop_ability_import_events' );

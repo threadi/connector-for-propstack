@@ -263,6 +263,77 @@ class ImmoObjects {
 	}
 
 	/**
+	 * Return the object with the given Propstack-ID for an import, in any post status.
+	 *
+	 * Unlike get_object_by_object_id() this also finds objects which are not published (e.g. drafts,
+	 * private or pending objects), so an import never creates a second post for the same Propstack-ID.
+	 * Only trashed objects and auto-drafts are ignored. If duplicates already exist, the oldest is used,
+	 * so every import updates the same post.
+	 *
+	 * The query is marked with "cfprop_import_lookup", so handlers of "pre_get_posts" can skip it.
+	 *
+	 * @param string $object_id     The Propstack-ID of the object.
+	 * @param string $language_code The language of the object.
+	 *
+	 * @return ImmoObject|false
+	 */
+	public function get_object_for_import( string $object_id, string $language_code ): false|ImmoObject {
+		// create the query.
+		$query = array(
+			'post_status'            => 'any',
+			'posts_per_page'         => 1,
+			'orderby'                => 'ID',
+			'order'                  => 'ASC',
+			'no_found_rows'          => false,
+			'update_post_term_cache' => false,
+			'suppress_filters'       => true,
+			// marker for "pre_get_posts" handlers, which must not restrict this lookup (e.g. to the objects of a broker).
+			'cfprop_import_lookup'   => true,
+			'meta_query'             => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary meta lookup; sync context.
+				'relation' => 'AND',
+				array(
+					'key'     => 'object_id',
+					'value'   => $object_id,
+					'compare' => '=',
+				),
+				array(
+					'key'     => 'language_code',
+					'value'   => $language_code,
+					'compare' => '=',
+				),
+			),
+		);
+
+		// get the objects.
+		$objects = $this->get_objects( $query );
+		if ( ! empty( $objects ) ) {
+			return $objects[0];
+		}
+		return false;
+	}
+
+	/**
+	 * Return the meta data which identify a new object, to save it together with the creation of its post.
+	 *
+	 * Hint:
+	 * These meta data are set in the same call as the post is created (via "meta_input"), so another
+	 * process (e.g. a webhook or a second import) finds the object immediately. Without this, the object
+	 * could not be found until all hooks of "cfprop_import_object" (including the download of images)
+	 * have been run, and another process would create a duplicate in this time.
+	 *
+	 * @param string $object_id     The Propstack-ID of the object.
+	 * @param string $language_code The language of the object.
+	 *
+	 * @return array<string,string>
+	 */
+	public function get_identifying_meta( string $object_id, string $language_code ): array {
+		return array(
+			'object_id'     => $object_id,
+			'language_code' => $language_code,
+		);
+	}
+
+	/**
 	 * Delete all objects.
 	 *
 	 * @param string $process_id The process ID.
