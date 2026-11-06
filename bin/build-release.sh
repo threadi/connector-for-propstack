@@ -2,8 +2,8 @@
 #
 # Builds the release of "Connector for Propstack".
 #
-# Used by the GitHub workflow .github/workflows/build-zip.yml AND by the ant build in build/build.xml,
-# so both create identical release zips. Change the steps or the list of files only here.
+# Used by the GitHub workflow .github/workflows/build-zip.yml, by the ant build in build/build.xml AND by
+# the Taskfile.yml, so all of them create identical release zips. Change the steps or the list of files only here.
 #
 # Usage (always from the root of the repository):
 #   bash bin/build-release.sh install                 install the PHP and npm packages and build the blocks
@@ -11,7 +11,7 @@
 #   bash bin/build-release.sh collect <version>       copy the files of the release to dist/connector-for-propstack
 #   bash bin/build-release.sh zip <path-to-zip>       zip dist/connector-for-propstack
 #
-# Optional environment variables (used by ant):
+# Optional environment variables (used by ant and Taskfile):
 #   CFPROP_COMPOSER  path to composer (default: composer)
 #   CFPROP_NPM       path to npm (default: npm)
 

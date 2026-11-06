@@ -1,0 +1,153 @@
+# Taskfile for "Connector for Propstack" - see https://taskfile.dev
+#
+# All steps of the release zip are in bin/build-release.sh, which is also used by the ant build
+# (build/build.xml) and the GitHub workflow (.github/workflows/build-zip.yml). So all three create identical zips.
+#
+# Usage (in the root of the repository):
+#   task prepare                  install everything for development (like "ant init")
+#   task release -- 3.1.0         run all checks and create releases/connector-for-propstack_3.1.0.zip (like "ant build")
+#   task release-zip -- 3.1.0     create the zip only, without any checks (like "ant release-zip")
+#   task --list                   show all tasks
+#
+# Settings are read in this order: environment variable, build/build.properties (the file of the ant build), default.
+#   version          task release -- 3.1.0, VERSION=3.1.0 or plugin.version
+#   composer         CFPROP_COMPOSER or composer.path (default: composer)
+#   npm              CFPROP_NPM or npm.path (default: npm)
+
+version: '3'
+
+vars:
+  RELEASE_SLUG: connector-for-propstack
+  RELEASE_DIR: releases
+  PROPERTIES: build/build.properties
+
+  # read a value from build/build.properties, if this file exists.
+  PROPERTY: sed -n "s/^${KEY}=//p" {{.PROPERTIES}} 2>/dev/null | tail -n 1 | tr -d '\r'
+
+  COMPOSER:
+    sh: KEY=composer.path; v="${CFPROP_COMPOSER:-$({{.PROPERTY}})}"; echo "${v:-composer}"
+  NPM:
+    sh: KEY=npm.path; v="${CFPROP_NPM:-$({{.PROPERTY}})}"; echo "${v:-npm}"
+  PROPERTY_VERSION:
+    sh: KEY=plugin.version; {{.PROPERTY}}
+
+# hand the paths of the tools over to bin/build-release.sh.
+env:
+  CFPROP_COMPOSER: '{{.COMPOSER}}'
+  CFPROP_NPM: '{{.NPM}}'
+
+tasks:
+  default:
+    desc: Show all tasks
+    silent: true
+    cmds:
+      - task --list
+
+  not-root:
+    internal: true
+    run: once
+    preconditions:
+      - sh: '[ "$(id -u)" != "0" ] || [ -n "${CFPROP_ALLOW_ROOT:-}" ]'
+        msg: Do not run as root! (set CFPROP_ALLOW_ROOT=1 to do it anyway, e.g. in a container)
+
+  check-version:
+    internal: true
+    vars:
+      # the version number: "task release -- 3.1.0", then VERSION=3.1.0, then plugin.version in build/build.properties.
+      RELEASE_VERSION: '{{.CLI_ARGS | default .VERSION | default .PROPERTY_VERSION}}'
+    preconditions:
+      - sh: echo "{{.RELEASE_VERSION}}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'
+        msg: '"{{.RELEASE_VERSION}}" is not a version number like 3.1.0 or 3.2.0-beta.1. Usage: task release -- 3.1.0'
+
+  composer-install:
+    desc: Install the PHP packages (with the dev packages)
+    run: once
+    deps: [not-root]
+    cmds:
+      - '"{{.COMPOSER}}" install'
+
+  autoloader-dev:
+    desc: Generate the autoloader for development
+    deps: [not-root]
+    cmds:
+      - '"{{.COMPOSER}}" dump-autoload -oa'
+
+  build-js:
+    desc: Install the PHP and npm packages and build the blocks
+    deps: [not-root]
+    cmds:
+      - bash bin/build-release.sh install
+
+  prepare:
+    desc: Prepare the project for development (like "ant init")
+    aliases: [init]
+    cmds:
+      - task: build-js
+      - task: autoloader-dev
+
+  docs:
+    desc: Generate the documentation of the hooks in doc/hooks.md
+    deps: [composer-install]
+    cmds:
+      - cmd: vendor/bin/wp-documentor parse app --format=markdown --output=doc/hooks.md --prefix=cfprop_ --exclude=Support.php --exclude=Transients.php
+        ignore_error: true
+
+  phpstan:
+    desc: Check the code with PHPStan
+    deps: [composer-install]
+    cmds:
+      - vendor/bin/phpstan analyse
+
+  phpcs:
+    desc: Check the code against the WordPress Coding Standards
+    deps: [composer-install]
+    cmds:
+      - vendor/bin/phpcs .
+
+  phpcbf:
+    desc: Fix issues with the WordPress Coding Standards automatically (not part of the release)
+    aliases: [fix-wcs]
+    deps: [composer-install]
+    cmds:
+      - cmd: vendor/bin/phpcbf .
+        ignore_error: true
+
+  test:
+    desc: Run the PHP unit tests (needs a MySQL database, see composer.json)
+    deps: [composer-install]
+    cmds:
+      - '"{{.COMPOSER}}" test-install-during-build'
+      - '"{{.COMPOSER}}" test'
+
+  restore-dev:
+    internal: true
+    cmds:
+      - '"{{.COMPOSER}}" install --no-interaction --no-progress'
+
+  release-zip:
+    desc: 'Create the release zip without any checks (like "ant release-zip"), e.g.: task release-zip -- 3.1.0'
+    deps: [not-root]
+    vars:
+      # the version number: "task release -- 3.1.0", then VERSION=3.1.0, then plugin.version in build/build.properties.
+      RELEASE_VERSION: '{{.CLI_ARGS | default .VERSION | default .PROPERTY_VERSION}}'
+    cmds:
+      - task: check-version
+      # restore the dev packages for further development - also if one of the following steps fails.
+      - defer: { task: restore-dev }
+      - bash bin/build-release.sh nodev
+      - bash bin/build-release.sh collect "{{.RELEASE_VERSION}}"
+      - bash bin/build-release.sh zip "{{.RELEASE_DIR}}/{{.RELEASE_SLUG}}_{{.RELEASE_VERSION}}.zip"
+      - 'echo "Created {{.RELEASE_DIR}}/{{.RELEASE_SLUG}}_{{.RELEASE_VERSION}}.zip"'
+
+  release:
+    desc: 'Run all checks and create the release zip (like "ant build"), e.g.: task release -- 3.1.0'
+    aliases: [build]
+    cmds:
+      # check the version number first, not after all checks have run.
+      - task: check-version
+      - task: build-js
+      - task: docs
+      - task: test
+      - task: phpstan
+      - task: phpcs
+      - task: release-zip

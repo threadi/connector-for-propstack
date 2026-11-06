@@ -1,11 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.0] - 09.10.2026
 
 ### Added
 
 - Added hint for the property groups ("Merkmale") of Propstack, which could be used with Connector for Propstack Pro, in the restrictions of the import of objects and in the description of the plugin
 - Added methods ImmoObjects::get_object_for_import() and Import_Base::get_chunk_lock_option() for other processes which create objects
+- Added Taskfile as third method to compile plugin releases
 
 ### Fixed
 

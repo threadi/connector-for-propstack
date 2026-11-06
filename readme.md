@@ -41,8 +41,12 @@ After checkout go through the following steps:
 
 ### Using Taskfile
 
-1. Run this command: `task prepare`
+You need [Task](https://taskfile.dev/installation/) in addition.
+
+1. Run this command in the main directory: `task prepare`
 2. after that, the plugin can be activated in WordPress.
+
+`task --list` shows all available tasks.
 
 ## Release
 
@@ -61,7 +65,7 @@ After checkout go through the following steps:
 11. `bash bin/build-release.sh zip releases/connector-for-propstack_1.2.3.zip`
 12. `composer install` to get the dev packages back.
 
-All steps of the release zip are in _bin/build-release.sh_. The ant build and the GitHub workflow use the same script, so they create identical zips.
+All steps of the release zip are in _bin/build-release.sh_. The ant build, the Taskfile and the GitHub workflow use the same script, so they create identical zips.
 
 ### From a local environment with ant
 
@@ -70,6 +74,15 @@ All steps of the release zip are in _bin/build-release.sh_. The ant build and th
 3. after that you will have a zip file in the release directory which could be used in WordPress to install it.
 
 `ant release-zip` creates the zip without the checks (e.g. to compare it with the zip from GitHub).
+
+### From a local environment with Taskfile
+
+1. execute the following command in the main directory: `task release -- 1.2.3` - adjust the version number.
+2. after that you will find the zip file _releases/connector-for-propstack_1.2.3.zip_, which could be used in WordPress to install it.
+
+`task release-zip -- 1.2.3` creates the zip without the checks (e.g. to compare it with the zip from GitHub).
+
+The Taskfile uses the same settings as ant: if _build/build.properties_ exists, the paths of the tools are taken from it. Environment variables (e.g. `CFPROP_COMPOSER`) take precedence. Without them the defaults are used. Like ant, the Taskfile does not run as root; set `CFPROP_ALLOW_ROOT=1` to do it anyway (e.g. in a container).
 
 ### On GitHub
 

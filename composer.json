@@ -1,6 +1,6 @@
 {
     "name": "threadi/connector-for-propstack",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "description": "This plugin supports the embedding of Propstack objects in WordPress.",
     "authors": [
         {
@@ -59,7 +59,7 @@
     },
     "require": {
         "php": "^8.2",
-        "threadi/easy-settings-for-wordpress": "^3.8.4",
+        "threadi/easy-settings-for-wordpress": "^3.9.1",
         "threadi/easy-setup-for-wordpress": "^1.5.0",
         "threadi/easy-transients-for-wordpress": "^1.4.9",
         "threadi/crypt-for-wordpress": "^4.0.0",
