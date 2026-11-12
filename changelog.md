@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed potential error if hook "template_include" loads with null value coming from third party plugins
+
 ## [3.1.0] - 09.10.2026
 
 ### Added
