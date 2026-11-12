@@ -11,6 +11,7 @@ namespace ConnectorForPropstack\Propstack;
 defined( 'ABSPATH' ) || exit;
 
 use easySettingsForWordPress\Fields\PermalinkSlug;
+use easySettingsForWordPress\Fields\TextInfo;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Settings;
 use stdClass;
@@ -326,6 +327,18 @@ class Propstack {
 		$field->set_options( $options );
 		$field->set_list_title( __( 'Available tags:', 'connector-for-propstack' ) );
 		$setting->set_field( $field );
+
+		// add a hint for the pages of projects, which are supported by the Pro plugin.
+		if ( Helper::show_pro_hints() ) {
+			$setting = $settings_obj->add_setting( 'cfprop_project_slugs_pro_hint' );
+			$setting->set_section( $permalink_section );
+			$setting->prevent_export( true );
+			$field = new TextInfo( $settings_obj );
+			$field->set_title( __( 'URL-slugs for projects', 'connector-for-propstack' ) );
+			/* translators: %1$s: Connector for Propstack Pro URL */
+			$field->set_description( '<span class="cfprop-pro-hint">' . sprintf( __( 'Show your projects from Propstack with their units on own pages with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
+			$setting->set_field( $field );
+		}
 	}
 
 	/**
