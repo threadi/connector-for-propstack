@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added hints about projects of Propstack, which are supported by Connector for Propstack Pro
+
 ### Fixed
 
 - Fixed potential error if hook "template_include" loads with null value coming from third party plugins
