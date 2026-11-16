@@ -5,6 +5,7 @@
 ### Added
 
 - Added hints about projects of Propstack, which are supported by Connector for Propstack Pro
+- Added search in settings
 
 ### Fixed
 
