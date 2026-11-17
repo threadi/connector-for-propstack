@@ -59,10 +59,10 @@
     },
     "require": {
         "php": "^8.2",
-        "threadi/easy-settings-for-wordpress": "^3.9.1",
-        "threadi/easy-setup-for-wordpress": "^1.5.0",
+        "threadi/easy-settings-for-wordpress": "^3.10.0",
+        "threadi/easy-setup-for-wordpress": "^1.6.1",
         "threadi/easy-transients-for-wordpress": "^1.4.9",
-        "threadi/crypt-for-wordpress": "^4.0.0",
+        "threadi/crypt-for-wordpress": "^4.1.2",
         "ext-simplexml": "*",
         "ext-libxml": "*",
         "ext-intl": "*"

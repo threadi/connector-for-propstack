@@ -651,6 +651,18 @@ class ImmoObjects {
 			$setting->set_field( $field );
 		}
 
+		// add a hint for the projects, which are supported by the Pro plugin.
+		if ( Helper::show_pro_hints() ) {
+			$setting = $settings_obj->add_setting( 'propstack_connector_import_projects_pro_hint' );
+			$setting->set_section( $import_restrictions_section );
+			$setting->prevent_export( true );
+			$field = new TextInfo( $settings_obj );
+			$field->set_title( __( 'Projects', 'connector-for-propstack' ) );
+			/* translators: %1$s: Connector for Propstack Pro URL */
+			$field->set_description( '<span class="cfprop-pro-hint">' . sprintf( __( 'Import your projects from Propstack and show them with their units, images and documents on own pages with <a href="%1$s" target="_blank">Connector for Propstack Pro</a>.', 'connector-for-propstack' ), Helper::get_pro_url() ) . '</span>' );
+			$setting->set_field( $field );
+		}
+
 		// get the available brokers.
 		$broker = Cache::get( Taxonomies\Broker::get_instance()->get_name() . '_non_empty_terms_for_settings' );
 		if ( empty( $broker ) ) {
