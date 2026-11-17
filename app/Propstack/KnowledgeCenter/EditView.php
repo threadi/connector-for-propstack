@@ -89,7 +89,7 @@ class EditView extends KnowledgeCenter_Base {
 						/* translators: %1$s will be replaced by a link to the settings. */
 						sprintf( __( 'Choose which fields are shown for each object type under %1$s.', 'connector-for-propstack' ), $this->get_settings_link( __( 'Settings > Fields', 'connector-for-propstack' ), 'propstack_connector_fields' ) ),
 						/* translators: %1$s will be replaced by a link to the settings. */
-						sprintf( __( 'Choose the filters above the list of objects under %1$s.', 'connector-for-propstack' ), $this->get_settings_link( __( 'Settings > Filters', 'connector-for-propstack' ), 'propstack_connector_filters' ) ),
+						sprintf( __( 'Choose the filters above the list of objects under %1$s.', 'connector-for-propstack' ), $this->get_settings_link( __( 'Settings > Objects > Filters', 'connector-for-propstack' ), 'propstack_connector_objects', 'propstack_connector_filters' ) ),
 						/* translators: %1$s and %2$s will be replaced by folder names. */
 						sprintf( __( 'Developers can copy the templates from the folder %1$s of this plugin to the folder %2$s in the child theme and change them there.', 'connector-for-propstack' ), '<code>templates</code>', '<code>connector-for-propstack</code>' ),
 					)

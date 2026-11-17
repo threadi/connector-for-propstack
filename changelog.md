@@ -7,6 +7,10 @@
 - Added hints about projects of Propstack, which are supported by Connector for Propstack Pro
 - Added search in settings
 
+### Changed
+
+- Moved the settings for filters and sortings to Settings > Objects
+
 ### Fixed
 
 - Fixed potential error if hook "template_include" loads with null value coming from third party plugins
