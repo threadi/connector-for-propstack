@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+	Tests against the live Propstack API, run them with "composer test-live".
+	Configure them via tests/live-config.php (see tests/live-config.example.php) or environment variables.
+	They are not part of "composer test", which never sends a request to Propstack.
+	See doc/live-tests.md.
+-->
+<phpunit
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertWarningsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertDeprecationsToExceptions="true"
+	>
+	<testsuites>
+		<testsuite name="live">
+			<directory suffix=".php">./tests/Live/</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
