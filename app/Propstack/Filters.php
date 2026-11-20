@@ -15,6 +15,7 @@ use easySettingsForWordPress\Fields\FieldTable;
 use easySettingsForWordPress\Fields\Select;
 use easySettingsForWordPress\Fields\Value;
 use easySettingsForWordPress\Page;
+use easySettingsForWordPress\Tab;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Settings;
 
@@ -61,7 +62,7 @@ class Filters {
 	public function init(): void {
 		// use hooks.
 		add_action( 'init', array( $this, 'init_filter' ) );
-		add_action( 'init', array( $this, 'add_settings' ) );
+		add_action( 'init', array( $this, 'add_settings' ), 21 ); // after the tab for objects has been added.
 		add_action( 'pre_get_posts', array( $this, 'filter_main_query' ) );
 		add_action( 'pre_get_posts', array( $this, 'set_archive_posts_per_page' ) );
 		add_filter( 'query_loop_block_query_vars', array( $this, 'filter_query_loop_block' ) );
@@ -100,8 +101,16 @@ class Filters {
 			return;
 		}
 
-		// add a tab on this page.
-		$filter_tab = $settings_page->add_tab( 'propstack_connector_filters', 40 );
+		// get the tab for objects, as the filters are a sub-tab of it.
+		$objects_tab = $settings_page->get_tab( 'propstack_connector_objects' );
+
+		// bail if the tab could not be found.
+		if ( ! $objects_tab instanceof Tab ) {
+			return;
+		}
+
+		// add a sub-tab for the filters.
+		$filter_tab = $objects_tab->add_tab( 'propstack_connector_filters', 40 );
 		$filter_tab->set_title( __( 'Filters', 'connector-for-propstack' ) );
 
 		// add the section in this tab.
@@ -550,16 +559,17 @@ class Filters {
 			return false;
 		}
 
-		// get the tab from the request.
-		$tab = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		// get the tab and the sub-tab from the request.
+		$tab    = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$subtab = filter_input( INPUT_GET, 'subtab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		// hide it if the tab is not called.
 		if ( is_null( $tab ) ) {
 			return true;
 		}
 
-		// hide it if the tab is not the filter tab.
-		if ( 'propstack_connector_filters' !== $tab ) {
+		// hide it if the sub-tab for filters below the objects is not called.
+		if ( 'propstack_connector_objects' !== $tab || 'propstack_connector_filters' !== $subtab ) {
 			return true;
 		}
 

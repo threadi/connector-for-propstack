@@ -65,7 +65,7 @@ class Sorting extends KnowledgeCenter_Base {
 		$text .= $this->get_list(
 			array(
 				/* translators: %1$s will be replaced by a link to the settings. */
-				sprintf( __( '<strong>Settings:</strong> enable or disable the sorting and hide sortings under %1$s. The default sorting could be chosen there with Connector for Propstack Pro.', 'connector-for-propstack' ), $this->get_settings_link( __( 'Settings > Sorting', 'connector-for-propstack' ), 'propstack_connector_sortings' ) ),
+				sprintf( __( '<strong>Settings:</strong> enable or disable the sorting and hide sortings under %1$s. The default sorting could be chosen there with Connector for Propstack Pro.', 'connector-for-propstack' ), $this->get_settings_link( __( 'Settings > Objects > Sorting', 'connector-for-propstack' ), 'propstack_connector_objects', 'propstack_connector_sortings' ) ),
 				__( '<strong>Only useful sortings:</strong> a sorting is offered only if at least half of the objects in the actual list have a value for it. Purchase prices and rents are not comparable: if the list contains objects to buy and to rent, sorting by price shows the objects to buy first (by purchase price), then the objects to rent (by rent).', 'connector-for-propstack' ),
 				__( '<strong>Objects without value</strong> are always shown at the end of the list.', 'connector-for-propstack' ),
 				__( '<strong>Single lists without sorting:</strong> add the attribute <code>show_sorting="0"</code> to the shortcode <code>[cfprop_widget_archive]</code> to hide the sorting for this list.', 'connector-for-propstack' ),

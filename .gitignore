@@ -16,3 +16,4 @@ languages/*.json
 /js/generated/*
 !/js/generated/.gitkeep
 /tmp/
+/tests/live-config.php

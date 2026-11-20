@@ -8,6 +8,22 @@ This repository provides the features for the free version of the WordPress plug
 
 We take security seriously. If you notice anything that could affect security, please send us a confidential message at [security@laolaweb.com](mailto:security@laolaweb.com).
 
+## AI / Agent Skills
+
+This repository ships an [Agent Skill](https://agentskills.io) for AI assistants of site operators and an `AGENTS.md` for coding agents.
+
+| File | Audience |
+|---|---|
+| `skills/connector-for-propstack/SKILL.md` | Assistants helping someone who runs WordPress with this plugin (setup, import, troubleshooting) |
+| `AGENTS.md` | Coding agents developing this plugin - and Connector for Propstack Pro, which builds on it |
+
+Install the skill into an agent project:
+
+```bash
+mkdir -p .agents/skills
+cp -r skills/connector-for-propstack .agents/skills/
+```
+
 ## Preparations
 
 Add this in your _wp-config.php_ for development:
@@ -183,6 +199,10 @@ Then: `composer test-install`
 ### Run
 
 `composer test`
+
+## Tests with live data
+
+`composer test` never sends a request to Propstack. `composer test-live` checks the import with the real Propstack API of an account: copy _tests/live-config.example.php_ to _tests/live-config.php_, enter the API key and run it. Read [doc/live-tests.md](doc/live-tests.md) (German: [doc/live-tests_de.md](doc/live-tests_de.md)) before the first run, especially the notes on the configuration.
 
 ## E2E tests
 

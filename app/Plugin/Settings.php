@@ -86,6 +86,53 @@ class Settings {
 		add_filter( 'admin_footer_text', array( $this, 'show_plugin_hint_in_footer' ), 0 );
 		add_filter( 'connector_for_propstack_enqueue_styles_and_scripts', array( $this, 'enqueue_styles_and_scripts' ), 10, 2 );
 		add_action( 'admin_action_propstack_connector_use_classic_view', array( $this, 'use_classic_view' ) );
+		add_action( 'admin_init', array( $this, 'redirect_moved_tabs' ) );
+	}
+
+	/**
+	 * Forward requests of tabs, which have been moved to another place in the settings, to their new place.
+	 *
+	 * E.g. the filters and the sortings are sub-tabs of the objects since 3.2.0, older links still work.
+	 *
+	 * @return void
+	 */
+	public function redirect_moved_tabs(): void {
+		// bail if this is not our settings page.
+		if ( $this->get_settings_obj()->get_menu_slug() !== filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ) {
+			return;
+		}
+
+		// bail if a sub-tab is requested.
+		if ( ! is_null( filter_input( INPUT_GET, 'subtab', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ) ) {
+			return;
+		}
+
+		// the moved tabs (old name => array with new tab and sub-tab).
+		$moved_tabs = array(
+			'propstack_connector_filters'  => array( 'propstack_connector_objects', 'propstack_connector_filters' ),
+			'propstack_connector_sortings' => array( 'propstack_connector_objects', 'propstack_connector_sortings' ),
+		);
+
+		/**
+		 * Filter the list of tabs in the settings, which have been moved to another place.
+		 *
+		 * @since 3.2.0 Available since 3.2.0.
+		 *
+		 * @param array<string,array<int,string>> $moved_tabs The moved tabs (old name => array with new tab and sub-tab).
+		 */
+		$moved_tabs = apply_filters( 'cfprop_settings_moved_tabs', $moved_tabs );
+
+		// get the requested tab.
+		$tab = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		// bail if the tab has not been moved.
+		if ( ! is_string( $tab ) || ! isset( $moved_tabs[ $tab ] ) ) {
+			return;
+		}
+
+		// forward the user to the new place.
+		wp_safe_redirect( $this->get_url( $moved_tabs[ $tab ][0], $moved_tabs[ $tab ][1] ?? '' ) );
+		exit;
 	}
 
 	/**

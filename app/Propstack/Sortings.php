@@ -15,6 +15,7 @@ use easySettingsForWordPress\Fields\FieldTable;
 use easySettingsForWordPress\Fields\Select;
 use easySettingsForWordPress\Fields\Value;
 use easySettingsForWordPress\Page;
+use easySettingsForWordPress\Tab;
 use ConnectorForPropstack\Plugin\Helper;
 use ConnectorForPropstack\Plugin\Settings;
 use ConnectorForPropstack\Plugin\Templates;
@@ -83,7 +84,7 @@ class Sortings {
 	public function init(): void {
 		// use hooks.
 		add_action( 'init', array( $this, 'init_sortings' ) );
-		add_action( 'init', array( $this, 'add_settings' ), 15 );
+		add_action( 'init', array( $this, 'add_settings' ), 22 ); // after the tab for objects has been added.
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'enqueue_block_assets', array( $this, 'register_assets' ) );
 		add_action( 'pre_get_posts', array( $this, 'sort_main_query' ), 20 );
@@ -160,8 +161,16 @@ class Sortings {
 			return;
 		}
 
-		// add a tab on this page.
-		$tab = $settings_page->add_tab( 'propstack_connector_sortings', 42 );
+		// get the tab for objects, as the sortings are a sub-tab of it.
+		$objects_tab = $settings_page->get_tab( 'propstack_connector_objects' );
+
+		// bail if the tab could not be found.
+		if ( ! $objects_tab instanceof Tab ) {
+			return;
+		}
+
+		// add a sub-tab for the sortings.
+		$tab = $objects_tab->add_tab( 'propstack_connector_sortings', 42 );
 		$tab->set_title( __( 'Sorting', 'connector-for-propstack' ) );
 
 		// add the section for the general settings.

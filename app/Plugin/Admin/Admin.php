@@ -76,7 +76,7 @@ class Admin {
 		add_action( 'admin_action_cfprop_log_reset_marker', array( $this, 'reset_error_marker_by_request' ) );
 
 		// use our own hooks.
-		add_action( 'connector-for-propstack_error', array( $this, 'save_crypt_error' ), 10, 3 );
+		add_action( Crypt::get_instance()->get_crypt_obj()->get_slug() . '_crypt_error', array( $this, 'save_crypt_error' ), 10, 3 );
 	}
 
 	/**

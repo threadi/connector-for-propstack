@@ -1,6 +1,6 @@
 {
     "name": "threadi/connector-for-propstack",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "description": "This plugin supports the embedding of Propstack objects in WordPress.",
     "authors": [
         {
@@ -22,6 +22,10 @@
             "composer dump-autoload"
         ],
         "test": "phpunit",
+        "test-live": [
+            "Composer\\Config::disableProcessTimeout",
+            "phpunit -c phpunit-live.xml.dist"
+        ],
         "test-install": "bash bin/install-wp-tests.sh wordpress_test root 'debian' 127.0.0.1 latest",
         "test-install-during-build": "bash bin/install-wp-tests.sh wordpress_test root 'debian' 127.0.0.1 latest false true"
     },
@@ -40,6 +44,9 @@
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true
+        },
+        "platform": {
+            "php": "8.2.0"
         },
         "optimize-autoloader": true,
         "classmap-authoritative": true,

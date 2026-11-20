@@ -119,6 +119,12 @@ tasks:
       - '"{{.COMPOSER}}" test-install-during-build'
       - '"{{.COMPOSER}}" test'
 
+  test-live:
+    desc: Run the tests against the live Propstack API (needs tests/live-config.php or CFPROP_LIVE_API_KEY, see tests/live-config.example.php)
+    deps: [composer-install]
+    cmds:
+      - '"{{.COMPOSER}}" test-live'
+
   restore-dev:
     internal: true
     cmds:

@@ -2,7 +2,7 @@
 Contributors: laolaweb, threadi
 Tags: propstack, real estate, immobilien, rental, property
 Requires at least: 6.6
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 8.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -52,12 +52,14 @@ This plugin uses the Propstack API instead. A read-only API key is all you need:
 The Pro version removes the limits of the free version and adds everything you need to build a complete real estate website:
 
 ➕ Import and display of all object types Propstack offers, such as "Plot", "Office" or "Store"
+➕ Import and display of Propstack projects, e.g. new residential buildings whose units are sold or rented individually: archive, detail page and a list of all units of each project
+➕ Inquiries about a project or a single unit go straight to the responsible broker
 ➕ Considerably more data fields for your Propstack objects
-➕ Seventeen widgets and ready-made templates for page builders such as Avada, Avia (Enfold), Beaver Builder, Bold Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Elementor, Fusion Builder, GeneratePress Elements, Live Composer, Oxygen, Salient, SiteOrigin, Themify, WPBakery and Zion Builder
-➕ Update objects immediately via webhooks from Propstack
+➕ Widgets and ready-made templates for objects and projects in 19 page builders such as Avada, Avia (Enfold), Beaver Builder, Bold Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Elementor, Fusion Builder, GeneratePress Elements, Live Composer, Oxygen, Salient, SiteOrigin, Themify, WPBakery and Zion Builder
+➕ Update objects and projects immediately via webhooks from Propstack
 ➕ More sortings like newest objects, living space, rooms or plot area
 ➕ Map with all objects of the list
-➕ Send contact enquiries straight into Propstack using Avada Forms, BitForm, Contact Form 7, Elementor Forms, EverestForms, FluentForms, Formidable, GravityForms, NinjaForms, SureForms or WPForms
+➕ Send contact inquiries straight into Propstack using Avada Forms, BitForm, Contact Form 7, Elementor Forms, EverestForms, FluentForms, Formidable, GravityForms, NinjaForms, SureForms or WPForms
 ➕ Six additional blocks for the block editor, for example object status
 ➕ More filters like living space, rooms or ZIP code, with live results without reloading the page and the number of hits on the button
 ➕ Exposé download with optional lead capture: visitors enter their contact details, the broker receives the inquiry
@@ -115,9 +117,9 @@ Every new release of this plugin is only published if it meets the following con
 
 = What is the difference between the free and the Pro version? =
 
-The free version imports your objects of the types "Apartment", "House" and "Garage" and displays them on your website with filter, list view and detail view. The list view shows up to 10 properties. It is free to use, permanently.
+The free version imports your objects of the types "Apartment", "House" and "Garage" and displays them on your website with filter, list view and detail view. The list view shows up to 10 objects. It is free to use, permanently.
 
-The Pro version displays your objects without any limit and adds all remaining object types such as "Plot", "Office" and "Store", considerably more data fields, eight widgets with ready-made templates for page builders, additional blocks, contact forms that submit enquiries directly into Propstack, and personal support. The annual licence also includes up to 3 hours of setup service. You can find the current pricing on [our website](https://laolaweb.com/en/plugins/propstack-wordpress-plugin/).
+The Pro version displays your objects without any limit and adds all remaining object types such as "Plot", "Office" and "Store", projects with their units, considerably more data fields, 19 widgets with ready-made templates for page builders, additional blocks, contact forms that submit inquiries directly into Propstack, and personal support. The annual licence also includes up to 3 hours of setup service. You can find the current pricing on [our website](https://laolaweb.com/en/plugins/propstack-wordpress-plugin/).
 
 = How do I create an API key in Propstack? =
 
@@ -137,21 +139,27 @@ No. No iFrame is used to embed any data. Your objects are stored in your own Wor
 
 = Can I use the plugin with Elementor, Bricks or Avada? =
 
-The import works regardless of which page builder you use. Creating and editing object templates inside a page builder requires the Pro version, which ships widgets and prepared templates for Avada, Bricks, Brizy, Elementor, Salient and WPBakery.
+The import works regardless of which page builder you use. Creating and editing object templates inside a page builder requires the Pro version, which ships widgets and prepared templates for Avada, Avia (Enfold), Beaver Builder, Bold Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Elementor, Fusion Builder, GeneratePress Elements, Live Composer, Oxygen, Salient, SiteOrigin, Themify, WPBakery and Zion Builder.
 
-In the free version you design your object views with the seven blocks of the block editor, with shortcodes and with CSS.
+In the free version you design your object views with the 10 blocks of the block editor, with shortcodes and with CSS.
 
-= How do I send contact enquiries from my website to Propstack? =
+= Can I show projects from Propstack, e.g. new buildings with several units? =
+
+Yes, with Connector for Propstack Pro. Projects are imported together with their images, documents and links. Each project gets its own page with a list of its units, and each unit links back to its project. Units without own images show the images of their project. Visitors can send an inquiry about the whole project or about a single unit, and it goes to the responsible broker.
+
+The free version imports the units as regular objects, but without the project they belong to.
+
+= How do I send contact inquiries from my website to Propstack? =
 
 In the free version, build a form with the form plugin of your choice, receive the submissions by email and enter them into Propstack manually.
 
-With Connector for Propstack Pro this transfer happens automatically: enquiries from Avada Forms, Elementor Forms, Contact Form 7 or WPForms are submitted directly into your Propstack account, with no manual step in between.
+With Connector for Propstack Pro this transfer happens automatically: inquiries from Avada Forms, BitForm, Contact Form 7, Elementor Forms, EverestForms, FluentForms, Formidable, GravityForms, NinjaForms, SureForms or WPForms are submitted directly into your Propstack account, with no manual step in between.
 
 = Does Propstack receive data about my website visitors? =
 
 No. The plugin communicates with the Propstack API only from your server, in order to import your own object data. Your visitors never connect to Propstack, so no visitor IP addresses or browser data are transferred. This is one of the practical differences to an embedded iFrame, which usually requires consent in your cookie banner.
 
-= What happens to object that are sold or archived? =
+= What happens to objects that are sold or archived? =
 
 Objects that are no longer marketed in Propstack are removed from the import. Consider setting up redirects for their URLs so that existing links and search engine results do not end in a 404 error.
 
@@ -174,10 +182,10 @@ For the free version, please use the [support forum](https://wordpress.org/suppo
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added hint for the property groups ("Merkmale") of Propstack, which could be used with Connector for Propstack Pro, in the restrictions of the import of objects and in the description of the plugin
-- Added methods ImmoObjects::get_object_for_import() and Import_Base::get_chunk_lock_option() for other processes which create objects
-- Fixed duplicate objects if two processes (e.g. the import and a webhook, or two imports) handled the same new object at the same time: the Propstack-ID and the language are now saved together with the creation of the post, not after all images have been downloaded
-- Fixed duplicate objects for objects which are not published (e.g. drafts or private objects): the import now finds existing objects in any status (except trash)
-- A scheduled import which could not start because another process held the lock is now retried a minute later instead of being skipped
+- Added hints about projects of Propstack, which are supported by Connector for Propstack Pro
+- Added search in settings
+- Moved the settings for filters and sortings to Settings > Objects
+- Fixed potential error if hook "template_include" loads with null value coming from third party plugins
+- Fixed missing crypt error handling
 
 [older changes](https://github.com/threadi/connector-for-propstack/blob/master/changelog.md)
